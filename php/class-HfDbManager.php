@@ -2,7 +2,7 @@
 
 if (!class_exists("HfDbManager")) {
 	class HfDbManager {
-		private $dbVersion = "2.4";
+		private $dbVersion = "2.5";
 		
 		function HfDbManager() { //constructor
 		}
@@ -76,7 +76,7 @@ if (!class_exists("HfDbManager")) {
 				dbDelta( $sql );
 				
 				$defaultGoal = array( 'goalID' => 1,
-					'title' => 'I only viewed sexually pure material on the Internet',
+					'title' => 'I have not viewed sexually explicit material on the Internet',
 					'isPositive' => 1,
 					'isPrivate' => 0 );
 				
@@ -163,6 +163,7 @@ if (!class_exists("HfDbManager")) {
 			global $wpdb;
 			$prefix = $wpdb->prefix;
 			$data = $this->removeNullValuePairs($data);
+			$data = $this->escapeData($data);
 			$cols = '';
 			$vals = '';
 			$pairs = '';
@@ -205,11 +206,19 @@ if (!class_exists("HfDbManager")) {
 			return $array;
 		}
 		
+		function escapeData($data) {
+			foreach ($data as $col=>$value) {
+				$col = esc_sql( $col );
+				$val = esc_sql( $val );
+			}
+			return $data;
+		}
+		
 		function insertIgnoreIntoDb($table, $data) {
 			global $wpdb;
 			$prefix = $wpdb->prefix;
 			$tableName = $prefix . $table;
-			
+			$data = $this->escapeData($data);
 			$setValues = '';
 			foreach ($data as $col => $val) {
 				if ($setValues !== '') {

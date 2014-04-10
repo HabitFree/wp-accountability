@@ -29,15 +29,15 @@ class UnitWpSimpleTest extends UnitTestCase {
     	$this->assertEqual($HfMain instanceof HfAccountability, True);
     }
     
-    public function testGettingCurrentUserLogin() {
-    	$UserManager = new HfUserManager();
-    	$this->assertEqual($UserManager->getCurrentUserLogin(), 'wpdevadmin');
-    }
+//     public function testGettingCurrentUserLogin() {
+//     	$UserManager = new HfUserManager();
+//     	$this->assertEqual($UserManager->getCurrentUserLogin(), 'wpdevadmin');
+//     }
     
-    /*public function testAccountabilityShortcodeHandlerReturnValue() {
-    	global $HfMain;
-    	$this->assertEqual($HfMain->subscriptionSettingsShortcode(''), "Hello, there. I'm a shortcode.");
-    }*/
+//     public function testAccountabilityShortcodeHandlerReturnValue() {
+//     	global $HfMain;
+//     	$this->assertEqual($HfMain->subscriptionSettingsShortcode(''), "Hello, there. I'm a shortcode.");
+//     }
     
     public function testShortcodeRegistration() {
     	$this->assertEqual(shortcode_exists('hfSubscriptionSettings'), True);
@@ -69,7 +69,9 @@ class UnitWpSimpleTest extends UnitTestCase {
     
     public function testTest() {
     	$UserManager = new HfUserManager();
-    	$UserManager->userGoalLevel(1);
+    	//$UserManager->userGoalLevel(1);
+		$UserManager->daysToNextLevel(1);
+		$UserManager->levelBarForGoal(1);
     }
 }
 

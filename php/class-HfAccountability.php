@@ -16,16 +16,25 @@ if (!class_exists("HfAccountability")) {
 		
 		function registerShortcodes() {
 			add_shortcode( 'hfSubscriptionSettings', array(HfAccountability::get_instance(), 'subscriptionSettingsShortcode') );
-			add_shortcode( 'hfReport', array(HfAccountability::get_instance(), 'reportShortcode') );		}
+			add_shortcode( 'hfReport', array(HfAccountability::get_instance(), 'reportShortcode') );
+			add_shortcode( 'userButtons', array(new HfUserManager(), 'userButtonsShortcode') );
+		}
 		
 		function reportShortcode( $atts ) {
+			$UserManager = new HfUserManager();
+			
+			if ( !is_user_logged_in() ) {
+				if ( empty($_GET['userID']) || !$this->emailIsValid($_GET['userID'], $_GET['emailID']) ) {
+					return $UserManager->requireLogin();
+				}
+			}
+			
 			$currentURL = $this->getCurrentPageUrl();
 			if ( isset($_GET['userID']) && $this->emailIsValid($_GET['userID'], $_GET['emailID']) ) {
 				$userID = $_GET['userID'];
 				$Mailer = new HfMailer();
 				$Mailer->markAsDelivered($_GET['emailID']);
 			} else {
-				$UserManager = new HfUserManager();
 				$userID = $UserManager->getCurrentUserId();
 			}
 			
@@ -61,7 +70,7 @@ if (!class_exists("HfAccountability")) {
 				$goal = $DbManager->getRow('hf_goal', 'goalID = ' . $goalID);
 				$level = $UserManager->userGoalLevel($goalID, $userID);
 				$html .= "<p>Level " . $level->stageID . ": " . $level->title . ":<br />" .
-					$goal->title . "<br />
+					$goal->title . "<br />" . $UserManager->levelBarForGoal($goalID, $userID) . "<br />
 						<span class='status'>
 							<label><input type='radio' name='" . $goalID . "' value='1'> Yes</label>
 							<label><input type='radio' name='" . $goalID . "' value='0'> No</label>
@@ -92,7 +101,16 @@ if (!class_exists("HfAccountability")) {
 			return $email != null;
 		}
 		
-		function subscriptionSettingsShortcode( $atts ) {
+		function settingsShortcode( $atts ) {
+			if ( is_user_logged_in() ) {
+				return $this->subscriptionSettings() . do_shortcode( '[wppb-edit-profile]' );
+			} else {
+				$UserManager = new HfUserManager();
+				return $UserManager->requireLogin();
+			}	
+		}
+		
+		function subscriptionSettingsShortcode() {
 			$userManager = new HfUserManager();
 			$userID = $userManager->getCurrentUserId();
 			$message = '';
@@ -138,9 +156,16 @@ if (!class_exists("HfAccountability")) {
 			return $this->getURLByTitle('Report');
 		}
 		
-		private function getURLByTitle($title) {
+		function getURLByTitle($title) {
 			$page = get_page_by_title( $title );
 			return get_permalink( $page->ID );
+		}
+		
+		function progressBar($percent, $label) {
+			return '<div class="meter">
+					<span class="label">'.$label.'</span>
+					<span class="progress" style="width: '.$percent.'%">'.$label.'</span>
+				</div>';
 		}
 	}
 }
