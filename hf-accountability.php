@@ -1,8 +1,7 @@
 <?php
 /*
-Plugin Name: Nathan's Awesome Widget
-Plugin URI: http://NathanArthur.com/
-Description: This plugin does awesome things
+Plugin Name: HabitFree Accountability
+Description: Keeps people accountable.
 Author: Nathan Arthur
 Version: 1.0
 Author URI: http://NathanArthur.com/
@@ -44,7 +43,6 @@ if (class_exists("HfAccountability")) {
 
 //Actions and Filters
 if (isset($HfMain)) {
-	//$HfMailerMain = new HfMailer();
 
 	//Actions
 	add_action( 'emailCronHook', array(new HfMailer(), 'sendEmailUpdates') );

@@ -15,12 +15,12 @@ if (!class_exists("HfAccountability")) {
 		}
 		
 		function registerShortcodes() {
-			add_shortcode( 'hfSubscriptionSettings', array(HfAccountability::get_instance(), 'subscriptionSettingsShortcode') );
-			add_shortcode( 'hfReport', array(HfAccountability::get_instance(), 'reportShortcode') );
+			add_shortcode( 'hfSettings', array(HfAccountability::get_instance(), 'settingsShortcode') );
+			add_shortcode( 'hfGoals', array(HfAccountability::get_instance(), 'goalsShortcode') );
 			add_shortcode( 'userButtons', array(new HfUserManager(), 'userButtonsShortcode') );
 		}
 		
-		function reportShortcode( $atts ) {
+		function goalsShortcode( $atts ) {
 			$UserManager = new HfUserManager();
 			
 			if ( !is_user_logged_in() ) {
@@ -52,7 +52,7 @@ if (!class_exists("HfAccountability")) {
 					$this->submitAccountabilityReport($userID, $key, $value, $emailID);
 				}
 				
-				return 'Thanks for checking in!';
+				return '<p class="success">Thanks for checking in!</p>' . $this->accountabilityForm($userID);
 			} else {
 				return $this->accountabilityForm($userID);
 			}
@@ -61,24 +61,43 @@ if (!class_exists("HfAccountability")) {
 		private function accountabilityForm($userID) {
 			$currentURL = $this->getCurrentPageUrl();
 			$DbManager = new HfDbManager();
-			$UserManager = new HfUserManager();
 			$goalSubs = $DbManager->getRows('hf_user_goal', 'userID = ' . $userID);
-			$html = '<form action="'. $currentURL .'" method="post">';
+			$html = '<form class="report-cards" action="'. $currentURL .'" method="post">';
 			
 			foreach ($goalSubs as $sub) {
 				$goalID = $sub->goalID;
-				$goal = $DbManager->getRow('hf_goal', 'goalID = ' . $goalID);
-				$level = $UserManager->userGoalLevel($goalID, $userID);
-				$html .= "<p>Level " . $level->stageID . ": " . $level->title . ":<br />" .
-					$goal->title . "<br />" . $UserManager->levelBarForGoal($goalID, $userID) . "<br />
-						<span class='status'>
-							<label><input type='radio' name='" . $goalID . "' value='1'> Yes</label>
-							<label><input type='radio' name='" . $goalID . "' value='0'> No</label>
-						</span>
-					</p>";
+				$html .= $this->generateGoalCard($goalID, $userID);
 			}
 			
-			return $html .= '<input type="submit" name="submit" value="Submit" /></form>';
+			return $html .= '<input class="submit" type="submit" name="submit" value="Submit" /></form>';
+		}
+		
+		private function generateGoalCard($goalID, $userID) {
+			$DbManager = new HfDbManager();
+			$UserManager = new HfUserManager();
+			$goal = $DbManager->getRow('hf_goal', 'goalID = ' . $goalID);
+			$level = $UserManager->userGoalLevel($goalID, $userID);
+			
+			$wrapperOpen = '<div class="report-card">';
+			$info = '<div class="info"><h2>'.$goal->title.'</h2>';
+			if ($goal->description != '') {
+				$info .= '<p>'.$goal->description.'</p></div>';
+			} else {
+				$info .= '</div>';
+			}
+			$stat1 = '<p class="stat">Level <span class="number">'.$level->levelID.'</span> '.$level->title.'</p>';
+			$stat2 = '<p class="stat">Level <span class="number">'.round($UserManager->levelPercentComplete($goalID, $userID), 1).'%</span> Complete</p>';
+			$stat3 = '<p class="stat">Days to <span class="number">'.round($UserManager->daysToNextLevel($goalID, $userID)).'</span> Next Level</p>';
+			$bar = $UserManager->levelBarForGoal($goalID, $userID);
+			$stats = '<div class="stats">' . $stat1 . $stat2 . $stat3 . $bar . '</div>';
+			$controls = "<div class='controls'>
+					<label><input type='radio' name='" . $goalID . "' value='0'> &#x2714;</label>
+					<label><input type='radio' name='" . $goalID . "' value='1'> &#x2718;</label>
+				</div>";
+			$report = "<div class='report'>Have you fallen since your last check-in?".$controls."</div>";
+			$wrapperClose = '</div>';
+			
+			return $wrapperOpen . $info . $stats . $report . $wrapperClose;
 		}
 		
 		private function submitAccountabilityReport($userID, $goalID, $isSuccessful, $emailID = null) {
@@ -103,14 +122,18 @@ if (!class_exists("HfAccountability")) {
 		
 		function settingsShortcode( $atts ) {
 			if ( is_user_logged_in() ) {
-				return $this->subscriptionSettings() . do_shortcode( '[wppb-edit-profile]' );
+				$html = '[su_tabs]
+						[su_tab title="Subscriptions"]'.$this->subscriptionSettings().'[/su_tab]
+						[su_tab title="Account"][wppb-edit-profile][/su_tab]
+					[/su_tabs]';
+				return do_shortcode( $html );
 			} else {
 				$UserManager = new HfUserManager();
 				return $UserManager->requireLogin();
-			}	
+			}
 		}
 		
-		function subscriptionSettingsShortcode() {
+		function subscriptionSettings() {
 			$userManager = new HfUserManager();
 			$userID = $userManager->getCurrentUserId();
 			$message = '';
@@ -153,7 +176,7 @@ if (!class_exists("HfAccountability")) {
 		}
 		
 		function getReportPageURL() {
-			return $this->getURLByTitle('Report');
+			return $this->getURLByTitle('Goals');
 		}
 		
 		function getURLByTitle($title) {
@@ -166,6 +189,19 @@ if (!class_exists("HfAccountability")) {
 					<span class="label">'.$label.'</span>
 					<span class="progress" style="width: '.$percent.'%">'.$label.'</span>
 				</div>';
+		}
+		
+		function donutChart($percent, $label) {
+			$percent = $this->roundToMultiple($percent, 5);
+			return '<div class="half_pie">
+				    <div class="half_part_pie_one half_bar_color half_percentage" data-percentage="'.$percent.'"></div>
+				    <div class="half_part_pie_two"></div>
+				    <div class="half_part_pie_three"></div>	<span class="half_pie_icon iconfont-android"></span>
+				</div>';
+		}
+		
+		function roundToMultiple($number, $multiple) {
+			return round($number/$multiple) * $multiple;
 		}
 	}
 }

@@ -26,23 +26,30 @@ if (!class_exists("HfMailer")) {
 		}
 		
 		function sendEmailUpdates() {
+			$UserManager = new HfUserManager();
 			$users = get_users(array(
 				'meta_key' => 'Subscribed',
 				'meta_value' => true
 			));
 			foreach ($users as $user) {
-				$HfMain = new HfAccountability();
-				$DbManager = new HfDbManager();
-				$subject = 'Testing HabitFree accountability';
-				$userID = $user->ID;
-				$emailID = $DbManager->generateEmailID();
-				
-				$reportURL = $HfMain->getReportPageURL() .
-					'&userID=' . $userID .
-					'&emailID=' . $emailID;
-				$message = "<p>Time to <a href='" . $reportURL . "'>check in</a>.</p>";
-				
-				$this->sendEmail($userID, $subject, $message, $emailID);
+				if ($UserManager->isAnyGoalDue($user->userID)) {
+					$HfMain = new HfAccountability();
+					$DbManager = new HfDbManager();
+					$subject = 'Testing HabitFree accountability';
+					$userID = $user->ID;
+					$emailID = $DbManager->generateEmailID();
+					$baseURL = $HfMain->getReportPageURL();
+					
+					if (strpos($baseURL,'?') !== false) {
+						$reportURL = $baseURL . '&userID=' . $userID . '&emailID=' . $emailID;
+					} else {
+						$reportURL = $baseURL . '?userID=' . $userID . '&emailID=' . $emailID;
+					}
+					
+					$message = "<p>Time to <a href='" . $reportURL . "'>check in</a>.</p>";
+					
+					$this->sendEmail($userID, $subject, $message, $emailID);
+				}
 			}
 		}
 		

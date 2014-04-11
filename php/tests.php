@@ -40,7 +40,7 @@ class UnitWpSimpleTest extends UnitTestCase {
 //     }
     
     public function testShortcodeRegistration() {
-    	$this->assertEqual(shortcode_exists('hfSubscriptionSettings'), True);
+    	$this->assertEqual(shortcode_exists('hfSettings'), True);
     }
     
     public function testDbDataNullRemoval() {
@@ -68,10 +68,6 @@ class UnitWpSimpleTest extends UnitTestCase {
     }
     
     public function testTest() {
-    	$UserManager = new HfUserManager();
-    	//$UserManager->userGoalLevel(1);
-		$UserManager->daysToNextLevel(1);
-		$UserManager->levelBarForGoal(1);
     }
 }
 

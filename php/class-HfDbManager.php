@@ -2,7 +2,7 @@
 
 if (!class_exists("HfDbManager")) {
 	class HfDbManager {
-		private $dbVersion = "2.5";
+		private $dbVersion = "2.7";
 		
 		function HfDbManager() { //constructor
 		}
@@ -60,14 +60,14 @@ if (!class_exists("HfDbManager")) {
 					PRIMARY KEY  (userID, goalID)
 				);
 				
-				CREATE TABLE " . $prefix . "hf_stage (
-					stageID int NOT NULL,
+				CREATE TABLE " . $prefix . "hf_level (
+					levelID int NOT NULL,
 					title VARCHAR(500) NOT NULL,
 					description text NULL,
 					size int NOT NULL,
 					emailInterval int NOT NULL,
 					target int NOT NULL,
-					PRIMARY KEY  (stageID)
+					PRIMARY KEY  (levelID)
 				);
 				
 				";
@@ -76,84 +76,84 @@ if (!class_exists("HfDbManager")) {
 				dbDelta( $sql );
 				
 				$defaultGoal = array( 'goalID' => 1,
-					'title' => 'I have not viewed sexually explicit material on the Internet',
+					'title' => 'Pornography Abstinence',
 					'isPositive' => 1,
 					'isPrivate' => 0 );
 				
 				$this->insertUpdateIntoDb('hf_goal', $defaultGoal);
 				
-				$defaultStage0 = array(
-						'stageID' => 0,
+				$defaultLevel0 = array(
+						'levelID' => 0,
 						'title' => 'Hibernation',
 						'size' => 0,
 						'emailInterval' => 0,
 						'target' => 0
 					);
 				
-				$defaultStage1 = array(
-						'stageID' => 1,
+				$defaultLevel1 = array(
+						'levelID' => 1,
 						'title' => 'Dawn',
 						'size' => 2,
 						'emailInterval' => 1,
 						'target' => 14
 					);
 				
-				$defaultStage2 = array(
-						'stageID' => 2,
+				$defaultLevel2 = array(
+						'levelID' => 2,
 						'title' => 'Breach',
 						'size' => 5,
 						'emailInterval' => 7,
 						'target' => 30
 					);
 				
-				$defaultStage3 = array(
-						'stageID' => 3,
+				$defaultLevel3 = array(
+						'levelID' => 3,
 						'title' => 'Progress',
 						'size' => 10,
 						'emailInterval' => 14,
 						'target' => 90
 					);
 				
-				$defaultStage4 = array(
-						'stageID' => 4,
+				$defaultLevel4 = array(
+						'levelID' => 4,
 						'title' => 'Conquest',
 						'size' => 15,
 						'emailInterval' => 30,
 						'target' => 365
 					);
 				
-				$defaultStage5 = array(
-						'stageID' => 5,
+				$defaultLevel5 = array(
+						'levelID' => 5,
 						'title' => 'Conquering',
 						'size' => 30,
 						'emailInterval' => 90,
 						'target' => 1095 // 3 years
 					);
 				
-				$defaultStage6 = array(
-						'stageID' => 6,
+				$defaultLevel6 = array(
+						'levelID' => 6,
 						'title' => 'Triumph',
 						'size' => 60,
 						'emailInterval' => 365,
 						'target' => 1095 // 3 years
 					);
 				
-				$defaultStage7 = array(
-						'stageID' => 7,
+				$defaultLevel7 = array(
+						'levelID' => 7,
 						'title' => 'Vigilance',
 						'size' => 0,
 						'emailInterval' => 365,
 						'target' => 0
 					);
 				
-				$this->insertUpdateIntoDb('hf_stage', $defaultStage0);
-				$this->insertUpdateIntoDb('hf_stage', $defaultStage1);
-				$this->insertUpdateIntoDb('hf_stage', $defaultStage2);
-				$this->insertUpdateIntoDb('hf_stage', $defaultStage3);
-				$this->insertUpdateIntoDb('hf_stage', $defaultStage4);
-				$this->insertUpdateIntoDb('hf_stage', $defaultStage5);
-				$this->insertUpdateIntoDb('hf_stage', $defaultStage6);
-				$this->insertUpdateIntoDb('hf_stage', $defaultStage7);
+				$this->insertUpdateIntoDb('hf_level', $defaultLevel0);
+				$this->insertUpdateIntoDb('hf_level', $defaultLevel1);
+				$this->insertUpdateIntoDb('hf_level', $defaultLevel2);
+				$this->insertUpdateIntoDb('hf_level', $defaultLevel3);
+				$this->insertUpdateIntoDb('hf_level', $defaultLevel4);
+				$this->insertUpdateIntoDb('hf_level', $defaultLevel5);
+				$this->insertUpdateIntoDb('hf_level', $defaultLevel6);
+				$this->insertUpdateIntoDb('hf_level', $defaultLevel7);
 				
 				update_option( "hfDbVersion", $this->dbVersion );
 			}
@@ -207,7 +207,7 @@ if (!class_exists("HfDbManager")) {
 		}
 		
 		function escapeData($data) {
-			foreach ($data as $col=>$value) {
+			foreach ($data as $col=>$val) {
 				$col = esc_sql( $col );
 				$val = esc_sql( $val );
 			}
