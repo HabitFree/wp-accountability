@@ -140,11 +140,11 @@ if (!class_exists("HfAccountability")) {
 			
 			if(isset($_POST) && array_key_exists('formSubmit',$_POST)) {
 				$varSubscription = isset($_POST['accountability']);
-				update_user_meta( $userID, "Subscribed", $varSubscription );
-				$message = '<p class="notice">Your changes have been saved.</p>';
+				update_user_meta( $userID, "hfSubscribed", $varSubscription );
+				$message = '<p class="success">Your changes have been saved.</p>';
 			}
 			
-			if (get_user_meta( $userID, "Subscribed", true )) {
+			if (get_user_meta( $userID, "hfSubscribed", true )) {
 				$additionalProperties = 'checked="checked"';
 			} else {
 				$additionalProperties = '';
@@ -202,6 +202,35 @@ if (!class_exists("HfAccountability")) {
 		
 		function roundToMultiple($number, $multiple) {
 			return round($number/$multiple) * $multiple;
+		}
+		
+		function createNonce($action, $lifeInSeconds = null) {
+			$DbManager = new HfDbManager();
+			$salt = wp_nonce_tick();
+			$nonce = substr(wp_hash($salt . $action, 'nonce'), -12, 10);
+			$DbManager->insertIntoDb('hf_nonce', array(
+				'nonce' => $nonce,
+				'salt' => $salt,
+				'lifeInSeconds' => $lifeInSeconds));
+			return $nonce;
+		}
+		
+		function verifyNonce($nonce, $action) {
+			$i = wp_nonce_tick();
+		
+			// Nonce generated 0-12 hours ago
+			if ( substr(wp_hash($i . $action, 'nonce'), -12, 10) === $nonce )
+				return 1;
+			// Nonce generated 12-24 hours ago
+			if ( substr(wp_hash(($i - 1) . $action, 'nonce'), -12, 10) === $nonce )
+				return 2;
+			// Invalid nonce
+			return false;
+		}
+
+		function sudoReactivateExtension() {
+			hfDeactivate();
+			hfActivate();
 		}
 	}
 }

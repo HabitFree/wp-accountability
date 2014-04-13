@@ -2,7 +2,7 @@
 
 if (!class_exists("HfDbManager")) {
 	class HfDbManager {
-		private $dbVersion = "2.7";
+		private $dbVersion = "3.1";
 		
 		function HfDbManager() { //constructor
 		}
@@ -68,6 +68,14 @@ if (!class_exists("HfDbManager")) {
 					emailInterval int NOT NULL,
 					target int NOT NULL,
 					PRIMARY KEY  (levelID)
+				);
+				
+				CREATE TABLE " . $prefix . "hf_nonce (
+					nonce VARCHAR(10) NOT NULL,
+					salt VARCHAR(10) NOT NULL,
+					lifeInSeconds int NULL,
+					date timestamp DEFAULT current_timestamp NOT NULL,
+					PRIMARY KEY  (nonce)
 				);
 				
 				";

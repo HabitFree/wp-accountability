@@ -9,7 +9,7 @@ if (!class_exists("HfMailer")) {
 		
 		function sendEmail($userID, $subject, $message, $emailID = null) {
 			$to = get_userdata( $userID )->user_email;
-			$success = wp_mail( $to, $subject, $message, $headers, $attachments );
+			$success = wp_mail( $to, $subject, $message );
 			if ($success) {
 				$this->recordEmail($userID, $subject, $message, $emailID);
 			}
@@ -25,41 +25,38 @@ if (!class_exists("HfMailer")) {
 			$HfDbMain->insertIntoDb($table, $data);
 		}
 		
-		function sendEmailUpdates() {
+		function sendReportRequestEmails() {
 			$UserManager = new HfUserManager();
 			$users = get_users(array(
-				'meta_key' => 'Subscribed',
+				'meta_key' => 'hfSubscribed',
 				'meta_value' => true
 			));
 			foreach ($users as $user) {
 				if ($UserManager->isAnyGoalDue($user->userID)) {
-					$HfMain = new HfAccountability();
-					$DbManager = new HfDbManager();
-					$subject = 'Testing HabitFree accountability';
-					$userID = $user->ID;
-					$emailID = $DbManager->generateEmailID();
-					$baseURL = $HfMain->getReportPageURL();
-					
-					if (strpos($baseURL,'?') !== false) {
-						$reportURL = $baseURL . '&userID=' . $userID . '&emailID=' . $emailID;
-					} else {
-						$reportURL = $baseURL . '?userID=' . $userID . '&emailID=' . $emailID;
-					}
-					
-					$message = "<p>Time to <a href='" . $reportURL . "'>check in</a>.</p>";
-					
-					$this->sendEmail($userID, $subject, $message, $emailID);
+					$this->sendReportRequestEmail($user->userID);
 				}
 			}
 		}
 		
-		function cronAdd5min( $schedules ) {
-			// Adds once weekly to the existing schedules.
-			$schedules['5min'] = array(
-				'interval' => 5*60,
-				'display' => __( 'Once every 5 minutes' )
-			);
-			return $schedules;
+		function sendReportRequestEmail($userID) {
+			$DbManager = new HfDbManager();
+			$subject = "How's it going?";
+			$emailID = $DbManager->generateEmailID();
+			$reportURL = $this->generateReportURL($userID, $emailID);
+			$message = "<p>Time to <a href='" . $reportURL . "'>check in</a>.</p>";
+			
+			$this->sendEmail($userID, $subject, $message, $emailID);
+		}
+		
+		function generateReportURL($userID, $emailID) {
+			$HfMain = new HfAccountability();
+			$baseURL = $HfMain->getReportPageURL();
+			
+			if (strpos($baseURL,'?') !== false) {
+				return $baseURL . '&userID=' . $userID . '&emailID=' . $emailID;
+			} else {
+				return $baseURL . '?userID=' . $userID . '&emailID=' . $emailID;
+			}
 		}
 		
 		function markAsDelivered( $emailID ) {
@@ -68,16 +65,6 @@ if (!class_exists("HfMailer")) {
 			$data = array( 'deliveryStatus' => 1 );
 			$where = array( 'emailID' => $emailID );
 			$DbManager->updateRows($table, $data, $where);
-		}
-		
-		function mandrillWebhookShortcode( $atts ) {
-			$this->sendEmail(1, 'Webhook Test', 'Trying, trying...');
-
-			if(isset($_POST)) {
-				$data = json_decode($_POST['mandrill_events']);
-				$message = var_dump($data);
-				$this->sendEmail(1, 'Webhook Test Data', $message);
-			}
 		}
 	}
 }

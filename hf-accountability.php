@@ -15,27 +15,28 @@ if ( !version_compare($wp_version,"3.0",">=") ) {
 
 #error_log("hello", 0, "/home/habitfree1/wp.habitfree.org/logs/debug.log");
 
-register_activation_hook(__FILE__,"my_plugin_activate");
-register_deactivation_hook(__FILE__,"my_plugin_deactivate");
+register_activation_hook(__FILE__,"hfActivate");
+register_deactivation_hook(__FILE__,"hfDeactivate");
 
-function my_plugin_activate() {
+function hfActivate() {
 	error_log("my plugin activated", 0);
-	wp_clear_scheduled_hook('emailCronHook');
-	wp_schedule_event(time(), 'daily', 'emailCronHook');
+	wp_clear_scheduled_hook('hfEmailCronHook');
+	wp_schedule_event(time(), 'daily', 'hfEmailCronHook');
 	$HfDbMain = new HfDbManager();
 	$HfDbMain->installDb();
 	$HfUserMain = new HfUserManager();
 	$HfUserMain->processAllUsers();
 }
 
-function my_plugin_deactivate() {
-	wp_clear_scheduled_hook('emailCronHook');
+function hfDeactivate() {
+	wp_clear_scheduled_hook('hfEmailCronHook');
 }
 
 require_once(dirname(__FILE__) . '/php/class-HfAccountability.php');
 require_once(dirname(__FILE__) . '/php/class-HfMailer.php');
 require_once(dirname(__FILE__) . '/php/class-HfDbManager.php');
 require_once(dirname(__FILE__) . '/php/class-HfUserManager.php');
+require_once(dirname(__FILE__) . '/php/class-HfAdminPanel.php');
 
 if (class_exists("HfAccountability")) {
 	$HfMain = new HfAccountability();
@@ -45,9 +46,9 @@ if (class_exists("HfAccountability")) {
 if (isset($HfMain)) {
 
 	//Actions
-	add_action( 'emailCronHook', array(new HfMailer(), 'sendEmailUpdates') );
-	add_action( 'user_register', array(new HfUserManager(), 'processNewUser') );
+	add_action( 'hfEmailCronHook', array( new HfMailer(), 'sendReportRequestEmails' ) );
+	add_action( 'user_register', array( new HfUserManager(), 'processNewUser' ) );
+	add_action( 'admin_menu', array( new HfAdminPanel(), 'registerAdminPanel' ) );
 	
 	//Filters
-	add_filter( 'cron_schedules', array(new HfMailer(), 'cronAdd5min') );
 }
