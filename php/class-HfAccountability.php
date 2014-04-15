@@ -85,19 +85,20 @@ if (!class_exists("HfAccountability")) {
 			} else {
 				$info .= '</div>';
 			}
-			$stat1 = '<p class="stat">Level <span class="number">'.$level->levelID.'</span> '.$level->title.'</p>';
-			$stat2 = '<p class="stat">Level <span class="number">'.round($UserManager->levelPercentComplete($goalID, $userID), 1).'%</span> Complete</p>';
-			$stat3 = '<p class="stat">Days to <span class="number">'.round($UserManager->daysToNextLevel($goalID, $userID)).'</span> Next Level</p>';
-			$bar = $UserManager->levelBarForGoal($goalID, $userID);
-			$stats = '<div class="stats">' . $stat1 . $stat2 . $stat3 . $bar . '</div>';
 			$controls = "<div class='controls'>
 					<label><input type='radio' name='" . $goalID . "' value='0'> &#x2714;</label>
 					<label><input type='radio' name='" . $goalID . "' value='1'> &#x2718;</label>
 				</div>";
 			$report = "<div class='report'>Have you fallen since your last check-in?".$controls."</div>";
+			$main = '<div class="main">' . $info . $report . '</div>';
+			$stat1 = '<p class="stat">Level <span class="number">'.$level->levelID.'</span> '.$level->title.'</p>';
+			$stat2 = '<p class="stat">Level <span class="number">'.round($UserManager->levelPercentComplete($goalID, $userID), 1).'%</span> Complete</p>';
+			$stat3 = '<p class="stat">Days to <span class="number">'.round($UserManager->daysToNextLevel($goalID, $userID)).'</span> Next Level</p>';
+			$bar = $UserManager->levelBarForGoal($goalID, $userID);
+			$stats = '<div class="stats">' . $stat1 . $stat2 . $stat3 . $bar . '</div>';
 			$wrapperClose = '</div>';
 			
-			return $wrapperOpen . $info . $stats . $report . $wrapperClose;
+			return $wrapperOpen . $main . $stats . $wrapperClose;
 		}
 		
 		private function submitAccountabilityReport($userID, $goalID, $isSuccessful, $emailID = null) {
@@ -204,33 +205,20 @@ if (!class_exists("HfAccountability")) {
 			return round($number/$multiple) * $multiple;
 		}
 		
-		function createNonce($action, $lifeInSeconds = null) {
-			$DbManager = new HfDbManager();
-			$salt = wp_nonce_tick();
-			$nonce = substr(wp_hash($salt . $action, 'nonce'), -12, 10);
-			$DbManager->insertIntoDb('hf_nonce', array(
-				'nonce' => $nonce,
-				'salt' => $salt,
-				'lifeInSeconds' => $lifeInSeconds));
-			return $nonce;
-		}
-		
-		function verifyNonce($nonce, $action) {
-			$i = wp_nonce_tick();
-		
-			// Nonce generated 0-12 hours ago
-			if ( substr(wp_hash($i . $action, 'nonce'), -12, 10) === $nonce )
-				return 1;
-			// Nonce generated 12-24 hours ago
-			if ( substr(wp_hash(($i - 1) . $action, 'nonce'), -12, 10) === $nonce )
-				return 2;
-			// Invalid nonce
-			return false;
+		function createRandomString($length) {
+			$randomBits = openssl_random_pseudo_bytes($length / 2);
+			return bin2hex($randomBits);
 		}
 
 		function sudoReactivateExtension() {
 			hfDeactivate();
 			hfActivate();
+		}
+		
+		function arrayToObject($array) {
+			foreach ($array as $key => $value) {
+    			$object->$key = $value;
+			}
 		}
 	}
 }

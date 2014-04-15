@@ -7,21 +7,26 @@ if (!class_exists("HfMailer")) {
 			//nothing here
 		}
 		
-		function sendEmail($userID, $subject, $message, $emailID = null) {
-			$to = get_userdata( $userID )->user_email;
+		function sendEmail($userID, $subject, $message, $emailID = null, $emailAddress = null) {
+			if ($emailAddress != null) {
+				$to = $emailAddress;
+			} else {
+				$to = get_userdata( $userID )->user_email;
+			}
 			$success = wp_mail( $to, $subject, $message );
 			if ($success) {
-				$this->recordEmail($userID, $subject, $message, $emailID);
+				$this->recordEmail($userID, $subject, $message, $emailID, $emailAddress);
 			}
 		}
 		
-		function recordEmail($userID, $subject, $message, $emailID = null) {
+		function recordEmail($userID, $subject, $message, $emailID = null, $emailAddress = null) {
 			$HfDbMain = new HfDbManager();
 			$table = "hf_email";
 			$data = array( 'subject' => $subject,
 				'body' => $message,
 				'userID' => $userID,
-				'emailID' => $emailID );
+				'emailID' => $emailID,
+				'address' => $emailAddress );
 			$HfDbMain->insertIntoDb($table, $data);
 		}
 		
@@ -65,6 +70,11 @@ if (!class_exists("HfMailer")) {
 			$data = array( 'deliveryStatus' => 1 );
 			$where = array( 'emailID' => $emailID );
 			$DbManager->updateRows($table, $data, $where);
+		}
+		
+		function sendInvitation( $inviterID, $destinationEmail, $daysToExpire ) {
+			$this->sendEmail(null, 'hi', 'body', null, $destinationEmail);
+			return '';
 		}
 	}
 }

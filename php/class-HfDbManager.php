@@ -2,7 +2,7 @@
 
 if (!class_exists("HfDbManager")) {
 	class HfDbManager {
-		private $dbVersion = "3.1";
+		private $dbVersion = "3.5";
 		
 		function HfDbManager() { //constructor
 		}
@@ -21,7 +21,8 @@ if (!class_exists("HfDbManager")) {
 					body text NOT NULL,
 					userID int NOT NULL,
 					deliveryStatus bit(1) DEFAULT 0 NOT NULL,
-					openTime timestamp NULL,
+					openTime datetime NULL,
+					address varchar(80) NULL,
 					KEY userID (userID),
 					PRIMARY KEY  (emailID)
 				);
@@ -70,12 +71,15 @@ if (!class_exists("HfDbManager")) {
 					PRIMARY KEY  (levelID)
 				);
 				
-				CREATE TABLE " . $prefix . "hf_nonce (
-					nonce VARCHAR(10) NOT NULL,
-					salt VARCHAR(10) NOT NULL,
-					lifeInSeconds int NULL,
-					date timestamp DEFAULT current_timestamp NOT NULL,
-					PRIMARY KEY  (nonce)
+				CREATE TABLE " . $prefix . "hf_invitation (
+					invitationID VARCHAR(400) NOT NULL,
+					inviterID int NOT NULL,
+					inviteeEmail VARCHAR(80) NOT NULL,
+					emailID int NOT NULL,
+					expirationDate datetime NOT NULL,
+					KEY inviterID (inviterID),
+					KEY emailID (emailID),
+					PRIMARY KEY  (invitationID)
 				);
 				
 				";
@@ -205,6 +209,16 @@ if (!class_exists("HfDbManager")) {
 			$wpdb->insert( $tableName, $data );
 		}
 		
+		function insertMultipleRows($table, $rows) {
+			global $wpdb;
+			$prefix = $wpdb->prefix;
+			$tableName = $prefix . $table;
+			foreach ($rows as $row=>$values) {
+				$data = $this->removeNullValuePairs($values);
+				$wpdb->insert( $tableName, $data );
+			}
+		}
+		
 		function removeNullValuePairs($array) {
 			foreach ($array as $key=>$value) {
 				if ($value === null) {
@@ -251,10 +265,14 @@ if (!class_exists("HfDbManager")) {
 			return $wpdb->get_row("SELECT * FROM " . $prefix . $table . " WHERE " . $criterion);
 		}
 		
-		function getRows($table, $criterion, $outputType = OBJECT) {
+		function getRows($table, $where, $outputType = OBJECT) {
 			global $wpdb;
 			$prefix = $wpdb->prefix;
-			return $wpdb->get_results("SELECT * FROM " . $prefix . $table . " WHERE " . $criterion, $outputType);
+			if ($where === null) {
+				return $wpdb->get_results("SELECT * FROM " . $prefix . $table, $outputType);
+			} else {
+				return $wpdb->get_results("SELECT * FROM " . $prefix . $table . " WHERE " . $where, $outputType);
+			}
 		}
 		
 		function generateEmailID() {
@@ -281,6 +299,35 @@ if (!class_exists("HfDbManager")) {
 			$prefix = $wpdb->prefix;
 			$tableName = $prefix . $table;
 			return $wpdb->update($tableName, $data, $where);
+		}
+		
+		function emptyTable($table) {
+			global $wpdb;
+			$prefix = $wpdb->prefix;
+			$tableName = $prefix . $table;
+			$wpdb->query("TRUNCATE TABLE " . $tableName );
+		}
+		
+		function createColumnSchemaObject($field, $type, $null, $key, $default, $extra) {
+			$column = new StdClass;
+			$column->Field = $field;
+			$column->Type = $type;
+			$column->Null = $null;
+			$column->Key = $key;
+			$column->Default = $default;
+			$column->Extra = $extra;
+			return $column;
+		}
+		
+		function getTableSchema($table) {
+			global $wpdb;
+			$prefix = $wpdb->prefix;
+			$tableName = $prefix . $table;
+			return $wpdb->get_results('SHOW COLUMNS FROM ' . $tableName, OBJECT_K);
+		}
+		
+		function getTable($table) {
+			return $this->getRows($table, null, ARRAY_A);
 		}
 	}
 }
