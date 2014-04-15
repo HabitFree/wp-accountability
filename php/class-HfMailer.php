@@ -73,7 +73,10 @@ if (!class_exists("HfMailer")) {
 		}
 		
 		function sendInvitation( $inviterID, $destinationEmail, $daysToExpire ) {
-			$this->sendEmail(null, 'hi', 'body', null, $destinationEmail);
+			$UserManager		= new HfUserManager();
+			$inviterUsername	= $UserManager->getUsernameByID( $inviterID, true );
+			$subject			= $inviterUsername . ' just invited you to join them at HabitFree!';
+			$this->sendEmail(null, '$subject', 'body', null, $destinationEmail);
 			return '';
 		}
 	}

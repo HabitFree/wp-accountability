@@ -2,7 +2,7 @@
 
 if (!class_exists("HfDbManager")) {
 	class HfDbManager {
-		private $dbVersion = "3.5";
+		private $dbVersion = "3.7";
 		
 		function HfDbManager() { //constructor
 		}
@@ -13,8 +13,7 @@ if (!class_exists("HfDbManager")) {
 			$installedDbVersion = get_option( "hfDbVersion" );
 			
 			if ( $installedDbVersion != $this->dbVersion ) {
-				$sql = "
-				CREATE TABLE " . $prefix .  "hf_email (
+				$emailTableSql = "CREATE TABLE " . $prefix .  "hf_email (
 					emailID int NOT NULL AUTO_INCREMENT,
 					sendTime timestamp DEFAULT current_timestamp NOT NULL,
 					subject VARCHAR(500) NOT NULL,
@@ -25,9 +24,9 @@ if (!class_exists("HfDbManager")) {
 					address varchar(80) NULL,
 					KEY userID (userID),
 					PRIMARY KEY  (emailID)
-				);
+				);";
 				
-				CREATE TABLE " . $prefix . "hf_goal (
+				$goalTableSql = "CREATE TABLE " . $prefix . "hf_goal (
 					goalID int NOT NULL AUTO_INCREMENT,
 					title VARCHAR(500) NOT NULL,
 					description text NULL,
@@ -38,9 +37,9 @@ if (!class_exists("HfDbManager")) {
 					dateCreated timestamp DEFAULT current_timestamp NOT NULL,
 					KEY creatorID (creatorID),
 					PRIMARY KEY  (goalID)
-				);
+				);";
 				
-				CREATE TABLE " . $prefix . "hf_report (
+				$reportTableSql = "CREATE TABLE " . $prefix . "hf_report (
 					reportID int NOT NULL AUTO_INCREMENT,
 					userID int NOT NULL,
 					goalID int NOT NULL,
@@ -51,17 +50,17 @@ if (!class_exists("HfDbManager")) {
 					KEY goalID (goalID),
 					KEY referringEmailID (referringEmailID),
 					PRIMARY KEY  (reportID)
-				);
+				);";
 				
-				CREATE TABLE " . $prefix . "hf_user_goal (
+				$userGoalTableSql = "CREATE TABLE " . $prefix . "hf_user_goal (
 					userID int NOT NULL,
 					goalID int NOT NULL,
 					dateStarted timestamp DEFAULT current_timestamp NOT NULL,
 					isActive bit(1) DEFAULT 1 NOT NULL,
 					PRIMARY KEY  (userID, goalID)
-				);
+				);";
 				
-				CREATE TABLE " . $prefix . "hf_level (
+				$levelTableSql = "CREATE TABLE " . $prefix . "hf_level (
 					levelID int NOT NULL,
 					title VARCHAR(500) NOT NULL,
 					description text NULL,
@@ -69,23 +68,26 @@ if (!class_exists("HfDbManager")) {
 					emailInterval int NOT NULL,
 					target int NOT NULL,
 					PRIMARY KEY  (levelID)
-				);
+				);";
 				
-				CREATE TABLE " . $prefix . "hf_invitation (
-					invitationID VARCHAR(400) NOT NULL,
+				$inviteTableSql = "CREATE TABLE " . $prefix . "hf_invite (
+					inviteID varchar(250) NOT NULL,
 					inviterID int NOT NULL,
 					inviteeEmail VARCHAR(80) NOT NULL,
 					emailID int NOT NULL,
 					expirationDate datetime NOT NULL,
 					KEY inviterID (inviterID),
 					KEY emailID (emailID),
-					PRIMARY KEY  (invitationID)
-				);
-				
-				";
+					PRIMARY KEY  (inviteID)
+				);";
 			
 				require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-				dbDelta( $sql );
+				dbDelta( $emailTableSql );
+				dbDelta( $goalTableSql );
+				dbDelta( $reportTableSql );
+				dbDelta( $userGoalTableSql );
+				dbDelta( $levelTableSql );
+				dbDelta( $inviteTableSql );
 				
 				$defaultGoal = array( 'goalID' => 1,
 					'title' => 'Pornography Abstinence',

@@ -185,12 +185,12 @@ class UnitWpSimpleTest extends UnitTestCase {
 		$this->assertEqual($currentSchema, $expectedSchema);
 	}
 	
-	public function testInvitationTableSchema() {
+	public function testInviteTableSchema() {
 		$DbManager = new HfDbManager();
-		$currentSchema = $DbManager->getTableSchema('hf_invitation');
+		$currentSchema = $DbManager->getTableSchema('hf_invite');
 		
 		$expectedSchema = array(
-				'invitationID'	=> $DbManager->createColumnSchemaObject('invitationID', 'varchar(400)', 'NO', 'PRI', null, ''),
+				'inviteID'		=> $DbManager->createColumnSchemaObject('inviteID', 'varchar(250)', 'NO', 'PRI', null, ''),
 				'inviterID'		=> $DbManager->createColumnSchemaObject('inviterID', 'int(11)', 'NO', 'MUL', null, ''),
 				'inviteeEmail'	=> $DbManager->createColumnSchemaObject('inviteeEmail', 'varchar(80)', 'NO', '', null, ''),
 				'emailID'		=> $DbManager->createColumnSchemaObject('emailID', 'int(11)', 'NO', 'MUL', null, ''),
@@ -207,12 +207,16 @@ class UnitWpSimpleTest extends UnitTestCase {
 	}
 	
 	public function testInvitationEmailSending() {
+		$HfMain				= new HfAccountability();
 		$Mailer				= new HfMailer();
 		$DbManager			= new HfDbManager();
 		$inviterID			= 1;
+		$inviter			= get_userdata( $inviterID );
+		$inviterName		= $inviter->user_login;
 		$destinationEmail	= 'hftest@mailinator.com';
 		$daysToExpire		= 10;
 		$invitationID		= $Mailer->sendInvitation($inviterID, $destinationEmail, $daysToExpire);
+		$invitationURL		= $HfMain->getURLByTitle('Register') . '&n=' . $invitationID;
 		
 		global $wpdb;
 		$prefix				= $wpdb->prefix;
@@ -220,10 +224,13 @@ class UnitWpSimpleTest extends UnitTestCase {
 		$tableName			= $prefix . $table;
 		$email				= $DbManager->getRow($table, 'emailID=( SELECT max(emailID) FROM '.$tableName.' )');
 		
-		// 2014-04-14 12:03:09
 		$this->assertEqual($email->sendTime, date('Y-m-d H:i:s'));
-		$this->assertEqual($email->subject, '');
-		$this->assertEqual($email->body, '');
+		$this->assertEqual($email->subject, ucwords($inviterName) . ' just invited you to join them at HabitFree!');
+		$this->assertEqual($email->body,
+			"<p>HabitFree is a community of young people striving for God's ideal of purity and Christian freedom.</p>
+			<p><a href='" . $invitationURL . "'>
+				Click here to join " . ucwords($inviterName) . " in his quest!
+			</a></p>");
 		$this->assertEqual($email->userID, null);
 		$this->assertEqual($email->address, $destinationEmail);
 	}
@@ -232,8 +239,6 @@ class UnitWpSimpleTest extends UnitTestCase {
 		$phpTime	= date('Y-m-d H:i:s');
 		global $wpdb;
 		$mysqlTime	= $wpdb->get_results("SELECT NOW()", ARRAY_A);
-		date_default_timezone_set('America/Chicago');
-		echo 'PHP Time: ' . $phpTime;
 		$this->assertEqual($phpTime, $mysqlTime[0]['NOW()']);
 	}
 }

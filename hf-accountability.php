@@ -44,6 +44,7 @@ if (class_exists("HfAccountability")) {
 
 //Actions and Filters
 if (isset($HfMain)) {
+	date_default_timezone_set('America/Chicago');
 
 	//Actions
 	add_action( 'hfEmailCronHook', array( new HfMailer(), 'sendReportRequestEmails' ) );

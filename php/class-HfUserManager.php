@@ -177,6 +177,15 @@ if (!class_exists("HfUserManager")) {
 			$secondsInADay = 86400;
 			return ( time() - $dateInSecondsOfLastReport ) / $secondsInADay;
 		}
+
+		function getUsernameByID($userID, $initialCaps = false) {
+			$user = get_userdata( $userID );
+			if ($initialCaps === true) {
+				return ucwords($user->user_login);
+			} else {
+				return $user->user_login;
+			}
+		}
 	}
 }
 
