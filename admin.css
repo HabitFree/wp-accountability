@@ -1,0 +1,6 @@
+span.fail {
+  display: inline-block;
+  padding-top: 20px;
+  color: red;
+  font-weight: bold;
+}
