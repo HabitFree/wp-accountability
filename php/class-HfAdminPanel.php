@@ -44,6 +44,11 @@ if (!class_exists("HfAdminPanel")) {
 					<p><input type="submit" name="sudoReactivateExtension" value="Sudo reactivate extension" /></p>
 				</form>';
 		}
+		
+		function addToAdminHead() {
+			$cssURL = plugins_url( 'admin.css' , dirname(__FILE__) );
+			echo "<link rel='stylesheet' type='text/css' href='". $cssURL . "' />";
+		}
 	}
 }
 ?>
