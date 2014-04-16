@@ -50,6 +50,7 @@ if (isset($HfMain)) {
 	add_action( 'hfEmailCronHook', array( new HfMailer(), 'sendReportRequestEmails' ) );
 	add_action( 'user_register', array( new HfUserManager(), 'processNewUser' ) );
 	add_action( 'admin_menu', array( new HfAdminPanel(), 'registerAdminPanel' ) );
+	add_action( 'admin_head', array( new HfAdminPanel(), 'addToAdminHead' ) );
 	
 	//Filters
 }

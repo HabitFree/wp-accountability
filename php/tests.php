@@ -63,6 +63,7 @@ class UnitWpSimpleTest extends UnitTestCase {
     	$this->assertEqual($DbManager->removeNullValuePairs($data), $expectedData);
     }
     
+	/*
     public function testTableEmpty() {
     	$DbManager = new HfDbManager();
 		$backup = $DbManager->getTable('hf_email');
@@ -87,6 +88,7 @@ class UnitWpSimpleTest extends UnitTestCase {
 		
     	$this->assertEqual($DbManager->getRows('hf_email', null, ARRAY_A), $backup);
 	}
+	*/
 
 	public function testSchemaColumnObjectCreation() {
   		$DbManager = new HfDbManager();
@@ -206,10 +208,15 @@ class UnitWpSimpleTest extends UnitTestCase {
 		$this->assertEqual(strlen($randomString), 400);
 	}
 	
-	public function testInvitationEmailSending() {
+	public function testInviteEmailSending() {
 		$HfMain				= new HfAccountability();
 		$Mailer				= new HfMailer();
 		$DbManager			= new HfDbManager();
+		
+		$table				= 'hf_email';
+		$rows 				= $DbManager->getTable($table);
+		$startRowCount 		= count($rows);
+
 		$inviterID			= 1;
 		$inviter			= get_userdata( $inviterID );
 		$inviterName		= $inviter->user_login;
@@ -220,9 +227,13 @@ class UnitWpSimpleTest extends UnitTestCase {
 		
 		global $wpdb;
 		$prefix				= $wpdb->prefix;
-		$table				= 'hf_email';
 		$tableName			= $prefix . $table;
 		$email				= $DbManager->getRow($table, 'emailID=( SELECT max(emailID) FROM '.$tableName.' )');
+		
+		$DbManager->deleteRow($table, 'emailID='.$email->emailID);
+		$DbManager->deleteRow('hf_invite', 'emailID='.$email->emailID);
+		$rows  				= $DbManager->getTable($table);
+		$endRowCount 		= count($rows);
 		
 		$this->assertEqual($email->sendTime, date('Y-m-d H:i:s'));
 		$this->assertEqual($email->subject, ucwords($inviterName) . ' just invited you to join them at HabitFree!');
@@ -230,6 +241,7 @@ class UnitWpSimpleTest extends UnitTestCase {
 			"<p>HabitFree is a community of young people striving for God's ideal of purity and Christian freedom.</p><p><a href='" . $invitationURL . "'>Click here to join " . ucwords($inviterName) . " in his quest!</a></p>");
 		$this->assertEqual($email->userID, 0);
 		$this->assertEqual($email->address, $destinationEmail);
+		$this->assertEqual($startRowCount, $endRowCount);
 	}
 	
 	public function testPHPandMySQLtimezonesMatch() {
@@ -237,6 +249,39 @@ class UnitWpSimpleTest extends UnitTestCase {
 		global $wpdb;
 		$mysqlTime	= $wpdb->get_results("SELECT NOW()", ARRAY_A);
 		$this->assertEqual($phpTime, $mysqlTime[0]['NOW()']);
+	}
+	
+	public function testInviteStorageInInviteTable() {
+		$Mailer				= new HfMailer();
+		$DbManager			= new HfDbManager();
+		
+		$table				= 'hf_invite';
+		$startInviteRowCount= $DbManager->countRowsInTable($table);
+		$startEmailRowCount	= $DbManager->countRowsInTable('hf_email');
+		
+		$inviterID			= 1;
+		$destinationEmail	= 'hftest@mailinator.com';
+		$daysToExpire		= 10;
+		$inviteID			= $Mailer->sendInvitation($inviterID, $destinationEmail, $daysToExpire);
+		
+		global $wpdb;
+		$prefix				= $wpdb->prefix;
+		$tableName			= $prefix . $table;
+		$invite				= $DbManager->getRow($table, 'emailID=( SELECT max(emailID) FROM '.$tableName.' )');
+		$inviteTable		= $DbManager->getFullTableName('hf_invite');
+		$emailID			= $DbManager->getVar('hf_invite', 'emailID', 'inviteID="'.$inviteID.'"');
+		
+		$DbManager->deleteRow($table, 'inviteID="'.$inviteID.'"');
+		$DbManager->deleteRow('hf_email', 'emailID='.$emailID);
+		$endInviteRowCount 	= $DbManager->countRowsInTable($table);
+		$endEmailRowCount	= $DbManager->countRowsInTable('hf_email');
+		
+		$this->assertEqual($invite->inviteID, $inviteID);
+		$this->assertEqual($invite->inviterID, $inviterID);
+		$this->assertEqual($invite->inviteeEmail, $destinationEmail);
+		$this->assertEqual($invite->expirationDate, date('Y-m-d H:i:s', strtotime('+'.$daysToExpire.' days')));
+		$this->assertEqual($startInviteRowCount, $endInviteRowCount);
+		$this->assertEqual($startEmailRowCount, $endEmailRowCount);
 	}
 }
 

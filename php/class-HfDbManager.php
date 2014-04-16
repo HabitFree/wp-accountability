@@ -208,7 +208,11 @@ if (!class_exists("HfDbManager")) {
 			$prefix = $wpdb->prefix;
 			$tableName = $prefix . $table;
 			$data = $this->removeNullValuePairs($data);
-			$wpdb->insert( $tableName, $data );
+			$success = $wpdb->insert( $tableName, $data );
+			if ($success === false) {
+				$wpdb->print_error();
+			}
+			return $success;
 		}
 		
 		function insertMultipleRows($table, $rows) {
@@ -330,6 +334,24 @@ if (!class_exists("HfDbManager")) {
 		
 		function getTable($table) {
 			return $this->getRows($table, null, ARRAY_A);
+		}
+		
+		function deleteRow($table, $where) {
+			global $wpdb;
+			$tableName = $this->getFullTableName($table);
+			return $wpdb->query( 'DELETE FROM ' . $tableName . ' WHERE ' . $where );
+		}
+		
+		function getFullTableName($table) {
+			global $wpdb;
+			$prefix = $wpdb->prefix;
+			return $prefix . $table;
+		}
+		
+		function countRowsInTable($table) {
+			$DbManager = new HfDbManager();
+			$rows = $DbManager->getTable($table);
+			return count($rows);
 		}
 	}
 }
