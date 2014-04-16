@@ -216,7 +216,7 @@ class UnitWpSimpleTest extends UnitTestCase {
 		$destinationEmail	= 'hftest@mailinator.com';
 		$daysToExpire		= 10;
 		$invitationID		= $Mailer->sendInvitation($inviterID, $destinationEmail, $daysToExpire);
-		$invitationURL		= $HfMain->getURLByTitle('Register') . '&n=' . $invitationID;
+		$invitationURL		= $HfMain->getURLByTitle('Register') . '?n=' . $invitationID;
 		
 		global $wpdb;
 		$prefix				= $wpdb->prefix;
@@ -227,11 +227,8 @@ class UnitWpSimpleTest extends UnitTestCase {
 		$this->assertEqual($email->sendTime, date('Y-m-d H:i:s'));
 		$this->assertEqual($email->subject, ucwords($inviterName) . ' just invited you to join them at HabitFree!');
 		$this->assertEqual($email->body,
-			"<p>HabitFree is a community of young people striving for God's ideal of purity and Christian freedom.</p>
-			<p><a href='" . $invitationURL . "'>
-				Click here to join " . ucwords($inviterName) . " in his quest!
-			</a></p>");
-		$this->assertEqual($email->userID, null);
+			"<p>HabitFree is a community of young people striving for God's ideal of purity and Christian freedom.</p><p><a href='" . $invitationURL . "'>Click here to join " . ucwords($inviterName) . " in his quest!</a></p>");
+		$this->assertEqual($email->userID, 0);
 		$this->assertEqual($email->address, $destinationEmail);
 	}
 	
