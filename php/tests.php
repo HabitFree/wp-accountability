@@ -283,6 +283,14 @@ class UnitWpSimpleTest extends UnitTestCase {
 		$this->assertEqual($startInviteRowCount, $endInviteRowCount);
 		$this->assertEqual($startEmailRowCount, $endEmailRowCount);
 	}
+
+	public function testTest() {
+		$UserManager = new HfUserManager();
+		$Mailer = new HfMailer();
+		var_dump($UserManager->isAnyGoalDue(1));
+		$Mailer->sendReportRequestEmails();
+		
+	}
 }
 
 ?>

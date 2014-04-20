@@ -50,8 +50,8 @@ if (!class_exists("HfMailer")) {
 				'meta_value' => true
 			));
 			foreach ($users as $user) {
-				if ($UserManager->isAnyGoalDue($user->userID)) {
-					$this->sendReportRequestEmail($user->userID);
+				if ($UserManager->isAnyGoalDue($user->ID)) {
+					$this->sendReportRequestEmail($user->ID);
 				}
 			}
 		}
@@ -62,7 +62,6 @@ if (!class_exists("HfMailer")) {
 			$emailID = $DbManager->generateEmailID();
 			$reportURL = $this->generateReportURL($userID, $emailID);
 			$message = "<p>Time to <a href='" . $reportURL . "'>check in</a>.</p>";
-			
 			$this->sendEmail($userID, $subject, $message, $emailID);
 		}
 		
@@ -143,7 +142,7 @@ if (!class_exists("HfMailer")) {
 			}
 			
 			if ( count($parameters) > 0 ) {
-				$url = urlPlusParameters($url, $parameters);
+				$url = $this->urlPlusParameters($url, $parameters);
 			}
 			
 			return $url;
