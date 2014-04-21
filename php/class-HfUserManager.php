@@ -147,9 +147,10 @@ if (!class_exists("HfUserManager")) {
 		
 		function isAnyGoalDue($userID) {
 			$DbManager = new HfDbManager();
-			$goals = $DbManager->getRows('hf_goal', 'userID = ' . $userID);
-			foreach ($goals as $goal) {
-				if ($this->isGoalDue($goal->goalID, $userID)) {
+			$goalSubs = $DbManager->getRows('hf_user_goal', 'userID = ' . $userID);
+			foreach ($goalSubs as $goalSub) {
+				var_dump($this->isGoalDue($goalSub->goalID, $userID));
+				if ($this->isGoalDue($goalSub->goalID, $userID)) {
 					return true;
 				}
 			}
