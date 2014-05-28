@@ -31,7 +31,9 @@ class UnitWpSimpleTest extends UnitTestCase {
     
 	public function testGettingCurrentUserLogin() {
 		$user = wp_get_current_user();
-		$UserManager = new HfUserManager();
+		$DbConnection = new HfDbConnection();
+        $HtmlGenerator = new HfHtmlGenerator();
+		$UserManager = new HfUserManager($DbConnection, $HtmlGenerator);
 		$this->assertEqual($UserManager->getCurrentUserLogin(), $user->user_login);
 	}
     
@@ -40,7 +42,7 @@ class UnitWpSimpleTest extends UnitTestCase {
     }
     
     public function testDbDataNullRemoval() {
-    	$DbManager = new HfDbManager();
+    	$DbManager = new HfDbConnection();
     	$data = array(
 				'one' => 'big one',
 				'two' => 'two',
@@ -91,7 +93,7 @@ class UnitWpSimpleTest extends UnitTestCase {
 	*/
 
 	public function testSchemaColumnObjectCreation() {
-  		$DbManager = new HfDbManager();
+  		$DbManager = new HfDbConnection();
 		$columnObject = $DbManager->createColumnSchemaObject('openTime', 'timestamp', 'YES', '', null, '');
 		
 		$expected = new StdClass;
@@ -106,7 +108,7 @@ class UnitWpSimpleTest extends UnitTestCase {
 	}
 	
 	public function testEmailTableSchema() {
-		$DbManager = new HfDbManager();
+		$DbManager = new HfDbConnection();
 		$currentSchema = $DbManager->getTableSchema('hf_email');
 		
 		$expectedSchema = array(
@@ -124,7 +126,7 @@ class UnitWpSimpleTest extends UnitTestCase {
 	}
 	
 	public function testGoalTableSchema() {
-		$DbManager = new HfDbManager();
+		$DbManager = new HfDbConnection();
 		$currentSchema = $DbManager->getTableSchema('hf_goal');
 		
 		$expectedSchema = array(
@@ -142,7 +144,7 @@ class UnitWpSimpleTest extends UnitTestCase {
 	}
 	
 	public function testReportTableSchema() {
-		$DbManager = new HfDbManager();
+		$DbManager = new HfDbConnection();
 		$currentSchema = $DbManager->getTableSchema('hf_report');
 		
 		$expectedSchema = array(
@@ -158,7 +160,7 @@ class UnitWpSimpleTest extends UnitTestCase {
 	}
 
 	public function testUserGoalTableSchema() {
-		$DbManager = new HfDbManager();
+		$DbManager = new HfDbConnection();
 		$currentSchema = $DbManager->getTableSchema('hf_user_goal');
 		
 		$expectedSchema = array(
@@ -172,7 +174,7 @@ class UnitWpSimpleTest extends UnitTestCase {
 	}
 	
 	public function testLevelTableSchema() {
-		$DbManager = new HfDbManager();
+		$DbManager = new HfDbConnection();
 		$currentSchema = $DbManager->getTableSchema('hf_level');
 		
 		$expectedSchema = array(
@@ -188,7 +190,7 @@ class UnitWpSimpleTest extends UnitTestCase {
 	}
 	
 	public function testInviteTableSchema() {
-		$DbManager = new HfDbManager();
+		$DbManager = new HfDbConnection();
 		$currentSchema = $DbManager->getTableSchema('hf_invite');
 		
 		$expectedSchema = array(
@@ -203,18 +205,21 @@ class UnitWpSimpleTest extends UnitTestCase {
 	}
 	
 	public function testRandomStringCreationLength() {
-		$HfMain = new HfAccountability();
-		$randomString = $HfMain->createRandomString(400);
+        $Security = new HfSecurity();
+		$randomString = $Security->createRandomString(400);
 		$this->assertEqual(strlen($randomString), 400);
 	}
 	
 	public function testInviteEmailSending() {
-		$HfMain				= new HfAccountability();
-		$Mailer				= new HfMailer();
-		$DbManager			= new HfDbManager();
+		$DbConnection		= new HfDbConnection();
+        $HtmlGenerator      = new HfHtmlGenerator();
+        $UserManager		= new HfUserManager($DbConnection, $HtmlGenerator);
+        $URLFinder          = new HfUrl();
+        $Security           = new HfSecurity();
+        $Mailer				= new HfMailer($URLFinder, $UserManager, $Security, $DbConnection);
 		
 		$table				= 'hf_email';
-		$rows 				= $DbManager->getTable($table);
+		$rows 				= $DbConnection->getTable($table);
 		$startRowCount 		= count($rows);
 
 		$inviterID			= 1;
@@ -222,17 +227,17 @@ class UnitWpSimpleTest extends UnitTestCase {
 		$inviterName		= $inviter->user_login;
 		$destinationEmail	= 'hftest@mailinator.com';
 		$daysToExpire		= 10;
-		$invitationID		= $Mailer->sendInvitation($inviterID, $destinationEmail, $daysToExpire);
-		$invitationURL		= $HfMain->getURLByTitle('Register') . '?n=' . $invitationID;
+		$invitationID		= $Mailer->sendInvitation($inviterID, $destinationEmail, $daysToExpire, $UserManager);
+		$invitationURL		= $URLFinder->getURLByTitle('Register') . '?n=' . $invitationID;
 		
 		global $wpdb;
 		$prefix				= $wpdb->prefix;
 		$tableName			= $prefix . $table;
-		$email				= $DbManager->getRow($table, 'emailID=( SELECT max(emailID) FROM '.$tableName.' )');
+		$email				= $DbConnection->getRow($table, 'emailID=( SELECT max(emailID) FROM '.$tableName.' )');
 		
-		$DbManager->deleteRow($table, 'emailID='.$email->emailID);
-		$DbManager->deleteRow('hf_invite', 'emailID='.$email->emailID);
-		$rows  				= $DbManager->getTable($table);
+		$DbConnection->deleteRow($table, 'emailID='.$email->emailID);
+		$DbConnection->deleteRow('hf_invite', 'emailID='.$email->emailID);
+		$rows  				= $DbConnection->getTable($table);
 		$endRowCount 		= count($rows);
 		
 		$this->assertEqual($email->sendTime, date('Y-m-d H:i:s'));
@@ -252,12 +257,16 @@ class UnitWpSimpleTest extends UnitTestCase {
 	}
 	
 	public function testInviteStorageInInviteTable() {
-		$Mailer				= new HfMailer();
-		$DbManager			= new HfDbManager();
+		$DbConnection		= new HfDbConnection();
+        $HtmlGenerator      = new HfHtmlGenerator();
+		$UserManager		= new HfUserManager($DbConnection, $HtmlGenerator);
+        $URLFinder          = new HfUrl();
+        $Security           = new HfSecurity();
+		$Mailer				= new HfMailer($URLFinder, $UserManager, $Security, $DbConnection);
 		
 		$table				= 'hf_invite';
-		$startInviteRowCount= $DbManager->countRowsInTable($table);
-		$startEmailRowCount	= $DbManager->countRowsInTable('hf_email');
+		$startInviteRowCount= $DbConnection->countRowsInTable($table);
+		$startEmailRowCount	= $DbConnection->countRowsInTable('hf_email');
 		
 		$inviterID			= 1;
 		$destinationEmail	= 'hftest@mailinator.com';
@@ -267,14 +276,14 @@ class UnitWpSimpleTest extends UnitTestCase {
 		global $wpdb;
 		$prefix				= $wpdb->prefix;
 		$tableName			= $prefix . $table;
-		$invite				= $DbManager->getRow($table, 'emailID=( SELECT max(emailID) FROM '.$tableName.' )');
-		$inviteTable		= $DbManager->getFullTableName('hf_invite');
-		$emailID			= $DbManager->getVar('hf_invite', 'emailID', 'inviteID="'.$inviteID.'"');
+		$invite				= $DbConnection->getRow($table, 'emailID=( SELECT max(emailID) FROM '.$tableName.' )');
+		$inviteTable		= $DbConnection->getFullTableName('hf_invite');
+		$emailID			= $DbConnection->getVar('hf_invite', 'emailID', 'inviteID="'.$inviteID.'"');
 		
-		$DbManager->deleteRow($table, 'inviteID="'.$inviteID.'"');
-		$DbManager->deleteRow('hf_email', 'emailID='.$emailID);
-		$endInviteRowCount 	= $DbManager->countRowsInTable($table);
-		$endEmailRowCount	= $DbManager->countRowsInTable('hf_email');
+		$DbConnection->deleteRow($table, 'inviteID="'.$inviteID.'"');
+		$DbConnection->deleteRow('hf_email', 'emailID='.$emailID);
+		$endInviteRowCount 	= $DbConnection->countRowsInTable($table);
+		$endEmailRowCount	= $DbConnection->countRowsInTable('hf_email');
 		
 		$this->assertEqual($invite->inviteID, $inviteID);
 		$this->assertEqual($invite->inviterID, $inviterID);
@@ -283,6 +292,23 @@ class UnitWpSimpleTest extends UnitTestCase {
 		$this->assertEqual($startInviteRowCount, $endInviteRowCount);
 		$this->assertEqual($startEmailRowCount, $endEmailRowCount);
 	}
+
+	/* public function testIsAnyGoalDueUsingMocks() {
+		Mock::generate('HfDbManager');
+		$DbConnection			= new MockHfDbManager();
+		$UserManager			= new HfUserManager($DbConnection);
+		
+		$mockRow				= new StdClass;
+		$mockRow->userID		= 1;
+		$mockRow->goalID		= '2014-04-15 14:26:14';
+		$mockRow->dateStarted	= 1;
+		$mockRow->isActive		= 1;
+		
+		$DbConnection->returns('getRows', array($mockRow));
+		
+		$result	= $UserManager->isAnyGoalDue(1);
+		$this->assertEqual($result, false);
+	} */
 }
 
 ?>

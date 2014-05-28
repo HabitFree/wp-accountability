@@ -2,8 +2,12 @@
 
 if (!class_exists("HfUserManager")) {
 	class HfUserManager {
-		
-		function HfUserManager() { //constructor
+		private $DbConnection;
+        private $HtmlGenerator;
+
+        function HfUserManager($DbConnection, $HtmlGenerator) {
+            $this->HtmlGenerator = $HtmlGenerator;
+			$this->DbConnection = $DbConnection;
 		}
 		
 		private function currentUser() {
@@ -18,13 +22,16 @@ if (!class_exists("HfUserManager")) {
 		}
 		
 		function processNewUser($userID) {
-			$HfMain = new HfAccountability();
-			$Mailer = new HfMailer();
-			$DbManager = new HfDbManager();
+            $UserManager = new HfUserManager($this->DbConnection);
+            $URLFinder = new HfUrl();
+            $Security = new HfSecurity();
+            $Mailer = new HfMailer($URLFinder, $UserManager, $Security, $this->DbConnection);
+            $HtmlGenerator = new HfHtmlGenerator();
+			$HfMain = new HfAccountability($HtmlGenerator, $UserManager, $Mailer, $URLFinder, $this->DbConnection);
 			$table = "hf_user_goal";
 			$data = array( 'userID' => $userID,
 				'goalID' => 1 );
-			$DbManager->insertIgnoreIntoDb($table, $data);
+			$this->DbConnection->insertIgnoreIntoDb($table, $data);
 			$settingsPageURL = $HfMain->getURLByTitle('Settings');
 			$message = "<p>Welcome to HabitFree! 
 				You've been subscribed to periodic accountability emails. 
@@ -40,11 +47,10 @@ if (!class_exists("HfUserManager")) {
 			return $this->currentUser()->ID;
 		}
 		
-		function userGoalLevel($goalID, $userID) {
-			$DbManager = new HfDbManager();			
+		function userGoalLevel($goalID, $userID) {		
 			$daysOfSuccess = $this->daysOfSuccess($goalID, $userID);	
 			$whereLevel = 'target > ' . $daysOfSuccess . ' ORDER BY target ASC';
-			return $DbManager->getRow('hf_level', $whereLevel);
+			return $this->DbConnection->getRow('hf_level', $whereLevel);
 		}
 		
 		function daysToNextLevel($goalID, $userID) {
@@ -54,24 +60,20 @@ if (!class_exists("HfUserManager")) {
 		}
 		
 		function currentLevelTarget($daysOfSuccess) {
-			$DbManager = new HfDbManager();
 			$whereCurrentLevel = 'target > ' . $daysOfSuccess . ' ORDER BY target ASC';
-			return $DbManager->getVar('hf_level', 'target', $whereCurrentLevel);
+			return $this->DbConnection->getVar('hf_level', 'target', $whereCurrentLevel);
 		}
 		
 		function levelBarForGoal($goalID, $userID) {
-			$HfMain = new HfAccountability();
-			$percent = $this->levelPercentComplete($goalID, $userID);
-			$daysOfSuccess = $this->daysOfSuccess($goalID, $userID);
-			return $HfMain->progressBar($percent, '');
+            $percent = $this->levelPercentComplete($goalID, $userID);
+			return $this->HtmlGenerator->progressBar($percent, '');
 		}
 		
 		function nextLevelName($daysOfSuccess) {
-			$DbManager = new HfDbManager();
 			$whereCurrentLevel = 'target > ' . $daysOfSuccess . ' ORDER BY target ASC';
-			$currentLevelID = $DbManager->getVar('hf_level', 'levelID', $whereCurrentLevel);
+			$currentLevelID = $this->DbConnection->getVar('hf_level', 'levelID', $whereCurrentLevel);
 			$whereNextLevel = 'levelID = ' . ($currentLevelID + 1);
-			return $DbManager->getVar('hf_level', 'title', $whereNextLevel);
+			return $this->DbConnection->getVar('hf_level', 'title', $whereNextLevel);
 		}
 		
 		function levelPercentComplete($goalID, $userID) {
@@ -81,7 +83,6 @@ if (!class_exists("HfUserManager")) {
 
 		function daysOfSuccess($goalID, $userID) {
 			global $wpdb;
-			$DbManager = new HfDbManager();
 			$prefix = $wpdb->prefix;
 			$table = 'hf_report';
 			$tableName = $prefix . $table;
@@ -106,9 +107,9 @@ if (!class_exists("HfUserManager")) {
 					FROM ' . $tableName . 
 					' WHERE NOT isSuccessful = 1)';
 			
-			$dateInSecondsOfFirstSuccess = strtotime($DbManager->getVar($table, $select, $whereFirstSuccess));
-			$dateInSecondsOfLastSuccess = strtotime($DbManager->getVar($table, $select, $whereLastSuccess));
-			$dateInSecondsOfLastFail = strtotime($DbManager->getVar($table, $select, $whereLastFail));
+			$dateInSecondsOfFirstSuccess = strtotime($this->DbConnection->getVar($table, $select, $whereFirstSuccess));
+			$dateInSecondsOfLastSuccess = strtotime($this->DbConnection->getVar($table, $select, $whereLastSuccess));
+			$dateInSecondsOfLastFail = strtotime($this->DbConnection->getVar($table, $select, $whereLastFail));
 			
 			$secondsInADay = 86400;
 			
@@ -128,14 +129,14 @@ if (!class_exists("HfUserManager")) {
 		}
 		
 		function userButtonsShortcode() {
-			$HfMain = new HfAccountability();
+			$URLFinder = new HfUrl();
 			$welcome = 'Welcome back, ' . $this->getCurrentUserLogin() . ' | ';
-			$logInOutLink = wp_loginout( $HfMain->getCurrentPageUrl(), false );
+			$logInOutLink = wp_loginout( $URLFinder->getCurrentPageUrl(), false );
 			if ( is_user_logged_in() ) {
-				$settingsURL = $HfMain->getURLByTitle('Settings');
+				$settingsURL = $URLFinder->getURLByTitle('Settings');
 				return $welcome . $logInOutLink . ' | <a href="'.$settingsURL.'">Settings</a>';
 			} else {
-				$registerURL = $HfMain->getURLByTitle('Register');
+				$registerURL = $URLFinder->getURLByTitle('Register');
 				return $logInOutLink . ' | <a href="'.$registerURL.'">Register</a>';
 			}
 				
@@ -146,10 +147,8 @@ if (!class_exists("HfUserManager")) {
 		}
 		
 		function isAnyGoalDue($userID) {
-			$DbManager = new HfDbManager();
-			$goalSubs = $DbManager->getRows('hf_user_goal', 'userID = ' . $userID);
+			$goalSubs = $this->DbConnection->getRows('hf_user_goal', 'userID = ' . $userID);
 			foreach ($goalSubs as $goalSub) {
-				var_dump($this->isGoalDue($goalSub->goalID, $userID));
 				if ($this->isGoalDue($goalSub->goalID, $userID)) {
 					return true;
 				}
@@ -158,7 +157,6 @@ if (!class_exists("HfUserManager")) {
 		}
 		
 		function isGoalDue($goalID, $userID) {
-			$dbManager = new HfDbManager();
 			$level = $this->userGoalLevel($goalID, $userID);
 			$emailInterval = $level->emailInterval;
 			$daysSinceLastReport = $this->daysSinceLastReport($goalID, $userID);
@@ -167,14 +165,13 @@ if (!class_exists("HfUserManager")) {
 		
 		function daysSinceLastReport($goalID, $userID) {
 			global $wpdb;
-			$DbManager = new HfDbManager();
 			$prefix = $wpdb->prefix;
 			$table = 'hf_report';
 			$tableName = $prefix . $table;
 			$whereLastReport = 'goalID = ' . $goalID .
 				' AND userID = ' . $userID .
 				' AND reportID=( SELECT max(reportID) FROM '.$tableName.' )';
-			$dateInSecondsOfLastReport = strtotime($DbManager->getVar('hf_report', 'date', $whereLastReport));
+			$dateInSecondsOfLastReport = strtotime($this->DbConnection->getVar('hf_report', 'date', $whereLastReport));
 			$secondsInADay = 86400;
 			return ( time() - $dateInSecondsOfLastReport ) / $secondsInADay;
 		}

@@ -1,10 +1,10 @@
 <?php
 
-if (!class_exists("HfDbManager")) {
-	class HfDbManager {
+if (!class_exists("HfDbConnection")) {
+	class HfDbConnection {
 		private $dbVersion = "3.7";
 		
-		function HfDbManager() { //constructor
+		function HfDbConnection() { //constructor
 		}
 		
 		function installDb() {
@@ -349,10 +349,14 @@ if (!class_exists("HfDbManager")) {
 		}
 		
 		function countRowsInTable($table) {
-			$DbManager = new HfDbManager();
-			$rows = $DbManager->getTable($table);
+			$rows = $this->getTable($table);
 			return count($rows);
 		}
+
+        function sudoReactivateExtension() {
+            hfDeactivate();
+            hfActivate();
+        }
 	}
 }
 ?>
