@@ -22,10 +22,11 @@ if (!class_exists("HfUserManager")) {
 		}
 		
 		function processNewUser($userID) {
-            $UserManager = new HfUserManager($this->DbConnection);
-            $URLFinder = new HfUrl();
+            $UserManager = new HfUserManager($this->DbConnection, $this->HtmlGenerator);
+            $URLFinder = new HfUrlFinder();
+            $UrlGenerator = new HfUrlGenerator();
             $Security = new HfSecurity();
-            $Mailer = new HfMailer($URLFinder, $UserManager, $Security, $this->DbConnection);
+            $Mailer = new HfMailer($URLFinder, $UrlGenerator, $UserManager, $Security, $this->DbConnection);
             $HtmlGenerator = new HfHtmlGenerator();
 			$HfMain = new HfAccountability($HtmlGenerator, $UserManager, $Mailer, $URLFinder, $this->DbConnection);
 			$table = "hf_user_goal";
@@ -36,7 +37,7 @@ if (!class_exists("HfUserManager")) {
 			$message = "<p>Welcome to HabitFree! 
 				You've been subscribed to periodic accountability emails. 
 				You can <a href='".$settingsPageURL."'>edit your subscription settings by clicking here</a>.</p>";
-			$Mailer->sendEmail($userID, 'Welcome!', $message);
+			$Mailer->sendEmailToUser($userID, 'Welcome!', $message);
 		}
 		
 		function getCurrentUserLogin() {
@@ -129,7 +130,7 @@ if (!class_exists("HfUserManager")) {
 		}
 		
 		function userButtonsShortcode() {
-			$URLFinder = new HfUrl();
+			$URLFinder = new HfUrlFinder();
 			$welcome = 'Welcome back, ' . $this->getCurrentUserLogin() . ' | ';
 			$logInOutLink = wp_loginout( $URLFinder->getCurrentPageUrl(), false );
 			if ( is_user_logged_in() ) {

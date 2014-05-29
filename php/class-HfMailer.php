@@ -5,38 +5,55 @@ if (!class_exists("HfMailer")) {
 		private $UserManager;
         private $Security;
         private $DbConnection;
-        private $Url;
+        private $UrlFinder;
+        private $UrlGenerator;
+        private $ApiInterface;
 
-        function HfMailer($Url, $UserManager, $Security, $DbConnection) {
+        function HfMailer($UrlFinder, $UrlGenerator, $UserManager, $Security, $DbConnection, $ApiInterface) {
             $this->DbConnection = $DbConnection;
 			$this->UserManager = $UserManager;
             $this->Security = $Security;
-            $this->Url = $Url;
+            $this->UrlFinder = $UrlFinder;
+            $this->UrlGenerator = $UrlGenerator;
+            $this->ApiInterface = $ApiInterface;
 		}
-		
-		function sendEmail($userID, $subject, $message, $emailID = null, $emailAddress = null) {
-			if ($emailAddress != null) {
-				$to = $emailAddress;
-			} else {
-				$to = get_userdata( $userID )->user_email;
-			}
-			$success = wp_mail( $to, $subject, $message );
-			
-			if ($success) {
-				$this->recordEmail($userID, $subject, $message, $emailID, $emailAddress);
-			}
-			
-			if ($emailID === null) {
-				$emailID = intval($this->DbConnection->getVar('hf_email', 'max(emailID)'));
-			}
-			
-			if ($success) {
-				return $emailID;
-			} else {
-				return false;
-			}
-			
-		}
+
+        function sendEmailToUser($userID, $subject, $body) {
+            $to = $this->ApiInterface->getUserEmail($userID);
+            $success = $this->ApiInterface->sendWpEmail($to, $subject, $body);
+            $emailID = intval($this->DbConnection->getVar('hf_email', 'max(emailID)'));
+
+            if($success) {
+                $this->recordEmail($userID, $subject, $body, $emailID, $to);
+                return $emailID;
+            } else {
+                return false;
+            }
+        }
+
+        function sendEmailToAddress($address, $subject, $body) {
+            $success = $this->ApiInterface->sendWpEmail($address, $subject, $body);
+            $emailID = intval($this->DbConnection->getVar('hf_email', 'max(emailID)'));
+
+            if($success) {
+                $this->recordEmail(null, $subject, $body, $emailID, $address);
+                return $emailID;
+            } else {
+                return false;
+            }
+        }
+
+        function sendEmailToUserAndSpecifyEmailID($userID, $subject, $body, $emailID) {
+            $to = $this->ApiInterface->getUserEmail($userID);
+            $success = $this->ApiInterface->sendWpEmail($to, $subject, $body);
+
+            if($success) {
+                $this->recordEmail($userID, $subject, $body, $emailID, $to);
+                return $emailID;
+            } else {
+                return false;
+            }
+        }
 		
 		function recordEmail($userID, $subject, $message, $emailID = null, $emailAddress = null) {
 			$table = "hf_email";
@@ -65,7 +82,7 @@ if (!class_exists("HfMailer")) {
 			$emailID = $this->DbConnection->generateEmailID();
 			$reportURL = $this->generateReportURL($userID, $emailID);
 			$message = "<p>Time to <a href='" . $reportURL . "'>check in</a>.</p>";
-			$this->sendEmail($userID, $subject, $message, $emailID);
+			$this->sendEmailToUserAndSpecifyEmailID($userID, $subject, $message, $emailID);
 		}
 		
 		function markAsDelivered( $emailID ) {
@@ -75,19 +92,19 @@ if (!class_exists("HfMailer")) {
 			$this->DbConnection->updateRows($table, $data, $where);
 		}
 		
-		function sendInvitation( $inviterID, $destinationEmail, $daysToExpire ) {
+		function sendInvitation( $inviterID, $address, $daysToExpire ) {
 			$inviteID			= $this->generateInviteID();
 			$inviteURL			= $this->generateInviteURL($inviteID);
 			$inviterUsername	= $this->UserManager->getUsernameByID( $inviterID, true );
 			$subject			= $inviterUsername . ' just invited you to join them at HabitFree!';
 			$body				= "<p>HabitFree is a community of young people striving for God's ideal of purity and Christian freedom.</p><p><a href='" . $inviteURL . "'>Click here to join " . $inviterUsername . " in his quest!</a></p>";
 			
-			$emailID = $this->sendEmail(null, $subject, $body, null, $destinationEmail);
+			$emailID = $this->sendEmailToAddress($address, $subject, $body);
 			
 			$expirationDate = date('Y-m-d H:i:s', strtotime('+'.$daysToExpire.' days'));
 			
 			if ($emailID !== false) {
-				$this->recordInvite($inviteID, $inviterID, $destinationEmail, $emailID, $expirationDate);
+				$this->recordInvite($inviteID, $inviterID, $address, $emailID, $expirationDate);
 			}
 			
 			return $inviteID;
@@ -108,24 +125,24 @@ if (!class_exists("HfMailer")) {
 		}
 		
 		function generateReportURL($userID, $emailID) {
-            $baseURL = $this->Url->getReportPageURL();
+            $baseURL = $this->UrlFinder->getReportPageURL();
 			
 			$parameters = array(
 					'userID'	=> $userID,
 					'emailID'	=> $emailID
 				);
 			
-			return $this->Url->addParametersToUrl($baseURL, $parameters);
+			return $this->UrlGenerator->addParametersToUrl($baseURL, $parameters);
 		}
 		
 		function generateInviteURL($inviteID) {
-			$baseURL = $this->Url->getURLByTitle('Register');
+			$baseURL = $this->UrlFinder->getURLByTitle('Register');
 			
 			$parameters = array(
 					'n' => $inviteID
 				);
 			
-			return $this->Url->addParametersToUrl($baseURL, $parameters);
+			return $this->UrlGenerator->addParametersToUrl($baseURL, $parameters);
 		}
 	}
 }

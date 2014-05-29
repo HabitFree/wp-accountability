@@ -1,9 +1,9 @@
 <?php
 
-if (!class_exists("HfUrl")) {
-    class HfUrl {
+if (!class_exists("HfUrlFinder")) {
+    class HfUrlFinder {
 
-        function HfUrl() {
+        function HfUrlFinder() {
         }
 
         function getCurrentPageUrl() {
@@ -27,23 +27,6 @@ if (!class_exists("HfUrl")) {
         function getURLByTitle($title) {
             $page = get_page_by_title( $title );
             return get_permalink( $page->ID );
-        }
-
-        function addParametersToUrl($url, $parameters) {
-            $name = key($parameters);
-            $value = array_shift($parameters);
-
-            if (strpos($url,'?') !== false) {
-                $url .= '&' . $name . '=' . $value;
-            } else {
-                $url .= '?' . $name . '=' . $value;
-            }
-
-            if ( count($parameters) > 0 ) {
-                $url = $this->addParametersToUrl($url, $parameters);
-            }
-
-            return $url;
         }
 
     }

@@ -24,7 +24,8 @@ function hfActivate() {
 	wp_schedule_event(time(), 'daily', 'hfEmailCronHook');
 	$HfDbMain = new HfDbConnection();
 	$HfDbMain->installDb();
-	$HfUserMain = new HfUserManager($HfDbMain);
+    $HtmlGenerator = new HfHtmlGenerator();
+	$HfUserMain = new HfUserManager($HfDbMain, $HtmlGenerator);
 	$HfUserMain->processAllUsers();
 }
 
@@ -32,7 +33,8 @@ function hfDeactivate() {
 	wp_clear_scheduled_hook('hfEmailCronHook');
 }
 
-require_once(dirname(__FILE__) . '/php/class-HfUrl.php');
+require_once(dirname(__FILE__) . '/php/class-HfUrlFinder.php');
+require_once(dirname(__FILE__) . '/php/class-HfUrlGenerator.php');
 require_once(dirname(__FILE__) . '/php/class-HfSecurity.php');
 require_once(dirname(__FILE__) . '/php/class-HfEmail.php');
 require_once(dirname(__FILE__) . '/php/class-HfAccountability.php');
@@ -41,14 +43,17 @@ require_once(dirname(__FILE__) . '/php/class-HfDbConnection.php');
 require_once(dirname(__FILE__) . '/php/class-HfUserManager.php');
 require_once(dirname(__FILE__) . '/php/class-HfAdminPanel.php');
 require_once(dirname(__FILE__) . '/php/class-HfHtmlGenerator.php');
+require_once(dirname(__FILE__) . '/php/class-HfWordPressInterface.php');
 
 if (class_exists("HfAccountability")) {
     $HfDbConnection = new HfDbConnection();
-    $HfUserManager = new HfUserManager($HfDbConnection);
-    $HfURLFinder = new HfUrl();
-    $HfSecurity = new HfSecurity();
-    $HfMailer = new HfMailer($HfURLFinder, $HfUserManager, $HfSecurity, $HfDbConnection);
     $HfHtmlGenerator = new HfHtmlGenerator();
+    $HfUserManager = new HfUserManager($HfDbConnection, $HfHtmlGenerator);
+    $HfURLFinder = new HfUrlFinder();
+    $HfUrlGenerator = new HfUrlGenerator();
+    $HfSecurity = new HfSecurity();
+    $HfWordPressInterface = new HfWordPressInterface();
+    $HfMailer = new HfMailer($HfURLFinder, $HfUrlGenerator, $HfUserManager, $HfSecurity, $HfDbConnection, $HfWordPressInterface);
 	$HfMain = new HfAccountability($HfHtmlGenerator, $HfUserManager, $HfMailer, $HfURLFinder, $HfDbConnection);
 }
 

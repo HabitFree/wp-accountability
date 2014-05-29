@@ -64,33 +64,6 @@ class UnitWpSimpleTest extends UnitTestCase {
 		
     	$this->assertEqual($DbManager->removeNullValuePairs($data), $expectedData);
     }
-    
-	/*
-    public function testTableEmpty() {
-    	$DbManager = new HfDbManager();
-		$backup = $DbManager->getTable('hf_email');
-		
-		$DbManager->emptyTable('hf_email');
-		
-		$rows = $DbManager->getTable('hf_email');
-		$rowCount = count($rows);
-		
-		$DbManager->insertMultipleRows('hf_email', $backup);
-		
-    	$this->assertEqual($rowCount, 0);
-    }
-	
-	public function testTableBackupAndRestore() {
-		$DbManager = new HfDbManager();
-		$backup = $DbManager->getRows('hf_email', null, ARRAY_A);
-		
-		$DbManager->emptyTable('hf_email');
-		
-		$DbManager->insertMultipleRows('hf_email', $backup);
-		
-    	$this->assertEqual($DbManager->getRows('hf_email', null, ARRAY_A), $backup);
-	}
-	*/
 
 	public function testSchemaColumnObjectCreation() {
   		$DbManager = new HfDbConnection();
@@ -209,45 +182,30 @@ class UnitWpSimpleTest extends UnitTestCase {
 		$randomString = $Security->createRandomString(400);
 		$this->assertEqual(strlen($randomString), 400);
 	}
-	
-	public function testInviteEmailSending() {
-		$DbConnection		= new HfDbConnection();
-        $HtmlGenerator      = new HfHtmlGenerator();
-        $UserManager		= new HfUserManager($DbConnection, $HtmlGenerator);
-        $URLFinder          = new HfUrl();
-        $Security           = new HfSecurity();
-        $Mailer				= new HfMailer($URLFinder, $UserManager, $Security, $DbConnection);
-		
-		$table				= 'hf_email';
-		$rows 				= $DbConnection->getTable($table);
-		$startRowCount 		= count($rows);
 
-		$inviterID			= 1;
-		$inviter			= get_userdata( $inviterID );
-		$inviterName		= $inviter->user_login;
-		$destinationEmail	= 'hftest@mailinator.com';
-		$daysToExpire		= 10;
-		$invitationID		= $Mailer->sendInvitation($inviterID, $destinationEmail, $daysToExpire, $UserManager);
-		$invitationURL		= $URLFinder->getURLByTitle('Register') . '?n=' . $invitationID;
-		
-		global $wpdb;
-		$prefix				= $wpdb->prefix;
-		$tableName			= $prefix . $table;
-		$email				= $DbConnection->getRow($table, 'emailID=( SELECT max(emailID) FROM '.$tableName.' )');
-		
-		$DbConnection->deleteRow($table, 'emailID='.$email->emailID);
-		$DbConnection->deleteRow('hf_invite', 'emailID='.$email->emailID);
-		$rows  				= $DbConnection->getTable($table);
-		$endRowCount 		= count($rows);
-		
-		$this->assertEqual($email->sendTime, date('Y-m-d H:i:s'));
-		$this->assertEqual($email->subject, ucwords($inviterName) . ' just invited you to join them at HabitFree!');
-		$this->assertEqual($email->body,
-			"<p>HabitFree is a community of young people striving for God's ideal of purity and Christian freedom.</p><p><a href='" . $invitationURL . "'>Click here to join " . ucwords($inviterName) . " in his quest!</a></p>");
-		$this->assertEqual($email->userID, 0);
-		$this->assertEqual($email->address, $destinationEmail);
-		$this->assertEqual($startRowCount, $endRowCount);
-	}
+    public function testEmailInviteSendingUsingMocks() {
+        Mock::generate('HfUrlFinder');
+        Mock::generate('HfUrlGenerator');
+        Mock::generate('HfUserManager');
+        Mock::generate('HfSecurity');
+        Mock::generate('HfDbConnection');
+        Mock::generate('HfWordPressInterface');
+
+        $UrlFinder      = new MockHfUrlFinder();
+        $UrlGenerator   = new MockHfUrlGenerator();
+        $UserManager    = new MockHfUserManager();
+        $Security       = new MockHfSecurity();
+        $DbConnection   = new MockHfDbConnection();
+        $WordPressApi   = new MockHfWordPressInterface();
+
+        $Security->returns('createRandomString', 555);
+        $DbConnection->returns('getVar', 5);
+
+        $Mailer = new HfMailer($UrlFinder, $UrlGenerator, $UserManager, $Security, $DbConnection, $WordPressApi);
+        $result = $Mailer->sendInvitation(1, 'me@test.com', 3);
+
+        $this->assertEqual($result, 555);
+    }
 	
 	public function testPHPandMySQLtimezonesMatch() {
 		$phpTime	= date('Y-m-d H:i:s');
@@ -255,60 +213,107 @@ class UnitWpSimpleTest extends UnitTestCase {
 		$mysqlTime	= $wpdb->get_results("SELECT NOW()", ARRAY_A);
 		$this->assertEqual($phpTime, $mysqlTime[0]['NOW()']);
 	}
-	
-	public function testInviteStorageInInviteTable() {
-		$DbConnection		= new HfDbConnection();
-        $HtmlGenerator      = new HfHtmlGenerator();
-		$UserManager		= new HfUserManager($DbConnection, $HtmlGenerator);
-        $URLFinder          = new HfUrl();
-        $Security           = new HfSecurity();
-		$Mailer				= new HfMailer($URLFinder, $UserManager, $Security, $DbConnection);
-		
-		$table				= 'hf_invite';
-		$startInviteRowCount= $DbConnection->countRowsInTable($table);
-		$startEmailRowCount	= $DbConnection->countRowsInTable('hf_email');
-		
-		$inviterID			= 1;
-		$destinationEmail	= 'hftest@mailinator.com';
-		$daysToExpire		= 10;
-		$inviteID			= $Mailer->sendInvitation($inviterID, $destinationEmail, $daysToExpire);
-		
-		global $wpdb;
-		$prefix				= $wpdb->prefix;
-		$tableName			= $prefix . $table;
-		$invite				= $DbConnection->getRow($table, 'emailID=( SELECT max(emailID) FROM '.$tableName.' )');
-		$inviteTable		= $DbConnection->getFullTableName('hf_invite');
-		$emailID			= $DbConnection->getVar('hf_invite', 'emailID', 'inviteID="'.$inviteID.'"');
-		
-		$DbConnection->deleteRow($table, 'inviteID="'.$inviteID.'"');
-		$DbConnection->deleteRow('hf_email', 'emailID='.$emailID);
-		$endInviteRowCount 	= $DbConnection->countRowsInTable($table);
-		$endEmailRowCount	= $DbConnection->countRowsInTable('hf_email');
-		
-		$this->assertEqual($invite->inviteID, $inviteID);
-		$this->assertEqual($invite->inviterID, $inviterID);
-		$this->assertEqual($invite->inviteeEmail, $destinationEmail);
-		$this->assertEqual($invite->expirationDate, date('Y-m-d H:i:s', strtotime('+'.$daysToExpire.' days')));
-		$this->assertEqual($startInviteRowCount, $endInviteRowCount);
-		$this->assertEqual($startEmailRowCount, $endEmailRowCount);
-	}
 
-	/* public function testIsAnyGoalDueUsingMocks() {
-		Mock::generate('HfDbManager');
-		$DbConnection			= new MockHfDbManager();
-		$UserManager			= new HfUserManager($DbConnection);
-		
-		$mockRow				= new StdClass;
-		$mockRow->userID		= 1;
-		$mockRow->goalID		= '2014-04-15 14:26:14';
-		$mockRow->dateStarted	= 1;
-		$mockRow->isActive		= 1;
-		
-		$DbConnection->returns('getRows', array($mockRow));
-		
-		$result	= $UserManager->isAnyGoalDue(1);
-		$this->assertEqual($result, false);
-	} */
+    public function testInviteStorageInInviteTableUsingMocks() {
+        Mock::generate('HfUrlFinder');
+        Mock::generate('HfUrlGenerator');
+        Mock::generate('HfUserManager');
+        Mock::generate('HfSecurity');
+        Mock::generate('HfDbConnection');
+        Mock::generate('HfWordPressInterface');
+
+        $UrlFinder      = new MockHfUrlFinder();
+        $UrlGenerator   = new MockHfUrlGenerator();
+        $UserManager    = new MockHfUserManager();
+        $Security       = new MockHfSecurity();
+        $DbConnection   = new MockHfDbConnection();
+        $WordPressApi   = new MockHfWordPressInterface();
+
+        $Security->returns('createRandomString', 555);
+        $DbConnection->returns('getVar', 5);
+        $WordPressApi->returns('sendWpEmail', true);
+
+        $Mailer = new HfMailer($UrlFinder, $UrlGenerator, $UserManager, $Security, $DbConnection, $WordPressApi);
+        $expirationDate = date('Y-m-d H:i:s', strtotime('+'. 3 .' days'));
+
+        $expectedRecord = array(
+            'inviteID' => 555,
+            'inviterID' => 1,
+            'inviteeEmail' => 'me@test.com',
+            'emailID' => 5,
+            'expirationDate' => $expirationDate
+        );
+
+        $DbConnection->expectAt(
+            1, 'insertIntoDb',
+            array('hf_invite', $expectedRecord ));
+
+        $Mailer->sendInvitation(1, 'me@test.com', 3);
+    }
+
+    public function testSendEmailByUserID() {
+        Mock::generate('HfUrlFinder');
+        Mock::generate('HfUrlGenerator');
+        Mock::generate('HfUserManager');
+        Mock::generate('HfSecurity');
+        Mock::generate('HfDbConnection');
+        Mock::generate('HfWordPressInterface');
+
+        $UrlFinder      = new MockHfUrlFinder();
+        $UrlGenerator   = new MockHfUrlGenerator();
+        $UserManager    = new MockHfUserManager();
+        $Security       = new MockHfSecurity();
+        $DbConnection   = new MockHfDbConnection();
+        $WordPressApi   = new MockHfWordPressInterface();
+
+        $WordPressApi->returns('sendWpEmail', true);
+        $DbConnection->returns('getVar', 5);
+
+        $Mailer = new HfMailer($UrlFinder, $UrlGenerator, $UserManager, $Security, $DbConnection, $WordPressApi);
+        $result = $Mailer->sendEmailToUser(1, 'test', 'test');
+
+        $this->assertEqual($result, 5);
+    }
+
+    public function testSendEmailToUserAndSpecifyEmailID() {
+        Mock::generate('HfUrlFinder');
+        Mock::generate('HfUrlGenerator');
+        Mock::generate('HfUserManager');
+        Mock::generate('HfSecurity');
+        Mock::generate('HfDbConnection');
+        Mock::generate('HfWordPressInterface');
+
+        $UrlFinder      = new MockHfUrlFinder();
+        $UrlGenerator   = new MockHfUrlGenerator();
+        $UserManager    = new MockHfUserManager();
+        $Security       = new MockHfSecurity();
+        $DbConnection   = new MockHfDbConnection();
+        $WordPressApi   = new MockHfWordPressInterface();
+
+        $Mailer = new HfMailer($UrlFinder, $UrlGenerator, $UserManager, $Security, $DbConnection, $WordPressApi);
+
+        $userID     = 1;
+        $subject    = 'test subject';
+        $body       = 'test body';
+        $emailID    = 123;
+
+        $WordPressApi->returns('sendWpEmail', true);
+        $WordPressApi->returns('getUserEmail', 'me@test.com');
+
+        $expectedRecord = array(
+            'subject'   => $subject,
+            'body'      => $body,
+            'userID'    => $userID,
+            'emailID'   => $emailID,
+            'address'   => 'me@test.com'
+        );
+
+        $DbConnection->expectOnce(
+            'insertIntoDb',
+            array('hf_email', $expectedRecord ));
+
+        $Mailer->sendEmailToUserAndSpecifyEmailID($userID, $subject, $body, $emailID);
+    }
 }
 
 ?>

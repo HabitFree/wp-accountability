@@ -23,9 +23,11 @@ if (!class_exists("HfAccountability")) {
             $DbConnection = new HfDbConnection();
             $HtmlGenerator = new HfHtmlGenerator();
             $UserManager = new HfUserManager($DbConnection, $HtmlGenerator);
-            $URLFinder = new HfUrl();
+            $URLFinder = new HfUrlFinder();
+            $UrlGenerator = new HfUrlGenerator();
             $Security = new HfSecurity();
-            $Mailer = new HfMailer($URLFinder, $UserManager, $Security, $DbConnection);
+            $WordPressInterface = new HfWordPressInterface();
+            $Mailer = new HfMailer($URLFinder, $UrlGenerator, $UserManager, $Security, $DbConnection, $WordPressInterface);
 			NULL === self::$instance and self::$instance = new self($HtmlGenerator, $UserManager, $Mailer, $URLFinder, $DbConnection);
 			return self::$instance;
 		}
