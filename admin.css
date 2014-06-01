@@ -4,3 +4,29 @@ span.fail {
   color: red;
   font-weight: bold;
 }
+
+span.pass {
+    display: inline-block;
+    padding-top: 20px;
+    color: green;
+    font-weight: bold;
+}
+
+.SimpleTestSummary {
+    padding:10px;
+    margin:20px 0;
+    color:white;
+}
+
+.SimpleTestPassBarColor {
+    background-color:green;
+}
+
+.SimpleTestFailBarColor {
+    background-color:red;
+}
+
+.SimpleTest {
+    margin-right:20px;
+    margin-top:-20px;
+}

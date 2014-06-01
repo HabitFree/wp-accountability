@@ -1,10 +1,14 @@
 <?php
 
-if (!class_exists("HfDbConnection")) {
-	class HfDbConnection {
+if (!class_exists("HfDatabase")) {
+	class HfDatabase {
 		private $dbVersion = "3.7";
+        private $WebsiteApi;
+        private $LanguageApi;
 		
-		function HfDbConnection() { //constructor
+		function HfDatabase($WebsiteApi, $LanguageApi) { //constructor
+            $this->WebsiteApi = $WebsiteApi;
+            $this->LanguageApi = $LanguageApi;
 		}
 		
 		function installDb() {
@@ -234,14 +238,6 @@ if (!class_exists("HfDbConnection")) {
 			return $array;
 		}
 		
-		function escapeData($data) {
-			foreach ($data as $col=>$val) {
-				$col = esc_sql( $col );
-				$val = esc_sql( $val );
-			}
-			return $data;
-		}
-		
 		function insertIgnoreIntoDb($table, $data) {
 			global $wpdb;
 			$prefix = $wpdb->prefix;
@@ -266,9 +262,9 @@ if (!class_exists("HfDbConnection")) {
 		}
 		
 		function getRow($table, $criterion) {
-			global $wpdb;
+            global $wpdb;
 			$prefix = $wpdb->prefix;
-			return $wpdb->get_row("SELECT * FROM " . $prefix . $table . " WHERE " . $criterion);
+            return $wpdb->get_row("SELECT * FROM " . $prefix . $table . " WHERE " . $criterion);
 		}
 		
 		function getRows($table, $where, $outputType = OBJECT) {
@@ -284,20 +280,7 @@ if (!class_exists("HfDbConnection")) {
 		function generateEmailID() {
 			$table = 'hf_email';
 			$select = 'max(emailID)';
-			return $this->getVar($table, $select) + 1;
-		}
-		
-		function getVar($table, $select, $where = null) {
-			global $wpdb;
-			$prefix = $wpdb->prefix;
-			$tableName = $prefix . $table;
-			if ($where === null) {
-				return $wpdb->get_var("SELECT " . $select . " FROM " . $tableName);
-			} else {
-				return $wpdb->get_var("SELECT " . $select .
-					" FROM " . $tableName .
-					" WHERE " . $where );
-			}
+			return $this->WebsiteApi->getVar($table, $select) + 1;
 		}
 		
 		function updateRows($table, $data, $where) {
@@ -356,6 +339,134 @@ if (!class_exists("HfDbConnection")) {
         function sudoReactivateExtension() {
             hfDeactivate();
             hfActivate();
+        }
+
+        function daysSinceLastEmail($userID) {
+            $timeNow            = $this->LanguageApi->getCurrentTime();
+            $table              = 'hf_email';
+            $fullTableName      = $this->WebsiteApi->getDbPrefix() . $table;
+            $select             = 'sendTime';
+            $where              = 'userID = ' . $userID . ' AND emailID = (SELECT max(emailID) FROM '. $fullTableName .')';
+            $dateOfLastEmail    = $this->WebsiteApi->getVar($table, $select, $where);
+            $timeOfLastEmail    = $this->LanguageApi->convertStringToTime($dateOfLastEmail);
+            $secondsInADay = 86400;
+            return ($timeNow - $timeOfLastEmail) / $secondsInADay;
+        }
+
+        public function daysSinceSecondToLastEmail($userID) {
+            $escapedUserID  = $this->escapeData($userID);
+            $timeNow        = $this->LanguageApi->getCurrentTime();
+
+            $timeString =
+                $this->WebsiteApi->executeQuery(
+                    'SELECT sendTime FROM
+                    (SELECT * FROM wp_hf_email WHERE userID = '. $escapedUserID .' ORDER BY emailID DESC LIMIT 2)
+                    AS T ORDER BY emailID LIMIT 1'
+                );
+
+            $timeOfSecondToLastEmail    = $this->LanguageApi->convertStringToTime($timeString);
+            $secondsInADay              = 86400;
+
+            return ($timeNow - $timeOfSecondToLastEmail) / $secondsInADay;
+        }
+
+        function escapeData($data) {
+            foreach ($data as $col=>$val) {
+                $col = esc_sql( $col );
+                $val = esc_sql( $val );
+            }
+            return $data;
+        }
+
+        function recordEmail($userID, $subject, $message, $emailID = null, $emailAddress = null) {
+            $table = "hf_email";
+            $data = array( 'subject' => $subject,
+                'body' => $message,
+                'userID' => $userID,
+                'emailID' => $emailID,
+                'address' => $emailAddress );
+            $this->insertIntoDb($table, $data);
+        }
+
+        function timeOfFirstSuccess($goalID, $userID) {
+            global $wpdb;
+            $prefix = $wpdb->prefix;
+            $table = 'hf_report';
+            $tableName = $prefix . $table;
+            $select = 'date';
+            $whereFirstSuccess = 'goalID = ' . $goalID .
+                ' AND userID = ' . $userID .
+                ' AND reportID=(
+                    SELECT min(reportID)
+                    FROM ' . $tableName .
+                ' WHERE isSuccessful = 1)';
+            $timeString = $this->WebsiteApi->getVar($table, $select, $whereFirstSuccess);
+
+            return $this->LanguageApi->convertStringToTime($timeString);
+        }
+
+        function timeOfLastSuccess($goalID, $userID) {
+            global $wpdb;
+            $prefix = $wpdb->prefix;
+            $table = 'hf_report';
+            $tableName = $prefix . $table;
+            $select = 'date';
+            $whereLastSuccess = 'goalID = ' . $goalID .
+                ' AND userID = ' . $userID .
+                ' AND reportID=(
+                    SELECT max(reportID)
+                    FROM ' . $tableName .
+                ' WHERE isSuccessful = 1)';
+            $timeString = $this->WebsiteApi->getVar($table, $select, $whereLastSuccess);
+
+            return $this->LanguageApi->convertStringToTime($timeString);
+        }
+
+        function timeOfLastFail($goalID, $userID) {
+            global $wpdb;
+            $prefix = $wpdb->prefix;
+            $table = 'hf_report';
+            $tableName = $prefix . $table;
+            $select = 'date';
+            $whereLastFail = 'goalID = ' . $goalID .
+                ' AND userID = ' . $userID .
+                ' AND reportID=(
+                    SELECT max(reportID)
+                    FROM ' . $tableName .
+                ' WHERE NOT isSuccessful = 1)';
+            $timeString = $this->WebsiteApi->getVar($table, $select, $whereLastFail);
+
+            return $this->LanguageApi->convertStringToTime($timeString);
+        }
+
+        function level($daysOfSuccess) {
+            $whereLevel = 'target > ' . $daysOfSuccess . ' ORDER BY target ASC';
+            return $this->getRow('hf_level', $whereLevel);
+        }
+
+        function daysSinceLastReport($goalID, $userID) {
+            global $wpdb;
+            $prefix = $wpdb->prefix;
+            $table = 'hf_report';
+            $tableName = $prefix . $table;
+            $whereLastReport = 'goalID = ' . $goalID .
+                ' AND userID = ' . $userID .
+                ' AND reportID=( SELECT max(reportID) FROM '.$tableName.' )';
+            $dateInSecondsOfLastReport = strtotime($this->DbConnection->getVar('hf_report', 'date', $whereLastReport));
+            $secondsInADay = 86400;
+            return ( time() - $dateInSecondsOfLastReport ) / $secondsInADay;
+        }
+
+        public function daysSinceAnyReport($userID) {
+            global $wpdb;
+            $prefix = $wpdb->prefix;
+            $table = 'hf_report';
+            $tableName = $prefix . $table;
+            $whereLastReport = 'userID = ' . $userID .
+                ' AND reportID=( SELECT max(reportID) FROM '.$tableName.' )';
+            $dateInSecondsOfLastReport = strtotime($this->DbConnection->getVar('hf_report', 'date', $whereLastReport));
+            $secondsInADay = 86400;
+            return ( time() - $dateInSecondsOfLastReport ) / $secondsInADay;
         }
 	}
 }
