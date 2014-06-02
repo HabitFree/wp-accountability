@@ -32,7 +32,7 @@ if (!class_exists("HfAdminPanel")) {
 			
 			echo $this->generateAdminPanelForm();
 			
-			echo do_shortcode( '[simpletest name="SimpleTest Unit Tests" path="/hf-accountability/php/tests.php"]' );
+			echo do_shortcode( '[simpletest name="SimpleTest Unit Tests" path="/hf-accountability/php/tests.php" passes="y"]' );
 		}
 		
 		function generateAdminPanelForm() {

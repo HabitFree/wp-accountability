@@ -16,7 +16,7 @@ class UnitWpSimpleTest extends UnitTestCase {
     }
     
     public function testMainClassExistence() {
-    	$this->assertEqual(class_exists("HfAccountability"), True);
+    	$this->assertEqual(class_exists("HfMain"), True);
     }
     
     public function testMainObjectExistence() {
@@ -26,14 +26,20 @@ class UnitWpSimpleTest extends UnitTestCase {
     
     public function testMainObjectType() {
     	global $HfMain;
-    	$this->assertEqual($HfMain instanceof HfAccountability, True);
+    	$this->assertEqual($HfMain instanceof HfMain, True);
     }
     
 	public function testGettingCurrentUserLogin() {
-		$user = wp_get_current_user();
-		$DbConnection = new HfDbConnection();
-        $HtmlGenerator = new HfHtmlGenerator();
-		$UserManager = new HfUserManager($DbConnection, $HtmlGenerator);
+        $ApiInterface   = new HfWordPressInterface();
+        $user           = wp_get_current_user($ApiInterface);
+        $PhpApi         = new HfPhpInterface();
+        $DbConnection   = new HfDatabase($ApiInterface, $PhpApi);
+        $UrlFinder      = new HfUrlFinder();
+        $UrlGenerator   = new HfUrlGenerator();
+        $Security       = new HfSecurity();
+        $Mailer         = new HfMailer($UrlFinder, $UrlGenerator, $Security, $DbConnection, $ApiInterface);
+		$UserManager    = new HfUserManager($DbConnection, $Mailer, $UrlFinder, $ApiInterface);
+
 		$this->assertEqual($UserManager->getCurrentUserLogin(), $user->user_login);
 	}
     
@@ -42,7 +48,9 @@ class UnitWpSimpleTest extends UnitTestCase {
     }
     
     public function testDbDataNullRemoval() {
-    	$DbManager = new HfDbConnection();
+        $WebsiteApi         = new HfWordPressInterface();
+        $PHPAPI         = new HfPhpInterface();
+        $DbManager = new HfDatabase($WebsiteApi, $PHPAPI);
     	$data = array(
 				'one' => 'big one',
 				'two' => 'two',
@@ -66,7 +74,9 @@ class UnitWpSimpleTest extends UnitTestCase {
     }
 
 	public function testSchemaColumnObjectCreation() {
-  		$DbManager = new HfDbConnection();
+        $ApiInterface   = new HfWordPressInterface();
+        $PHPAPI         = new HfPhpInterface();
+        $DbManager = new HfDatabase($ApiInterface, $PHPAPI);
 		$columnObject = $DbManager->createColumnSchemaObject('openTime', 'timestamp', 'YES', '', null, '');
 		
 		$expected = new StdClass;
@@ -81,7 +91,9 @@ class UnitWpSimpleTest extends UnitTestCase {
 	}
 	
 	public function testEmailTableSchema() {
-		$DbManager = new HfDbConnection();
+        $WebsiteApi         = new HfWordPressInterface();
+        $PHPAPI         = new HfPhpInterface();
+        $DbManager = new HfDatabase($WebsiteApi, $PHPAPI);
 		$currentSchema = $DbManager->getTableSchema('hf_email');
 		
 		$expectedSchema = array(
@@ -99,7 +111,9 @@ class UnitWpSimpleTest extends UnitTestCase {
 	}
 	
 	public function testGoalTableSchema() {
-		$DbManager = new HfDbConnection();
+        $ApiInterface   = new HfWordPressInterface();
+        $PHPAPI         = new HfPhpInterface();
+        $DbManager = new HfDatabase($ApiInterface, $PHPAPI);
 		$currentSchema = $DbManager->getTableSchema('hf_goal');
 		
 		$expectedSchema = array(
@@ -117,7 +131,9 @@ class UnitWpSimpleTest extends UnitTestCase {
 	}
 	
 	public function testReportTableSchema() {
-		$DbManager = new HfDbConnection();
+        $ApiInterface   = new HfWordPressInterface();
+        $PHPAPI         = new HfPhpInterface();
+        $DbManager = new HfDatabase($ApiInterface, $PHPAPI);
 		$currentSchema = $DbManager->getTableSchema('hf_report');
 		
 		$expectedSchema = array(
@@ -133,7 +149,9 @@ class UnitWpSimpleTest extends UnitTestCase {
 	}
 
 	public function testUserGoalTableSchema() {
-		$DbManager = new HfDbConnection();
+        $ApiInterface   = new HfWordPressInterface();
+        $PHPAPI         = new HfPhpInterface();
+        $DbManager = new HfDatabase($ApiInterface, $PHPAPI);
 		$currentSchema = $DbManager->getTableSchema('hf_user_goal');
 		
 		$expectedSchema = array(
@@ -147,7 +165,9 @@ class UnitWpSimpleTest extends UnitTestCase {
 	}
 	
 	public function testLevelTableSchema() {
-		$DbManager = new HfDbConnection();
+        $ApiInterface   = new HfWordPressInterface();
+        $PHPAPI         = new HfPhpInterface();
+        $DbManager = new HfDatabase($ApiInterface, $PHPAPI);
 		$currentSchema = $DbManager->getTableSchema('hf_level');
 		
 		$expectedSchema = array(
@@ -163,7 +183,9 @@ class UnitWpSimpleTest extends UnitTestCase {
 	}
 	
 	public function testInviteTableSchema() {
-		$DbManager = new HfDbConnection();
+        $ApiInterface   = new HfWordPressInterface();
+        $PHPAPI         = new HfPhpInterface();
+        $DbManager = new HfDatabase($ApiInterface, $PHPAPI);
 		$currentSchema = $DbManager->getTableSchema('hf_invite');
 		
 		$expectedSchema = array(
@@ -185,24 +207,22 @@ class UnitWpSimpleTest extends UnitTestCase {
 
     public function testEmailInviteSendingUsingMocks() {
         Mock::generate('HfUrlFinder');
-        Mock::generate('HfUrlGenerator');
-        Mock::generate('HfUserManager');
-        Mock::generate('HfSecurity');
-        Mock::generate('HfDbConnection');
+        Mock::generate('HfDatabase');
+        Mock::generate('HfHtmlGenerator');
+        Mock::generate('HfMailer');
         Mock::generate('HfWordPressInterface');
 
         $UrlFinder      = new MockHfUrlFinder();
-        $UrlGenerator   = new MockHfUrlGenerator();
-        $UserManager    = new MockHfUserManager();
-        $Security       = new MockHfSecurity();
-        $DbConnection   = new MockHfDbConnection();
-        $WordPressApi   = new MockHfWordPressInterface();
+        $DbConnection   = new MockHfDatabase();
+        $HtmlGenerator  = new MockHfHtmlGenerator();
+        $Messenger      = new MockHfMailer();
+        $WebsiteApi     = new MockHfWordPressInterface();
 
-        $Security->returns('createRandomString', 555);
-        $DbConnection->returns('getVar', 5);
+        $Messenger->returns('generateInviteID', 555);
+        $DbConnection->returns('generateEmailID', 5);
 
-        $Mailer = new HfMailer($UrlFinder, $UrlGenerator, $UserManager, $Security, $DbConnection, $WordPressApi);
-        $result = $Mailer->sendInvitation(1, 'me@test.com', 3);
+        $UserManager = new HfUserManager($DbConnection, $Messenger, $UrlFinder, $WebsiteApi);
+        $result = $UserManager->sendInvitation(1, 'me@test.com', 3);
 
         $this->assertEqual($result, 555);
     }
@@ -216,24 +236,19 @@ class UnitWpSimpleTest extends UnitTestCase {
 
     public function testInviteStorageInInviteTableUsingMocks() {
         Mock::generate('HfUrlFinder');
-        Mock::generate('HfUrlGenerator');
-        Mock::generate('HfUserManager');
-        Mock::generate('HfSecurity');
-        Mock::generate('HfDbConnection');
+        Mock::generate('HfDatabase');
+        Mock::generate('HfHtmlGenerator');
+        Mock::generate('HfMailer');
         Mock::generate('HfWordPressInterface');
 
         $UrlFinder      = new MockHfUrlFinder();
-        $UrlGenerator   = new MockHfUrlGenerator();
-        $UserManager    = new MockHfUserManager();
-        $Security       = new MockHfSecurity();
-        $DbConnection   = new MockHfDbConnection();
-        $WordPressApi   = new MockHfWordPressInterface();
+        $DbConnection   = new MockHfDatabase();
+        $Messenger      = new MockHfMailer();
+        $WebsiteApi     = new MockHfWordPressInterface();
 
-        $Security->returns('createRandomString', 555);
-        $DbConnection->returns('getVar', 5);
-        $WordPressApi->returns('sendWpEmail', true);
+        $DbConnection->returns('generateEmailID', 5);
 
-        $Mailer = new HfMailer($UrlFinder, $UrlGenerator, $UserManager, $Security, $DbConnection, $WordPressApi);
+        $UserManager = new HfUserManager($DbConnection, $Messenger, $UrlFinder, $WebsiteApi);
         $expirationDate = date('Y-m-d H:i:s', strtotime('+'. 3 .' days'));
 
         $expectedRecord = array(
@@ -248,49 +263,47 @@ class UnitWpSimpleTest extends UnitTestCase {
             1, 'insertIntoDb',
             array('hf_invite', $expectedRecord ));
 
-        $Mailer->sendInvitation(1, 'me@test.com', 3);
+        $UserManager->sendInvitation(1, 'me@test.com', 3);
     }
 
     public function testSendEmailByUserID() {
         Mock::generate('HfUrlFinder');
         Mock::generate('HfUrlGenerator');
-        Mock::generate('HfUserManager');
         Mock::generate('HfSecurity');
-        Mock::generate('HfDbConnection');
+        Mock::generate('HfDatabase');
         Mock::generate('HfWordPressInterface');
 
         $UrlFinder      = new MockHfUrlFinder();
         $UrlGenerator   = new MockHfUrlGenerator();
-        $UserManager    = new MockHfUserManager();
         $Security       = new MockHfSecurity();
-        $DbConnection   = new MockHfDbConnection();
+        $DbConnection   = new MockHfDatabase();
         $WordPressApi   = new MockHfWordPressInterface();
 
-        $WordPressApi->returns('sendWpEmail', true);
-        $DbConnection->returns('getVar', 5);
+        $WordPressApi->returns('getVar', 5);
+        $WordPressApi->returns('getUserEmail', 'me@test.com');
 
-        $Mailer = new HfMailer($UrlFinder, $UrlGenerator, $UserManager, $Security, $DbConnection, $WordPressApi);
-        $result = $Mailer->sendEmailToUser(1, 'test', 'test');
+        $DbConnection->expectOnce(
+            'recordEmail',
+            array(1, 'test', 'test', 5, 'me@test.com'));
 
-        $this->assertEqual($result, 5);
+        $Mailer = new HfMailer($UrlFinder, $UrlGenerator, $Security, $DbConnection, $WordPressApi);
+        $Mailer->sendEmailToUser(1, 'test', 'test');
     }
 
     public function testSendEmailToUserAndSpecifyEmailID() {
         Mock::generate('HfUrlFinder');
         Mock::generate('HfUrlGenerator');
-        Mock::generate('HfUserManager');
         Mock::generate('HfSecurity');
-        Mock::generate('HfDbConnection');
+        Mock::generate('HfDatabase');
         Mock::generate('HfWordPressInterface');
 
         $UrlFinder      = new MockHfUrlFinder();
         $UrlGenerator   = new MockHfUrlGenerator();
-        $UserManager    = new MockHfUserManager();
         $Security       = new MockHfSecurity();
-        $DbConnection   = new MockHfDbConnection();
+        $DbConnection   = new MockHfDatabase();
         $WordPressApi   = new MockHfWordPressInterface();
 
-        $Mailer = new HfMailer($UrlFinder, $UrlGenerator, $UserManager, $Security, $DbConnection, $WordPressApi);
+        $Mailer = new HfMailer($UrlFinder, $UrlGenerator, $Security, $DbConnection, $WordPressApi);
 
         $userID     = 1;
         $subject    = 'test subject';
@@ -300,19 +313,243 @@ class UnitWpSimpleTest extends UnitTestCase {
         $WordPressApi->returns('sendWpEmail', true);
         $WordPressApi->returns('getUserEmail', 'me@test.com');
 
-        $expectedRecord = array(
-            'subject'   => $subject,
-            'body'      => $body,
-            'userID'    => $userID,
-            'emailID'   => $emailID,
-            'address'   => 'me@test.com'
-        );
-
         $DbConnection->expectOnce(
-            'insertIntoDb',
-            array('hf_email', $expectedRecord ));
+            'recordEmail',
+            array( $userID, $subject, $body, $emailID, 'me@test.com' ));
 
         $Mailer->sendEmailToUserAndSpecifyEmailID($userID, $subject, $body, $emailID);
+
+    }
+
+    public function testSendReportRequestEmailsChecksThrottling() {
+        Mock::generate('HfMailer');
+        Mock::generate('HfWordPressInterface');
+        Mock::generate('HfHtmlGenerator');
+        Mock::generate('HfDatabase');
+
+        $Messenger                  = new MockHfMailer();
+        $WebsiteApi                 = new MockHfWordPressInterface();
+        $HtmlGenerator              = new MockHfHtmlGenerator();
+        $DbConnection               = new MockHfDatabase();
+
+        $mockUser                   = new stdClass();
+        $mockUser->ID               = 1;
+        $mockUsers                  = array($mockUser);
+        $WebsiteApi->returns('getSubscribedUsers', $mockUsers);
+
+        $mockGoalSub                = new stdClass();
+        $mockGoalSub->goalID        = 1;
+        $mockGoalSubs               = array($mockGoalSub);
+        $DbConnection->returns('getRows', $mockGoalSubs);
+
+        $mockLevel                  = new stdClass();
+        $mockLevel->emailInterval   = 1;
+        $DbConnection->returns('level', $mockLevel);
+
+        $DbConnection->returns('daysSinceLastReport', 2);
+        $Messenger->returns('notThrottled', true);
+
+        $Messenger->expectAtLeastOnce('notThrottled');
+
+        $Goals = new HfGoals($Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection);
+        $Goals->sendReportRequestEmails();
+    }
+
+    public function testDaysSinceLastEmail() {
+        Mock::generate('HfWordPressInterface');
+        Mock::generate('HfPhpInterface');
+
+        $WebsiteAPI = new MockHfWordPressInterface();
+        $PhpApi     = new MockHfPhpInterface();
+
+        $WebsiteAPI->returns('getVar', '2014-05-27 16:04:29');
+        $PhpApi->returns('convertStringToTime', 1401224669.0);
+        $PhpApi->returns('getCurrentTime', 1401483869.0);
+
+        $Database   = new HfDatabase($WebsiteAPI, $PhpApi);
+        $result     = $Database->daysSinceLastEmail(1);
+
+        $this->assertEqual($result, 3);
+    }
+
+    public function testSendReportRequestEmailsSendsEmailWhenReportDue() {
+        Mock::generate('HfMailer');
+        Mock::generate('HfWordPressInterface');
+        Mock::generate('HfHtmlGenerator');
+        Mock::generate('HfDatabase');
+
+        $Messenger                  = new MockHfMailer();
+        $WebsiteApi                 = new MockHfWordPressInterface();
+        $HtmlGenerator              = new MockHfHtmlGenerator();
+        $DbConnection               = new MockHfDatabase();
+
+        $mockUser                   = new stdClass();
+        $mockUser->ID               = 1;
+        $mockUsers                  = array($mockUser);
+        $WebsiteApi->returns('getSubscribedUsers', $mockUsers);
+
+        $mockGoalSub                = new stdClass();
+        $mockGoalSub->goalID        = 1;
+        $mockGoalSubs               = array($mockGoalSub);
+        $DbConnection->returns('getRows', $mockGoalSubs);
+
+        $mockLevel                  = new stdClass();
+        $mockLevel->emailInterval   = 1;
+        $DbConnection->returns('level', $mockLevel);
+
+        $DbConnection->returns('daysSinceLastEmail', 2);
+        $DbConnection->returns('daysSinceLastReport', 2);
+        $Messenger->returns('notThrottled', true);
+
+        $Messenger->expectAtLeastOnce('sendReportRequestEmail');
+
+        $Goals = new HfGoals($Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection);
+        $Goals->sendReportRequestEmails();
+    }
+
+    public function testSendReportRequestEmailsDoesNotSendEmailWhenReportNotDue() {
+        Mock::generate('HfMailer');
+        Mock::generate('HfWordPressInterface');
+        Mock::generate('HfHtmlGenerator');
+        Mock::generate('HfDatabase');
+
+        $Messenger                  = new MockHfMailer();
+        $WebsiteApi                 = new MockHfWordPressInterface();
+        $HtmlGenerator              = new MockHfHtmlGenerator();
+        $DbConnection               = new MockHfDatabase();
+
+        $mockUser                   = new stdClass();
+        $mockUser->ID               = 1;
+        $mockUsers                  = array($mockUser);
+        $WebsiteApi->returns('getSubscribedUsers', $mockUsers);
+
+        $mockGoalSub                = new stdClass();
+        $mockGoalSub->goalID        = 1;
+        $mockGoalSubs               = array($mockGoalSub);
+        $DbConnection->returns('getRows', $mockGoalSubs);
+
+        $mockLevel                  = new stdClass();
+        $mockLevel->emailInterval   = 1;
+        $DbConnection->returns('level', $mockLevel);
+
+        $DbConnection->returns('daysSinceLastEmail', 2);
+        $DbConnection->returns('daysSinceLastReport', 0);
+
+        $Messenger->expectNever('sendReportRequestEmail');
+
+        $Goals = new HfGoals($Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection);
+        $Goals->sendReportRequestEmails();
+    }
+
+    public function testNotThrottledReturnsTrue() {
+        Mock::generate('HfUrlFinder');
+        Mock::generate('HfUrlGenerator');
+        Mock::generate('HfSecurity');
+        Mock::generate('HfDatabase');
+        Mock::generate('HfWordPressInterface');
+
+        $UrlFinder      = new MockHfUrlFinder();
+        $UrlGenerator   = new MockHfUrlGenerator();
+        $Security       = new MockHfSecurity();
+        $DbConnection   = new MockHfDatabase();
+        $ApiInterface   = new MockHfWordPressInterface();
+
+        $DbConnection->returns('daysSinceAnyReport',100);
+        $DbConnection->returns('daysSinceLastEmail',10);
+        $DbConnection->returns('daysSinceSecondToLastEmail',12);
+
+        $Mailer         = new HfMailer($UrlFinder, $UrlGenerator, $Security, $DbConnection, $ApiInterface);
+        $result         = $Mailer->notThrottled(1);
+
+        $this->assertEqual($result, true);
+    }
+
+    public function testNotThrottledReturnsFalse() {
+        Mock::generate('HfUrlFinder');
+        Mock::generate('HfUrlGenerator');
+        Mock::generate('HfSecurity');
+        Mock::generate('HfDatabase');
+        Mock::generate('HfWordPressInterface');
+
+        $UrlFinder      = new MockHfUrlFinder();
+        $UrlGenerator   = new MockHfUrlGenerator();
+        $Security       = new MockHfSecurity();
+        $DbConnection   = new MockHfDatabase();
+        $ApiInterface   = new MockHfWordPressInterface();
+
+        $DbConnection->returns('daysSinceAnyReport',100);
+        $DbConnection->returns('daysSinceLastEmail',10);
+        $DbConnection->returns('daysSinceSecondToLastEmail',17);
+
+        $Mailer         = new HfMailer($UrlFinder, $UrlGenerator, $Security, $DbConnection, $ApiInterface);
+        $result         = $Mailer->notThrottled(1);
+
+        $this->assertEqual($result, false);
+    }
+
+    public function testSendReportRequestEmailsDoesNotSendEmailWhenUserThrottled() {
+        Mock::generate('HfMailer');
+        Mock::generate('HfWordPressInterface');
+        Mock::generate('HfHtmlGenerator');
+        Mock::generate('HfDatabase');
+
+        $Messenger                  = new MockHfMailer();
+        $WebsiteApi                 = new MockHfWordPressInterface();
+        $HtmlGenerator              = new MockHfHtmlGenerator();
+        $DbConnection               = new MockHfDatabase();
+
+        $mockUser                   = new stdClass();
+        $mockUser->ID               = 1;
+        $mockUsers                  = array($mockUser);
+        $WebsiteApi->returns('getSubscribedUsers', $mockUsers);
+
+        $mockGoalSub                = new stdClass();
+        $mockGoalSub->goalID        = 1;
+        $mockGoalSubs               = array($mockGoalSub);
+        $DbConnection->returns('getRows', $mockGoalSubs);
+
+        $mockLevel                  = new stdClass();
+        $mockLevel->emailInterval   = 1;
+        $DbConnection->returns('level', $mockLevel);
+
+        $DbConnection->returns('daysSinceLastEmail', 2);
+        $DbConnection->returns('daysSinceLastReport', 5);
+        $Messenger->returns('notThrottled', false);
+
+        $Messenger->expectNever('sendReportRequestEmail');
+
+        $Goals = new HfGoals($Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection);
+        $Goals->sendReportRequestEmails();
+    }
+
+    public function testStringToInt() {
+        $PhpApi = new HfPhpInterface();
+        $string = '7';
+        $int = $PhpApi->convertStringToInt($string);
+
+        $this->assertTrue($int === 7);
+    }
+
+    public function testCurrentLevelTarget() {
+        Mock::generate('HfMailer');
+        Mock::generate('HfWordPressInterface');
+        Mock::generate('HfHtmlGenerator');
+        Mock::generate('HfDatabase');
+
+        $Messenger          = new MockHfMailer();
+        $WebsiteApi         = new MockHfWordPressInterface();
+        $HtmlGenerator      = new MockHfHtmlGenerator();
+        $DbConnection       = new MockHfDatabase();
+
+        $mockLevel          = new stdClass();
+        $mockLevel->target  = 14;
+        $DbConnection->returns('level', $mockLevel);
+
+        $Goals = new HfGoals($Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection);
+
+        $target = $Goals->currentLevelTarget(5);
+
+        $this->assertEqual($target, 14);
     }
 }
 
