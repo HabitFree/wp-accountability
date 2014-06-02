@@ -468,6 +468,8 @@ if (!class_exists("HfDatabase")) {
             $secondsInADay = 86400;
             return ( time() - $dateInSecondsOfLastReport ) / $secondsInADay;
         }
+
+
 	}
 }
 ?>

@@ -32,8 +32,8 @@ class UnitWpSimpleTest extends UnitTestCase {
 	public function testGettingCurrentUserLogin() {
         $ApiInterface   = new HfWordPressInterface();
         $user           = wp_get_current_user($ApiInterface);
-        $PHPAPI         = new HfPhpInterface();
-        $DbConnection   = new HfDatabase($ApiInterface, $PHPAPI);
+        $PhpApi         = new HfPhpInterface();
+        $DbConnection   = new HfDatabase($ApiInterface, $PhpApi);
         $UrlFinder      = new HfUrlFinder();
         $UrlGenerator   = new HfUrlGenerator();
         $Security       = new HfSecurity();
@@ -520,6 +520,36 @@ class UnitWpSimpleTest extends UnitTestCase {
 
         $Goals = new HfGoals($Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection);
         $Goals->sendReportRequestEmails();
+    }
+
+    public function testStringToInt() {
+        $PhpApi = new HfPhpInterface();
+        $string = '7';
+        $int = $PhpApi->convertStringToInt($string);
+
+        $this->assertTrue($int === 7);
+    }
+
+    public function testCurrentLevelTarget() {
+        Mock::generate('HfMailer');
+        Mock::generate('HfWordPressInterface');
+        Mock::generate('HfHtmlGenerator');
+        Mock::generate('HfDatabase');
+
+        $Messenger          = new MockHfMailer();
+        $WebsiteApi         = new MockHfWordPressInterface();
+        $HtmlGenerator      = new MockHfHtmlGenerator();
+        $DbConnection       = new MockHfDatabase();
+
+        $mockLevel          = new stdClass();
+        $mockLevel->target  = 14;
+        $DbConnection->returns('level', $mockLevel);
+
+        $Goals = new HfGoals($Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection);
+
+        $target = $Goals->currentLevelTarget(5);
+
+        $this->assertEqual($target, 14);
     }
 }
 

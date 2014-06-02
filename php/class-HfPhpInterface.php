@@ -8,4 +8,8 @@ class HfPhpInterface {
     public function convertStringToTime($string) {
         return strtotime($string);
     }
+
+    public function convertStringToInt($string) {
+        return intval($string);
+    }
 } 

@@ -10,14 +10,16 @@ if (!class_exists("HfMain")) {
         private $URLFinder;
         private $HtmlGenerator;
         private $Goals;
+        private $LanguageApi;
 
-        function HfMain($HtmlGenerator, $UserManager, $Mailer, $URLFinder, $DbConnection, $Goals) {
+        function HfMain($HtmlGenerator, $UserManager, $Mailer, $URLFinder, $DbConnection, $Goals, $LanguageApi) {
             $this->UserManager      = $UserManager;
             $this->Mailer           = $Mailer;
             $this->DbConnection     = $DbConnection;
             $this->URLFinder        = $URLFinder;
             $this->HtmlGenerator    = $HtmlGenerator;
             $this->Goals            = $Goals;
+            $this->LanguageApi      = $LanguageApi;
 
 			add_action('init', array($this, 'registerShortcodes') );
 		}
@@ -33,8 +35,9 @@ if (!class_exists("HfMain")) {
             $Messenger          = new HfMailer($UrlFinder, $UrlGenerator, $Security, $DbConnection, $WebsiteApi);
             $UserManager        = new HfUserManager($DbConnection, $Messenger, $UrlFinder, $WebsiteApi);
             $Goals              = new HfGoals($Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection);
+            $LanguageApi        = new HfPhpInterface();
 
-			NULL === self::$instance and self::$instance = new self($HtmlGenerator, $UserManager, $Messenger, $UrlFinder, $DbConnection, $Goals);
+			NULL === self::$instance and self::$instance = new self($HtmlGenerator, $UserManager, $Messenger, $UrlFinder, $DbConnection, $Goals, $LanguageApi);
 			return self::$instance;
 		}
 		
@@ -84,7 +87,7 @@ if (!class_exists("HfMain")) {
 			$html = '<form class="report-cards" action="'. $currentURL .'" method="post">';
 
             foreach ($goalSubs as $sub) {
-				$goalID = $sub->goalID;
+				$goalID = $this->LanguageApi->convertStringToInt($sub->goalID);
 				$html .= $this->Goals->generateGoalCard($goalID, $userID);
 			}
 

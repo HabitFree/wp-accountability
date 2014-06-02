@@ -66,7 +66,7 @@ if (class_exists("HfMain")) {
     $HfMailer               = new HfMailer($HfUrlFinder, $HfUrlGenerator, $HfSecurity, $HfDbConnection, $HfWordPressInterface);
     $HfUserManager          = new HfUserManager($HfDbConnection, $HfMailer, $HfUrlFinder, $HfWordPressInterface);
     $HfGoals                = new HfGoals($HfMailer, $HfWordPressInterface, $HfHtmlGenerator, $HfDbConnection);
-	$HfMain                 = new HfMain($HfHtmlGenerator, $HfUserManager, $HfMailer, $HfUrlFinder, $HfDbConnection, $HfGoals);
+	$HfMain                 = new HfMain($HfHtmlGenerator, $HfUserManager, $HfMailer, $HfUrlFinder, $HfDbConnection, $HfGoals, $HfPhpApi);
 }
 
 //Actions and Filters

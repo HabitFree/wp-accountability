@@ -1,21 +1,21 @@
 <?php
 class HfGoals {
-    private $DbConnection;
+    private $Database;
     private $HtmlGenerator;
     private $WebsiteApi;
     private $Messenger;
 
-    function __construct($Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection) {
+    function __construct($Messenger, $WebsiteApi, $HtmlGenerator, $Database) {
         $this->Messenger = $Messenger;
         $this->WebsiteApi = $WebsiteApi;
         $this->HtmlGenerator = $HtmlGenerator;
-        $this->DbConnection = $DbConnection;
+        $this->Database = $Database;
     }
 
     function generateGoalCard($goalID, $userID) {
-        $goal = $this->DbConnection->getRow('hf_goal', 'goalID = ' . $goalID);
+        $goal = $this->Database->getRow('hf_goal', 'goalID = ' . $goalID);
         $daysOfSuccess = $this->daysOfSuccess($goalID, $userID);
-        $level = $this->DbConnection->level($daysOfSuccess);
+        $level = $this->Database->level($daysOfSuccess);
         $wrapperOpen = '<div class="report-card">';
         $info = '<div class="info"><h2>'.$goal->title.'</h2>';
         if ($goal->description != '') {
@@ -40,65 +40,15 @@ class HfGoals {
         return $wrapperOpen . $main . $stats . $wrapperClose;
     }
 
-    function daysToNextLevel($goalID, $userID) {
-        $daysOfSuccess = $this->daysOfSuccess($goalID, $userID);
-        $target = $this->currentLevelTarget($daysOfSuccess);
-        return $target - $daysOfSuccess;
-    }
-
-    function levelBarForGoal($goalID, $userID) {
-        $percent = $this->levelPercentComplete($goalID, $userID);
-        return $this->HtmlGenerator->progressBar($percent, '');
-    }
-
-    function nextLevelName($daysOfSuccess) {
-        $whereCurrentLevel = 'target > ' . $daysOfSuccess . ' ORDER BY target ASC';
-        $currentLevelID = $this->DbConnection->getVar('hf_level', 'levelID', $whereCurrentLevel);
-        $whereNextLevel = 'levelID = ' . ($currentLevelID + 1);
-        return $this->DbConnection->getVar('hf_level', 'title', $whereNextLevel);
-    }
-
     function levelPercentComplete($goalID, $userID) {
         $daysOfSuccess = $this->daysOfSuccess($goalID, $userID);
         return ($this->daysOfSuccess($goalID, $userID) / $this->currentLevelTarget($daysOfSuccess)) * 100;
     }
 
-    function currentLevelTarget($daysOfSuccess) {
-        $whereCurrentLevel = 'target > ' . $daysOfSuccess . ' ORDER BY target ASC';
-        return $this->DbConnection->getVar('hf_level', 'target', $whereCurrentLevel);
-    }
-
-    function sendReportRequestEmails() {
-        $users = $this->WebsiteApi->getSubscribedUsers();
-        foreach ($users as $user) {
-            if ($this->isAnyGoalDue($user->ID) and ($this->Messenger->notThrottled($user->ID))) {
-                $this->Messenger->sendReportRequestEmail($user->ID);
-            }
-        }
-    }
-
-    private function isAnyGoalDue($userID) {
-        $goalSubs = $this->DbConnection->getRows('hf_user_goal', 'userID = ' . $userID);
-        foreach ($goalSubs as $goalSub) {
-            if ($this->isGoalDue($goalSub->goalID, $userID)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private function isGoalDue($goalID, $userID) {
-        $daysOfSuccess = $this->daysOfSuccess($goalID, $userID);
-        $level = $this->DbConnection->level($goalID, $userID, $daysOfSuccess);
-        $emailInterval = $level->emailInterval;
-        $daysSinceLastReport = $this->DbConnection->daysSinceLastReport($goalID, $userID);
-        return $daysSinceLastReport > $emailInterval;
-    }
-
     function daysOfSuccess($goalID, $userID) {
-        $dateInSecondsOfFirstSuccess    = $this->DbConnection->timeOfFirstSuccess($goalID, $userID);
-        $dateInSecondsOfLastSuccess     = $this->DbConnection->timeOfLastSuccess($goalID, $userID);
-        $dateInSecondsOfLastFail        = $this->DbConnection->timeOfLastFail($goalID, $userID);
+        $dateInSecondsOfFirstSuccess    = $this->Database->timeOfFirstSuccess($goalID, $userID);
+        $dateInSecondsOfLastSuccess     = $this->Database->timeOfLastSuccess($goalID, $userID);
+        $dateInSecondsOfLastFail        = $this->Database->timeOfLastFail($goalID, $userID);
 
         $secondsInADay = 86400;
 
@@ -115,5 +65,55 @@ class HfGoals {
         }
 
         return $daysOfSuccess;
+    }
+
+    function currentLevelTarget($daysOfSuccess) {
+        $level = $this->Database->level($daysOfSuccess);
+        return $level->target;
+    }
+
+    function daysToNextLevel($goalID, $userID) {
+        $daysOfSuccess = $this->daysOfSuccess($goalID, $userID);
+        $target = $this->currentLevelTarget($daysOfSuccess);
+        return $target - $daysOfSuccess;
+    }
+
+    function levelBarForGoal($goalID, $userID) {
+        $percent = $this->levelPercentComplete($goalID, $userID);
+        return $this->HtmlGenerator->progressBar($percent, '');
+    }
+
+    function nextLevelName($daysOfSuccess) {
+        $whereCurrentLevel = 'target > ' . $daysOfSuccess . ' ORDER BY target ASC';
+        $currentLevelID = $this->Database->getVar('hf_level', 'levelID', $whereCurrentLevel);
+        $whereNextLevel = 'levelID = ' . ($currentLevelID + 1);
+        return $this->Database->getVar('hf_level', 'title', $whereNextLevel);
+    }
+
+    function sendReportRequestEmails() {
+        $users = $this->WebsiteApi->getSubscribedUsers();
+        foreach ($users as $user) {
+            if ($this->isAnyGoalDue($user->ID) and ($this->Messenger->notThrottled($user->ID))) {
+                $this->Messenger->sendReportRequestEmail($user->ID);
+            }
+        }
+    }
+
+    private function isAnyGoalDue($userID) {
+        $goalSubs = $this->Database->getRows('hf_user_goal', 'userID = ' . $userID);
+        foreach ($goalSubs as $goalSub) {
+            if ($this->isGoalDue($goalSub->goalID, $userID)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function isGoalDue($goalID, $userID) {
+        $daysOfSuccess = $this->daysOfSuccess($goalID, $userID);
+        $level = $this->Database->level($goalID, $userID, $daysOfSuccess);
+        $emailInterval = $level->emailInterval;
+        $daysSinceLastReport = $this->Database->daysSinceLastReport($goalID, $userID);
+        return $daysSinceLastReport > $emailInterval;
     }
 } 
