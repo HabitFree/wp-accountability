@@ -896,6 +896,37 @@ class UnitWpSimpleTest extends UnitTestCase {
 
         $RegisterShortcode->getOutput();
     }
+
+    public function testIsEmailTakenMethodExists() {
+        $Factory    = new HfFactory();
+        $Cms        = $Factory->makeContentManagementSystem();
+
+        $this->assertTrue(method_exists($Cms, 'isEmailTaken'));
+    }
+
+    public function testRegisterShortcodeRejectsTakenEmails() {
+        list($UrlFinder, $Database, $PhpLibrary, $Cms, $UserManager) = $this->makeRegisterShortcodeMockDependencies();
+
+        $RegisterShortcode = new HfRegisterShortcode($UrlFinder, $Database, $PhpLibrary, $Cms, $UserManager);
+
+        $PhpLibrary->returns('isPostEmpty', false);
+        $PhpLibrary->returns('isUrlParameterEmpty', false);
+        $PhpLibrary->returns('getPost', 'test@gmail.com');
+
+        $Cms->returns('isEmailTaken', true);
+
+        $mockInvite             = new stdClass();
+        $mockInvite->inviterID  = 777;
+
+        $Database->returns('getInvite', $mockInvite);
+
+        $Cms->expectAtLeastOnce('isEmailTaken');
+        $Cms->expectNever('createUser');
+
+        $output = $RegisterShortcode->getOutput();
+
+        $this->assertTrue(strstr($output, "<p class='fail'>Oops. That email is already in use.</p>"));
+    }
 }
 
 ?>

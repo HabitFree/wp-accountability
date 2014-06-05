@@ -52,6 +52,7 @@ class HfRegisterShortcode implements hf_iShortcode {
         return !$this->CodeLibrary->isPostEmpty('username')
             and !$this->isUsernameAlreadyTaken()
             and !$this->CodeLibrary->isPostEmpty('email')
+            and $this->emailAvailable()
             and !$this->isEmailInvalid()
             and !$this->CodeLibrary->isPostEmpty('password')
             and !$this->CodeLibrary->isPostEmpty('passwordConfirmation')
@@ -71,6 +72,10 @@ class HfRegisterShortcode implements hf_iShortcode {
 
         if ( $this->CodeLibrary->isPostEmpty('email') or $this->isEmailInvalid() ) {
             $html .= '<p class="fail">Please provide a valid email address.</p>';
+        }
+
+        if ( !$this->emailAvailable() ) {
+            $html .= "<p class='fail'>Oops. That email is already in use.</p>";
         }
 
         if ( $this->CodeLibrary->isPostEmpty('password') ) {
@@ -126,5 +131,9 @@ class HfRegisterShortcode implements hf_iShortcode {
         $this->Database->createRelationship($userID, $inviterID);
         $nonce = $this->CodeLibrary->getGet('n');
         $this->Database->deleteInvite($nonce);
+    }
+
+    private function emailAvailable() {
+        return !$this->Cms->isEmailTaken($this->CodeLibrary->getPost('email'));
     }
 } 

@@ -63,4 +63,8 @@ class HfWordPressInterface implements Hf_iContentManagementSystem {
     public function deleteRows($table, $where) {
         return $this->wpdb->delete($table, $where);
     }
+
+    public function isEmailTaken($email) {
+        return email_exists( $email );
+    }
 } 
