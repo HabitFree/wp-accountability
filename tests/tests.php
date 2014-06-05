@@ -4,12 +4,66 @@ require_once(dirname(__FILE__) . '/../hf-accountability.php');
 
 class UnitWpSimpleTest extends UnitTestCase {
     private $functionsFacade;
+    private $Factory;
 
     public function __construct() {
+        $this->Factory = new HfFactory();
     }
 
     public function setUp() {
+
     }
+
+//    Helper Functions
+
+    private function makeUserManagerMockDependencies() {
+        Mock::generate('HfDatabase');
+        Mock::generate('HfMailer');
+        Mock::generate('HfUrlFinder');
+        Mock::generate('HfWordPressInterface');
+        Mock::generate('HfPhpLibrary');
+
+        $UrlFinder  = new MockHfUrlFinder();
+        $Database   = new MockHfDatabase();
+        $Messenger  = new MockHfMailer();
+        $Cms        = new MockHfWordPressInterface();
+        $PhpApi     = new MockHfPhpLibrary();
+
+        return array($UrlFinder, $Database, $Messenger, $Cms, $PhpApi);
+    }
+
+    private function makeRegisterShortcodeMockDependencies() {
+        Mock::generate('HfUrlFinder');
+        Mock::generate('HfDatabase');
+        Mock::generate('HfPhpLibrary');
+        Mock::generate('HfWordPressInterface');
+        Mock::generate('HfUserManager');
+
+        $UrlFinder      = new MockHfUrlFinder();
+        $Database       = new MockHfDatabase();
+        $PhpLibrary     = new MockHfPhpLibrary();
+        $Cms            = new MockHfWordPressInterface();
+        $UserManager    = new MockHfUserManager();
+
+        return array($UrlFinder, $Database, $PhpLibrary, $Cms, $UserManager);
+    }
+
+    private function makeDatabaseMockDependencies() {
+        Mock::generate('HfWordPressInterface');
+        Mock::generate('HfPhpLibrary');
+
+        $Cms            = new MockHfWordPressInterface();
+        $CodeLibrary    = new MockHfPhpLibrary();
+
+        return array($Cms, $CodeLibrary);
+    }
+
+    private function classImplementsInterface($class, $interface) {
+        $interfacesImplemented = class_implements($class);
+        return in_array($interface, $interfacesImplemented);
+    }
+
+//    Tests
 
     public function testTestingFramework() {
         $this->assertEqual(1, 1);
@@ -36,9 +90,8 @@ class UnitWpSimpleTest extends UnitTestCase {
     }
 
     public function testDbDataNullRemoval() {
-        $WebsiteApi         = new HfWordPressInterface();
-        $PHPAPI         = new HfPhpLibrary();
-        $DbManager = new HfDatabase($WebsiteApi, $PHPAPI);
+        $Database = $this->Factory->makeDatabase();
+
     	$data = array(
 				'one' => 'big one',
 				'two' => 'two',
@@ -58,173 +111,147 @@ class UnitWpSimpleTest extends UnitTestCase {
 				'seven' => false
 			);
 
-    	$this->assertEqual($DbManager->removeNullValuePairs($data), $expectedData);
+    	$this->assertEqual($Database->removeNullValuePairs($data), $expectedData);
     }
 
 	public function testSchemaColumnObjectCreation() {
-        $ApiInterface   = new HfWordPressInterface();
-        $PHPAPI         = new HfPhpLibrary();
-        $DbManager = new HfDatabase($ApiInterface, $PHPAPI);
-		$columnObject = $DbManager->createColumnSchemaObject('openTime', 'timestamp', 'YES', '', null, '');
+        $Database           = $this->Factory->makeDatabase();
+		$columnObject       = $Database->createColumnSchemaObject('openTime', 'timestamp', 'YES', '', null, '');
 
-		$expected = new StdClass;
-		$expected->Field = 'openTime';
-		$expected->Type = 'timestamp';
-		$expected->Null = 'YES';
-		$expected->Key = '';
-		$expected->Default = null;
-		$expected->Extra = '';
+		$expected           = new StdClass;
+		$expected->Field    = 'openTime';
+		$expected->Type     = 'timestamp';
+		$expected->Null     = 'YES';
+		$expected->Key      = '';
+		$expected->Default  = null;
+		$expected->Extra    = '';
 
 		$this->assertEqual($columnObject, $expected);
 	}
 
 	public function testEmailTableSchema() {
-        $WebsiteApi         = new HfWordPressInterface();
-        $PHPAPI         = new HfPhpLibrary();
-        $DbManager = new HfDatabase($WebsiteApi, $PHPAPI);
-		$currentSchema = $DbManager->getTableSchema('hf_email');
+        $Database       = $this->Factory->makeDatabase();
+        $currentSchema  = $Database->getTableSchema('hf_email');
 
 		$expectedSchema = array(
-				'emailID'		=> $DbManager->createColumnSchemaObject('emailID', 'int(11)', 'NO', 'PRI', null, 'auto_increment'),
-				'sendTime'		=> $DbManager->createColumnSchemaObject('sendTime', 'timestamp', 'NO', '', 'CURRENT_TIMESTAMP', ''),
-				'subject'		=> $DbManager->createColumnSchemaObject('subject', 'varchar(500)', 'NO', '', null, ''),
-				'body'			=> $DbManager->createColumnSchemaObject('body', 'text', 'NO', '', null, ''),
-				'userID'		=> $DbManager->createColumnSchemaObject('userID', 'int(11)', 'NO', 'MUL', null, ''),
-				'deliveryStatus'=> $DbManager->createColumnSchemaObject('deliveryStatus', 'bit(1)', 'NO', '', "b'0'", ''),
-				'openTime'		=> $DbManager->createColumnSchemaObject('openTime', 'datetime', 'YES', '', null, ''),
-				'address'		=> $DbManager->createColumnSchemaObject('address', 'varchar(80)', 'YES', '', null, '')
+				'emailID'		=> $Database->createColumnSchemaObject('emailID', 'int(11)', 'NO', 'PRI', null, 'auto_increment'),
+				'sendTime'		=> $Database->createColumnSchemaObject('sendTime', 'timestamp', 'NO', '', 'CURRENT_TIMESTAMP', ''),
+				'subject'		=> $Database->createColumnSchemaObject('subject', 'varchar(500)', 'NO', '', null, ''),
+				'body'			=> $Database->createColumnSchemaObject('body', 'text', 'NO', '', null, ''),
+				'userID'		=> $Database->createColumnSchemaObject('userID', 'int(11)', 'NO', 'MUL', null, ''),
+				'deliveryStatus'=> $Database->createColumnSchemaObject('deliveryStatus', 'bit(1)', 'NO', '', "b'0'", ''),
+				'openTime'		=> $Database->createColumnSchemaObject('openTime', 'datetime', 'YES', '', null, ''),
+				'address'		=> $Database->createColumnSchemaObject('address', 'varchar(80)', 'YES', '', null, '')
 			);
 
 		$this->assertEqual($currentSchema, $expectedSchema);
 	}
 
 	public function testGoalTableSchema() {
-        $ApiInterface   = new HfWordPressInterface();
-        $PHPAPI         = new HfPhpLibrary();
-        $DbManager = new HfDatabase($ApiInterface, $PHPAPI);
-		$currentSchema = $DbManager->getTableSchema('hf_goal');
+        $Database       = $this->Factory->makeDatabase();
+		$currentSchema  = $Database->getTableSchema('hf_goal');
 
 		$expectedSchema = array(
-				'goalID'		=> $DbManager->createColumnSchemaObject('goalID', 'int(11)', 'NO', 'PRI', null, 'auto_increment'),
-				'title'			=> $DbManager->createColumnSchemaObject('title', 'varchar(500)', 'NO', '', null, ''),
-				'description'	=> $DbManager->createColumnSchemaObject('description', 'text', 'YES', '', null, ''),
-				'thumbnail'		=> $DbManager->createColumnSchemaObject('thumbnail', 'varchar(80)', 'YES', '', null, ''),
-				'isPositive'	=> $DbManager->createColumnSchemaObject('isPositive', 'bit(1)', 'NO', '', "b'0'", ''),
-				'isPrivate'		=> $DbManager->createColumnSchemaObject('isPrivate', 'bit(1)', 'NO', '', "b'1'", ''),
-				'creatorID'		=> $DbManager->createColumnSchemaObject('creatorID', 'int(11)', 'YES', 'MUL', null, ''),
-				'dateCreated'	=> $DbManager->createColumnSchemaObject('dateCreated', 'timestamp', 'NO', '', 'CURRENT_TIMESTAMP', '')
+				'goalID'		=> $Database->createColumnSchemaObject('goalID', 'int(11)', 'NO', 'PRI', null, 'auto_increment'),
+				'title'			=> $Database->createColumnSchemaObject('title', 'varchar(500)', 'NO', '', null, ''),
+				'description'	=> $Database->createColumnSchemaObject('description', 'text', 'YES', '', null, ''),
+				'thumbnail'		=> $Database->createColumnSchemaObject('thumbnail', 'varchar(80)', 'YES', '', null, ''),
+				'isPositive'	=> $Database->createColumnSchemaObject('isPositive', 'bit(1)', 'NO', '', "b'0'", ''),
+				'isPrivate'		=> $Database->createColumnSchemaObject('isPrivate', 'bit(1)', 'NO', '', "b'1'", ''),
+				'creatorID'		=> $Database->createColumnSchemaObject('creatorID', 'int(11)', 'YES', 'MUL', null, ''),
+				'dateCreated'	=> $Database->createColumnSchemaObject('dateCreated', 'timestamp', 'NO', '', 'CURRENT_TIMESTAMP', '')
 			);
 
 		$this->assertEqual($currentSchema, $expectedSchema);
 	}
 
 	public function testReportTableSchema() {
-        $ApiInterface   = new HfWordPressInterface();
-        $PHPAPI         = new HfPhpLibrary();
-        $DbManager = new HfDatabase($ApiInterface, $PHPAPI);
-		$currentSchema = $DbManager->getTableSchema('hf_report');
+        $Database       = $this->Factory->makeDatabase();
+		$currentSchema  = $Database->getTableSchema('hf_report');
 
 		$expectedSchema = array(
-				'reportID'			=> $DbManager->createColumnSchemaObject('reportID', 'int(11)', 'NO', 'PRI', null, 'auto_increment'),
-				'userID'			=> $DbManager->createColumnSchemaObject('userID', 'int(11)', 'NO', 'MUL', null, ''),
-				'goalID'			=> $DbManager->createColumnSchemaObject('goalID', 'int(11)', 'NO', 'MUL', null, ''),
-				'referringEmailID'	=> $DbManager->createColumnSchemaObject('referringEmailID', 'int(11)', 'YES', 'MUL', null, ''),
-				'isSuccessful'		=> $DbManager->createColumnSchemaObject('isSuccessful', 'tinyint(4)', 'NO', '', null, ''),
-				'date'				=> $DbManager->createColumnSchemaObject('date', 'timestamp', 'NO', '', 'CURRENT_TIMESTAMP', '')
+				'reportID'			=> $Database->createColumnSchemaObject('reportID', 'int(11)', 'NO', 'PRI', null, 'auto_increment'),
+				'userID'			=> $Database->createColumnSchemaObject('userID', 'int(11)', 'NO', 'MUL', null, ''),
+				'goalID'			=> $Database->createColumnSchemaObject('goalID', 'int(11)', 'NO', 'MUL', null, ''),
+				'referringEmailID'	=> $Database->createColumnSchemaObject('referringEmailID', 'int(11)', 'YES', 'MUL', null, ''),
+				'isSuccessful'		=> $Database->createColumnSchemaObject('isSuccessful', 'tinyint(4)', 'NO', '', null, ''),
+				'date'				=> $Database->createColumnSchemaObject('date', 'timestamp', 'NO', '', 'CURRENT_TIMESTAMP', '')
 			);
 
 		$this->assertEqual($currentSchema, $expectedSchema);
 	}
 
 	public function testUserGoalTableSchema() {
-        $ApiInterface   = new HfWordPressInterface();
-        $PHPAPI         = new HfPhpLibrary();
-        $DbManager = new HfDatabase($ApiInterface, $PHPAPI);
-		$currentSchema = $DbManager->getTableSchema('hf_user_goal');
+        $Database       = $this->Factory->makeDatabase();
+		$currentSchema  = $Database->getTableSchema('hf_user_goal');
 
 		$expectedSchema = array(
-				'userID'		=> $DbManager->createColumnSchemaObject('userID', 'int(11)', 'NO', 'PRI', null, ''),
-				'goalID'		=> $DbManager->createColumnSchemaObject('goalID', 'int(11)', 'NO', 'PRI', null, ''),
-				'dateStarted'	=> $DbManager->createColumnSchemaObject('dateStarted', 'timestamp', 'NO', '', 'CURRENT_TIMESTAMP', ''),
-				'isActive'		=> $DbManager->createColumnSchemaObject('isActive', 'bit(1)', 'NO', '', "b'1'", '')
+				'userID'		=> $Database->createColumnSchemaObject('userID', 'int(11)', 'NO', 'PRI', null, ''),
+				'goalID'		=> $Database->createColumnSchemaObject('goalID', 'int(11)', 'NO', 'PRI', null, ''),
+				'dateStarted'	=> $Database->createColumnSchemaObject('dateStarted', 'timestamp', 'NO', '', 'CURRENT_TIMESTAMP', ''),
+				'isActive'		=> $Database->createColumnSchemaObject('isActive', 'bit(1)', 'NO', '', "b'1'", '')
 			);
 
 		$this->assertEqual($currentSchema, $expectedSchema);
 	}
 
 	public function testLevelTableSchema() {
-        $ApiInterface   = new HfWordPressInterface();
-        $PHPAPI         = new HfPhpLibrary();
-        $DbManager = new HfDatabase($ApiInterface, $PHPAPI);
-		$currentSchema = $DbManager->getTableSchema('hf_level');
+        $Database       = $this->Factory->makeDatabase();
+		$currentSchema  = $Database->getTableSchema('hf_level');
 
 		$expectedSchema = array(
-				'levelID'		=> $DbManager->createColumnSchemaObject('levelID', 'int(11)', 'NO', 'PRI', null, ''),
-				'title'			=> $DbManager->createColumnSchemaObject('title', 'varchar(500)', 'NO', '', null, ''),
-				'description'	=> $DbManager->createColumnSchemaObject('description', 'text', 'YES', '', null, ''),
-				'size'			=> $DbManager->createColumnSchemaObject('size', 'int(11)', 'NO', '', null, ''),
-				'emailInterval'	=> $DbManager->createColumnSchemaObject('emailInterval', 'int(11)', 'NO', '', null, ''),
-				'target'		=> $DbManager->createColumnSchemaObject('target', 'int(11)', 'NO', '', null, ''),
+				'levelID'		=> $Database->createColumnSchemaObject('levelID', 'int(11)', 'NO', 'PRI', null, ''),
+				'title'			=> $Database->createColumnSchemaObject('title', 'varchar(500)', 'NO', '', null, ''),
+				'description'	=> $Database->createColumnSchemaObject('description', 'text', 'YES', '', null, ''),
+				'size'			=> $Database->createColumnSchemaObject('size', 'int(11)', 'NO', '', null, ''),
+				'emailInterval'	=> $Database->createColumnSchemaObject('emailInterval', 'int(11)', 'NO', '', null, ''),
+				'target'		=> $Database->createColumnSchemaObject('target', 'int(11)', 'NO', '', null, ''),
 			);
 
 		$this->assertEqual($currentSchema, $expectedSchema);
 	}
 
 	public function testInviteTableSchema() {
-        $ApiInterface   = new HfWordPressInterface();
-        $PHPAPI         = new HfPhpLibrary();
-        $DbManager = new HfDatabase($ApiInterface, $PHPAPI);
-		$currentSchema = $DbManager->getTableSchema('hf_invite');
+        $Database       = $this->Factory->makeDatabase();
+		$currentSchema  = $Database->getTableSchema('hf_invite');
 
 		$expectedSchema = array(
-				'inviteID'		=> $DbManager->createColumnSchemaObject('inviteID', 'varchar(250)', 'NO', 'PRI', null, ''),
-				'inviterID'		=> $DbManager->createColumnSchemaObject('inviterID', 'int(11)', 'NO', 'MUL', null, ''),
-				'inviteeEmail'	=> $DbManager->createColumnSchemaObject('inviteeEmail', 'varchar(80)', 'NO', '', null, ''),
-				'emailID'		=> $DbManager->createColumnSchemaObject('emailID', 'int(11)', 'NO', 'MUL', null, ''),
-				'expirationDate'=> $DbManager->createColumnSchemaObject('expirationDate', 'datetime', 'NO', '', null, '')
+				'inviteID'		=> $Database->createColumnSchemaObject('inviteID', 'varchar(250)', 'NO', 'PRI', null, ''),
+				'inviterID'		=> $Database->createColumnSchemaObject('inviterID', 'int(11)', 'NO', 'MUL', null, ''),
+				'inviteeEmail'	=> $Database->createColumnSchemaObject('inviteeEmail', 'varchar(80)', 'NO', '', null, ''),
+				'emailID'		=> $Database->createColumnSchemaObject('emailID', 'int(11)', 'NO', 'MUL', null, ''),
+				'expirationDate'=> $Database->createColumnSchemaObject('expirationDate', 'datetime', 'NO', '', null, '')
 			);
 
 		$this->assertEqual($currentSchema, $expectedSchema);
 	}
 
     public function testRelationshipTableSchema() {
-        $ApiInterface   = new HfWordPressInterface();
-        $PHPAPI         = new HfPhpLibrary();
-        $DbManager = new HfDatabase($ApiInterface, $PHPAPI);
-        $currentSchema = $DbManager->getTableSchema('hf_relationship');
+        $Database       = $this->Factory->makeDatabase();
+        $currentSchema  = $Database->getTableSchema('hf_relationship');
 
         $expectedSchema = array(
-            'userID1'		=> $DbManager->createColumnSchemaObject('userID1', 'int(11)', 'NO', 'PRI', null, ''),
-            'userID2'		=> $DbManager->createColumnSchemaObject('userID2', 'int(11)', 'NO', 'PRI', null, '')
+            'userID1'		=> $Database->createColumnSchemaObject('userID1', 'int(11)', 'NO', 'PRI', null, ''),
+            'userID2'		=> $Database->createColumnSchemaObject('userID2', 'int(11)', 'NO', 'PRI', null, '')
         );
 
         $this->assertEqual($currentSchema, $expectedSchema);
     }
 
 	public function testRandomStringCreationLength() {
-        $Security = new HfSecurity();
-		$randomString = $Security->createRandomString(400);
+        $Security       = $this->Factory->makeSecurity();
+		$randomString   = $Security->createRandomString(400);
+
 		$this->assertEqual(strlen($randomString), 400);
 	}
 
     public function testEmailInviteSendingUsingMocks() {
-        Mock::generate('HfUrlFinder');
-        Mock::generate('HfDatabase');
-        Mock::generate('HfHtmlGenerator');
-        Mock::generate('HfMailer');
-        Mock::generate('HfWordPressInterface');
-        Mock::generate('HfPhpLibrary');
-
-        $UrlFinder      = new MockHfUrlFinder();
-        $DbConnection   = new MockHfDatabase();
-        $Messenger      = new MockHfMailer();
-        $WebsiteApi     = new MockHfWordPressInterface();
-        $PhpApi         = new MockHfPhpLibrary();
+        list($UrlFinder, $Database, $Messenger, $Cms, $PhpApi) = $this->makeUserManagerMockDependencies();
 
         $Messenger->returns('generateInviteID', 555);
-        $DbConnection->returns('generateEmailID', 5);
+        $Database->returns('generateEmailID', 5);
 
-        $UserManager = new HfUserManager($DbConnection, $Messenger, $UrlFinder, $WebsiteApi, $PhpApi);
+        $UserManager = new HfUserManager($Database, $Messenger, $UrlFinder, $Cms, $PhpApi);
         $result = $UserManager->sendInvitation(1, 'me@test.com', 3);
 
         $this->assertEqual($result, 555);
@@ -238,22 +265,12 @@ class UnitWpSimpleTest extends UnitTestCase {
 	}
 
     public function testInviteStorageInInviteTableUsingMocks() {
-        Mock::generate('HfUrlFinder');
-        Mock::generate('HfDatabase');
-        Mock::generate('HfHtmlGenerator');
-        Mock::generate('HfMailer');
-        Mock::generate('HfWordPressInterface');
-        Mock::generate('HfPhpLibrary');
+        list($UrlFinder, $Database, $Messenger, $Cms, $PhpApi) = $this->makeUserManagerMockDependencies();
 
-        $UrlFinder      = new MockHfUrlFinder();
-        $DbConnection   = new MockHfDatabase();
-        $Messenger      = new MockHfMailer();
-        $WebsiteApi     = new MockHfWordPressInterface();
-        $PhpApi         = new MockHfPhpLibrary();
+        $UserManager = new HfUserManager($Database, $Messenger, $UrlFinder, $Cms, $PhpApi);
 
-        $DbConnection->returns('generateEmailID', 5);
+        $Database->returns('generateEmailID', 5);
 
-        $UserManager = new HfUserManager($DbConnection, $Messenger, $UrlFinder, $WebsiteApi, $PhpApi);
         $expirationDate = date('Y-m-d H:i:s', strtotime('+'. 3 .' days'));
 
         $expectedRecord = array(
@@ -264,7 +281,7 @@ class UnitWpSimpleTest extends UnitTestCase {
             'expirationDate' => $expirationDate
         );
 
-        $DbConnection->expectAt(
+        $Database->expectAt(
             1, 'insertIntoDb',
             array('hf_invite', $expectedRecord ));
 
@@ -630,25 +647,15 @@ class UnitWpSimpleTest extends UnitTestCase {
     }
 
     public function testRegistrationShortcodeHtml() {
-        Mock::generate('HfUrlFinder');
-        Mock::generate('HfDatabase');
-        Mock::generate('HfHtmlGenerator');
-        Mock::generate('HfMailer');
-        Mock::generate('HfWordPressInterface');
-        Mock::generate('HfPhpLibrary');
-
-        $UrlFinder      = new MockHfUrlFinder();
-        $DbConnection   = new MockHfDatabase();
-        $Messenger      = new MockHfMailer();
-        $WebsiteApi     = new MockHfWordPressInterface();
-        $PhpApi         = new MockHfPhpLibrary();
+        list($UrlFinder, $Database, $PhpLibrary, $Cms, $UserManager) = $this->makeRegisterShortcodeMockDependencies();
 
         $UrlFinder->returns('getCurrentPageURL', 'test.com');
+        $PhpLibrary->returns('isPostEmpty', true);
 
-        $UserManager    = new HfUserManager($DbConnection, $Messenger, $UrlFinder, $WebsiteApi, $PhpApi);
+        $RegisterShortcode    = new HfRegisterShortcode($UrlFinder, $Database, $PhpLibrary, $Cms, $UserManager);
 
         $expectedHtml   = '<form action="test.com" method="post"><p><label for="username"><span class="required">*</span> Username: <input type="text" name="username" value="" required /></label></p><p><label for="email"><span class="required">*</span> Email: <input type="text" name="email" value="" required /></label></p><p><label for="password"><span class="required">*</span> Password: <input type="password" name="password" required /></label></p><p><label for="passwordConfirmation"><span class="required">*</span> Confirm Password: <input type="password" name="passwordConfirmation" required /></label></p><p><input type="submit" name="submit" value="Register" /></p></form>';
-        $resultHtml     = $UserManager->registerShortcode();
+        $resultHtml     = $RegisterShortcode->getOutput();
 
         $this->assertEqual($expectedHtml, $resultHtml);
     }
@@ -824,11 +831,7 @@ class UnitWpSimpleTest extends UnitTestCase {
     }
 
     public function testGetGoalSubscriptions() {
-        Mock::generate('HfWordPressInterface');
-        Mock::generate('HfPhpLibrary');
-
-        $Cms            = new MockHfWordPressInterface();
-        $CodeLibrary    = new MockHfPhpLibrary();
+        list($Cms, $CodeLibrary) = $this->makeDatabaseMockDependencies();
 
         $Cms->expectOnce('getRows');
 
@@ -841,6 +844,57 @@ class UnitWpSimpleTest extends UnitTestCase {
         $Factory = new HfFactory();
         $Goals = $Factory->makeGoals();
         $Goals->sendReportRequestEmails();
+    }
+
+    public function testRegisterShortcodeExists() {
+        $this->assertTrue(class_exists('HfRegisterShortcode'));
+    }
+
+    public function testRegisterShortcodeUsesShortcodeInterface() {
+        $this->assertTrue($this->classImplementsInterface('HfRegisterShortcode', 'Hf_iShortcode'));
+    }
+
+    public function testCmsHasDeleteRowsFunction() {
+        $Cms = new HfWordPressInterface();
+
+        $this->assertTrue(method_exists($Cms, 'deleteRows'));
+    }
+
+    public function testDatabaseHasDeleteInvitationMethod() {
+        list($Cms, $CodeLibrary) = $this->makeDatabaseMockDependencies();
+
+        $Database = new HfDatabase($Cms, $CodeLibrary);
+
+        $this->assertTrue(method_exists($Database, 'deleteInvite'));
+    }
+
+    public function testDatabaseCallsDeleteRowsMethod() {
+        list($Cms, $CodeLibrary) = $this->makeDatabaseMockDependencies();
+
+        $Database = new HfDatabase($Cms, $CodeLibrary);
+
+        $Cms->expectOnce('deleteRows');
+
+        $Database->deleteInvite(777);
+    }
+
+    public function testRegisterShortcodeCallsDeleteInvitation() {
+        list($UrlFinder, $Database, $PhpLibrary, $Cms, $UserManager) = $this->makeRegisterShortcodeMockDependencies();
+
+        $PhpLibrary->returns('isPostEmpty', false);
+        $PhpLibrary->returns('isUrlParameterEmpty', false);
+        $PhpLibrary->returns('getPost', 'test@gmail.com');
+
+        $mockInvite             = new stdClass();
+        $mockInvite->inviterID  = 777;
+
+        $Database->returns('getInvite', $mockInvite);
+
+        $Database->expectOnce('deleteInvite');
+
+        $RegisterShortcode = new HfRegisterShortcode($UrlFinder, $Database, $PhpLibrary, $Cms, $UserManager);
+
+        $RegisterShortcode->getOutput();
     }
 }
 

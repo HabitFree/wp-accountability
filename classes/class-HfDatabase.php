@@ -3,11 +3,11 @@
 if (!class_exists("HfDatabase")) {
 	class HfDatabase {
 		private $dbVersion = "3.8";
-        private $ContentManagementSystem;
+        private $Cms;
         private $CodeLibrary;
 		
 		function HfDatabase(Hf_iContentManagementSystem $ContentManagementSystem, Hf_iCodeLibrary $CodeLibrary) { //constructor
-            $this->ContentManagementSystem = $ContentManagementSystem;
+            $this->Cms = $ContentManagementSystem;
             $this->CodeLibrary = $CodeLibrary;
 		}
 		
@@ -283,9 +283,9 @@ if (!class_exists("HfDatabase")) {
 		
 		function generateEmailID() {
 			$table = 'hf_email';
-			$tableName = $this->ContentManagementSystem->getDbPrefix() . $table;
+			$tableName = $this->Cms->getDbPrefix() . $table;
             $query = 'SELECT max(emailID) FROM ' . $tableName;
-			return $this->ContentManagementSystem->getVar($query) + 1;
+			return $this->Cms->getVar($query) + 1;
 		}
 		
 		function updateRows($table, $data, $where) {
@@ -348,11 +348,11 @@ if (!class_exists("HfDatabase")) {
 
         function daysSinceLastEmail($userID) {
             $table              = 'hf_email';
-            $fullTableName      = $this->ContentManagementSystem->getDbPrefix() . $table;
+            $fullTableName      = $this->Cms->getDbPrefix() . $table;
 
             $query              = 'SELECT sendTime FROM '.$fullTableName.' WHERE userID = '.$userID.' ORDER BY emailID DESC LIMIT 1';
 
-            $dateOfLastEmail    = $this->ContentManagementSystem->getVar($query);
+            $dateOfLastEmail    = $this->Cms->getVar($query);
             $timeOfLastEmail    = $this->CodeLibrary->convertStringToTime($dateOfLastEmail);
             $timeNow            = $this->CodeLibrary->getCurrentTime();
             $secondsInADay      = 86400;
@@ -366,10 +366,10 @@ if (!class_exists("HfDatabase")) {
             $timeNow        = $this->CodeLibrary->getCurrentTime();
 
             $table              = 'hf_email';
-            $fullTableName      = $this->ContentManagementSystem->getDbPrefix() . $table;
+            $fullTableName      = $this->Cms->getDbPrefix() . $table;
 
             $timeString =
-                $this->ContentManagementSystem->getVar(
+                $this->Cms->getVar(
                     'SELECT sendTime FROM
                     (SELECT * FROM '.$fullTableName.' WHERE userID = '. $escapedUserID .' ORDER BY emailID DESC LIMIT 2)
                     AS T ORDER BY emailID LIMIT 1'
@@ -407,7 +407,7 @@ if (!class_exists("HfDatabase")) {
             $query = 'SELECT date FROM '.$tableName.'
                 WHERE goalID = '.$goalID.' AND userID = '.$userID.'
                 AND reportID=( SELECT min(reportID) FROM '.$tableName.' WHERE isSuccessful = 1)';
-            $timeString = $this->ContentManagementSystem->getVar($query);
+            $timeString = $this->Cms->getVar($query);
 
             return $this->CodeLibrary->convertStringToTime($timeString);
         }
@@ -420,7 +420,7 @@ if (!class_exists("HfDatabase")) {
             $query = 'SELECT date FROM '.$tableName.'
                 WHERE goalID = '.$goalID.' AND userID = '.$userID.'
                 AND reportID=( SELECT max(reportID) FROM '.$tableName.' WHERE isSuccessful = 1)';
-            $timeString = $this->ContentManagementSystem->getVar($query);
+            $timeString = $this->Cms->getVar($query);
 
             return $this->CodeLibrary->convertStringToTime($timeString);
         }
@@ -433,7 +433,7 @@ if (!class_exists("HfDatabase")) {
             $query = 'SELECT date FROM '.$tableName.'
                 WHERE goalID = '.$goalID.' AND userID = '.$userID.'
                 AND reportID=( SELECT max(reportID) FROM '.$tableName.' WHERE NOT isSuccessful = 1)';
-            $timeString = $this->ContentManagementSystem->getVar($query);
+            $timeString = $this->Cms->getVar($query);
 
             return $this->CodeLibrary->convertStringToTime($timeString);
         }
@@ -451,7 +451,7 @@ if (!class_exists("HfDatabase")) {
             $query = 'SELECT date FROM '.$tableName.'
                 WHERE goalID = '.$goalID.' AND userID = '.$userID.'
                 AND reportID=( SELECT max(reportID) FROM '.$tableName.')';
-            $dateInSecondsOfLastReport = strtotime($this->ContentManagementSystem->getVar($query));
+            $dateInSecondsOfLastReport = strtotime($this->Cms->getVar($query));
             $secondsInADay = 86400;
             return ( time() - $dateInSecondsOfLastReport ) / $secondsInADay;
         }
@@ -464,7 +464,7 @@ if (!class_exists("HfDatabase")) {
             $query = 'SELECT date FROM '.$tableName.'
                 WHERE userID = '.$userID.'
                 AND reportID=( SELECT max(reportID) FROM '.$tableName.')';
-            $dateInSecondsOfLastReport = strtotime($this->ContentManagementSystem->getVar($query));
+            $dateInSecondsOfLastReport = strtotime($this->Cms->getVar($query));
             $secondsInADay = 86400;
             return ( time() - $dateInSecondsOfLastReport ) / $secondsInADay;
         }
@@ -473,7 +473,7 @@ if (!class_exists("HfDatabase")) {
             global $wpdb;
             $tableName = $wpdb->prefix . 'hf_email';
             $query = 'SELECT max(emailID) FROM '.$tableName;
-            return intval($this->ContentManagementSystem->getVar($query));
+            return intval($this->Cms->getVar($query));
         }
 
         public function getInvite($nonce) {
@@ -504,8 +504,6 @@ if (!class_exists("HfDatabase")) {
                 'isSuccessful' => $isSuccessful,
                 'referringEmailID' => $emailID );
             $this->insertIntoDb('hf_report', $data);
-            print('hello');
-
         }
 
         public function emailIsValid($userID, $emailID) {
@@ -517,7 +515,14 @@ if (!class_exists("HfDatabase")) {
         }
 
         public function getGoalSubscriptions($userID) {
-            return $this->ContentManagementSystem->getRows('hf_user_goal', 'userID = ' . $userID);
+            return $this->Cms->getRows('hf_user_goal', 'userID = ' . $userID);
+        }
+
+        public function deleteInvite($inviteID) {
+            $table = $this->Cms->getDbPrefix() . 'hf_invite';
+            $where = array('inviteID' => $inviteID);
+
+            $this->Cms->deleteRows($table, $where);
         }
 	}
 }

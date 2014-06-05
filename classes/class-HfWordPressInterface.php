@@ -42,7 +42,7 @@ class HfWordPressInterface implements Hf_iContentManagementSystem {
         print('hello');
     }
 
-    public function createUser($username, $email, $password) {
+    public function createUser($username, $password, $email) {
         return wp_create_user( $username, $password, $email );
     }
 
@@ -50,7 +50,7 @@ class HfWordPressInterface implements Hf_iContentManagementSystem {
         return is_user_logged_in();
     }
 
-    function getRows($table, $where, $outputType = OBJECT) {
+    public function getRows($table, $where, $outputType = OBJECT) {
         global $wpdb;
         $prefix = $wpdb->prefix;
         if ($where === null) {
@@ -58,5 +58,9 @@ class HfWordPressInterface implements Hf_iContentManagementSystem {
         } else {
             return $wpdb->get_results("SELECT * FROM " . $prefix . $table . " WHERE " . $where, $outputType);
         }
+    }
+
+    public function deleteRows($table, $where) {
+        return $this->wpdb->delete($table, $where);
     }
 } 
