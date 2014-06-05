@@ -6,11 +6,13 @@ if (!class_exists("HfAdminPanel")) {
         private $Mailer;
         private $URLFinder;
         private $DbConnection;
+        private $UserManager;
 
-        function HfAdminPanel($Mailer, $URLFinder, $DbConnection) {
+        function HfAdminPanel($Mailer, $URLFinder, $DbConnection, $UserManager) {
             $this->DbConnection = $DbConnection;
             $this->URLFinder = $URLFinder;
             $this->Mailer = $Mailer;
+            $this->UserManager = $UserManager;
 		}
 		
 		function registerAdminPanel() {
@@ -24,6 +26,11 @@ if (!class_exists("HfAdminPanel")) {
                 $this->Mailer->sendReportRequestEmail(1);
 				echo '<p class="success">Test email sent.</p>';
 			}
+
+            if(isset($_POST) && array_key_exists('sendTestInvite',$_POST)) {
+                $this->UserManager->sendInvitation( 1, 'natethegreat.arthur@gmail.com', 7 );
+                echo '<p class="success">Test invite sent.</p>';
+            }
 			
 			if(isset($_POST) && array_key_exists('sudoReactivateExtension',$_POST)) {
                 $this->DbConnection->sudoReactivateExtension();
@@ -32,15 +39,18 @@ if (!class_exists("HfAdminPanel")) {
 			
 			echo $this->generateAdminPanelForm();
 			
-			echo do_shortcode( '[simpletest name="SimpleTest Unit Tests" path="/hf-accountability/php/tests.php" passes="y"]' );
+			echo do_shortcode( '[simpletest name="SimpleTest Unit Tests" path="/hf-accountability/tests/tests.php" passes="y"]' );
 		}
 		
 		function generateAdminPanelForm() {
             $currentURL = $this->URLFinder->getCurrentPageURL();
-			return '<form action="'. $currentURL .'" method="post">
-					<p><input type="submit" name="sendTestReportRequestEmail" value="Send test report request email" /></p>
-					<p><input type="submit" name="sudoReactivateExtension" value="Sudo reactivate extension" /></p>
-				</form>';
+            $Form       = new HfGenericForm($currentURL);
+
+            $Form->addSubmitButton('sendTestReportRequestEmail', 'Send test report request email');
+            $Form->addSubmitButton('sendTestInvite', 'Send test invite');
+            $Form->addSubmitButton('sudoReactivateExtension', 'Sudo reactivate extension');
+
+			return $Form->getHtml();
 		}
 		
 		function addToAdminHead() {

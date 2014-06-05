@@ -2,13 +2,13 @@
 
 if (!class_exists("HfDatabase")) {
 	class HfDatabase {
-		private $dbVersion = "3.7";
-        private $WebsiteApi;
-        private $LanguageApi;
+		private $dbVersion = "3.8";
+        private $ContentManagementSystem;
+        private $CodeLibrary;
 		
-		function HfDatabase($WebsiteApi, $LanguageApi) { //constructor
-            $this->WebsiteApi = $WebsiteApi;
-            $this->LanguageApi = $LanguageApi;
+		function HfDatabase(Hf_iContentManagementSystem $ContentManagementSystem, Hf_iCodeLibrary $CodeLibrary) { //constructor
+            $this->ContentManagementSystem = $ContentManagementSystem;
+            $this->CodeLibrary = $CodeLibrary;
 		}
 		
 		function installDb() {
@@ -84,14 +84,21 @@ if (!class_exists("HfDatabase")) {
 					KEY emailID (emailID),
 					PRIMARY KEY  (inviteID)
 				);";
+
+                $relationshipTableSql = "CREATE TABLE " . $prefix . "hf_relationship (
+					userID1 int NOT NULL,
+					userID2 int NOT NULL,
+					PRIMARY KEY  (userID1, userID2)
+				);";
 			
-				require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+				require_once( ABSPATH . 'wp-admin/includes/upgrade.classes' );
 				dbDelta( $emailTableSql );
 				dbDelta( $goalTableSql );
 				dbDelta( $reportTableSql );
 				dbDelta( $userGoalTableSql );
 				dbDelta( $levelTableSql );
 				dbDelta( $inviteTableSql );
+                dbDelta( $relationshipTableSql );
 				
 				$defaultGoal = array( 'goalID' => 1,
 					'title' => 'Pornography Abstinence',
@@ -213,10 +220,7 @@ if (!class_exists("HfDatabase")) {
 			$tableName = $prefix . $table;
 			$data = $this->removeNullValuePairs($data);
 			$success = $wpdb->insert( $tableName, $data );
-			if ($success === false) {
-				$wpdb->print_error();
-			}
-			return $success;
+            return $success;
 		}
 		
 		function insertMultipleRows($table, $rows) {
@@ -279,8 +283,9 @@ if (!class_exists("HfDatabase")) {
 		
 		function generateEmailID() {
 			$table = 'hf_email';
-			$select = 'max(emailID)';
-			return $this->WebsiteApi->getVar($table, $select) + 1;
+			$tableName = $this->ContentManagementSystem->getDbPrefix() . $table;
+            $query = 'SELECT max(emailID) FROM ' . $tableName;
+			return $this->ContentManagementSystem->getVar($query) + 1;
 		}
 		
 		function updateRows($table, $data, $where) {
@@ -342,29 +347,35 @@ if (!class_exists("HfDatabase")) {
         }
 
         function daysSinceLastEmail($userID) {
-            $timeNow            = $this->LanguageApi->getCurrentTime();
             $table              = 'hf_email';
-            $fullTableName      = $this->WebsiteApi->getDbPrefix() . $table;
-            $select             = 'sendTime';
-            $where              = 'userID = ' . $userID . ' AND emailID = (SELECT max(emailID) FROM '. $fullTableName .')';
-            $dateOfLastEmail    = $this->WebsiteApi->getVar($table, $select, $where);
-            $timeOfLastEmail    = $this->LanguageApi->convertStringToTime($dateOfLastEmail);
-            $secondsInADay = 86400;
+            $fullTableName      = $this->ContentManagementSystem->getDbPrefix() . $table;
+
+            $query              = 'SELECT sendTime FROM '.$fullTableName.' WHERE userID = '.$userID.' ORDER BY emailID DESC LIMIT 1';
+
+            $dateOfLastEmail    = $this->ContentManagementSystem->getVar($query);
+            $timeOfLastEmail    = $this->CodeLibrary->convertStringToTime($dateOfLastEmail);
+            $timeNow            = $this->CodeLibrary->getCurrentTime();
+            $secondsInADay      = 86400;
+
             return ($timeNow - $timeOfLastEmail) / $secondsInADay;
         }
 
         public function daysSinceSecondToLastEmail($userID) {
-            $escapedUserID  = $this->escapeData($userID);
-            $timeNow        = $this->LanguageApi->getCurrentTime();
+            $userID = $this->CodeLibrary->convertIntToString($userID);
+            $escapedUserID  = $this->escapeData(array($userID))[0];
+            $timeNow        = $this->CodeLibrary->getCurrentTime();
+
+            $table              = 'hf_email';
+            $fullTableName      = $this->ContentManagementSystem->getDbPrefix() . $table;
 
             $timeString =
-                $this->WebsiteApi->executeQuery(
+                $this->ContentManagementSystem->getVar(
                     'SELECT sendTime FROM
-                    (SELECT * FROM wp_hf_email WHERE userID = '. $escapedUserID .' ORDER BY emailID DESC LIMIT 2)
+                    (SELECT * FROM '.$fullTableName.' WHERE userID = '. $escapedUserID .' ORDER BY emailID DESC LIMIT 2)
                     AS T ORDER BY emailID LIMIT 1'
                 );
 
-            $timeOfSecondToLastEmail    = $this->LanguageApi->convertStringToTime($timeString);
+            $timeOfSecondToLastEmail    = $this->CodeLibrary->convertStringToTime($timeString);
             $secondsInADay              = 86400;
 
             return ($timeNow - $timeOfSecondToLastEmail) / $secondsInADay;
@@ -393,16 +404,12 @@ if (!class_exists("HfDatabase")) {
             $prefix = $wpdb->prefix;
             $table = 'hf_report';
             $tableName = $prefix . $table;
-            $select = 'date';
-            $whereFirstSuccess = 'goalID = ' . $goalID .
-                ' AND userID = ' . $userID .
-                ' AND reportID=(
-                    SELECT min(reportID)
-                    FROM ' . $tableName .
-                ' WHERE isSuccessful = 1)';
-            $timeString = $this->WebsiteApi->getVar($table, $select, $whereFirstSuccess);
+            $query = 'SELECT date FROM '.$tableName.'
+                WHERE goalID = '.$goalID.' AND userID = '.$userID.'
+                AND reportID=( SELECT min(reportID) FROM '.$tableName.' WHERE isSuccessful = 1)';
+            $timeString = $this->ContentManagementSystem->getVar($query);
 
-            return $this->LanguageApi->convertStringToTime($timeString);
+            return $this->CodeLibrary->convertStringToTime($timeString);
         }
 
         function timeOfLastSuccess($goalID, $userID) {
@@ -410,16 +417,12 @@ if (!class_exists("HfDatabase")) {
             $prefix = $wpdb->prefix;
             $table = 'hf_report';
             $tableName = $prefix . $table;
-            $select = 'date';
-            $whereLastSuccess = 'goalID = ' . $goalID .
-                ' AND userID = ' . $userID .
-                ' AND reportID=(
-                    SELECT max(reportID)
-                    FROM ' . $tableName .
-                ' WHERE isSuccessful = 1)';
-            $timeString = $this->WebsiteApi->getVar($table, $select, $whereLastSuccess);
+            $query = 'SELECT date FROM '.$tableName.'
+                WHERE goalID = '.$goalID.' AND userID = '.$userID.'
+                AND reportID=( SELECT max(reportID) FROM '.$tableName.' WHERE isSuccessful = 1)';
+            $timeString = $this->ContentManagementSystem->getVar($query);
 
-            return $this->LanguageApi->convertStringToTime($timeString);
+            return $this->CodeLibrary->convertStringToTime($timeString);
         }
 
         function timeOfLastFail($goalID, $userID) {
@@ -427,16 +430,12 @@ if (!class_exists("HfDatabase")) {
             $prefix = $wpdb->prefix;
             $table = 'hf_report';
             $tableName = $prefix . $table;
-            $select = 'date';
-            $whereLastFail = 'goalID = ' . $goalID .
-                ' AND userID = ' . $userID .
-                ' AND reportID=(
-                    SELECT max(reportID)
-                    FROM ' . $tableName .
-                ' WHERE NOT isSuccessful = 1)';
-            $timeString = $this->WebsiteApi->getVar($table, $select, $whereLastFail);
+            $query = 'SELECT date FROM '.$tableName.'
+                WHERE goalID = '.$goalID.' AND userID = '.$userID.'
+                AND reportID=( SELECT max(reportID) FROM '.$tableName.' WHERE NOT isSuccessful = 1)';
+            $timeString = $this->ContentManagementSystem->getVar($query);
 
-            return $this->LanguageApi->convertStringToTime($timeString);
+            return $this->CodeLibrary->convertStringToTime($timeString);
         }
 
         function level($daysOfSuccess) {
@@ -449,10 +448,10 @@ if (!class_exists("HfDatabase")) {
             $prefix = $wpdb->prefix;
             $table = 'hf_report';
             $tableName = $prefix . $table;
-            $whereLastReport = 'goalID = ' . $goalID .
-                ' AND userID = ' . $userID .
-                ' AND reportID=( SELECT max(reportID) FROM '.$tableName.' )';
-            $dateInSecondsOfLastReport = strtotime($this->DbConnection->getVar('hf_report', 'date', $whereLastReport));
+            $query = 'SELECT date FROM '.$tableName.'
+                WHERE goalID = '.$goalID.' AND userID = '.$userID.'
+                AND reportID=( SELECT max(reportID) FROM '.$tableName.')';
+            $dateInSecondsOfLastReport = strtotime($this->ContentManagementSystem->getVar($query));
             $secondsInADay = 86400;
             return ( time() - $dateInSecondsOfLastReport ) / $secondsInADay;
         }
@@ -462,14 +461,64 @@ if (!class_exists("HfDatabase")) {
             $prefix = $wpdb->prefix;
             $table = 'hf_report';
             $tableName = $prefix . $table;
-            $whereLastReport = 'userID = ' . $userID .
-                ' AND reportID=( SELECT max(reportID) FROM '.$tableName.' )';
-            $dateInSecondsOfLastReport = strtotime($this->DbConnection->getVar('hf_report', 'date', $whereLastReport));
+            $query = 'SELECT date FROM '.$tableName.'
+                WHERE userID = '.$userID.'
+                AND reportID=( SELECT max(reportID) FROM '.$tableName.')';
+            $dateInSecondsOfLastReport = strtotime($this->ContentManagementSystem->getVar($query));
             $secondsInADay = 86400;
             return ( time() - $dateInSecondsOfLastReport ) / $secondsInADay;
         }
 
+        public function idOfLastEmail() {
+            global $wpdb;
+            $tableName = $wpdb->prefix . 'hf_email';
+            $query = 'SELECT max(emailID) FROM '.$tableName;
+            return intval($this->ContentManagementSystem->getVar($query));
+        }
 
+        public function getInvite($nonce) {
+            $whereInvite = "inviteID = '" . $nonce . "'";
+            return $this->getRow('hf_invite', $whereInvite);
+        }
+
+        public function createRelationship($userOneID, $userTwoID) {
+            if ($userOneID < $userTwoID) {
+                $row = array(
+                    'userID1' => $userOneID,
+                    'userID2' => $userTwoID
+                );
+            } else {
+                $row = array(
+                    'userID1' => $userTwoID,
+                    'userID2' => $userOneID
+                );
+            }
+
+            $this->insertIgnoreIntoDb('hf_relationship', $row);
+        }
+
+        public function submitAccountabilityReport($userID, $goalID, $isSuccessful, $emailID = null) {
+            $data = array(
+                'userID' => $userID,
+                'goalID' => $goalID,
+                'isSuccessful' => $isSuccessful,
+                'referringEmailID' => $emailID );
+            $this->insertIntoDb('hf_report', $data);
+            print('hello');
+
+        }
+
+        public function emailIsValid($userID, $emailID) {
+            $email = $this->getRow('hf_email',
+                'userID = ' . $userID .
+                ' AND emailID = ' . $emailID);
+
+            return $email != null;
+        }
+
+        public function getGoalSubscriptions($userID) {
+            return $this->ContentManagementSystem->getRows('hf_user_goal', 'userID = ' . $userID);
+        }
 	}
 }
 ?>

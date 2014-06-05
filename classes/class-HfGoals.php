@@ -1,18 +1,22 @@
 <?php
 class HfGoals {
     private $Database;
-    private $HtmlGenerator;
-    private $WebsiteApi;
+    private $View;
+    private $ContentManagementSystem;
     private $Messenger;
+    private $CodeLibrary;
 
-    function __construct($Messenger, $WebsiteApi, $HtmlGenerator, $Database) {
+    function __construct($Messenger, Hf_iContentManagementSystem $ContentManagementSystem, Hf_iDisplayCodeGenerator $View, $Database, Hf_iCodeLibrary $CodeLibrary) {
         $this->Messenger = $Messenger;
-        $this->WebsiteApi = $WebsiteApi;
-        $this->HtmlGenerator = $HtmlGenerator;
+        $this->ContentManagementSystem = $ContentManagementSystem;
+        $this->View = $View;
         $this->Database = $Database;
+        $this->CodeLibrary = $CodeLibrary;
     }
 
-    function generateGoalCard($goalID, $userID) {
+    function generateGoalCard($sub) {
+        $goalID = $this->CodeLibrary->convertStringToInt($sub->goalID);
+        $userID = $this->CodeLibrary->convertStringToInt($sub->userID);
         $goal = $this->Database->getRow('hf_goal', 'goalID = ' . $goalID);
         $daysOfSuccess = $this->daysOfSuccess($goalID, $userID);
         $level = $this->Database->level($daysOfSuccess);
@@ -80,7 +84,7 @@ class HfGoals {
 
     function levelBarForGoal($goalID, $userID) {
         $percent = $this->levelPercentComplete($goalID, $userID);
-        return $this->HtmlGenerator->progressBar($percent, '');
+        return $this->View->progressBar($percent, '');
     }
 
     function nextLevelName($daysOfSuccess) {
@@ -91,9 +95,10 @@ class HfGoals {
     }
 
     function sendReportRequestEmails() {
-        $users = $this->WebsiteApi->getSubscribedUsers();
+        $users = $this->ContentManagementSystem->getSubscribedUsers();
+
         foreach ($users as $user) {
-            if ($this->isAnyGoalDue($user->ID) and ($this->Messenger->notThrottled($user->ID))) {
+            if ( $this->isAnyGoalDue($user->ID) and !$this->Messenger->isThrottled($user->ID) ) {
                 $this->Messenger->sendReportRequestEmail($user->ID);
             }
         }
@@ -110,10 +115,11 @@ class HfGoals {
     }
 
     private function isGoalDue($goalID, $userID) {
-        $daysOfSuccess = $this->daysOfSuccess($goalID, $userID);
-        $level = $this->Database->level($goalID, $userID, $daysOfSuccess);
-        $emailInterval = $level->emailInterval;
-        $daysSinceLastReport = $this->Database->daysSinceLastReport($goalID, $userID);
+        $daysOfSuccess          = $this->daysOfSuccess($goalID, $userID);
+        $level                  = $this->Database->level($goalID, $userID, $daysOfSuccess);
+        $emailInterval          = $level->emailInterval;
+        $daysSinceLastReport    = $this->Database->daysSinceLastReport($goalID, $userID);
+
         return $daysSinceLastReport > $emailInterval;
     }
 } 

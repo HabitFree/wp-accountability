@@ -6,27 +6,27 @@ if (!class_exists("HfMailer")) {
         private $DbConnection;
         private $UrlFinder;
         private $UrlGenerator;
-        private $CmsApi;
+        private $ContentManagementSystem;
 
-        function HfMailer($UrlFinder, $UrlGenerator, $Security, $DbConnection, $ApiInterface) {
+        function HfMailer($UrlFinder, $UrlGenerator, $Security, $DbConnection, Hf_iContentManagementSystem $ContentManagementSystem) {
             $this->DbConnection = $DbConnection;
             $this->Security = $Security;
             $this->UrlFinder = $UrlFinder;
             $this->UrlGenerator = $UrlGenerator;
-            $this->CmsApi = $ApiInterface;
+            $this->ContentManagementSystem = $ContentManagementSystem;
 		}
 
         function sendEmailToUser($userID, $subject, $body) {
-            $to = $this->CmsApi->getUserEmail($userID);
-            $this->CmsApi->sendWpEmail($to, $subject, $body);
-            $emailID = intval($this->CmsApi->getVar('hf_email', 'max(emailID)'));
+            $to = $this->ContentManagementSystem->getUserEmail($userID);
+            $this->ContentManagementSystem->sendWpEmail($to, $subject, $body);
+            $emailID = intval($this->ContentManagementSystem->getVar('hf_email', 'max(emailID)'));
 
             $this->DbConnection->recordEmail($userID, $subject, $body, $emailID, $to);
         }
 
         function sendEmailToAddress($address, $subject, $body) {
-            $success = $this->CmsApi->sendWpEmail($address, $subject, $body);
-            $emailID = intval($this->DbConnection->getVar('hf_email', 'max(emailID)'));
+            $success = $this->ContentManagementSystem->sendWpEmail($address, $subject, $body);
+            $emailID = $this->DbConnection->idOfLastEmail();
 
             if($success) {
                 $this->DbConnection->recordEmail(null, $subject, $body, $emailID, $address);
@@ -45,8 +45,8 @@ if (!class_exists("HfMailer")) {
         }
 
         function sendEmailToUserAndSpecifyEmailID($userID, $subject, $body, $emailID) {
-            $to = $this->CmsApi->getUserEmail($userID);
-            $success = $this->CmsApi->sendWpEmail($to, $subject, $body);
+            $to = $this->ContentManagementSystem->getUserEmail($userID);
+            $success = $this->ContentManagementSystem->sendWpEmail($to, $subject, $body);
 
             if($success) {
                 $this->DbConnection->recordEmail($userID, $subject, $body, $emailID, $to);
@@ -98,20 +98,41 @@ if (!class_exists("HfMailer")) {
 			return $this->UrlGenerator->addParametersToUrl($baseURL, $parameters);
 		}
 
-        public function notThrottled($userID) {
+        public function isThrottled($userID) {
+            if ($this->hasNotRespondedSinceLastEmail($userID)) {
+                return !$this->emailIntervalExceeded($userID);
+            } else {
+                return false;
+            }
+        }
+
+        private function hasNotRespondedSinceLastEmail($userID) {
             $daysSinceLastReport        = $this->DbConnection->daysSinceAnyReport($userID);
+            $daysSinceLastEmail         = $this->DbConnection->daysSinceLastEmail($userID);
+
+            return $daysSinceLastReport > $daysSinceLastEmail;
+        }
+
+        private function daysBetweenLastTwoEmails($userID) {
             $daysSinceLastEmail         = $this->DbConnection->daysSinceLastEmail($userID);
             $daysSinceSecondToLastEmail = $this->DbConnection->daysSinceSecondToLastEmail($userID);
 
-            if ($daysSinceLastReport > $daysSinceLastEmail) {
-                $lastInterval = $daysSinceSecondToLastEmail - $daysSinceLastEmail;
-                $currentInterval = $lastInterval * 2;
-
-                return $daysSinceLastEmail > $currentInterval;
-            }
-
-            return false;
+            return $daysSinceSecondToLastEmail - $daysSinceLastEmail;
         }
-	}
+
+        private function emailIntervalExceeded($userID) {
+            $daysSinceLastEmail = $this->DbConnection->daysSinceLastEmail($userID);
+            $currentInterval = $this->currentInterval($userID);
+
+            return $daysSinceLastEmail > $currentInterval;
+        }
+
+        private function currentInterval($userID) {
+            $lastInterval = $this->daysBetweenLastTwoEmails($userID);
+            $currentInterval = $lastInterval * 2;
+
+            return $currentInterval;
+        }
+    }
 }
 ?>
