@@ -2,11 +2,11 @@
 
 class HfSettingsShortcode implements Hf_iShortcode {
     private $UserManager;
-    private $UrlFinder;
+    private $PageLocator;
     private $Security;
 
-    function __construct( $UrlFinder, $UserManager, $Security ) {
-        $this->UrlFinder   = $UrlFinder;
+    function __construct( Hf_iPageLocator $PageLocator, Hf_iUserManager $UserManager, Hf_iSecurity $Security ) {
+        $this->PageLocator = $PageLocator;
         $this->UserManager = $UserManager;
         $this->Security    = $Security;
     }
@@ -40,7 +40,7 @@ class HfSettingsShortcode implements Hf_iShortcode {
             $additionalProperties = '';
         }
 
-        $currentURL = $this->UrlFinder->getCurrentPageURL();
+        $currentURL = $this->PageLocator->getCurrentPageURL();
         $html       = $message . '<form action="' . $currentURL . '" method="post">
 					<p><label>
 						<input type="checkbox" name="accountability" value="yes" ' . $additionalProperties . ' />

@@ -1,12 +1,12 @@
 <?php
 
 class HfLogInShortcode implements Hf_iShortcode {
-    private $UrlFinder;
+    private $PageLocator;
     private $CodeLibrary;
     private $Cms;
 
-    function __construct( $UrlFinder, Hf_iCodeLibrary $CodeLibrary, Hf_iContentManagementSystem $ContentManagementSystem ) {
-        $this->UrlFinder   = $UrlFinder;
+    function __construct( Hf_iPageLocator $PageLocator, Hf_iCodeLibrary $CodeLibrary, Hf_iContentManagementSystem $ContentManagementSystem ) {
+        $this->PageLocator = $PageLocator;
         $this->CodeLibrary = $CodeLibrary;
         $this->Cms         = $ContentManagementSystem;
     }
@@ -43,7 +43,7 @@ class HfLogInShortcode implements Hf_iShortcode {
     }
 
     private function makeLogInForm() {
-        $Form = new HfGenericForm( $this->UrlFinder->getCurrentPageUrl() );
+        $Form = new HfGenericForm( $this->PageLocator->getCurrentPageUrl() );
 
         $Form->addTextBox( 'username', 'Username', '', true );
         $Form->addPasswordBox( 'password', 'Password', true );
@@ -66,6 +66,6 @@ class HfLogInShortcode implements Hf_iShortcode {
 
         $result = $this->Cms->authenticateUser( $username, $password );
 
-        return !$this->Cms->isError($result);
+        return !$this->Cms->isError( $result );
     }
 } 

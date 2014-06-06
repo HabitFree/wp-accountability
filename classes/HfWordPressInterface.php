@@ -28,9 +28,7 @@ class HfWordPressInterface implements Hf_iContentManagementSystem {
     }
 
     public function getVar( $query ) {
-        global $wpdb;
-
-        return $wpdb->get_var( $query );
+        return $this->wpdb->get_var( $query );
     }
 
     public function getDbPrefix() {
@@ -38,9 +36,7 @@ class HfWordPressInterface implements Hf_iContentManagementSystem {
     }
 
     public function executeQuery( $query ) {
-        global $wpdb;
-        $wpdb->query( $query );
-        print( 'hello' );
+        $this->wpdb->query( $query );
     }
 
     public function createUser( $username, $password, $email ) {

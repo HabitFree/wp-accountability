@@ -17,14 +17,14 @@ class UnitWpSimpleTest extends UnitTestCase {
 //    Helper Functions
 
     private function makeUserManagerMockDependencies() {
-        Mock::generate('HfDatabase');
+        Mock::generate('HfMysqlDatabase');
         Mock::generate('HfMailer');
         Mock::generate('HfUrlFinder');
         Mock::generate('HfWordPressInterface');
         Mock::generate('HfPhpLibrary');
 
         $UrlFinder  = new MockHfUrlFinder();
-        $Database   = new MockHfDatabase();
+        $Database   = new MockHfMysqlDatabase();
         $Messenger  = new MockHfMailer();
         $Cms        = new MockHfWordPressInterface();
         $PhpApi     = new MockHfPhpLibrary();
@@ -34,13 +34,13 @@ class UnitWpSimpleTest extends UnitTestCase {
 
     private function makeRegisterShortcodeMockDependencies() {
         Mock::generate('HfUrlFinder');
-        Mock::generate('HfDatabase');
+        Mock::generate('HfMysqlDatabase');
         Mock::generate('HfPhpLibrary');
         Mock::generate('HfWordPressInterface');
         Mock::generate('HfUserManager');
 
         $UrlFinder      = new MockHfUrlFinder();
-        $Database       = new MockHfDatabase();
+        $Database       = new MockHfMysqlDatabase();
         $PhpLibrary     = new MockHfPhpLibrary();
         $Cms            = new MockHfWordPressInterface();
         $UserManager    = new MockHfUserManager();
@@ -87,11 +87,10 @@ class UnitWpSimpleTest extends UnitTestCase {
         $ApiInterface   = new HfWordPressInterface();
         $user           = wp_get_current_user($ApiInterface);
         $PhpApi         = new HfPhpLibrary();
-        $DbConnection   = new HfDatabase($ApiInterface, $PhpApi);
+        $DbConnection   = new HfMysqlDatabase($ApiInterface, $PhpApi);
         $UrlFinder      = new HfUrlFinder();
-        $UrlGenerator   = new HfUrlGenerator();
         $Security       = new HfSecurity();
-        $Mailer         = new HfMailer($UrlFinder, $UrlGenerator, $Security, $DbConnection, $ApiInterface);
+        $Mailer         = new HfMailer($UrlFinder, $Security, $DbConnection, $ApiInterface);
 		$UserManager    = new HfUserManager($DbConnection, $Mailer, $UrlFinder, $ApiInterface, $PhpApi);
 
 		$this->assertEqual($UserManager->getCurrentUserLogin(), $user->user_login);
@@ -302,15 +301,13 @@ class UnitWpSimpleTest extends UnitTestCase {
 
     public function testSendEmailByUserID() {
         Mock::generate('HfUrlFinder');
-        Mock::generate('HfUrlGenerator');
         Mock::generate('HfSecurity');
-        Mock::generate('HfDatabase');
+        Mock::generate('HfMysqlDatabase');
         Mock::generate('HfWordPressInterface');
 
         $UrlFinder      = new MockHfUrlFinder();
-        $UrlGenerator   = new MockHfUrlGenerator();
         $Security       = new MockHfSecurity();
-        $DbConnection   = new MockHfDatabase();
+        $DbConnection   = new MockHfMysqlDatabase();
         $WordPressApi   = new MockHfWordPressInterface();
 
         $WordPressApi->returns('getVar', 5);
@@ -320,24 +317,22 @@ class UnitWpSimpleTest extends UnitTestCase {
             'recordEmail',
             array(1, 'test', 'test', 5, 'me@test.com'));
 
-        $Mailer = new HfMailer($UrlFinder, $UrlGenerator, $Security, $DbConnection, $WordPressApi);
+        $Mailer = new HfMailer($UrlFinder, $Security, $DbConnection, $WordPressApi);
         $Mailer->sendEmailToUser(1, 'test', 'test');
     }
 
     public function testSendEmailToUserAndSpecifyEmailID() {
         Mock::generate('HfUrlFinder');
-        Mock::generate('HfUrlGenerator');
         Mock::generate('HfSecurity');
-        Mock::generate('HfDatabase');
+        Mock::generate('HfMysqlDatabase');
         Mock::generate('HfWordPressInterface');
 
         $UrlFinder      = new MockHfUrlFinder();
-        $UrlGenerator   = new MockHfUrlGenerator();
         $Security       = new MockHfSecurity();
-        $DbConnection   = new MockHfDatabase();
+        $DbConnection   = new MockHfMysqlDatabase();
         $WordPressApi   = new MockHfWordPressInterface();
 
-        $Mailer = new HfMailer($UrlFinder, $UrlGenerator, $Security, $DbConnection, $WordPressApi);
+        $Mailer = new HfMailer($UrlFinder, $Security, $DbConnection, $WordPressApi);
 
         $userID     = 1;
         $subject    = 'test subject';
@@ -359,13 +354,13 @@ class UnitWpSimpleTest extends UnitTestCase {
         Mock::generate('HfMailer');
         Mock::generate('HfWordPressInterface');
         Mock::generate('HfHtmlGenerator');
-        Mock::generate('HfDatabase');
+        Mock::generate('HfMysqlDatabase');
         Mock::generate('HfPhpLibrary');
 
         $Messenger                  = new MockHfMailer();
         $WebsiteApi                 = new MockHfWordPressInterface();
         $HtmlGenerator              = new MockHfHtmlGenerator();
-        $DbConnection               = new MockHfDatabase();
+        $DbConnection               = new MockHfMysqlDatabase();
         $CodeLibrary                = new MockHfPhpLibrary();
 
         $mockUser                   = new stdClass();
@@ -402,7 +397,7 @@ class UnitWpSimpleTest extends UnitTestCase {
         $PhpApi->returns('convertStringToTime', 1401224669.0);
         $PhpApi->returns('getCurrentTime', 1401483869.0);
 
-        $Database   = new HfDatabase($WebsiteAPI, $PhpApi);
+        $Database   = new HfMysqlDatabase($WebsiteAPI, $PhpApi);
         $result     = $Database->daysSinceLastEmail(1);
 
         $this->assertEqual($result, 3);
@@ -412,13 +407,13 @@ class UnitWpSimpleTest extends UnitTestCase {
         Mock::generate('HfMailer');
         Mock::generate('HfWordPressInterface');
         Mock::generate('HfHtmlGenerator');
-        Mock::generate('HfDatabase');
+        Mock::generate('HfMysqlDatabase');
         Mock::generate('HfPhpLibrary');
 
         $Messenger                  = new MockHfMailer();
         $WebsiteApi                 = new MockHfWordPressInterface();
         $HtmlGenerator              = new MockHfHtmlGenerator();
-        $DbConnection               = new MockHfDatabase();
+        $DbConnection               = new MockHfMysqlDatabase();
         $CodeLibrary                = new MockHfPhpLibrary();
 
         $mockUser                   = new stdClass();
@@ -449,13 +444,13 @@ class UnitWpSimpleTest extends UnitTestCase {
         Mock::generate('HfMailer');
         Mock::generate('HfWordPressInterface');
         Mock::generate('HfHtmlGenerator');
-        Mock::generate('HfDatabase');
+        Mock::generate('HfMysqlDatabase');
         Mock::generate('HfPhpLibrary');
 
         $Messenger                  = new MockHfMailer();
         $WebsiteApi                 = new MockHfWordPressInterface();
         $HtmlGenerator              = new MockHfHtmlGenerator();
-        $DbConnection               = new MockHfDatabase();
+        $DbConnection               = new MockHfMysqlDatabase();
         $CodeLibrary                = new MockHfPhpLibrary();
 
         $mockUser                   = new stdClass();
@@ -483,22 +478,20 @@ class UnitWpSimpleTest extends UnitTestCase {
 
     public function testIsThrottledReturnsFalse() {
         Mock::generate('HfUrlFinder');
-        Mock::generate('HfUrlGenerator');
         Mock::generate('HfSecurity');
-        Mock::generate('HfDatabase');
+        Mock::generate('HfMysqlDatabase');
         Mock::generate('HfWordPressInterface');
 
         $UrlFinder      = new MockHfUrlFinder();
-        $UrlGenerator   = new MockHfUrlGenerator();
         $Security       = new MockHfSecurity();
-        $DbConnection   = new MockHfDatabase();
+        $DbConnection   = new MockHfMysqlDatabase();
         $ApiInterface   = new MockHfWordPressInterface();
 
         $DbConnection->returns('daysSinceAnyReport',100);
         $DbConnection->returns('daysSinceLastEmail',10);
         $DbConnection->returns('daysSinceSecondToLastEmail',12);
 
-        $Mailer         = new HfMailer($UrlFinder, $UrlGenerator, $Security, $DbConnection, $ApiInterface);
+        $Mailer         = new HfMailer($UrlFinder, $Security, $DbConnection, $ApiInterface);
         $result         = $Mailer->isThrottled(1);
 
         $this->assertEqual($result, false);
@@ -506,22 +499,20 @@ class UnitWpSimpleTest extends UnitTestCase {
 
     public function testIsThrottledReturnsTrue() {
         Mock::generate('HfUrlFinder');
-        Mock::generate('HfUrlGenerator');
         Mock::generate('HfSecurity');
-        Mock::generate('HfDatabase');
+        Mock::generate('HfMysqlDatabase');
         Mock::generate('HfWordPressInterface');
 
         $UrlFinder      = new MockHfUrlFinder();
-        $UrlGenerator   = new MockHfUrlGenerator();
         $Security       = new MockHfSecurity();
-        $DbConnection   = new MockHfDatabase();
+        $DbConnection   = new MockHfMysqlDatabase();
         $ApiInterface   = new MockHfWordPressInterface();
 
         $DbConnection->returns('daysSinceAnyReport',100);
         $DbConnection->returns('daysSinceLastEmail',10);
         $DbConnection->returns('daysSinceSecondToLastEmail',17);
 
-        $Mailer         = new HfMailer($UrlFinder, $UrlGenerator, $Security, $DbConnection, $ApiInterface);
+        $Mailer         = new HfMailer($UrlFinder, $Security, $DbConnection, $ApiInterface);
         $result         = $Mailer->isThrottled(1);
 
         $this->assertEqual($result, true);
@@ -531,13 +522,13 @@ class UnitWpSimpleTest extends UnitTestCase {
         Mock::generate('HfMailer');
         Mock::generate('HfWordPressInterface');
         Mock::generate('HfHtmlGenerator');
-        Mock::generate('HfDatabase');
+        Mock::generate('HfMysqlDatabase');
         Mock::generate('HfPhpLibrary');
 
         $Messenger                  = new MockHfMailer();
         $WebsiteApi                 = new MockHfWordPressInterface();
         $HtmlGenerator              = new MockHfHtmlGenerator();
-        $DbConnection               = new MockHfDatabase();
+        $DbConnection               = new MockHfMysqlDatabase();
         $CodeLibrary                = new MockHfPhpLibrary();
 
         $mockUser                   = new stdClass();
@@ -576,13 +567,13 @@ class UnitWpSimpleTest extends UnitTestCase {
         Mock::generate('HfMailer');
         Mock::generate('HfWordPressInterface');
         Mock::generate('HfHtmlGenerator');
-        Mock::generate('HfDatabase');
+        Mock::generate('HfMysqlDatabase');
         Mock::generate('HfPhpLibrary');
 
         $Messenger          = new MockHfMailer();
         $WebsiteApi         = new MockHfWordPressInterface();
         $HtmlGenerator      = new MockHfHtmlGenerator();
-        $DbConnection       = new MockHfDatabase();
+        $DbConnection       = new MockHfMysqlDatabase();
         $CodeLibrary        = new MockHfPhpLibrary();
 
         $mockLevel          = new stdClass();
@@ -636,12 +627,12 @@ class UnitWpSimpleTest extends UnitTestCase {
     public function testGenerateAdminPanelButtons() {
         Mock::generate('HfMailer');
         Mock::generate('HfUrlFinder');
-        Mock::generate('HfDatabase');
+        Mock::generate('HfMysqlDatabase');
         Mock::generate('HfUserManager');
 
         $Mailer         = new MockHfMailer();
         $URLFinder      = new MockHfUrlFinder();
-        $DbConnection   = new MockHfDatabase();
+        $DbConnection   = new MockHfMysqlDatabase();
         $UserManager    = new MockHfUserManager();
 
         $URLFinder->returns('getCurrentPageURL', 'test.com');
@@ -680,46 +671,6 @@ class UnitWpSimpleTest extends UnitTestCase {
 
     public function testViewInterfaceExists() {
         $this->assertTrue(interface_exists('Hf_iView'));
-    }
-
-    public function testWebViewClassExists() {
-        $this->assertTrue(class_exists('HfWebView'));
-    }
-
-    public function testDisplayErrorMessage() {
-        Mock::generate('HfPhpLibrary');
-
-        $PhpLibrary = new MockHfPhpLibrary();
-        $WebView    = new HfWebView($PhpLibrary);
-        $message    = '<p class="error">Error!</p>';
-
-        $PhpLibrary->expectOnce('printToScreen', array($message));
-
-        $WebView->displayErrorMessage('Error!');
-    }
-
-    public function testDisplaySuccessMessage() {
-        Mock::generate('HfPhpLibrary');
-
-        $PhpLibrary = new MockHfPhpLibrary();
-        $WebView    = new HfWebView($PhpLibrary);
-        $message    = '<p class="success">Success!</p>';
-
-        $PhpLibrary->expectOnce('printToScreen', array($message));
-
-        $WebView->displaySuccessMessage('Success!');
-    }
-
-    public function testDisplayInfoMessage() {
-        Mock::generate('HfPhpLibrary');
-
-        $PhpLibrary = new MockHfPhpLibrary();
-        $WebView    = new HfWebView($PhpLibrary);
-        $message    = '<p class="info">FYI</p>';
-
-        $PhpLibrary->expectOnce('printToScreen', array($message));
-
-        $WebView->displayInfoMessage('FYI');
     }
 
     public function testSettingsShortcodeClassExists() {
@@ -769,7 +720,7 @@ class UnitWpSimpleTest extends UnitTestCase {
         $Factory = new HfFactory();
         $Database = $Factory->makeDatabase();
 
-        $this->assertTrue(is_a($Database, 'HfDatabase'));
+        $this->assertTrue(is_a($Database, 'HfMysqlDatabase' ));
     }
 
     public function testFactoryMakePhpLibrary() {
@@ -791,13 +742,6 @@ class UnitWpSimpleTest extends UnitTestCase {
         $Security = $Factory->makeSecurity();
 
         $this->assertTrue(is_a($Security, 'HfSecurity'));
-    }
-
-    public function testFactoryMakeUrlGenerator() {
-        $Factory = new HfFactory();
-        $UrlGenerator = $Factory->makeUrlGenerator();
-
-        $this->assertTrue(is_a($UrlGenerator, 'HfUrlGenerator'));
     }
 
     public function testFactoryMakeSettingsShortcode() {
@@ -847,7 +791,7 @@ class UnitWpSimpleTest extends UnitTestCase {
 
         $Cms->expectOnce('getRows');
 
-        $Database       = new HfDatabase($Cms, $CodeLibrary);
+        $Database       = new HfMysqlDatabase($Cms, $CodeLibrary);
 
         $Database->getGoalSubscriptions(1);
     }
@@ -875,7 +819,7 @@ class UnitWpSimpleTest extends UnitTestCase {
     public function testDatabaseHasDeleteInvitationMethod() {
         list($Cms, $CodeLibrary) = $this->makeDatabaseMockDependencies();
 
-        $Database = new HfDatabase($Cms, $CodeLibrary);
+        $Database = new HfMysqlDatabase($Cms, $CodeLibrary);
 
         $this->assertTrue(method_exists($Database, 'deleteInvite'));
     }
@@ -883,7 +827,7 @@ class UnitWpSimpleTest extends UnitTestCase {
     public function testDatabaseCallsDeleteRowsMethod() {
         list($Cms, $CodeLibrary) = $this->makeDatabaseMockDependencies();
 
-        $Database = new HfDatabase($Cms, $CodeLibrary);
+        $Database = new HfMysqlDatabase($Cms, $CodeLibrary);
 
         $Cms->expectOnce('deleteRows');
 

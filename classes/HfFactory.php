@@ -72,17 +72,16 @@ class HfFactory {
         $WordPressInterface = $this->makeContentManagementSystem();
         $Database           = $this->makeDatabase();
         $Security           = $this->makeSecurity();
-        $UrlGenerator       = $this->makeUrlGenerator();
         $UrlFinder          = $this->makeUrlFinder();
 
-        return new HfMailer( $UrlFinder, $UrlGenerator, $Security, $Database, $WordPressInterface );
+        return new HfMailer( $UrlFinder, $Security, $Database, $WordPressInterface );
     }
 
     public function makeDatabase() {
         $WordPressInterface = $this->makeContentManagementSystem();
         $PhpLibrary         = $this->makeCodeLibrary();
 
-        return new HfDatabase( $WordPressInterface, $PhpLibrary );
+        return new HfMysqlDatabase( $WordPressInterface, $PhpLibrary );
     }
 
     public function makeUrlFinder() {
@@ -103,9 +102,5 @@ class HfFactory {
 
     public function makeSecurity() {
         return new HfSecurity();
-    }
-
-    public function makeUrlGenerator() {
-        return new HfUrlGenerator();
     }
 } 
