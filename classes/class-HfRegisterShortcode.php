@@ -98,20 +98,13 @@ class HfRegisterShortcode implements hf_iShortcode {
         $this->UserManager->processNewUser($userID);
 
         if ($this->isInvited()) {
-            $this->processInvitation($userID);
+            $nonce = $this->CodeLibrary->getGet('n');
+            $this->UserManager->processInvite($userID, $nonce);
         }
     }
 
     private function isInvited() {
         return !$this->CodeLibrary->isUrlParameterEmpty('n');
-    }
-
-    private function getInviterID() {
-        $nonce = $this->CodeLibrary->getGet('n');
-        $invite = $this->Database->getInvite($nonce);
-        $inviterID = $this->CodeLibrary->convertStringToInt($invite->inviterID);
-
-        return $inviterID;
     }
 
     private function isUsernameAlreadyTaken() {
@@ -124,13 +117,6 @@ class HfRegisterShortcode implements hf_iShortcode {
 
     private function doPasswordsMatch() {
         return $this->CodeLibrary->getPost('password') === $this->CodeLibrary->getPost('passwordConfirmation');
-    }
-
-    private function processInvitation($userID) {
-        $inviterID = $this->getInviterID();
-        $this->Database->createRelationship($userID, $inviterID);
-        $nonce = $this->CodeLibrary->getGet('n');
-        $this->Database->deleteInvite($nonce);
     }
 
     private function emailAvailable() {

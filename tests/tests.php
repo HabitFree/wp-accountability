@@ -58,6 +58,18 @@ class UnitWpSimpleTest extends UnitTestCase {
         return array($Cms, $CodeLibrary);
     }
 
+    private function makeLogInShortcodeMockDependencies() {
+        Mock::generate('HfUrlFinder');
+        Mock::generate('HfPhpLibrary');
+        Mock::generate('HfWordPressInterface');
+
+        $UrlFinder  = new MockHfUrlFinder();
+        $PhpLibrary = new MockHfPhpLibrary();
+        $Cms        = new MockHfWordPressInterface();
+
+        return array($UrlFinder, $PhpLibrary, $Cms);
+    }
+
     private function classImplementsInterface($class, $interface) {
         $interfacesImplemented = class_implements($class);
         return in_array($interface, $interfacesImplemented);
@@ -890,7 +902,7 @@ class UnitWpSimpleTest extends UnitTestCase {
 
         $Database->returns('getInvite', $mockInvite);
 
-        $Database->expectOnce('deleteInvite');
+        $UserManager->expectOnce('processInvite');
 
         $RegisterShortcode = new HfRegisterShortcode($UrlFinder, $Database, $PhpLibrary, $Cms, $UserManager);
 
@@ -926,6 +938,110 @@ class UnitWpSimpleTest extends UnitTestCase {
         $output = $RegisterShortcode->getOutput();
 
         $this->assertTrue(strstr($output, "<p class='fail'>Oops. That email is already in use.</p>"));
+    }
+
+    public function testLogInShortcodeImplementsShortcodeInterface() {
+        $this->assertTrue($this->classImplementsInterface('HfLogInShortcode', 'Hf_iShortcode'));
+    }
+
+    public function testLogInShortcodeExists() {
+        $this->assertTrue(shortcode_exists('hfLogIn'));
+    }
+
+    public function testLogInShortcodeOutputsLogInForm() {
+        list($UrlFinder, $PhpLibrary, $Cms) = $this->makeLogInShortcodeMockDependencies();
+
+        $PhpLibrary->returns('isPostEmpty', true);
+        $UrlFinder->returns('getCurrentPageUrl', 'test.com');
+
+        $LogInShortcode = new HfLogInShortcode($UrlFinder, $PhpLibrary, $Cms);
+        $resultHtml     = $LogInShortcode->getOutput();
+
+        $expectedHtml   = '<form action="test.com" method="post"><p><label for="username"><span class="required">*</span> Username: <input type="text" name="username" value="" required /></label></p><p><label for="password"><span class="required">*</span> Password: <input type="password" name="password" required /></label></p><p><input type="submit" name="submit" value="Log In" /></p></form>';
+
+        $this->assertEqual($resultHtml, $expectedHtml);
+    }
+
+    public function testLogInShortcodeWithAlternateActionUrl() {
+        list($UrlFinder, $PhpLibrary, $Cms) = $this->makeLogInShortcodeMockDependencies();
+
+        $PhpLibrary->returns('isPostEmpty', true);
+        $UrlFinder->returns('getCurrentPageUrl', 'anothertest.com');
+
+        $LogInShortcode = new HfLogInShortcode($UrlFinder, $PhpLibrary, $Cms);
+        $resultHtml     = $LogInShortcode->getOutput();
+
+        $expectedHtml   = '<form action="anothertest.com" method="post"><p><label for="username"><span class="required">*</span> Username: <input type="text" name="username" value="" required /></label></p><p><label for="password"><span class="required">*</span> Password: <input type="password" name="password" required /></label></p><p><input type="submit" name="submit" value="Log In" /></p></form>';
+
+        $this->assertEqual($resultHtml, $expectedHtml);
+    }
+
+    public function testLogInShortcodeOutputsSuccessMessage() {
+        list($UrlFinder, $PhpLibrary, $Cms) = $this->makeLogInShortcodeMockDependencies();
+
+        $PhpLibrary->returns('isPostEmpty', false);
+        $Cms->returns('authenticateUser', new stdClass());
+        $Cms->returns('isError', false);
+
+        $LogInShortcode = new HfLogInShortcode($UrlFinder, $PhpLibrary, $Cms);
+
+        $resultHtml     = $LogInShortcode->getOutput();
+        $expectedHtml   = '<p class="success">You have been successfully logged in.</p><p><a href="/">Onward!</a></p>';
+
+        $this->assertEqual($resultHtml, $expectedHtml);
+    }
+
+    public function testLogInShortcodeDisplaysEmptyFieldErrors() {
+        list($UrlFinder, $PhpLibrary, $Cms) = $this->makeLogInShortcodeMockDependencies();
+
+        $PhpLibrary->returns('isPostEmpty', true);
+        $PhpLibrary->returnsAt(0, 'isPostEmpty', false);
+        $PhpLibrary->returnsAt(2, 'isPostEmpty', false);
+
+        $LogInShortcode = new HfLogInShortcode($UrlFinder, $PhpLibrary, $Cms);
+
+        $resultHtml     = $LogInShortcode->getOutput();
+        $expectedHtml   = '<p class="fail">Please provide a valid username and password combination.</p>';
+
+        $this->assertTrue(strstr($resultHtml, $expectedHtml));
+    }
+
+    public function testLogInShortcodeAuthenticatesUser() {
+        list($UrlFinder, $PhpLibrary, $Cms) = $this->makeLogInShortcodeMockDependencies();
+
+        Mock::generate('HfWordPressInterface');
+        $Cms = new MockHfWordPressInterface();
+
+        $Cms->expectOnce('authenticateUser');
+
+        $LogInShortcode = new HfLogInShortcode($UrlFinder, $PhpLibrary, $Cms);
+
+        $LogInShortcode->getOutput();
+    }
+
+    public function testLogInShortcodeOutputsErrorMessageWhenLogInUnsuccessful() {
+        list($UrlFinder, $PhpLibrary, $Cms) = $this->makeLogInShortcodeMockDependencies();
+
+        $PhpLibrary->returns('isPostEmpty', false);
+        $Cms->returns('isError', true);
+
+        $LogInShortcode = new HfLogInShortcode($UrlFinder, $PhpLibrary, $Cms);
+
+        $resultHtml     = $LogInShortcode->getOutput();
+        $expectedHtml   = '<p class="fail">Please provide a valid username and password combination.</p>';
+
+        $this->assertTrue(strstr($resultHtml, $expectedHtml));
+    }
+
+    public function testLogInShortcodeLooksForUsernameAndPassword() {
+        list($UrlFinder, $PhpLibrary, $Cms) = $this->makeLogInShortcodeMockDependencies();
+
+        $PhpLibrary->expectAt(0, 'getPost', array('username'));
+        $PhpLibrary->expectAt(1, 'getPost', array('password'));
+
+        $LogInShortcode = new HfLogInShortcode($UrlFinder, $PhpLibrary, $Cms);
+
+        $LogInShortcode->getOutput();
     }
 }
 

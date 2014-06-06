@@ -55,6 +55,7 @@ require_once(dirname(__FILE__) . '/classes/class-HfFactory.php');
 require_once(dirname(__FILE__) . '/classes/class-HfGoalsShortcode.php');
 require_once(dirname(__FILE__) . '/classes/class-HfAccountabilityForm.php');
 require_once(dirname(__FILE__) . '/classes/class-HfRegisterShortcode.php');
+require_once(dirname(__FILE__) . '/classes/class-HfLogInShortcode.php');
 
 date_default_timezone_set('America/Chicago');
 
@@ -75,9 +76,11 @@ function hfRegisterShortcodes() {
     $SettingsShortcode  = $Factory->makeSettingsShortcode();
     $GoalsShortcode     = $Factory->makeGoalsShortcode();
     $RegisterShortcode  = $Factory->makeRegisterShortcode();
+    $LogInShortcode     = $Factory->makeLogInShortcode();
 
     add_shortcode( 'hfSettings', array($SettingsShortcode, 'getOutput') );
     add_shortcode( 'hfGoals', array($GoalsShortcode, 'getOutput') );
     add_shortcode( 'userButtons', array($UserManager, 'userButtonsShortcode') );
     add_shortcode( 'hfRegister', array($RegisterShortcode, 'getOutput') );
+    add_shortcode( 'hfLogIn', array($LogInShortcode, 'getOutput') );
 }

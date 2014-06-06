@@ -7,19 +7,21 @@ class HfGoalsShortcode implements Hf_iShortcode {
     private $UrlFinder;
     private $Goals;
     private $CodeLibrary;
+    private $Security;
 
-    function __construct($UserManager, $Messenger, $UrlFinder, $Database, $Goals, Hf_iCodeLibrary $CodeLibrary) {
+    function __construct($UserManager, $Messenger, $UrlFinder, $Database, $Goals, Hf_iCodeLibrary $CodeLibrary, $Security) {
         $this->UserManager      = $UserManager;
         $this->Messenger        = $Messenger;
         $this->Database         = $Database;
         $this->UrlFinder        = $UrlFinder;
         $this->Goals            = $Goals;
         $this->CodeLibrary      = $CodeLibrary;
+        $this->Security         = $Security;
     }
 
     public function getOutput() {
         if ( !$this->isUserAuthorized() ) {
-            return $this->UserManager->requireLogin();
+            return $this->Security->requireLogin();
         }
 
         $userID = $this->determineUserID();
