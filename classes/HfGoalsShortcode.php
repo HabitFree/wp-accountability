@@ -8,8 +8,9 @@ class HfGoalsShortcode implements Hf_iShortcode {
     private $Goals;
     private $CodeLibrary;
     private $Security;
+    private $Cms;
 
-    function __construct( Hf_iUserManager $UserManager, Hf_iMessenger $Messenger, Hf_iPageLocator $PageLocator, Hf_iDatabase $Database, Hf_iGoals $Goals, Hf_iCodeLibrary $CodeLibrary, Hf_iSecurity $Security ) {
+    function __construct( Hf_iUserManager $UserManager, Hf_iMessenger $Messenger, Hf_iAssetLocator $PageLocator, Hf_iDatabase $Database, Hf_iGoals $Goals, Hf_iCodeLibrary $CodeLibrary, Hf_iSecurity $Security, Hf_iContentManagementSystem $ContentManagementSystem ) {
         $this->UserManager = $UserManager;
         $this->Messenger   = $Messenger;
         $this->Database    = $Database;
@@ -17,6 +18,7 @@ class HfGoalsShortcode implements Hf_iShortcode {
         $this->Goals       = $Goals;
         $this->CodeLibrary = $CodeLibrary;
         $this->Security    = $Security;
+        $this->Cms         = $ContentManagementSystem;
     }
 
     public function getOutput() {
@@ -36,7 +38,7 @@ class HfGoalsShortcode implements Hf_iShortcode {
     }
 
     private function isUserAuthorized() {
-        if ( is_user_logged_in() ) {
+        if ( $this->Cms->isUserLoggedIn() ) {
             return true;
         } elseif ( $this->CodeLibrary->isUrlParameterEmpty( 'userID' ) ) {
             return false;

@@ -21,8 +21,6 @@ interface Hf_iDatabase {
 
     public function daysSinceLastReport( $goalID, $userID );
 
-    public function emptyTable( $table );
-
     public function createColumnSchemaObject( $field, $type, $null, $key, $default, $extra );
 
     public function getRows( $table, $where, $outputType = OBJECT );
@@ -42,8 +40,6 @@ interface Hf_iDatabase {
     public function emailIsValid( $userID, $emailID );
 
     public function getRow( $table, $criterion );
-
-    public function sudoReactivateExtension();
 
     public function timeOfLastFail( $goalID, $userID );
 

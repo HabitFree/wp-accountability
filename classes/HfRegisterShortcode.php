@@ -7,7 +7,7 @@ class HfRegisterShortcode implements hf_iShortcode {
     private $Cms;
     private $UserManager;
 
-    function __construct( Hf_iPageLocator $PageLocator, Hf_iDatabase $Database, Hf_iCodeLibrary $CodeLibrary, $ContentManagementSystem, Hf_iUserManager $UserManager ) {
+    function __construct( Hf_iAssetLocator $PageLocator, Hf_iDatabase $Database, Hf_iCodeLibrary $CodeLibrary, Hf_iContentManagementSystem $ContentManagementSystem, Hf_iUserManager $UserManager ) {
         $this->PageLocator = $PageLocator;
         $this->Database    = $Database;
         $this->CodeLibrary = $CodeLibrary;
@@ -50,8 +50,10 @@ class HfRegisterShortcode implements hf_iShortcode {
     }
 
     private function isRegistrationFormValid() {
+        $username = $this->CodeLibrary->getPost( 'username' );
+
         return !$this->CodeLibrary->isPostEmpty( 'username' )
-        and !$this->isUsernameAlreadyTaken()
+        and !$this->Cms->isUsernameTaken($username)
         and !$this->CodeLibrary->isPostEmpty( 'email' )
         and $this->emailAvailable()
         and !$this->isEmailInvalid()
@@ -62,12 +64,13 @@ class HfRegisterShortcode implements hf_iShortcode {
 
     private function getRegistrationFormErrors() {
         $html = '';
+        $username = $this->CodeLibrary->getPost( 'username' );
 
         if ( $this->CodeLibrary->isPostEmpty( 'username' ) ) {
             $html .= '<p class="fail">Please provide a username.</p>';
         }
 
-        if ( $this->isUsernameAlreadyTaken() ) {
+        if ( $this->Cms->isUsernameTaken($username) ) {
             $html .= '<p class="fail">Sorry, that username is already taken. Please select another.</p>';
         }
 
@@ -106,10 +109,6 @@ class HfRegisterShortcode implements hf_iShortcode {
 
     private function isInvited() {
         return !$this->CodeLibrary->isUrlParameterEmpty( 'n' );
-    }
-
-    private function isUsernameAlreadyTaken() {
-        return username_exists( $this->CodeLibrary->getPost( 'username' ) );
     }
 
     private function isEmailInvalid() {

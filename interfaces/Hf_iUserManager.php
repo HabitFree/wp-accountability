@@ -9,8 +9,6 @@ interface Hf_iUserManager {
 
     public function processInvite( $inviteeID, $nonce );
 
-    public function getUsernameByID( $userID, $initialCaps = false );
-
     public function getCurrentUserId();
 
     public function processNewUser( $userID );

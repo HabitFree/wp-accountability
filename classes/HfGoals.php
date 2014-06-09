@@ -92,14 +92,6 @@ class HfGoals implements Hf_iGoals {
         return $this->View->progressBar( $percent, '' );
     }
 
-    function nextLevelName( $daysOfSuccess ) {
-        $whereCurrentLevel = 'target > ' . $daysOfSuccess . ' ORDER BY target ASC';
-        $currentLevelID    = $this->Database->getVar( 'hf_level', 'levelID', $whereCurrentLevel );
-        $whereNextLevel    = 'levelID = ' . ( $currentLevelID + 1 );
-
-        return $this->Database->getVar( 'hf_level', 'title', $whereNextLevel );
-    }
-
     function sendReportRequestEmails() {
         $users = $this->ContentManagementSystem->getSubscribedUsers();
 

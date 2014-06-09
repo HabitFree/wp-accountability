@@ -299,13 +299,6 @@ class HfMysqlDatabase implements Hf_iDatabase {
         return $wpdb->update( $tableName, $data, $where );
     }
 
-    function emptyTable( $table ) {
-        global $wpdb;
-        $prefix    = $wpdb->prefix;
-        $tableName = $prefix . $table;
-        $wpdb->query( "TRUNCATE TABLE " . $tableName );
-    }
-
     function createColumnSchemaObject( $field, $type, $null, $key, $default, $extra ) {
         $column          = new StdClass;
         $column->Field   = $field;
@@ -348,11 +341,6 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $rows = $this->getTable( $table );
 
         return count( $rows );
-    }
-
-    function sudoReactivateExtension() {
-        hfDeactivate();
-        hfActivate();
     }
 
     function daysSinceLastEmail( $userID ) {

@@ -5,8 +5,6 @@ interface Hf_iGoals {
 
     function currentLevelTarget( $daysOfSuccess );
 
-    function nextLevelName( $daysOfSuccess );
-
     function generateGoalCard( $sub );
 
     function sendReportRequestEmails();

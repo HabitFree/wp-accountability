@@ -6,7 +6,7 @@ class HfMailer implements Hf_iMessenger {
     private $PageLocator;
     private $ContentManagementSystem;
 
-    function HfMailer( Hf_iPageLocator $PageLocator, Hf_iSecurity $Security, Hf_iDatabase $Database, Hf_iContentManagementSystem $ContentManagementSystem ) {
+    function HfMailer( Hf_iAssetLocator $PageLocator, Hf_iSecurity $Security, Hf_iDatabase $Database, Hf_iContentManagementSystem $ContentManagementSystem ) {
         $this->Database                = $Database;
         $this->Security                = $Security;
         $this->PageLocator             = $PageLocator;
@@ -78,7 +78,7 @@ class HfMailer implements Hf_iMessenger {
     }
 
     function generateReportURL( $userID, $emailID ) {
-        $baseURL = $this->PageLocator->getUrlByTitle( 'Goals' );
+        $baseURL = $this->PageLocator->getPageUrlByTitle( 'Goals' );
 
         $parameters = array(
             'userID'  => $userID,
@@ -89,7 +89,7 @@ class HfMailer implements Hf_iMessenger {
     }
 
     function generateInviteURL( $inviteID ) {
-        $baseURL = $this->PageLocator->getUrlByTitle( 'Register' );
+        $baseURL = $this->PageLocator->getPageUrlByTitle( 'Register' );
 
         $parameters = array(
             'n' => $inviteID

@@ -6,8 +6,10 @@ class HfAdminPanel {
     private $PageLocator;
     private $Database;
     private $UserManager;
+    private $Cms;
 
-    function HfAdminPanel( Hf_iMessenger $Messenger, Hf_iPageLocator $PageLocator, Hf_iDatabase $Database, Hf_iUserManager $UserManager ) {
+    function HfAdminPanel( Hf_iMessenger $Messenger, Hf_iAssetLocator $PageLocator, Hf_iDatabase $Database, Hf_iUserManager $UserManager, Hf_iContentManagementSystem $ContentManagementSystem ) {
+        $this->Cms         = $ContentManagementSystem;
         $this->Database    = $Database;
         $this->PageLocator = $PageLocator;
         $this->Messenger   = $Messenger;
@@ -15,7 +17,7 @@ class HfAdminPanel {
     }
 
     function registerAdminPanel() {
-        add_menu_page( 'HF Plugin', 'HF Plugin', 'activate_plugins', 'hfAdmin', array($this, 'generateAdminPanel') );
+        $this->Cms->addPageToAdminMenu('HF Plugin', 'hfAdmin', array($this, 'generateAdminPanel'));
     }
 
     function generateAdminPanel() {
@@ -32,13 +34,19 @@ class HfAdminPanel {
         }
 
         if ( isset( $_POST ) && array_key_exists( 'sudoReactivateExtension', $_POST ) ) {
-            $this->Database->sudoReactivateExtension();
+            $this->sudoReactivateExtension();
             echo '<p class="success">Deactivation and activation functions successfully called.</p>';
         }
 
         echo $this->generateAdminPanelForm();
 
-        echo do_shortcode( '[simpletest name="SimpleTest Unit Tests" path="/hf-accountability/tests/tests.php" passes="y"]' );
+        $shortcode = '[simpletest name="SimpleTest Unit Tests" path="/hf-accountability/tests/tests.php" passes="y"]';
+        echo $this->Cms->getShortcodeOutput( $shortcode );
+    }
+
+    private function sudoReactivateExtension() {
+        hfDeactivate();
+        hfActivate();
     }
 
     function generateAdminPanelForm() {
@@ -53,7 +61,7 @@ class HfAdminPanel {
     }
 
     function addToAdminHead() {
-        $cssURL = plugins_url( 'admin.css', dirname( __FILE__ ) );
+        $cssURL = $this->Cms->getPluginAssetUrl('admin.css');
         echo "<link rel='stylesheet' type='text/css' href='" . $cssURL . "' />";
     }
 }

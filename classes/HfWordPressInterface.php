@@ -76,4 +76,24 @@ class HfWordPressInterface implements Hf_iContentManagementSystem {
     public function isError( $thing ) {
         return is_wp_error( $thing );
     }
+
+    public function getShortcodeOutput( $shortcode ) {
+        return do_shortcode( $shortcode );
+    }
+
+    public function addPageToAdminMenu($name, $slug, $function) {
+        add_menu_page( $name, $name, 'activate_plugins', $slug, $function );
+    }
+
+    public function getPluginAssetUrl( $fileName ) {
+        return plugins_url( $fileName, dirname( __FILE__ ) );
+    }
+
+    public function isUsernameTaken($username) {
+        return username_exists( $username );
+    }
+
+    public function expandShortcodes( $string ) {
+        return do_shortcode( $string );
+    }
 } 

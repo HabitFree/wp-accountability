@@ -3,14 +3,14 @@
 class HfUserManager implements Hf_iUserManager {
     private $Database;
     private $Messenger;
-    private $PageLocator;
+    private $AssetLocator;
     private $ContentManagementSystem;
     private $CodeLibrary;
 
-    function HfUserManager( Hf_iDatabase $Database, Hf_iMessenger $Messenger, Hf_iPageLocator $PageLocator, Hf_iContentManagementSystem $ContentManagementSystem, Hf_iCodeLibrary $CodeLibrary ) {
+    function HfUserManager( Hf_iDatabase $Database, Hf_iMessenger $Messenger, Hf_iAssetLocator $PageLocator, Hf_iContentManagementSystem $ContentManagementSystem, Hf_iCodeLibrary $CodeLibrary ) {
         $this->Database                = $Database;
         $this->Messenger               = $Messenger;
-        $this->PageLocator             = $PageLocator;
+        $this->AssetLocator            = $PageLocator;
         $this->ContentManagementSystem = $ContentManagementSystem;
         $this->CodeLibrary             = $CodeLibrary;
     }
@@ -27,7 +27,7 @@ class HfUserManager implements Hf_iUserManager {
         $data  = array('userID' => $userID,
                        'goalID' => 1);
         $this->Database->insertIgnoreIntoDb( $table, $data );
-        $settingsPageURL = $this->PageLocator->getUrlByTitle( 'Settings' );
+        $settingsPageURL = $this->AssetLocator->getPageUrlByTitle( 'Settings' );
         $message         = "<p>Welcome to HabitFree!
 				You've been subscribed to periodic accountability emails. 
 				You can <a href='" . $settingsPageURL . "'>edit your subscription settings by clicking here</a>.</p>";
@@ -43,34 +43,24 @@ class HfUserManager implements Hf_iUserManager {
     }
 
     function userButtonsShortcode() {
-        $URLFinder = new HfUrlFinder();
-        $welcome   = 'Welcome back, ' . $this->getCurrentUserLogin() . ' | ';
+        $welcome = 'Welcome back, ' . $this->getCurrentUserLogin() . ' | ';
 
         if ( is_user_logged_in() ) {
-            $logOutUrl   = wp_logout_url( $URLFinder->getCurrentPageUrl() );
-            $settingsURL = $URLFinder->getUrlByTitle( 'Settings' );
+            $logOutUrl   = wp_logout_url( $this->AssetLocator->getCurrentPageUrl() );
+            $settingsURL = $this->AssetLocator->getPageUrlByTitle( 'Settings' );
 
             return $welcome .
             '<a href="' . $logOutUrl . '">Log Out</a> | <a href="' . $settingsURL . '">Settings</a>';
         } else {
-            $registerURL = $URLFinder->getUrlByTitle( 'Register' );
-            $loginUrl    = $this->PageLocator->getUrlByTitle( 'Log In' );
+            $registerURL = $this->AssetLocator->getPageUrlByTitle( 'Register' );
+            $loginUrl    = $this->AssetLocator->getPageUrlByTitle( 'Log In' );
 
             return '<a href="' . $loginUrl . '">Log In</a> | <a href="' . $registerURL . '">Register</a>';
         }
 
     }
 
-    function getUsernameByID( $userID, $initialCaps = false ) {
-        $user = get_userdata( $userID );
-        if ( $initialCaps === true ) {
-            return ucwords( $user->user_login );
-        } else {
-            return $user->user_login;
-        }
-    }
-
-    function sendInvitation( $inviterID, $address, $daysToExpire ) {
+    public function sendInvitation( $inviterID, $address, $daysToExpire ) {
         $inviteID        = $this->Messenger->generateInviteID();
         $inviteURL       = $this->Messenger->generateInviteURL( $inviteID );
         $inviterUsername = $this->getUsernameByID( $inviterID, true );
@@ -86,6 +76,15 @@ class HfUserManager implements Hf_iUserManager {
         }
 
         return $inviteID;
+    }
+
+    private function getUsernameByID( $userID, $initialCaps = false ) {
+        $user = get_userdata( $userID );
+        if ( $initialCaps === true ) {
+            return ucwords( $user->user_login );
+        } else {
+            return $user->user_login;
+        }
     }
 
     public function processInvite( $inviteeID, $nonce ) {

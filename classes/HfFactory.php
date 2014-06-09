@@ -1,12 +1,19 @@
 <?php
 
 class HfFactory {
+    public function makeAuthenticateShortcode() {
+        $DisplayCodeGenerator = $this->makeHtmlGenerator();
+
+        return new HfAuthenticateShortcode($DisplayCodeGenerator);
+    }
+
     public function makeLogInShortcode() {
         $UrlFinder   = $this->makeUrlFinder();
         $CodeLibrary = $this->makeCodeLibrary();
         $Cms         = $this->makeContentManagementSystem();
+        $UserManager = $this->makeUserManager();
 
-        return new HfLogInShortcode( $UrlFinder, $CodeLibrary, $Cms );
+        return new HfLogInShortcode( $UrlFinder, $CodeLibrary, $Cms, $UserManager );
     }
 
     public function makeRegisterShortcode() {
@@ -27,8 +34,9 @@ class HfFactory {
         $UserManager = $this->makeUserManager();
         $Goals       = $this->makeGoals();
         $Security    = $this->makeSecurity();
+        $Cms         = $this->makeContentManagementSystem();
 
-        return new HfGoalsShortcode( $UserManager, $Messenger, $UrlFinder, $Database, $Goals, $CodeLibrary, $Security );
+        return new HfGoalsShortcode( $UserManager, $Messenger, $UrlFinder, $Database, $Goals, $CodeLibrary, $Security, $Cms );
     }
 
     public function makeGoals() {
@@ -46,8 +54,9 @@ class HfFactory {
         $URLFinder    = $this->makeUrlFinder();
         $DbConnection = $this->makeDatabase();
         $UserManager  = $this->makeUserManager();
+        $Cms          = $this->makeContentManagementSystem();
 
-        return new HfAdminPanel( $Mailer, $URLFinder, $DbConnection, $UserManager );
+        return new HfAdminPanel( $Mailer, $URLFinder, $DbConnection, $UserManager, $Cms );
     }
 
     public function makeSettingsShortcode() {
@@ -85,11 +94,15 @@ class HfFactory {
     }
 
     public function makeUrlFinder() {
-        return new HfUrlFinder();
+        $Cms = $this->makeContentManagementSystem();
+
+        return new HfUrlFinder($Cms);
     }
 
     public function makeHtmlGenerator() {
-        return new HfHtmlGenerator();
+        $Cms = $this->makeContentManagementSystem();
+
+        return new HfHtmlGenerator($Cms);
     }
 
     public function makeCodeLibrary() {

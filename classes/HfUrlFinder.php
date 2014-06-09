@@ -1,7 +1,13 @@
 <?php
 
-class HfUrlFinder implements Hf_iPageLocator {
-    function getCurrentPageUrl() {
+class HfUrlFinder implements Hf_iAssetLocator {
+    private $Cms;
+
+    function __construct( Hf_iContentManagementSystem $ContentManagementSystem ) {
+        $this->Cms = $ContentManagementSystem;
+    }
+
+    public function getCurrentPageUrl() {
         $pageURL = 'http';
         if ( isset( $_SERVER["HTTPS"] ) ) {
             if ( $_SERVER["HTTPS"] == "on" ) {
@@ -18,9 +24,13 @@ class HfUrlFinder implements Hf_iPageLocator {
         return $pageURL;
     }
 
-    function getUrlByTitle( $title ) {
+    public function getPageUrlByTitle( $title ) {
         $page = get_page_by_title( $title );
 
         return get_permalink( $page->ID );
+    }
+
+    public function getPluginAssetUrl( $fileName ) {
+        return $this->Cms->getPluginAssetUrl( $fileName );
     }
 }

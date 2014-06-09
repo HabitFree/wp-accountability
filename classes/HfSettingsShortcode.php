@@ -5,7 +5,7 @@ class HfSettingsShortcode implements Hf_iShortcode {
     private $PageLocator;
     private $Security;
 
-    function __construct( Hf_iPageLocator $PageLocator, Hf_iUserManager $UserManager, Hf_iSecurity $Security ) {
+    function __construct( Hf_iAssetLocator $PageLocator, Hf_iUserManager $UserManager, Hf_iSecurity $Security ) {
         $this->PageLocator = $PageLocator;
         $this->UserManager = $UserManager;
         $this->Security    = $Security;

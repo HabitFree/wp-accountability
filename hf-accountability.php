@@ -36,7 +36,7 @@ require_once( dirname( __FILE__ ) . '/interfaces/Hf_iView.php' );
 require_once( dirname( __FILE__ ) . '/interfaces/Hf_iShortcode.php' );
 require_once( dirname( __FILE__ ) . '/interfaces/Hf_iGoals.php' );
 require_once( dirname( __FILE__ ) . '/interfaces/Hf_iMessenger.php' );
-require_once( dirname( __FILE__ ) . '/interfaces/Hf_iPageLocator.php' );
+require_once( dirname( __FILE__ ) . '/interfaces/Hf_iAssetLocator.php' );
 require_once( dirname( __FILE__ ) . '/interfaces/Hf_iDatabase.php' );
 require_once( dirname( __FILE__ ) . '/interfaces/Hf_iUserManager.php' );
 require_once( dirname( __FILE__ ) . '/interfaces/Hf_iSecurity.php' );
@@ -60,6 +60,7 @@ require_once( dirname( __FILE__ ) . '/classes/HfGoalsShortcode.php' );
 require_once( dirname( __FILE__ ) . '/classes/HfAccountabilityForm.php' );
 require_once( dirname( __FILE__ ) . '/classes/HfRegisterShortcode.php' );
 require_once( dirname( __FILE__ ) . '/classes/HfLogInShortcode.php' );
+require_once( dirname( __FILE__ ) . '/classes/HfAuthenticateShortcode.php' );
 
 date_default_timezone_set( 'America/Chicago' );
 
@@ -75,16 +76,16 @@ add_action( 'admin_head', array($HfAdminPanel, 'addToAdminHead') );
 add_action( 'init', 'hfRegisterShortcodes' );
 
 function hfRegisterShortcodes() {
-    $Factory           = new HfFactory();
-    $UserManager       = $Factory->makeUserManager();
-    $SettingsShortcode = $Factory->makeSettingsShortcode();
-    $GoalsShortcode    = $Factory->makeGoalsShortcode();
-    $RegisterShortcode = $Factory->makeRegisterShortcode();
-    $LogInShortcode    = $Factory->makeLogInShortcode();
+    var_dump('We tried...');
+
+    $Factory               = new HfFactory();
+    $UserManager           = $Factory->makeUserManager();
+    $SettingsShortcode     = $Factory->makeSettingsShortcode();
+    $GoalsShortcode        = $Factory->makeGoalsShortcode();
+    $AuthenticateShortcode = $Factory->makeAuthenticateShortcode();
 
     add_shortcode( 'hfSettings', array($SettingsShortcode, 'getOutput') );
     add_shortcode( 'hfGoals', array($GoalsShortcode, 'getOutput') );
     add_shortcode( 'userButtons', array($UserManager, 'userButtonsShortcode') );
-    add_shortcode( 'hfRegister', array($RegisterShortcode, 'getOutput') );
-    add_shortcode( 'hfLogIn', array($LogInShortcode, 'getOutput') );
+    add_shortcode( 'hfAuthenticate', array($AuthenticateShortcode, 'getOutput') );
 }

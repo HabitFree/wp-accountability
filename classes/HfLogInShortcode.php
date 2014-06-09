@@ -4,11 +4,13 @@ class HfLogInShortcode implements Hf_iShortcode {
     private $PageLocator;
     private $CodeLibrary;
     private $Cms;
+    private $UserManager;
 
-    function __construct( Hf_iPageLocator $PageLocator, Hf_iCodeLibrary $CodeLibrary, Hf_iContentManagementSystem $ContentManagementSystem ) {
+    function __construct( Hf_iAssetLocator $PageLocator, Hf_iCodeLibrary $CodeLibrary, Hf_iContentManagementSystem $ContentManagementSystem, Hf_iUserManager $UserManager ) {
         $this->PageLocator = $PageLocator;
         $this->CodeLibrary = $CodeLibrary;
         $this->Cms         = $ContentManagementSystem;
+        $this->UserManager = $UserManager;
     }
 
     public function getOutput() {
@@ -66,6 +68,20 @@ class HfLogInShortcode implements Hf_iShortcode {
 
         $result = $this->Cms->authenticateUser( $username, $password );
 
+        if ( $this->isInvite() and !$this->Cms->isError( $result ) ) {
+            $this->processInvite( $result );
+        }
+
         return !$this->Cms->isError( $result );
+    }
+
+    private function isInvite() {
+        return !$this->CodeLibrary->isUrlParameterEmpty( 'n' );
+    }
+
+    private function processInvite( $invitee ) {
+        $nonce     = $this->CodeLibrary->getUrlParameter( 'n' );
+        $inviteeID = $invitee->ID;
+        $this->UserManager->processInvite( $inviteeID, $nonce );
     }
 } 
