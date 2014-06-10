@@ -90,7 +90,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
 					PRIMARY KEY  (userID1, userID2)
 				);";
 
-            require_once( ABSPATH . 'wp-admin/includes/upgrade.classes' );
+            require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
             dbDelta( $emailTableSql );
             dbDelta( $goalTableSql );
             dbDelta( $reportTableSql );

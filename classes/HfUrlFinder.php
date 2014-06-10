@@ -25,6 +25,8 @@ class HfUrlFinder implements Hf_iAssetLocator {
     }
 
     public function getPageUrlByTitle( $title ) {
+        print('Title: ');
+        var_dump($title);
         $page = get_page_by_title( $title );
 
         return get_permalink( $page->ID );

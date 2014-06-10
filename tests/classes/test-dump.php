@@ -1,73 +1,31 @@
 <?php
+require_once( dirname( dirname( __FILE__ ) ) . '/HfTestCase.php' );
 
-require_once( dirname( __FILE__ ) . '/../hf-accountability.php' );
-
-class UnitWpSimpleTest extends UnitTestCase {
-    private $functionsFacade;
-    private $Factory;
-
-    public function __construct() {
-        $this->Factory = new HfFactory();
-    }
-
-    public function setUp() {
-
-    }
-
-//    Helper Functions
-
-    private function makeUserManagerMockDependencies() {
-        Mock::generate( 'HfMysqlDatabase' );
-        Mock::generate( 'HfMailer' );
-        Mock::generate( 'HfUrlFinder' );
-        Mock::generate( 'HfWordPressInterface' );
-        Mock::generate( 'HfPhpLibrary' );
-
-        $UrlFinder = new MockHfUrlFinder();
-        $Database  = new MockHfMysqlDatabase();
-        $Messenger = new MockHfMailer();
-        $Cms       = new MockHfWordPressInterface();
-        $PhpApi    = new MockHfPhpLibrary();
-
-        return array($UrlFinder, $Database, $Messenger, $Cms, $PhpApi);
-    }
+class TestDump extends HfTestCase {
+    // helpers
 
     private function makeRegisterShortcodeMockDependencies() {
-        Mock::generate( 'HfUrlFinder' );
-        Mock::generate( 'HfMysqlDatabase' );
-        Mock::generate( 'HfPhpLibrary' );
-        Mock::generate( 'HfWordPressInterface' );
-        Mock::generate( 'HfUserManager' );
-
-        $UrlFinder   = new MockHfUrlFinder();
-        $Database    = new MockHfMysqlDatabase();
-        $PhpLibrary  = new MockHfPhpLibrary();
-        $Cms         = new MockHfWordPressInterface();
-        $UserManager = new MockHfUserManager();
+        $UrlFinder   = $this->myMakeMock('HfUrlFinder');
+        $Database    = $this->myMakeMock('HfMysqlDatabase');
+        $PhpLibrary  = $this->myMakeMock('HfPhpLibrary');
+        $Cms         = $this->myMakeMock('HfWordPressInterface');
+        $UserManager = $this->myMakeMock('HfUserManager');
 
         return array($UrlFinder, $Database, $PhpLibrary, $Cms, $UserManager);
     }
 
     private function makeDatabaseMockDependencies() {
-        Mock::generate( 'HfWordPressInterface' );
-        Mock::generate( 'HfPhpLibrary' );
-
-        $Cms         = new MockHfWordPressInterface();
-        $CodeLibrary = new MockHfPhpLibrary();
+        $Cms         = $this->myMakeMock('HfWordPressInterface');
+        $CodeLibrary = $this->myMakeMock('HfPhpLibrary');
 
         return array($Cms, $CodeLibrary);
     }
 
     private function makeLogInShortcodeMockDependencies() {
-        Mock::generate( 'HfUrlFinder' );
-        Mock::generate( 'HfPhpLibrary' );
-        Mock::generate( 'HfWordPressInterface' );
-        Mock::generate( 'HfUserManager' );
-
-        $UrlFinder   = new MockHfUrlFinder();
-        $PhpLibrary  = new MockHfPhpLibrary();
-        $Cms         = new MockHfWordPressInterface();
-        $UserManager = new MockHfUserManager();
+        $UrlFinder   = $this->myMakeMock('HfUrlFinder');
+        $PhpLibrary  = $this->myMakeMock('HfPhpLibrary');
+        $Cms         = $this->myMakeMock('HfWordPressInterface');
+        $UserManager = $this->myMakeMock('HfUserManager');
 
         return array($UrlFinder, $PhpLibrary, $Cms, $UserManager);
     }
@@ -78,350 +36,127 @@ class UnitWpSimpleTest extends UnitTestCase {
         return in_array( $interface, $interfacesImplemented );
     }
 
-//    Tests
-
-    public function testTestingFramework() {
-        $this->assertEqual( 1, 1 );
-    }
-
-    public function testGettingCurrentUserLogin() {
-        $UserManager = $this->Factory->makeUserManager();
-        $user         = wp_get_current_user();
-
-        $this->assertEqual( $UserManager->getCurrentUserLogin(), $user->user_login );
-    }
-
-    public function testShortcodeRegistration() {
-        $this->assertEqual( shortcode_exists( 'hfSettings' ), true );
-    }
-
-    public function testDbDataNullRemoval() {
-        $Database = $this->Factory->makeDatabase();
-
-        $data = array(
-            'one'   => 'big one',
-            'two'   => 'two',
-            'three' => null,
-            'four'  => 4,
-            'five'  => 'null',
-            'six'   => 0,
-            'seven' => false
-        );
-
-        $expectedData = array(
-            'one'   => 'big one',
-            'two'   => 'two',
-            'four'  => 4,
-            'five'  => 'null',
-            'six'   => 0,
-            'seven' => false
-        );
-
-        $this->assertEqual( $Database->removeNullValuePairs( $data ), $expectedData );
-    }
-
-    public function testRandomStringCreationLength() {
-        $Security     = $this->Factory->makeSecurity();
-        $randomString = $Security->createRandomString( 400 );
-
-        $this->assertEqual( strlen( $randomString ), 400 );
-    }
-
-    public function testEmailInviteSendingUsingMocks() {
-        list( $UrlFinder, $Database, $Messenger, $Cms, $PhpApi ) = $this->makeUserManagerMockDependencies();
-
-        $Messenger->returns( 'generateInviteID', 555 );
-        $Database->returns( 'generateEmailID', 5 );
-
-        $UserManager = new HfUserManager( $Database, $Messenger, $UrlFinder, $Cms, $PhpApi );
-        $result      = $UserManager->sendInvitation( 1, 'me@test.com', 3 );
-
-        $this->assertEqual( $result, 555 );
-    }
-
-    public function testPHPandMySQLtimezonesMatch() {
-        $phpTime = date( 'Y-m-d H:i:s' );
-        global $wpdb;
-        $mysqlTime = $wpdb->get_results( "SELECT NOW()", ARRAY_A );
-        $this->assertEqual( $phpTime, $mysqlTime[0]['NOW()'] );
-    }
-
-    public function testInviteStorageInInviteTableUsingMocks() {
-        list( $UrlFinder, $Database, $Messenger, $Cms, $PhpApi ) = $this->makeUserManagerMockDependencies();
-
-        $UserManager = new HfUserManager( $Database, $Messenger, $UrlFinder, $Cms, $PhpApi );
-
-        $Database->returns( 'generateEmailID', 5 );
-
-        $expirationDate = date( 'Y-m-d H:i:s', strtotime( '+' . 3 . ' days' ) );
-
-        $expectedRecord = array(
-            'inviteID'       => 555,
-            'inviterID'      => 1,
-            'inviteeEmail'   => 'me@test.com',
-            'emailID'        => 5,
-            'expirationDate' => $expirationDate
-        );
-
-        $Database->expectAt(
-            1, 'insertIntoDb',
-            array('hf_invite', $expectedRecord) );
-
-        $UserManager->sendInvitation( 1, 'me@test.com', 3 );
-    }
-
-    public function testSendEmailByUserID() {
-        Mock::generate( 'HfUrlFinder' );
-        Mock::generate( 'HfSecurity' );
-        Mock::generate( 'HfMysqlDatabase' );
-        Mock::generate( 'HfWordPressInterface' );
-
-        $UrlFinder    = new MockHfUrlFinder();
-        $Security     = new MockHfSecurity();
-        $DbConnection = new MockHfMysqlDatabase();
-        $WordPressApi = new MockHfWordPressInterface();
-
-        $WordPressApi->returns( 'getVar', 5 );
-        $WordPressApi->returns( 'getUserEmail', 'me@test.com' );
-
-        $DbConnection->expectOnce(
-            'recordEmail',
-            array(1, 'test', 'test', 5, 'me@test.com') );
-
-        $Mailer = new HfMailer( $UrlFinder, $Security, $DbConnection, $WordPressApi );
-        $Mailer->sendEmailToUser( 1, 'test', 'test' );
-    }
-
-    public function testSendEmailToUserAndSpecifyEmailID() {
-        Mock::generate( 'HfUrlFinder' );
-        Mock::generate( 'HfSecurity' );
-        Mock::generate( 'HfMysqlDatabase' );
-        Mock::generate( 'HfWordPressInterface' );
-
-        $UrlFinder    = new MockHfUrlFinder();
-        $Security     = new MockHfSecurity();
-        $DbConnection = new MockHfMysqlDatabase();
-        $WordPressApi = new MockHfWordPressInterface();
-
-        $Mailer = new HfMailer( $UrlFinder, $Security, $DbConnection, $WordPressApi );
-
-        $userID  = 1;
-        $subject = 'test subject';
-        $body    = 'test body';
-        $emailID = 123;
-
-        $WordPressApi->returns( 'sendWpEmail', true );
-        $WordPressApi->returns( 'getUserEmail', 'me@test.com' );
-
-        $DbConnection->expectOnce(
-            'recordEmail',
-            array($userID, $subject, $body, $emailID, 'me@test.com') );
-
-        $Mailer->sendEmailToUserAndSpecifyEmailID( $userID, $subject, $body, $emailID );
-
-    }
-
-    public function testSendReportRequestEmailsChecksThrottling() {
-        Mock::generate( 'HfMailer' );
-        Mock::generate( 'HfWordPressInterface' );
-        Mock::generate( 'HfHtmlGenerator' );
-        Mock::generate( 'HfMysqlDatabase' );
-        Mock::generate( 'HfPhpLibrary' );
-
-        $Messenger     = new MockHfMailer();
-        $WebsiteApi    = new MockHfWordPressInterface();
-        $HtmlGenerator = new MockHfHtmlGenerator();
-        $DbConnection  = new MockHfMysqlDatabase();
-        $CodeLibrary   = new MockHfPhpLibrary();
-
-        $mockUser     = new stdClass();
-        $mockUser->ID = 1;
-        $mockUsers    = array($mockUser);
-        $WebsiteApi->returns( 'getSubscribedUsers', $mockUsers );
-
-        $mockGoalSub         = new stdClass();
-        $mockGoalSub->goalID = 1;
-        $mockGoalSubs        = array($mockGoalSub);
-        $DbConnection->returns( 'getRows', $mockGoalSubs );
-
-        $mockLevel                = new stdClass();
-        $mockLevel->emailInterval = 1;
-        $DbConnection->returns( 'level', $mockLevel );
-
-        $DbConnection->returns( 'daysSinceLastReport', 2 );
-        $Messenger->returns( 'isThrottled', true );
-
-        $Messenger->expectAtLeastOnce( 'isThrottled' );
-
-        $Goals = new HfGoals( $Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection, $CodeLibrary );
-        $Goals->sendReportRequestEmails();
-    }
-
-    public function testDaysSinceLastEmail() {
-        Mock::generate( 'HfWordPressInterface' );
-        Mock::generate( 'HfPhpLibrary' );
-
-        $WebsiteAPI = new MockHfWordPressInterface();
-        $PhpApi     = new MockHfPhpLibrary();
-
-        $WebsiteAPI->returns( 'getVar', '2014-05-27 16:04:29' );
-        $PhpApi->returns( 'convertStringToTime', 1401224669.0 );
-        $PhpApi->returns( 'getCurrentTime', 1401483869.0 );
-
-        $Database = new HfMysqlDatabase( $WebsiteAPI, $PhpApi );
-        $result   = $Database->daysSinceLastEmail( 1 );
-
-        $this->assertEqual( $result, 3 );
-    }
-    // ========= stopped here =========
+    // tests
 
     public function testSendReportRequestEmailsSendsEmailWhenReportDue() {
-        Mock::generate( 'HfMailer' );
-        Mock::generate( 'HfWordPressInterface' );
-        Mock::generate( 'HfHtmlGenerator' );
-        Mock::generate( 'HfMysqlDatabase' );
-        Mock::generate( 'HfPhpLibrary' );
-
-        $Messenger     = new MockHfMailer();
-        $WebsiteApi    = new MockHfWordPressInterface();
-        $HtmlGenerator = new MockHfHtmlGenerator();
-        $DbConnection  = new MockHfMysqlDatabase();
-        $CodeLibrary   = new MockHfPhpLibrary();
+        $Messenger     = $this->myMakeMock( 'HfMailer' );
+        $WebsiteApi    = $this->myMakeMock( 'HfWordPressInterface' );
+        $HtmlGenerator = $this->myMakeMock( 'HfHtmlGenerator' );
+        $DbConnection  = $this->myMakeMock( 'HfMysqlDatabase' );
+        $CodeLibrary   = $this->myMakeMock( 'HfPhpLibrary' );
 
         $mockUser     = new stdClass();
         $mockUser->ID = 1;
         $mockUsers    = array($mockUser);
-        $WebsiteApi->returns( 'getSubscribedUsers', $mockUsers );
+        $this->mySetReturnValue( $WebsiteApi, 'getSubscribedUsers', $mockUsers );
 
         $mockGoalSub         = new stdClass();
         $mockGoalSub->goalID = 1;
         $mockGoalSubs        = array($mockGoalSub);
-        $DbConnection->returns( 'getRows', $mockGoalSubs );
+        $this->mySetReturnValue( $DbConnection, 'getRows', $mockGoalSubs );
 
         $mockLevel                = new stdClass();
         $mockLevel->emailInterval = 1;
-        $DbConnection->returns( 'level', $mockLevel );
+        $this->mySetReturnValue( $DbConnection, 'level', $mockLevel );
 
-        $DbConnection->returns( 'daysSinceLastEmail', 2 );
-        $DbConnection->returns( 'daysSinceLastReport', 2 );
-        $Messenger->returns( 'isThrottled', false );
+        $this->mySetReturnValue( $DbConnection, 'daysSinceLastEmail', 2 );
+        $this->mySetReturnValue( $DbConnection, 'daysSinceLastReport', 2 );
+        $this->mySetReturnValue( $Messenger, 'isThrottled', false );
 
-        $Messenger->expectAtLeastOnce( 'sendReportRequestEmail' );
+        $this->myExpectAtLeastOnce( $Messenger, 'sendReportRequestEmail' );
 
         $Goals = new HfGoals( $Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection, $CodeLibrary );
         $Goals->sendReportRequestEmails();
     }
 
     public function testSendReportRequestEmailsDoesNotSendEmailWhenReportNotDue() {
-        Mock::generate( 'HfMailer' );
-        Mock::generate( 'HfWordPressInterface' );
-        Mock::generate( 'HfHtmlGenerator' );
-        Mock::generate( 'HfMysqlDatabase' );
-        Mock::generate( 'HfPhpLibrary' );
-
-        $Messenger     = new MockHfMailer();
-        $WebsiteApi    = new MockHfWordPressInterface();
-        $HtmlGenerator = new MockHfHtmlGenerator();
-        $DbConnection  = new MockHfMysqlDatabase();
-        $CodeLibrary   = new MockHfPhpLibrary();
+        $Messenger     = $this->myMakeMock( 'HfMailer' );
+        $WebsiteApi    = $this->myMakeMock( 'HfWordPressInterface' );
+        $HtmlGenerator = $this->myMakeMock( 'HfHtmlGenerator' );
+        $DbConnection  = $this->myMakeMock( 'HfMysqlDatabase' );
+        $CodeLibrary   = $this->myMakeMock( 'HfPhpLibrary' );
 
         $mockUser     = new stdClass();
         $mockUser->ID = 1;
         $mockUsers    = array($mockUser);
-        $WebsiteApi->returns( 'getSubscribedUsers', $mockUsers );
+        $this->mySetReturnValue( $WebsiteApi, 'getSubscribedUsers', $mockUsers );
 
         $mockGoalSub         = new stdClass();
         $mockGoalSub->goalID = 1;
         $mockGoalSubs        = array($mockGoalSub);
-        $DbConnection->returns( 'getRows', $mockGoalSubs );
+        $this->mySetReturnValue( $DbConnection, 'getRows', $mockGoalSubs );
 
         $mockLevel                = new stdClass();
         $mockLevel->emailInterval = 1;
-        $DbConnection->returns( 'level', $mockLevel );
+        $this->mySetReturnValue( $DbConnection, 'level', $mockLevel );
 
-        $DbConnection->returns( 'daysSinceLastEmail', 2 );
-        $DbConnection->returns( 'daysSinceLastReport', 0 );
+        $this->mySetReturnValue( $DbConnection, 'daysSinceLastEmail', 2 );
+        $this->mySetReturnValue( $DbConnection, 'daysSinceLastReport', 0 );
 
-        $Messenger->expectNever( 'sendReportRequestEmail' );
+        $this->myExpectNever( $Messenger, 'sendReportRequestEmail' );
 
         $Goals = new HfGoals( $Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection, $CodeLibrary );
         $Goals->sendReportRequestEmails();
     }
 
     public function testIsThrottledReturnsFalse() {
-        Mock::generate( 'HfUrlFinder' );
-        Mock::generate( 'HfSecurity' );
-        Mock::generate( 'HfMysqlDatabase' );
-        Mock::generate( 'HfWordPressInterface' );
+        $UrlFinder    = $this->myMakeMock( 'HfUrlFinder' );
+        $Security     = $this->myMakeMock( 'HfSecurity' );
+        $DbConnection = $this->myMakeMock( 'HfMysqlDatabase' );
+        $ApiInterface = $this->myMakeMock( 'HfWordPressInterface' );
 
-        $UrlFinder    = new MockHfUrlFinder();
-        $Security     = new MockHfSecurity();
-        $DbConnection = new MockHfMysqlDatabase();
-        $ApiInterface = new MockHfWordPressInterface();
-
-        $DbConnection->returns( 'daysSinceAnyReport', 100 );
-        $DbConnection->returns( 'daysSinceLastEmail', 10 );
-        $DbConnection->returns( 'daysSinceSecondToLastEmail', 12 );
+        $this->mySetReturnValue( $DbConnection, 'daysSinceAnyReport', 100 );
+        $this->mySetReturnValue( $DbConnection, 'daysSinceLastEmail', 10 );
+        $this->mySetReturnValue( $DbConnection, 'daysSinceSecondToLastEmail', 12 );
 
         $Mailer = new HfMailer( $UrlFinder, $Security, $DbConnection, $ApiInterface );
         $result = $Mailer->isThrottled( 1 );
 
-        $this->assertEqual( $result, false );
+        $this->assertEquals( $result, false );
     }
 
     public function testIsThrottledReturnsTrue() {
-        Mock::generate( 'HfUrlFinder' );
-        Mock::generate( 'HfSecurity' );
-        Mock::generate( 'HfMysqlDatabase' );
-        Mock::generate( 'HfWordPressInterface' );
+        $UrlFinder    = $this->myMakeMock( 'HfUrlFinder' );
+        $Security     = $this->myMakeMock( 'HfSecurity' );
+        $DbConnection = $this->myMakeMock( 'HfMysqlDatabase' );
+        $ApiInterface = $this->myMakeMock( 'HfWordPressInterface' );
 
-        $UrlFinder    = new MockHfUrlFinder();
-        $Security     = new MockHfSecurity();
-        $DbConnection = new MockHfMysqlDatabase();
-        $ApiInterface = new MockHfWordPressInterface();
-
-        $DbConnection->returns( 'daysSinceAnyReport', 100 );
-        $DbConnection->returns( 'daysSinceLastEmail', 10 );
-        $DbConnection->returns( 'daysSinceSecondToLastEmail', 17 );
+        $this->mySetReturnValue( $DbConnection, 'daysSinceAnyReport', 100 );
+        $this->mySetReturnValue( $DbConnection, 'daysSinceLastEmail', 10 );
+        $this->mySetReturnValue( $DbConnection, 'daysSinceSecondToLastEmail', 17 );
 
         $Mailer = new HfMailer( $UrlFinder, $Security, $DbConnection, $ApiInterface );
         $result = $Mailer->isThrottled( 1 );
 
-        $this->assertEqual( $result, true );
+        $this->assertEquals( $result, true );
     }
 
     public function testSendReportRequestEmailsDoesNotSendEmailWhenUserThrottled() {
-        Mock::generate( 'HfMailer' );
-        Mock::generate( 'HfWordPressInterface' );
-        Mock::generate( 'HfHtmlGenerator' );
-        Mock::generate( 'HfMysqlDatabase' );
-        Mock::generate( 'HfPhpLibrary' );
-
-        $Messenger     = new MockHfMailer();
-        $WebsiteApi    = new MockHfWordPressInterface();
-        $HtmlGenerator = new MockHfHtmlGenerator();
-        $DbConnection  = new MockHfMysqlDatabase();
-        $CodeLibrary   = new MockHfPhpLibrary();
+        $Messenger     = $this->myMakeMock( 'HfMailer' );
+        $WebsiteApi    = $this->myMakeMock( 'HfWordPressInterface' );
+        $HtmlGenerator = $this->myMakeMock( 'HfHtmlGenerator' );
+        $DbConnection  = $this->myMakeMock( 'HfMysqlDatabase' );
+        $CodeLibrary   = $this->myMakeMock( 'HfPhpLibrary' );
 
         $mockUser     = new stdClass();
         $mockUser->ID = 1;
         $mockUsers    = array($mockUser);
-        $WebsiteApi->returns( 'getSubscribedUsers', $mockUsers );
+        $this->mySetReturnValue( $WebsiteApi, 'getSubscribedUsers', $mockUsers );
 
         $mockGoalSub         = new stdClass();
         $mockGoalSub->goalID = 1;
         $mockGoalSubs        = array($mockGoalSub);
-        $DbConnection->returns( 'getRows', $mockGoalSubs );
+        $this->mySetReturnValue( $DbConnection, 'getRows', $mockGoalSubs );
 
         $mockLevel                = new stdClass();
         $mockLevel->emailInterval = 1;
-        $DbConnection->returns( 'level', $mockLevel );
+        $this->mySetReturnValue( $DbConnection, 'level', $mockLevel );
 
-        $DbConnection->returns( 'daysSinceLastEmail', 2 );
-        $DbConnection->returns( 'daysSinceLastReport', 5 );
-        $Messenger->returns( 'IsThrottled', true );
+        $this->mySetReturnValue( $DbConnection, 'daysSinceLastEmail', 2 );
+        $this->mySetReturnValue( $DbConnection, 'daysSinceLastReport', 5 );
+        $this->mySetReturnValue( $Messenger, 'IsThrottled', true );
 
-        $Messenger->expectNever( 'sendReportRequestEmail' );
+        $this->myExpectNever( $Messenger, 'sendReportRequestEmail' );
 
         $Goals = new HfGoals( $Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection, $CodeLibrary );
         $Goals->sendReportRequestEmails();
@@ -436,27 +171,21 @@ class UnitWpSimpleTest extends UnitTestCase {
     }
 
     public function testCurrentLevelTarget() {
-        Mock::generate( 'HfMailer' );
-        Mock::generate( 'HfWordPressInterface' );
-        Mock::generate( 'HfHtmlGenerator' );
-        Mock::generate( 'HfMysqlDatabase' );
-        Mock::generate( 'HfPhpLibrary' );
-
-        $Messenger     = new MockHfMailer();
-        $WebsiteApi    = new MockHfWordPressInterface();
-        $HtmlGenerator = new MockHfHtmlGenerator();
-        $DbConnection  = new MockHfMysqlDatabase();
-        $CodeLibrary   = new MockHfPhpLibrary();
+        $Messenger     = $this->myMakeMock( 'HfMailer' );
+        $WebsiteApi    = $this->myMakeMock( 'HfWordPressInterface' );
+        $HtmlGenerator = $this->myMakeMock( 'HfHtmlGenerator' );
+        $DbConnection  = $this->myMakeMock( 'HfMysqlDatabase' );
+        $CodeLibrary   = $this->myMakeMock( 'HfPhpLibrary' );
 
         $mockLevel         = new stdClass();
         $mockLevel->target = 14;
-        $DbConnection->returns( 'level', $mockLevel );
+        $this->mySetReturnValue( $DbConnection, 'level', $mockLevel );
 
         $Goals = new HfGoals( $Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection, $CodeLibrary );
 
         $target = $Goals->currentLevelTarget( 5 );
 
-        $this->assertEqual( $target, 14 );
+        $this->assertEquals( $target, 14 );
     }
 
     public function testHfFormClassExists() {
@@ -467,7 +196,7 @@ class UnitWpSimpleTest extends UnitTestCase {
         $Form = new HfGenericForm( 'test.com' );
         $html = $Form->getHtml();
 
-        $this->assertEqual( $html, '<form action="test.com" method="post"></form>' );
+        $this->assertEquals( $html, '<form action="test.com" method="post"></form>' );
     }
 
     public function testAddTextBoxInputToForm() {
@@ -479,7 +208,7 @@ class UnitWpSimpleTest extends UnitTestCase {
 
         $html = $Form->getHtml();
 
-        $this->assertEqual( $html,
+        $this->assertEquals( $html,
             '<form action="test.com" method="post"><p><label for="test">Hello, there: <input type="text" name="test" value="" /></label></p></form>'
         );
     }
@@ -493,30 +222,24 @@ class UnitWpSimpleTest extends UnitTestCase {
 
         $html = $Form->getHtml();
 
-        $this->assertEqual( $html, '<form action="test.com" method="post"><p><input type="submit" name="submit" value="Submit" /></p></form>' );
+        $this->assertEquals( $html, '<form action="test.com" method="post"><p><input type="submit" name="submit" value="Submit" /></p></form>' );
     }
 
     public function testGenerateAdminPanelButtons() {
-        Mock::generate( 'HfMailer' );
-        Mock::generate( 'HfUrlFinder' );
-        Mock::generate( 'HfMysqlDatabase' );
-        Mock::generate( 'HfUserManager' );
-        Mock::generate( 'HfWordPressInterface' );
+        $Mailer       = $this->myMakeMock( 'HfMailer' );
+        $URLFinder    = $this->myMakeMock( 'HfUrlFinder' );
+        $DbConnection = $this->myMakeMock( 'HfMysqlDatabase' );
+        $UserManager  = $this->myMakeMock( 'HfUserManager' );
+        $Cms          = $this->myMakeMock( 'HfWordPressInterface' );
 
-        $Mailer       = new MockHfMailer();
-        $URLFinder    = new MockHfUrlFinder();
-        $DbConnection = new MockHfMysqlDatabase();
-        $UserManager  = new MockHfUserManager();
-        $Cms          = new MockHfWordPressInterface();
-
-        $URLFinder->returns( 'getCurrentPageURL', 'test.com' );
+        $this->mySetReturnValue( $URLFinder, 'getCurrentPageURL', 'test.com' );
 
         $AdminPanel = new HfAdminPanel( $Mailer, $URLFinder, $DbConnection, $UserManager, $Cms );
 
         $expectedHtml = '<form action="test.com" method="post"><p><input type="submit" name="sendTestReportRequestEmail" value="Send test report request email" /></p><p><input type="submit" name="sendTestInvite" value="Send test invite" /></p><p><input type="submit" name="sudoReactivateExtension" value="Sudo reactivate extension" /></p></form>';
         $resultHtml   = $AdminPanel->generateAdminPanelForm();
 
-        $this->assertEqual( $expectedHtml, $resultHtml );
+        $this->assertEquals( $expectedHtml, $resultHtml );
     }
 
     public function testRegistrationShortcodeExists() {
@@ -526,15 +249,15 @@ class UnitWpSimpleTest extends UnitTestCase {
     public function testRegistrationShortcodeHtml() {
         list( $UrlFinder, $Database, $PhpLibrary, $Cms, $UserManager ) = $this->makeRegisterShortcodeMockDependencies();
 
-        $UrlFinder->returns( 'getCurrentPageURL', 'test.com' );
-        $PhpLibrary->returns( 'isPostEmpty', true );
+        $this->mySetReturnValue( $UrlFinder, 'getCurrentPageURL', 'test.com' );
+        $this->mySetReturnValue( $PhpLibrary, 'isPostEmpty', true );
 
         $RegisterShortcode = new HfRegisterShortcode( $UrlFinder, $Database, $PhpLibrary, $Cms, $UserManager );
 
         $expectedHtml = '<form action="test.com" method="post"><p><label for="username"><span class="required">*</span> Username: <input type="text" name="username" value="" required /></label></p><p><label for="email"><span class="required">*</span> Email: <input type="text" name="email" value="" required /></label></p><p><label for="password"><span class="required">*</span> Password: <input type="password" name="password" required /></label></p><p><label for="passwordConfirmation"><span class="required">*</span> Confirm Password: <input type="password" name="passwordConfirmation" required /></label></p><p><input type="submit" name="submit" value="Register" /></p></form>';
         $resultHtml   = $RegisterShortcode->getOutput();
 
-        $this->assertEqual( $expectedHtml, $resultHtml );
+        $this->assertEquals( $expectedHtml, $resultHtml );
     }
 
     public function testWordPressPrintToScreenMethodExists() {
@@ -556,7 +279,7 @@ class UnitWpSimpleTest extends UnitTestCase {
     }
 
     public function testFactoryMakeGoals() {
-        $Goals   = $this->Factory->makeGoals();
+        $Goals = $this->Factory->makeGoals();
 
         $this->assertTrue( is_a( $Goals, 'HfGoals' ) );
     }
@@ -568,7 +291,7 @@ class UnitWpSimpleTest extends UnitTestCase {
     }
 
     public function testFactoryMakeMailer() {
-        $Mailer  = $this->Factory->makeMessenger();
+        $Mailer = $this->Factory->makeMessenger();
 
         $this->assertTrue( is_a( $Mailer, 'HfMailer' ) );
     }
@@ -642,8 +365,7 @@ class UnitWpSimpleTest extends UnitTestCase {
     }
 
     public function testHfAccountabilityFormClassHasPopulateMethod() {
-        Mock::generate( 'HfGoals' );
-        $Goals              = new MockHfGoals();
+        $Goals              = $this->myMakeMock( 'HfGoals' );
         $AccountabilityForm = new HfAccountabilityForm( 'test.com', $Goals );
         $this->assertTrue( method_exists( $AccountabilityForm, 'populate' ) );
     }
@@ -651,7 +373,7 @@ class UnitWpSimpleTest extends UnitTestCase {
     public function testGetGoalSubscriptions() {
         list( $Cms, $CodeLibrary ) = $this->makeDatabaseMockDependencies();
 
-        $Cms->expectOnce( 'getRows' );
+        $this->myExpectOnce( $Cms, 'getRows' );
 
         $Database = new HfMysqlDatabase( $Cms, $CodeLibrary );
 
@@ -691,7 +413,7 @@ class UnitWpSimpleTest extends UnitTestCase {
 
         $Database = new HfMysqlDatabase( $Cms, $CodeLibrary );
 
-        $Cms->expectOnce( 'deleteRows' );
+        $this->myExpectOnce( $Cms, 'deleteRows' );
 
         $Database->deleteInvite( 777 );
     }
@@ -699,16 +421,16 @@ class UnitWpSimpleTest extends UnitTestCase {
     public function testRegisterShortcodeCallsDeleteInvitation() {
         list( $UrlFinder, $Database, $PhpLibrary, $Cms, $UserManager ) = $this->makeRegisterShortcodeMockDependencies();
 
-        $PhpLibrary->returns( 'isPostEmpty', false );
-        $PhpLibrary->returns( 'isUrlParameterEmpty', false );
-        $PhpLibrary->returns( 'getPost', 'test@gmail.com' );
+        $this->mySetReturnValue( $PhpLibrary, 'isPostEmpty', false );
+        $this->mySetReturnValue( $PhpLibrary, 'isUrlParameterEmpty', false );
+        $this->mySetReturnValue( $PhpLibrary, 'getPost', 'test@gmail.com' );
 
         $mockInvite            = new stdClass();
         $mockInvite->inviterID = 777;
 
-        $Database->returns( 'getInvite', $mockInvite );
+        $this->mySetReturnValue( $Database, 'getInvite', $mockInvite );
 
-        $UserManager->expectOnce( 'processInvite' );
+        $this->myExpectOnce( $UserManager, 'processInvite' );
 
         $RegisterShortcode = new HfRegisterShortcode( $UrlFinder, $Database, $PhpLibrary, $Cms, $UserManager );
 
@@ -727,23 +449,23 @@ class UnitWpSimpleTest extends UnitTestCase {
 
         $RegisterShortcode = new HfRegisterShortcode( $UrlFinder, $Database, $PhpLibrary, $Cms, $UserManager );
 
-        $PhpLibrary->returns( 'isPostEmpty', false );
-        $PhpLibrary->returns( 'isUrlParameterEmpty', false );
-        $PhpLibrary->returns( 'getPost', 'test@gmail.com' );
+        $this->mySetReturnValue( $PhpLibrary, 'isPostEmpty', false );
+        $this->mySetReturnValue( $PhpLibrary, 'isUrlParameterEmpty', false );
+        $this->mySetReturnValue( $PhpLibrary, 'getPost', 'test@gmail.com' );
 
-        $Cms->returns( 'isEmailTaken', true );
+        $this->mySetReturnValue( $Cms, 'isEmailTaken', true );
 
         $mockInvite            = new stdClass();
         $mockInvite->inviterID = 777;
 
-        $Database->returns( 'getInvite', $mockInvite );
+        $this->mySetReturnValue( $Database, 'getInvite', $mockInvite );
 
-        $Cms->expectAtLeastOnce( 'isEmailTaken' );
-        $Cms->expectNever( 'createUser' );
+        $this->myExpectAtLeastOnce( $Cms, 'isEmailTaken' );
+        $this->myExpectNever( $Cms, 'createUser' );
 
         $output = $RegisterShortcode->getOutput();
 
-        $this->assertTrue( strstr( $output, "<p class='fail'>Oops. That email is already in use.</p>" ) );
+        $this->assertTrue( strstr( $output, "<p class='fail'>Oops. That email is already in use.</p>" ) != false );
     }
 
     public function testLogInShortcodeImplementsShortcodeInterface() {
@@ -753,70 +475,70 @@ class UnitWpSimpleTest extends UnitTestCase {
     public function testLogInShortcodeOutputsLogInForm() {
         list( $UrlFinder, $PhpLibrary, $Cms, $UserManager ) = $this->makeLogInShortcodeMockDependencies();
 
-        $PhpLibrary->returns( 'isUrlParameterEmpty', true );
-        $PhpLibrary->returns( 'isPostEmpty', true );
-        $UrlFinder->returns( 'getCurrentPageUrl', 'test.com' );
+        $this->mySetReturnValue( $PhpLibrary, 'isUrlParameterEmpty', true );
+        $this->mySetReturnValue( $PhpLibrary, 'isPostEmpty', true );
+        $this->mySetReturnValue( $UrlFinder, 'getCurrentPageUrl', 'test.com' );
 
         $LogInShortcode = new HfLogInShortcode( $UrlFinder, $PhpLibrary, $Cms, $UserManager );
         $resultHtml     = $LogInShortcode->getOutput();
 
         $expectedHtml = '<form action="test.com" method="post"><p><label for="username"><span class="required">*</span> Username: <input type="text" name="username" value="" required /></label></p><p><label for="password"><span class="required">*</span> Password: <input type="password" name="password" required /></label></p><p><input type="submit" name="submit" value="Log In" /></p></form>';
 
-        $this->assertEqual( $resultHtml, $expectedHtml );
+        $this->assertEquals( $resultHtml, $expectedHtml );
     }
 
     public function testLogInShortcodeWithAlternateActionUrl() {
         list( $UrlFinder, $PhpLibrary, $Cms, $UserManager ) = $this->makeLogInShortcodeMockDependencies();
 
-        $PhpLibrary->returns( 'isUrlParameterEmpty', true );
-        $PhpLibrary->returns( 'isPostEmpty', true );
-        $UrlFinder->returns( 'getCurrentPageUrl', 'anothertest.com' );
+        $this->mySetReturnValue( $PhpLibrary, 'isUrlParameterEmpty', true );
+        $this->mySetReturnValue( $PhpLibrary, 'isPostEmpty', true );
+        $this->mySetReturnValue( $UrlFinder, 'getCurrentPageUrl', 'anothertest.com' );
 
         $LogInShortcode = new HfLogInShortcode( $UrlFinder, $PhpLibrary, $Cms, $UserManager );
         $resultHtml     = $LogInShortcode->getOutput();
 
         $expectedHtml = '<form action="anothertest.com" method="post"><p><label for="username"><span class="required">*</span> Username: <input type="text" name="username" value="" required /></label></p><p><label for="password"><span class="required">*</span> Password: <input type="password" name="password" required /></label></p><p><input type="submit" name="submit" value="Log In" /></p></form>';
 
-        $this->assertEqual( $resultHtml, $expectedHtml );
+        $this->assertEquals( $resultHtml, $expectedHtml );
     }
 
     public function testLogInShortcodeOutputsSuccessMessage() {
         list( $UrlFinder, $PhpLibrary, $Cms, $UserManager ) = $this->makeLogInShortcodeMockDependencies();
 
-        $PhpLibrary->returns( 'isUrlParameterEmpty', true );
-        $PhpLibrary->returns( 'isPostEmpty', false );
-        $Cms->returns( 'authenticateUser', new stdClass() );
-        $Cms->returns( 'isError', false );
+        $this->mySetReturnValue( $PhpLibrary, 'isUrlParameterEmpty', true );
+        $this->mySetReturnValue( $PhpLibrary, 'isPostEmpty', false );
+        $this->mySetReturnValue( $Cms, 'authenticateUser', new stdClass() );
+        $this->mySetReturnValue( $Cms, 'isError', false );
 
         $LogInShortcode = new HfLogInShortcode( $UrlFinder, $PhpLibrary, $Cms, $UserManager );
 
         $resultHtml   = $LogInShortcode->getOutput();
         $expectedHtml = '<p class="success">You have been successfully logged in.</p><p><a href="/">Onward!</a></p>';
 
-        $this->assertEqual( $resultHtml, $expectedHtml );
+        $this->assertEquals( $resultHtml, $expectedHtml );
     }
 
     public function testLogInShortcodeDisplaysEmptyFieldErrors() {
         list( $UrlFinder, $PhpLibrary, $Cms, $UserManager ) = $this->makeLogInShortcodeMockDependencies();
 
-        $PhpLibrary->returns( 'isUrlParameterEmpty', true );
-        $PhpLibrary->returns( 'isPostEmpty', true );
-        $PhpLibrary->returnsAt( 0, 'isPostEmpty', false );
-        $PhpLibrary->returnsAt( 2, 'isPostEmpty', false );
+        $this->mySetReturnValue( $PhpLibrary, 'isUrlParameterEmpty', true );
+        $this->mySetReturnValues($PhpLibrary, 'isPostEmpty', array(false, true, false, true, true, true, true));
 
         $LogInShortcode = new HfLogInShortcode( $UrlFinder, $PhpLibrary, $Cms, $UserManager );
 
         $resultHtml   = $LogInShortcode->getOutput();
         $expectedHtml = '<p class="fail">Please provide a valid username and password combination.</p>';
 
-        $this->assertTrue( strstr( $resultHtml, $expectedHtml ) );
+        $isStringThere = (strstr( $resultHtml, $expectedHtml ) != false);
+        var_dump($isStringThere);
+        $this->assertTrue( $isStringThere );
     }
 
     public function testLogInShortcodeAuthenticatesUser() {
         list( $UrlFinder, $PhpLibrary, $Cms, $UserManager ) = $this->makeLogInShortcodeMockDependencies();
 
-        $PhpLibrary->returns( 'isUrlParameterEmpty', true );
-        $Cms->expectOnce( 'authenticateUser' );
+        $this->mySetReturnValue( $PhpLibrary, 'isUrlParameterEmpty', true );
+        $this->myExpectOnce( $Cms, 'authenticateUser' );
 
         $LogInShortcode = new HfLogInShortcode( $UrlFinder, $PhpLibrary, $Cms, $UserManager );
 
@@ -826,24 +548,25 @@ class UnitWpSimpleTest extends UnitTestCase {
     public function testLogInShortcodeOutputsErrorMessageWhenLogInUnsuccessful() {
         list( $UrlFinder, $PhpLibrary, $Cms, $UserManager ) = $this->makeLogInShortcodeMockDependencies();
 
-        $PhpLibrary->returns( 'isUrlParameterEmpty', true );
-        $PhpLibrary->returns( 'isPostEmpty', false );
-        $Cms->returns( 'isError', true );
+        $this->mySetReturnValue( $PhpLibrary, 'isUrlParameterEmpty', true );
+        $this->mySetReturnValue( $PhpLibrary, 'isPostEmpty', false );
+        $this->mySetReturnValue( $Cms, 'isError', true );
 
         $LogInShortcode = new HfLogInShortcode( $UrlFinder, $PhpLibrary, $Cms, $UserManager );
 
         $resultHtml   = $LogInShortcode->getOutput();
         $expectedHtml = '<p class="fail">Please provide a valid username and password combination.</p>';
 
-        $this->assertTrue( strstr( $resultHtml, $expectedHtml ) );
+        $this->assertTrue( strstr( $resultHtml, $expectedHtml ) != false );
     }
 
     public function testLogInShortcodeLooksForUsernameAndPassword() {
         list( $UrlFinder, $PhpLibrary, $Cms, $UserManager ) = $this->makeLogInShortcodeMockDependencies();
 
-        $PhpLibrary->returns( 'isUrlParameterEmpty', true );
-        $PhpLibrary->expectAt( 0, 'getPost', array('username') );
-        $PhpLibrary->expectAt( 1, 'getPost', array('password') );
+        $this->mySetReturnValue( $PhpLibrary, 'isUrlParameterEmpty', true );
+
+        $this->myExpectAt($PhpLibrary, 'getPost', 0, array('username'));
+        $this->myExpectAt($PhpLibrary, 'getPost', 1, array('password'));
 
         $LogInShortcode = new HfLogInShortcode( $UrlFinder, $PhpLibrary, $Cms, $UserManager );
 
@@ -854,14 +577,14 @@ class UnitWpSimpleTest extends UnitTestCase {
         list( $UrlFinder, $PhpLibrary, $Cms, $UserManager ) = $this->makeLogInShortcodeMockDependencies();
 
 
-        $PhpLibrary->returns( 'isPostEmpty', false );
-        $Cms->returns( 'isError', false );
+        $this->mySetReturnValue( $PhpLibrary, 'isPostEmpty', false );
+        $this->mySetReturnValue( $Cms, 'isError', false );
 
         $mockUser     = new stdClass();
         $mockUser->ID = 1;
-        $Cms->returns( 'authenticateUser', $mockUser );
+        $this->mySetReturnValue( $Cms, 'authenticateUser', $mockUser );
 
-        $PhpLibrary->expectAtLeastOnce( 'getUrlParameter', array('n') );
+        $this->myExpectAtLeastOnce( $PhpLibrary, 'getUrlParameter', array('n') );
 
         $LogInShortcode = new HfLogInShortcode( $UrlFinder, $PhpLibrary, $Cms, $UserManager );
         $LogInShortcode->getOutput();
@@ -870,14 +593,14 @@ class UnitWpSimpleTest extends UnitTestCase {
     public function testLogInShortcodeCreatesRelationship() {
         list( $UrlFinder, $PhpLibrary, $Cms, $UserManager ) = $this->makeLogInShortcodeMockDependencies();
 
-        $PhpLibrary->returns( 'isPostEmpty', false );
-        $Cms->returns( 'isError', false );
+        $this->mySetReturnValue( $PhpLibrary, 'isPostEmpty', false );
+        $this->mySetReturnValue( $Cms, 'isError', false );
 
         $mockUser     = new stdClass();
         $mockUser->ID = 1;
-        $Cms->returns( 'authenticateUser', $mockUser );
+        $this->mySetReturnValue( $Cms, 'authenticateUser', $mockUser );
 
-        $UserManager->expectAtLeastOnce( 'processInvite' );
+        $this->myExpectAtLeastOnce( $UserManager, 'processInvite' );
 
         $LogInShortcode = new HfLogInShortcode( $UrlFinder, $PhpLibrary, $Cms, $UserManager );
         $LogInShortcode->getOutput();
@@ -904,7 +627,7 @@ class UnitWpSimpleTest extends UnitTestCase {
 
         $result = $HtmlGenerator->generateTabs( $contents, 1 );
 
-        $this->assertTrue( strstr( $result, $expected ) );
+        $this->assertTrue( strstr( $result, $expected ) != false );
     }
 
     public function testHtmlGeneratorCreatesDifferentTabs() {
@@ -915,12 +638,12 @@ class UnitWpSimpleTest extends UnitTestCase {
             'duck2' => 'quack, quack'
         );
 
-        $expected = '<div class="su-tabs su-tabs-style-default" data-active="2"><div class="su-tabs-nav"><span class="">duck1</span><span class="">duck2</span></div><div class="su-tabs-panes"><div class="su-tabs-pane su-clearfix">quack</div>
-<div class="su-tabs-pane su-clearfix">quack, quack</div></div></div>';
+        $expected = '[su_tabs active="2"][su_tab title="duck1"]quack[/su_tab][su_tab title="duck2"]quack, quack[/su_tab][/su_tabs]';
 
         $result = $HtmlGenerator->generateTabs( $contents, 2 );
 
-        $this->assertTrue( strstr( $result, $expected ) );
+        $isStringThere = (strstr( $result, $expected ) != false);
+        $this->assertTrue( $isStringThere );
     }
 
     public function testAuthenticateShortcodeGeneratesTabs() {
@@ -928,8 +651,8 @@ class UnitWpSimpleTest extends UnitTestCase {
 
         $result = $AuthenticateShortcode->getOutput();
 
-        var_dump($result);
-        $this->assertTrue( strstr( $result, '<div class="su-tabs su-tabs-style-default" data-active="1">' ) );
+        $isStringThere = (strstr( $result, '[su_tabs active="1"]' ) != false);
+        $this->assertTrue( $isStringThere );
     }
 
     public function testAuthenticateShortcodeGeneratesLogInTab() {
@@ -937,7 +660,7 @@ class UnitWpSimpleTest extends UnitTestCase {
 
         $result = $AuthenticateShortcode->getOutput();
 
-        $this->assertTrue( strstr( $result, '[su_tab title="Log In"]' ) );
+        $this->assertTrue( strstr( $result, '[su_tab title="Log In"]' ) != false );
     }
 
     public function testAuthenticateShortcodeGeneratesRegisterTab() {
@@ -945,7 +668,7 @@ class UnitWpSimpleTest extends UnitTestCase {
 
         $result = $AuthenticateShortcode->getOutput();
 
-        $this->assertTrue( strstr( $result, '[su_tab title="Register"]' ) );
+        $this->assertTrue( strstr( $result, '[su_tab title="Register"]' ) != false );
     }
 
     public function testAuthenticateShortcodeIncludesLogInForm() {
@@ -955,14 +678,12 @@ class UnitWpSimpleTest extends UnitTestCase {
 
         $logInHtml = '<form action="anothertest.com" method="post"><p><label for="username"><span class="required">*</span> Username: <input type="text" name="username" value="" required /></label></p><p><label for="password"><span class="required">*</span> Password: <input type="password" name="password" required /></label></p><p><input type="submit" name="login" value="Log In" /></p></form>';
 
-        $this->assertTrue( strstr( $result, $logInHtml ) );
+        $this->assertTrue( strstr( $result, $logInHtml ) != false );
     }
 
     public function testMakeAuthenticateShortcode() {
         $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
 
-        $this->assertTrue( is_a($AuthenticateShortcode, 'HfAuthenticateShortcode') );
+        $this->assertTrue( is_a( $AuthenticateShortcode, 'HfAuthenticateShortcode' ) );
     }
-}
-
-?>
+} 

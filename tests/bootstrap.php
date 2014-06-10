@@ -36,8 +36,26 @@ function _manually_load_plugin() {
     require TEST_PLUGIN_FILE;
 
     // Make sure plugin is installed here ...
+
+    add_action( 'init', 'hfCreateTestPages' );
+
+    $_SERVER['SERVER_NAME'] = 'habitfree.org';
+
+    hfActivate();
 }
+
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
+
+function hfCreateTestPages() {
+    $settingsPage = array(
+        'post_title'  => 'Settings',
+        'post_status' => 'publish',
+        'post_type'   => 'page',
+        'post_author' => 1
+    );
+
+    wp_insert_post( $settingsPage );
+}
 
 /**
  * Sets up the WordPress test environment.

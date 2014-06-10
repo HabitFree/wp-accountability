@@ -20,7 +20,8 @@ function hfActivate() {
     wp_schedule_event( time(), 'daily', 'hfEmailCronHook' );
 
     $Database->installDb();
-    $UserManager->processAllUsers();
+
+    add_action( 'wp_loaded', array($UserManager, 'processAllUsers') );
 
     error_log( "my plugin activated", 0 );
 }
@@ -76,8 +77,6 @@ add_action( 'admin_head', array($HfAdminPanel, 'addToAdminHead') );
 add_action( 'init', 'hfRegisterShortcodes' );
 
 function hfRegisterShortcodes() {
-    var_dump('We tried...');
-
     $Factory               = new HfFactory();
     $UserManager           = $Factory->makeUserManager();
     $SettingsShortcode     = $Factory->makeSettingsShortcode();
