@@ -16,8 +16,8 @@ class HfGoals implements Hf_iGoals {
     }
 
     function generateGoalCard( $sub ) {
-        $goalID        = $this->CodeLibrary->convertStringToInt( $sub->goalID );
-        $userID        = $this->CodeLibrary->convertStringToInt( $sub->userID );
+        $goalID        = intval( $sub->goalID );
+        $userID        = intval( $sub->userID );
         $goal          = $this->Database->getRow( 'hf_goal', 'goalID = ' . $goalID );
         $daysOfSuccess = $this->daysOfSuccess( $goalID, $userID );
         $level         = $this->Database->level( $daysOfSuccess );

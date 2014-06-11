@@ -350,7 +350,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $query = 'SELECT sendTime FROM ' . $fullTableName . ' WHERE userID = ' . $userID . ' ORDER BY emailID DESC LIMIT 1';
 
         $dateOfLastEmail = $this->Cms->getVar( $query );
-        $timeOfLastEmail = $this->CodeLibrary->convertStringToTime( $dateOfLastEmail );
+        $timeOfLastEmail = strtotime( $dateOfLastEmail );
         $timeNow         = $this->CodeLibrary->getCurrentTime();
         $secondsInADay   = 86400;
 
@@ -358,7 +358,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function daysSinceSecondToLastEmail( $userID ) {
-        $userID        = $this->CodeLibrary->convertIntToString( $userID );
+        $userID        = strval( $userID );
         $escapedUserID = $this->escapeData( array($userID) )[0];
         $timeNow       = $this->CodeLibrary->getCurrentTime();
 
@@ -372,7 +372,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
                     AS T ORDER BY emailID LIMIT 1'
             );
 
-        $timeOfSecondToLastEmail = $this->CodeLibrary->convertStringToTime( $timeString );
+        $timeOfSecondToLastEmail = strtotime( $timeString );
         $secondsInADay           = 86400;
 
         return ( $timeNow - $timeOfSecondToLastEmail ) / $secondsInADay;
@@ -407,7 +407,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
                 AND reportID=( SELECT min(reportID) FROM ' . $tableName . ' WHERE isSuccessful = 1)';
         $timeString = $this->Cms->getVar( $query );
 
-        return $this->CodeLibrary->convertStringToTime( $timeString );
+        return strtotime( $timeString );
     }
 
     function timeOfLastSuccess( $goalID, $userID ) {
@@ -420,7 +420,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
                 AND reportID=( SELECT max(reportID) FROM ' . $tableName . ' WHERE isSuccessful = 1)';
         $timeString = $this->Cms->getVar( $query );
 
-        return $this->CodeLibrary->convertStringToTime( $timeString );
+        return strtotime( $timeString );
     }
 
     function timeOfLastFail( $goalID, $userID ) {
@@ -433,7 +433,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
                 AND reportID=( SELECT max(reportID) FROM ' . $tableName . ' WHERE NOT isSuccessful = 1)';
         $timeString = $this->Cms->getVar( $query );
 
-        return $this->CodeLibrary->convertStringToTime( $timeString );
+        return strtotime( $timeString );
     }
 
     function level( $daysOfSuccess ) {

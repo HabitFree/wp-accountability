@@ -3,21 +3,9 @@
 interface Hf_iCodeLibrary {
     public function getCurrentTime();
 
-    public function convertStringToTime($string);
+    public function isPostEmpty( $name );
 
-    public function convertStringToInt($string);
+    public function getPost( $name );
 
-    public function printToScreen($string);
-
-    public function getUrlParameter($name);
-
-    public function isUrlParameterEmpty($name);
-
-    public function convertIntToString($int);
-
-    public function isPostEmpty($name);
-
-    public function getPost($name);
-
-    public function getGet($name);
+    public function getGet( $name );
 } 

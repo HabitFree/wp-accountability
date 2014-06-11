@@ -1,4 +1,5 @@
 <?php
+require_once( dirname( dirname( __FILE__ ) ) . '/hf-accountability.php' );
 
 abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     protected $backupGlobals = false;
@@ -56,5 +57,15 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
 
             call_user_func_array( array($ExpectantMock, "with"), $expectations );
         }
+    }
+
+    protected function classImplementsInterface( $class, $interface ) {
+        $interfacesImplemented = class_implements( $class );
+
+        return in_array( $interface, $interfacesImplemented );
+    }
+
+    protected function haystackContainsNeedle( $haystack, $needle ) {
+        return strstr( $haystack, $needle ) != false;
     }
 } 

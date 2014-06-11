@@ -1,6 +1,6 @@
 <?php
 
-require_once( dirname(dirname( __FILE__ )) . '/HfTestCase.php' );
+require_once( dirname( dirname( __FILE__ ) ) . '/HfTestCase.php' );
 
 class TestDatabase extends HfTestCase {
     // Helper Functions
@@ -157,12 +157,12 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testDaysSinceLastEmail() {
-        $WebsiteAPI = $this->myMakeMock('HfWordPressInterface');
-        $PhpApi     = $this->myMakeMock('HfPhpLibrary');
+        $WebsiteAPI = $this->myMakeMock( 'HfWordPressInterface' );
+        $PhpApi     = $this->myMakeMock( 'HfPhpLibrary' );
 
-        $this->mySetReturnValue($WebsiteAPI, 'getVar', '2014-05-27 16:04:29');
-        $this->mySetReturnValue($PhpApi, 'convertStringToTime', 1401224669.0);
-        $this->mySetReturnValue($PhpApi, 'getCurrentTime', 1401483869.0);
+        $this->mySetReturnValue( $WebsiteAPI, 'getVar', '2014-05-27 16:04:29' );
+        $this->mySetReturnValue( $PhpApi, 'convertStringToTime', 1401224669.0 );
+        $this->mySetReturnValue( $PhpApi, 'getCurrentTime', 1401483869.0 );
 
         $Database = new HfMysqlDatabase( $WebsiteAPI, $PhpApi );
         $result   = $Database->daysSinceLastEmail( 1 );

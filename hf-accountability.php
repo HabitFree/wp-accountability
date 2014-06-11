@@ -59,8 +59,6 @@ require_once( dirname( __FILE__ ) . '/classes/HfSettingsShortcode.php' );
 require_once( dirname( __FILE__ ) . '/classes/HfFactory.php' );
 require_once( dirname( __FILE__ ) . '/classes/HfGoalsShortcode.php' );
 require_once( dirname( __FILE__ ) . '/classes/HfAccountabilityForm.php' );
-require_once( dirname( __FILE__ ) . '/classes/HfRegisterShortcode.php' );
-require_once( dirname( __FILE__ ) . '/classes/HfLogInShortcode.php' );
 require_once( dirname( __FILE__ ) . '/classes/HfAuthenticateShortcode.php' );
 
 date_default_timezone_set( 'America/Chicago' );

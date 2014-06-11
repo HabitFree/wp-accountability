@@ -16,13 +16,6 @@ class TestGeneral extends \PHPUnit_Framework_TestCase {
         $this->assertEquals( 1, 1 );
     }
 
-    public function testGettingCurrentUserLogin() {
-        $UserManager = $this->Factory->makeUserManager();
-        $user         = wp_get_current_user();
-
-        $this->assertEquals( $UserManager->getCurrentUserLogin(), $user->user_login );
-    }
-
     public function testShortcodeRegistration() {
         $this->assertEquals( true, shortcode_exists( 'hfSettings' ) );
     }

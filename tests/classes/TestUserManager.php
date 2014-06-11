@@ -1,5 +1,5 @@
 <?php
-require_once( dirname(dirname( __FILE__ )) . '/HfTestCase.php' );
+require_once( dirname( dirname( __FILE__ ) ) . '/HfTestCase.php' );
 
 class TestUserManager extends HfTestCase {
     // Helper Functions
@@ -19,8 +19,8 @@ class TestUserManager extends HfTestCase {
     public function testEmailInviteSendingUsingMocks() {
         list( $UrlFinder, $Database, $Messenger, $Cms, $PhpApi ) = $this->makeUserManagerMockDependencies();
 
-        $this->mySetReturnValue($Messenger, 'generateInviteID', 555);
-        $this->mySetReturnValue($Database, 'generateEmailID', 5);
+        $this->mySetReturnValue( $Messenger, 'generateInviteID', 555 );
+        $this->mySetReturnValue( $Database, 'generateEmailID', 5 );
 
         $UserManager = new HfUserManager( $Database, $Messenger, $UrlFinder, $Cms, $PhpApi );
         $result      = $UserManager->sendInvitation( 1, 'me@test.com', 3 );
@@ -35,10 +35,10 @@ class TestUserManager extends HfTestCase {
 
         $Messenger = new HfMailer( $UrlFinder, $Security, $Database, $Cms );
 
-        $this->mySetReturnValue($Database, 'idOfLastEmail', 5);
-        $this->mySetReturnValue($Database, 'generateEmailID', 5);
-        $this->mySetReturnValue($Cms, 'sendWpEmail', true);
-        $this->mySetReturnValue($Security, 'createRandomString', 555);
+        $this->mySetReturnValue( $Database, 'idOfLastEmail', 5 );
+        $this->mySetReturnValue( $Database, 'generateEmailID', 5 );
+        $this->mySetReturnValue( $Cms, 'sendWpEmail', true );
+        $this->mySetReturnValue( $Security, 'createRandomString', 555 );
 
         $expirationDate = date( 'Y-m-d H:i:s', strtotime( '+' . 3 . ' days' ) );
 
@@ -50,9 +50,16 @@ class TestUserManager extends HfTestCase {
             'expirationDate' => $expirationDate
         );
 
-        $this->myExpectAtLeastOnce($Database, 'insertIntoDb', array('hf_invite', $expectedRecord));
+        $this->myExpectAtLeastOnce( $Database, 'insertIntoDb', array('hf_invite', $expectedRecord) );
 
         $UserManager = new HfUserManager( $Database, $Messenger, $UrlFinder, $Cms, $PhpApi );
         $UserManager->sendInvitation( 1, 'me@test.com', 3 );
+    }
+
+    public function testGettingCurrentUserLogin() {
+        $UserManager = $this->Factory->makeUserManager();
+        $user        = wp_get_current_user();
+
+        $this->assertEquals( $UserManager->getCurrentUserLogin(), $user->user_login );
     }
 }

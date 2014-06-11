@@ -40,6 +40,7 @@ function _manually_load_plugin() {
     add_action( 'init', 'hfCreateTestPages' );
 
     $_SERVER['SERVER_NAME'] = 'habitfree.org';
+    $_SERVER["SERVER_PORT"] = 80;
 
     hfActivate();
 }

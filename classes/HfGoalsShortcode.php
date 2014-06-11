@@ -40,9 +40,9 @@ class HfGoalsShortcode implements Hf_iShortcode {
     private function isUserAuthorized() {
         if ( $this->Cms->isUserLoggedIn() ) {
             return true;
-        } elseif ( $this->CodeLibrary->isUrlParameterEmpty( 'userID' ) ) {
+        } elseif ( empty( $_GET['userID'] ) ) {
             return false;
-        } elseif ( $this->Database->emailIsValid( $this->CodeLibrary->getUrlParameter( 'userID' ), $this->CodeLibrary->getUrlParameter( 'emailID' ) ) ) {
+        } elseif ( $this->Database->emailIsValid( $_GET['userID'], $_GET['emailID'] ) ) {
             return true;
         } else {
             return false;

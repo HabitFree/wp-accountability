@@ -17,7 +17,7 @@ class HfAdminPanel {
     }
 
     function registerAdminPanel() {
-        $this->Cms->addPageToAdminMenu('HF Plugin', 'hfAdmin', array($this, 'generateAdminPanel'));
+        $this->Cms->addPageToAdminMenu( 'HF Plugin', 'hfAdmin', array($this, 'generateAdminPanel') );
     }
 
     function generateAdminPanel() {
@@ -39,9 +39,6 @@ class HfAdminPanel {
         }
 
         echo $this->generateAdminPanelForm();
-
-        $shortcode = '[simpletest name="SimpleTest Unit Tests" path="/hf-accountability/tests/tests.php" passes="y"]';
-        echo $this->Cms->getShortcodeOutput( $shortcode );
     }
 
     private function sudoReactivateExtension() {
@@ -61,7 +58,7 @@ class HfAdminPanel {
     }
 
     function addToAdminHead() {
-        $cssURL = $this->Cms->getPluginAssetUrl('admin.css');
+        $cssURL = $this->Cms->getPluginAssetUrl( 'admin.css' );
         echo "<link rel='stylesheet' type='text/css' href='" . $cssURL . "' />";
     }
 }
