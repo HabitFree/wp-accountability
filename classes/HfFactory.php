@@ -9,7 +9,6 @@ class HfFactory {
     }
 
     public function makeGoalsShortcode() {
-        $CodeLibrary = $this->makeCodeLibrary();
         $Database    = $this->makeDatabase();
         $UrlFinder   = $this->makeUrlFinder();
         $Messenger   = $this->makeMessenger();
@@ -18,7 +17,7 @@ class HfFactory {
         $Security    = $this->makeSecurity();
         $Cms         = $this->makeContentManagementSystem();
 
-        return new HfGoalsShortcode( $UserManager, $Messenger, $UrlFinder, $Database, $Goals, $CodeLibrary, $Security, $Cms );
+        return new HfGoalsShortcode( $UserManager, $Messenger, $UrlFinder, $Database, $Goals, $Security, $Cms );
     }
 
     public function makeGoals() {

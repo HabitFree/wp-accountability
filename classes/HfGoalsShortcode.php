@@ -6,17 +6,15 @@ class HfGoalsShortcode implements Hf_iShortcode {
     private $Messenger;
     private $PageLocator;
     private $Goals;
-    private $CodeLibrary;
     private $Security;
     private $Cms;
 
-    function __construct( Hf_iUserManager $UserManager, Hf_iMessenger $Messenger, Hf_iAssetLocator $PageLocator, Hf_iDatabase $Database, Hf_iGoals $Goals, Hf_iCodeLibrary $CodeLibrary, Hf_iSecurity $Security, Hf_iContentManagementSystem $ContentManagementSystem ) {
+    function __construct( Hf_iUserManager $UserManager, Hf_iMessenger $Messenger, Hf_iAssetLocator $PageLocator, Hf_iDatabase $Database, Hf_iGoals $Goals, Hf_iSecurity $Security, Hf_iContentManagementSystem $ContentManagementSystem ) {
         $this->UserManager = $UserManager;
         $this->Messenger   = $Messenger;
         $this->Database    = $Database;
         $this->PageLocator = $PageLocator;
         $this->Goals       = $Goals;
-        $this->CodeLibrary = $CodeLibrary;
         $this->Security    = $Security;
         $this->Cms         = $ContentManagementSystem;
     }
