@@ -5,10 +5,6 @@ class HfPhpLibrary implements Hf_iCodeLibrary {
         return time();
     }
 
-    public function isPostEmpty( $name ) {
-        return empty( $_POST[$name] );
-    }
-
     public function getPost( $name ) {
         return $_POST[$name];
     }
