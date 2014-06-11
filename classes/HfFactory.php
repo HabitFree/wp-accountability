@@ -25,9 +25,8 @@ class HfFactory {
         $Database           = $this->makeDatabase();
         $HtmlGenerator      = $this->makeHtmlGenerator();
         $Mailer             = $this->makeMessenger();
-        $CodeLibrary        = $this->makeCodeLibrary();
 
-        return new HfGoals( $Mailer, $WordPressInterface, $HtmlGenerator, $Database, $CodeLibrary );
+        return new HfGoals( $Mailer, $WordPressInterface, $HtmlGenerator, $Database );
     }
 
     public function makeAdminPanel() {

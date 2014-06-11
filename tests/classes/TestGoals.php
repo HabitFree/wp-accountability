@@ -28,7 +28,7 @@ class TestGoals extends HfTestCase {
 
         $this->myExpectAtLeastOnce( $Messenger, 'isThrottled' );
 
-        $Goals = new HfGoals( $Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection, $CodeLibrary );
+        $Goals = new HfGoals( $Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection );
         $Goals->sendReportRequestEmails();
     }
 
@@ -59,7 +59,7 @@ class TestGoals extends HfTestCase {
 
         $this->myExpectAtLeastOnce( $Messenger, 'sendReportRequestEmail' );
 
-        $Goals = new HfGoals( $Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection, $CodeLibrary );
+        $Goals = new HfGoals( $Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection );
         $Goals->sendReportRequestEmails();
     }
 
@@ -89,7 +89,7 @@ class TestGoals extends HfTestCase {
 
         $this->myExpectNever( $Messenger, 'sendReportRequestEmail' );
 
-        $Goals = new HfGoals( $Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection, $CodeLibrary );
+        $Goals = new HfGoals( $Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection );
         $Goals->sendReportRequestEmails();
     }
 
@@ -120,7 +120,7 @@ class TestGoals extends HfTestCase {
 
         $this->myExpectNever( $Messenger, 'sendReportRequestEmail' );
 
-        $Goals = new HfGoals( $Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection, $CodeLibrary );
+        $Goals = new HfGoals( $Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection );
         $Goals->sendReportRequestEmails();
     }
 
@@ -135,7 +135,7 @@ class TestGoals extends HfTestCase {
         $mockLevel->target = 14;
         $this->mySetReturnValue( $DbConnection, 'level', $mockLevel );
 
-        $Goals = new HfGoals( $Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection, $CodeLibrary );
+        $Goals = new HfGoals( $Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection );
 
         $target = $Goals->currentLevelTarget( 5 );
 

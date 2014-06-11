@@ -5,14 +5,12 @@ class HfGoals implements Hf_iGoals {
     private $View;
     private $ContentManagementSystem;
     private $Messenger;
-    private $CodeLibrary;
 
-    function __construct( Hf_iMessenger $Messenger, Hf_iContentManagementSystem $ContentManagementSystem, Hf_iDisplayCodeGenerator $View, Hf_iDatabase $Database, Hf_iCodeLibrary $CodeLibrary ) {
+    function __construct( Hf_iMessenger $Messenger, Hf_iContentManagementSystem $ContentManagementSystem, Hf_iDisplayCodeGenerator $View, Hf_iDatabase $Database ) {
         $this->Messenger               = $Messenger;
         $this->ContentManagementSystem = $ContentManagementSystem;
         $this->View                    = $View;
         $this->Database                = $Database;
-        $this->CodeLibrary             = $CodeLibrary;
     }
 
     function generateGoalCard( $sub ) {
