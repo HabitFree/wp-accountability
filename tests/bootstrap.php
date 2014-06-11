@@ -37,7 +37,9 @@ function _manually_load_plugin() {
 
     // Make sure plugin is installed here ...
 
-    add_action( 'init', 'hfCreateTestPages' );
+    add_action( 'init', 'hfDoStuffOnInit' );
+
+    //hfCreateTestPages();
 
     $_SERVER['SERVER_NAME'] = 'habitfree.org';
     $_SERVER["SERVER_PORT"] = 80;
@@ -47,7 +49,10 @@ function _manually_load_plugin() {
 
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
 
-function hfCreateTestPages() {
+function hfDoStuffOnInit() {
+    wp_create_user( 'hare', 'boundless', 'taken@taken.com' );
+
+
     $settingsPage = array(
         'post_title'  => 'Settings',
         'post_status' => 'publish',
@@ -55,7 +60,17 @@ function hfCreateTestPages() {
         'post_author' => 1
     );
 
+    $logInPage = array(
+        'post_title'  => 'Log In',
+        'post_status' => 'publish',
+        'post_type'   => 'page',
+        'post_author' => 1
+    );
+
+    print('<br />creating a page...<br />');
     wp_insert_post( $settingsPage );
+    wp_insert_post( $logInPage );
+    print('<br />created a page...<br />');
 }
 
 /**

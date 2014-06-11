@@ -4,8 +4,9 @@ class HfFactory {
     public function makeAuthenticateShortcode() {
         $DisplayCodeGenerator = $this->makeHtmlGenerator();
         $AssetLocator = $this->makeUrlFinder();
+        $Cms = $this->makeContentManagementSystem();
 
-        return new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator );
+        return new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $Cms );
     }
 
     public function makeGoalsShortcode() {

@@ -72,7 +72,7 @@ class TestAuthenticateShortcode extends HfTestCase {
         $HtmlGenerator         = new HfHtmlGenerator( $Cms );
         $UrlLocator            = $this->myMakeMock( 'HfUrlFinder' );
         $currentUrl            = 'mysite.com';
-        $AuthenticateShortcode = new HfAuthenticateShortcode( $HtmlGenerator, $UrlLocator );
+        $AuthenticateShortcode = new HfAuthenticateShortcode( $HtmlGenerator, $UrlLocator, $Cms );
 
         $this->mySetReturnValue( $UrlLocator, 'getCurrentPageUrl', $currentUrl );
         $result = $AuthenticateShortcode->getOutput();
@@ -234,6 +234,20 @@ class TestAuthenticateShortcode extends HfTestCase {
         $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
         $haystack              = $AuthenticateShortcode->getOutput();
         $needle                = '[su_tab title="Register"]<p class="error">';
+
+        $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
+    }
+
+    public function testAuthenticateShortcodeChecksIfEmailIsAvailable() {
+        $_POST['register']             = '';
+        $_POST['username']             = 'turtle';
+        $_POST['email']                = 'taken@taken.com';
+        $_POST['password']             = '';
+        $_POST['passwordConfirmation'] = '';
+
+        $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
+        $haystack              = $AuthenticateShortcode->getOutput();
+        $needle                = '<p class="error">That email is already taken. Did you mean to log in?</p>';
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }
