@@ -54,7 +54,7 @@ class HfFactory {
         $Mailer             = $this->makeMessenger();
         $Database           = $this->makeDatabase();
 
-        return new HfUserManager( $Database, $Mailer, $UrlFinder, $WordPressInterface, $PhpLibrary );
+        return new HfUserManager( $Database, $Mailer, $UrlFinder, $WordPressInterface );
     }
 
     public function makeMessenger() {

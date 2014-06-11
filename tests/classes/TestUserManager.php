@@ -22,7 +22,7 @@ class TestUserManager extends HfTestCase {
         $this->mySetReturnValue( $Messenger, 'generateInviteID', 555 );
         $this->mySetReturnValue( $Database, 'generateEmailID', 5 );
 
-        $UserManager = new HfUserManager( $Database, $Messenger, $UrlFinder, $Cms, $PhpApi );
+        $UserManager = new HfUserManager( $Database, $Messenger, $UrlFinder, $Cms );
         $result      = $UserManager->sendInvitation( 1, 'me@test.com', 3 );
 
         $this->assertEquals( $result, 555 );
@@ -52,7 +52,7 @@ class TestUserManager extends HfTestCase {
 
         $this->myExpectAtLeastOnce( $Database, 'insertIntoDb', array('hf_invite', $expectedRecord) );
 
-        $UserManager = new HfUserManager( $Database, $Messenger, $UrlFinder, $Cms, $PhpApi );
+        $UserManager = new HfUserManager( $Database, $Messenger, $UrlFinder, $Cms );
         $UserManager->sendInvitation( 1, 'me@test.com', 3 );
     }
 
