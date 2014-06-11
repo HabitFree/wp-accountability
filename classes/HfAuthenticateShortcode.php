@@ -7,14 +7,10 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private $username;
     private $email;
 
-    private $isRegistering;
-    private $isLoggingIn;
-
     function __construct( Hf_iDisplayCodeGenerator $DisplayCodeGenerator, Hf_iAssetLocator $AssetLocator ) {
         $this->DisplayCodeGenerator = $DisplayCodeGenerator;
         $this->AssetLocator = $AssetLocator;
 
-        $this->determineUserIntent();
         $this->recallPostData();
     }
 
@@ -23,7 +19,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     private function getErrors() {
-        if ( $this->isRegistering ) {
+        if ( $this->isRegistering() ) {
             return $this->getRegistrationErrors();
         }
     }
@@ -51,11 +47,11 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     private function recallPostData() {
-        if ( $this->isRegistering or $this->isLoggingIn ) {
+        if ( $this->isRegistering() or $this->isLoggingIn() ) {
             $this->username = $_POST['username'];
         }
 
-        if ( $this->isRegistering ) {
+        if ( $this->isRegistering() ) {
             $this->email = $_POST['email'];
         }
     }
@@ -69,11 +65,6 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         ), $activeTabNumber );
 
         return $tabs;
-    }
-
-    private function determineUserIntent() {
-        $this->isRegistering = isset( $_POST['register'] );
-        $this->isLoggingIn   = isset( $_POST['login'] );
     }
 
     private function getRegistrationErrors() {
@@ -105,5 +96,13 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         if ( empty( $_POST['password'] ) ) {
             return '<p class="error">Please enter a password.</p>';
         }
+    }
+
+    private function isRegistering() {
+        return isset( $_POST['register'] );
+    }
+
+    private function isLoggingIn() {
+        return isset( $_POST['login'] );
     }
 } 
