@@ -94,7 +94,7 @@ class HfUserManager implements Hf_iUserManager {
     }
 
     private function getInviterID() {
-        $nonce     = $this->CodeLibrary->getGet( 'n' );
+        $nonce     = $_GET['n'];
         $invite    = $this->Database->getInvite( $nonce );
         $inviterID = intval( $invite->inviterID );
 
