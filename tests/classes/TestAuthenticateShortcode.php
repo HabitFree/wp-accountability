@@ -223,4 +223,18 @@ class TestAuthenticateShortcode extends HfTestCase {
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }
+
+    public function testAuthenticateShortcodePlacesErrorsWithinRegistrationTab() {
+        $_POST['register']             = '';
+        $_POST['username']             = '';
+        $_POST['email']                = '';
+        $_POST['password']             = '';
+        $_POST['passwordConfirmation'] = '';
+
+        $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
+        $haystack              = $AuthenticateShortcode->getOutput();
+        $needle                = '[su_tab title="Register"]<p class="error">';
+
+        $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
+    }
 }

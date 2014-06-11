@@ -15,13 +15,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     public function getOutput() {
-        return $this->getErrors() . $this->getTabs();
-    }
-
-    private function getErrors() {
-        if ( $this->isRegistering() ) {
-            return $this->getRegistrationErrors();
-        }
+        return $this->getTabs();
     }
 
     private function generateLogInForm() {
@@ -61,17 +55,19 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
         $tabs = $this->DisplayCodeGenerator->generateTabs( array(
             'Log In'   => $this->generateLogInForm(),
-            'Register' => $this->generateRegistrationForm()
+            'Register' => $this->getRegistrationErrors() . $this->generateRegistrationForm()
         ), $activeTabNumber );
 
         return $tabs;
     }
 
     private function getRegistrationErrors() {
-        return $this->missingUsernameError() .
-        $this->invalidEmailError() .
-        $this->missingPasswordError() .
-        $this->passwordMatchError();
+        if ( $this->isRegistering() ) {
+            return $this->missingUsernameError() .
+            $this->invalidEmailError() .
+            $this->missingPasswordError() .
+            $this->passwordMatchError();
+        }
     }
 
     private function passwordMatchError() {
