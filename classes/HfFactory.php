@@ -50,7 +50,6 @@ class HfFactory {
     public function makeUserManager() {
         $WordPressInterface = $this->makeContentManagementSystem();
         $UrlFinder          = $this->makeUrlFinder();
-        $PhpLibrary         = $this->makeCodeLibrary();
         $Mailer             = $this->makeMessenger();
         $Database           = $this->makeDatabase();
 

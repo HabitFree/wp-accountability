@@ -9,7 +9,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     function __construct( Hf_iDisplayCodeGenerator $DisplayCodeGenerator, Hf_iAssetLocator $AssetLocator ) {
         $this->DisplayCodeGenerator = $DisplayCodeGenerator;
-        $this->AssetLocator = $AssetLocator;
+        $this->AssetLocator         = $AssetLocator;
 
         $this->recallPostData();
     }
@@ -57,7 +57,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     private function getTabs() {
-        $activeTabNumber = 1;
+        $activeTabNumber = $this->determineActiveTab();
 
         $tabs = $this->DisplayCodeGenerator->generateTabs( array(
             'Log In'   => $this->generateLogInForm(),
@@ -104,5 +104,13 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     private function isLoggingIn() {
         return isset( $_POST['login'] );
+    }
+
+    private function determineActiveTab() {
+        if ( $this->isRegistering() ) {
+            return 2;
+        } else {
+            return 1;
+        }
     }
 } 
