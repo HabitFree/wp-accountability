@@ -81,6 +81,7 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeRemembersUsernameOnPost() {
+        $_POST = array();
         $_POST['login']    = '';
         $_POST['username'] = 'CharlieBrown';
 
@@ -91,7 +92,10 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeRemembersEmailOnPost() {
+        $_POST = array();
         $_POST['register']             = '';
+        $_POST['username']             = '';
+        $_POST['email']             = '';
         $_POST['password']             = '';
         $_POST['passwordConfirmation'] = '';
         $_POST['email']                = 'charlie@peanuts.net';
@@ -103,7 +107,10 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeChecksNewPasswordsMatch() {
+        $_POST = array();
         $_POST['register']             = '';
+        $_POST['username']             = '';
+        $_POST['email']             = '';
         $_POST['password']             = 'duck';
         $_POST['passwordConfirmation'] = 'goat';
 
@@ -115,7 +122,10 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodePassesMatchingPasswords() {
+        $_POST = array();
         $_POST['register']             = '';
+        $_POST['username']             = '';
+        $_POST['email']             = '';
         $_POST['password']             = 'horse';
         $_POST['passwordConfirmation'] = 'horse';
 
@@ -127,8 +137,10 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeRequiresUsernameEntry() {
+        $_POST = array();
         $_POST['register']             = '';
         $_POST['username']             = '';
+        $_POST['email']             = '';
         $_POST['password']             = '';
         $_POST['passwordConfirmation'] = '';
 
@@ -140,8 +152,10 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeRequiresUsernameEntryAndChecksPasswords() {
+        $_POST = array();
         $_POST['register']             = '';
         $_POST['username']             = '';
+        $_POST['email']             = '';
         $_POST['password']             = 'horse';
         $_POST['passwordConfirmation'] = 'chimpanzee';
 
@@ -155,6 +169,7 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeRequiresEmailAddressInput() {
+        $_POST = array();
         $_POST['register']             = '';
         $_POST['username']             = 'OldMcDonald';
         $_POST['email']                = '';
@@ -169,6 +184,7 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeRequiresValidEmailAddress() {
+        $_POST = array();
         $_POST['register']             = '';
         $_POST['username']             = 'OldMcDonald';
         $_POST['email']                = 'jack.com';
@@ -183,6 +199,7 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeAcceptsValidEmailAddress() {
+        $_POST = array();
         $_POST['register']             = '';
         $_POST['username']             = 'OldMcDonald';
         $_POST['email']                = 'me@my.com';
@@ -197,6 +214,7 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeRequiresPasswordEntry() {
+        $_POST = array();
         $_POST['register']             = '';
         $_POST['username']             = '';
         $_POST['email']                = '';
@@ -211,6 +229,7 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeSwitchesToRegisterTabForRegisteringUsers() {
+        $_POST = array();
         $_POST['register']             = '';
         $_POST['username']             = '';
         $_POST['email']                = '';
@@ -225,6 +244,7 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodePlacesErrorsWithinRegistrationTab() {
+        $_POST = array();
         $_POST['register']             = '';
         $_POST['username']             = '';
         $_POST['email']                = '';
@@ -239,6 +259,7 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeChecksIfEmailIsAvailable() {
+        $_POST = array();
         $_POST['register']             = '';
         $_POST['username']             = 'turtle';
         $_POST['email']                = 'taken@taken.com';
@@ -248,6 +269,19 @@ class TestAuthenticateShortcode extends HfTestCase {
         $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
         $haystack              = $AuthenticateShortcode->getOutput();
         $needle                = '<p class="error">That email is already taken. Did you mean to log in?</p>';
+
+        $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
+    }
+
+    public function testAuthenticateShortcodeRequiresLogInUsername() {
+        $_POST = array();
+        $_POST['login']             = '';
+        $_POST['username']             = '';
+        $_POST['password']             = '';
+
+        $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
+        $haystack              = $AuthenticateShortcode->getOutput();
+        $needle                = '<p class="error">Please enter a username.</p>';
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }

@@ -20,7 +20,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         return $this->getTabs();
     }
 
-    private function generateLogInForm() {
+    private function generateLoginForm() {
         $Form = new HfGenericForm( $this->AssetLocator->getCurrentPageUrl() );
 
         $Form->addTextBox( 'username', 'Username', $this->username, true );
@@ -56,11 +56,17 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         $activeTabNumber = $this->determineActiveTab();
 
         $tabs = $this->DisplayCodeGenerator->generateTabs( array(
-            'Log In'   => $this->generateLogInForm(),
+            'Log In'   => $this->getLoginErrors() . $this->generateLoginForm(),
             'Register' => $this->getRegistrationErrors() . $this->generateRegistrationForm()
         ), $activeTabNumber );
 
         return $tabs;
+    }
+
+    private function getLoginErrors() {
+        if ($this->isLoggingIn()) {
+            return $this->missingUsernameError();
+        }
     }
 
     private function getRegistrationErrors() {
