@@ -353,4 +353,23 @@ class TestAuthenticateShortcode extends HfTestCase {
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }
+
+    public function testAuthenticateShortcodeDisplaysLogInSuccessMessage() {
+        $_POST             = array();
+        $_POST['login']    = '';
+        $_POST['username'] = 'Joe';
+        $_POST['password'] = 'bo';
+
+        $DisplayCodeGenerator = $this->Factory->makeHtmlGenerator();
+        $AssetLocator = $this->Factory->makeUrlFinder();
+        $ContentManagementSystem = $this->myMakeMock('HfWordPressInterface');
+
+        $this->mySetReturnValue($ContentManagementSystem, 'authenticateUser', true);
+
+        $AuthenticateShortcode = new HfAuthenticateShortcode($DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem);
+        $haystack = $AuthenticateShortcode->getOutput();
+        $needle = '<p class="success">Welcome back!</p>';
+
+        $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
+    }
 }

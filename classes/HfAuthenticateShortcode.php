@@ -8,8 +8,8 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private $username;
     private $email;
 
-    private $loginErrors;
-    private $registrationErrors;
+    private $loginMessages;
+    private $registrationMessages;
 
     function __construct( Hf_iDisplayCodeGenerator $DisplayCodeGenerator, Hf_iAssetLocator $AssetLocator, Hf_iContentManagementSystem $ContentManagementSystem ) {
         $this->DisplayCodeGenerator = $DisplayCodeGenerator;
@@ -64,8 +64,8 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         $activeTabNumber = $this->determineActiveTab();
 
         $tabs = $this->DisplayCodeGenerator->generateTabs( array(
-            'Log In'   => $this->loginErrors . $this->generateLoginForm(),
-            'Register' => $this->registrationErrors . $this->generateRegistrationForm()
+            'Log In'   => $this->loginMessages . $this->generateLoginForm(),
+            'Register' => $this->registrationMessages . $this->generateRegistrationForm()
         ), $activeTabNumber );
 
         return $tabs;
@@ -73,7 +73,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     private function validateLoginForm() {
         if ( $this->isLoggingIn() ) {
-            $this->loginErrors .=
+            $this->loginMessages .=
                 $this->missingUsernameError() .
                 $this->missingPasswordError();
         }
@@ -81,7 +81,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     private function validateRegistrationForm() {
         if ( $this->isRegistering() ) {
-            $this->registrationErrors .=
+            $this->registrationMessages .=
                 $this->missingUsernameError() .
                 $this->invalidEmailError() .
                 $this->emailTakenError() .
@@ -139,7 +139,9 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private function attemptLogin() {
         if ( $this->isLoggingIn() ) {
             if ( !$this->Cms->authenticateUser( $_POST['username'], $_POST['password'] ) ) {
-                $this->loginErrors .= '<p class="error">That username and password combination is incorrect.</p>';
+                $this->loginMessages .= '<p class="error">That username and password combination is incorrect.</p>';
+            } else {
+                $this->loginMessages .= '<p class="success">Welcome back!</p>';
             }
         }
     }
