@@ -496,7 +496,37 @@ class TestAuthenticateShortcode extends HfTestCase {
         $ContentManagementSystem = $this->myMakeMock( 'HfWordPressInterface' );
         $UserManager = $this->myMakeMock('HfUserManager');
 
+        $mockUser = new stdClass();
+        $mockUser->ID = 7;
+
         $this->mySetReturnValue( $ContentManagementSystem, 'createUser', true );
+        $this->mySetReturnValue($ContentManagementSystem, 'currentUser', $mockUser);
+        $this->mySetReturnValue($ContentManagementSystem, 'getUserEmail', 'joe@wallysworld.com');
+        $this->myExpectOnce($UserManager, 'processInvite', array('joe@wallysworld.com', 555));
+
+        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem, $UserManager );
+
+        $AuthenticateShortcode->getOutput();
+    }
+
+    public function testAuthenticateShortcodeLoginProcessInvite() {
+        $_POST             = array();
+        $_POST['login']             = '';
+        $_POST['username']             = 'Joe';
+        $_POST['password']             = 'bo';
+        $_GET['n'] = 555;
+
+        $DisplayCodeGenerator    = $this->Factory->makeHtmlGenerator();
+        $AssetLocator            = $this->Factory->makeUrlFinder();
+        $ContentManagementSystem = $this->myMakeMock( 'HfWordPressInterface' );
+        $UserManager = $this->myMakeMock('HfUserManager');
+
+        $mockUser = new stdClass();
+        $mockUser->ID = 7;
+
+        $this->mySetReturnValue( $ContentManagementSystem, 'authenticateUser', true );
+        $this->mySetReturnValue($ContentManagementSystem, 'currentUser', $mockUser);
+        $this->mySetReturnValue($ContentManagementSystem, 'getUserEmail', 'joe@wallysworld.com');
         $this->myExpectOnce($UserManager, 'processInvite', array('joe@wallysworld.com', 555));
 
         $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem, $UserManager );

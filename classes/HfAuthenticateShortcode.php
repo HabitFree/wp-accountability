@@ -13,11 +13,14 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private $registrationMessages;
     private $additionalHtml;
 
+    private $isLoginSuccessful = false;
+    private $isRegistrationSuccessful = false;
+
     function __construct( Hf_iDisplayCodeGenerator $DisplayCodeGenerator, Hf_iAssetLocator $AssetLocator, Hf_iContentManagementSystem $ContentManagementSystem, Hf_iUserManager $UserManager ) {
         $this->DisplayCodeGenerator = $DisplayCodeGenerator;
         $this->AssetLocator         = $AssetLocator;
         $this->Cms                  = $ContentManagementSystem;
-        $this->UserManager = $UserManager;
+        $this->UserManager          = $UserManager;
     }
 
     public function getOutput() {
@@ -26,8 +29,8 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         $this->validateLoginForm();
         $this->validateRegistrationForm();
 
-        $this->attemptLogin();
-        $this->attemptRegistration();
+        $this->processLoginRequest();
+        $this->processRegistrationRequest();
 
         return $this->additionalHtml . $this->getTabs();
     }
@@ -140,9 +143,12 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         }
     }
 
-    private function attemptLogin() {
-        if ( $this->isLoggingIn() and empty($this->loginMessages) ) {
-            if ( $this->isLoginSuccessful() ) {
+    private function processLoginRequest() {
+        if ( $this->isLoggingIn() and $this->isLoginFormValid() ) {
+            $this->attemptLogin();
+
+            if ( $this->isLoginSuccessful ) {
+                $this->processInvite();
                 $this->loginMessages .= '<p class="success">Welcome back!</p>';
                 $this->redirectUser();
             } else {
@@ -151,13 +157,19 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         }
     }
 
-    private function isLoginSuccessful() {
-        return $this->Cms->authenticateUser( $_POST['username'], $_POST['password'] );
+    private function attemptLogin() {
+        $success = $this->Cms->authenticateUser( $_POST['username'], $_POST['password'] );
+        if ( $success ) {
+            $this->isLoginSuccessful = true;
+        }
     }
 
-    private function attemptRegistration() {
-        if ($this->isRegistering() and empty($this->registrationMessages) ) {
-            if ( $this->isRegistrationSuccessful() ) {
+    private function processRegistrationRequest() {
+        if ( $this->isRegistering() and $this->isRegistrationFormValid() ) {
+            $this->attemptRegistration();
+
+            if ( $this->isRegistrationSuccessful ) {
+                $this->attemptLogin();
                 $this->processInvite();
                 $this->registrationMessages .= '<p class="success">Welcome to HabitFree!</p>';
                 $this->redirectUser();
@@ -165,8 +177,11 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         }
     }
 
-    private function isRegistrationSuccessful() {
-        return $this->Cms->createUser( $_POST['username'], $_POST['password'], $_POST['email'] );
+    private function attemptRegistration() {
+        $success = $this->Cms->createUser( $_POST['username'], $_POST['password'], $_POST['email'] );
+        if ( $success ) {
+            $this->isRegistrationSuccessful = true;
+        }
     }
 
     private function redirectUser() {
@@ -176,12 +191,22 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     private function processInvite() {
-        if (  $this->isInvite() ) {
-            $this->UserManager->processInvite( $_POST['email'], $_GET['n'] );
+        if ( $this->isInvite() ) {
+            $user         = $this->Cms->currentUser();
+            $inviteeEmail = $this->Cms->getUserEmail( $user->ID );
+            $this->UserManager->processInvite( $inviteeEmail, $_GET['n'] );
         }
     }
 
     private function isInvite() {
         return !empty( $_GET['n'] );
+    }
+
+    private function isRegistrationFormValid() {
+        return empty( $this->registrationMessages );
+    }
+
+    private function isLoginFormValid() {
+        return empty( $this->loginMessages );
     }
 } 
