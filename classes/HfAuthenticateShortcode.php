@@ -11,7 +11,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     function __construct( Hf_iDisplayCodeGenerator $DisplayCodeGenerator, Hf_iAssetLocator $AssetLocator, Hf_iContentManagementSystem $ContentManagementSystem ) {
         $this->DisplayCodeGenerator = $DisplayCodeGenerator;
         $this->AssetLocator         = $AssetLocator;
-        $this->Cms = $ContentManagementSystem;
+        $this->Cms                  = $ContentManagementSystem;
 
         $this->recallPostData();
     }
@@ -64,8 +64,9 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     private function getLoginErrors() {
-        if ($this->isLoggingIn()) {
-            return $this->missingUsernameError();
+        if ( $this->isLoggingIn() ) {
+            return $this->missingUsernameError() .
+            $this->missingPasswordError();
         }
     }
 
@@ -98,7 +99,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     private function emailTakenError() {
-        if ($this->Cms->isEmailTaken($_POST['email'])) {
+        if ( $this->Cms->isEmailTaken( $_POST['email'] ) ) {
             return '<p class="error">That email is already taken. Did you mean to log in?</p>';
         }
     }
