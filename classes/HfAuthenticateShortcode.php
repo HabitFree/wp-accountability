@@ -156,7 +156,14 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     private function attemptRegistration() {
         if ($this->isRegistering() and empty($this->registrationMessages) ) {
-            $this->Cms->createUser($_POST['username'], $_POST['password'], $_POST['email']);
+            if ( $this->isRegistrationSuccessful() ) {
+                $homeUrl = $this->AssetLocator->getHomePageUrl();
+                $this->registrationMessages .= '<p class="success">Welcome to HabitFree! <a href="' . $homeUrl . '">Click here</a> if you are not automatically redirected. <a href="' . $homeUrl . '">Onward!</a></p>';
+            }
         }
+    }
+
+    private function isRegistrationSuccessful() {
+        return $this->Cms->createUser( $_POST['username'], $_POST['password'], $_POST['email'] );
     }
 } 

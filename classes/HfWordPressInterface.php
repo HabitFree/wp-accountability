@@ -40,7 +40,7 @@ class HfWordPressInterface implements Hf_iContentManagementSystem {
     }
 
     public function createUser( $username, $password, $email ) {
-        return wp_create_user( $username, $password, $email );
+        return !$this->isError(wp_create_user( $username, $password, $email ));
     }
 
     public function isUserLoggedIn() {

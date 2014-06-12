@@ -429,4 +429,27 @@ class TestAuthenticateShortcode extends HfTestCase {
         $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem );
         $AuthenticateShortcode->getOutput();
     }
+
+    public function testAuthenticateShortcodeDisplaysRegistrationSuccessMessage() {
+        $_POST                         = array();
+        $_POST['register']             = '';
+        $_POST['username']             = 'Joe';
+        $_POST['email']                = 'joe@wallysworld.com';
+        $_POST['password']             = 'bo';
+        $_POST['passwordConfirmation'] = 'bo';
+
+        $DisplayCodeGenerator    = $this->Factory->makeHtmlGenerator();
+        $AssetLocator            = $this->Factory->makeUrlFinder();
+        $ContentManagementSystem = $this->myMakeMock( 'HfWordPressInterface' );
+
+        $this->mySetReturnValue( $ContentManagementSystem, 'createUser', true );
+
+        $homeUrl = $AssetLocator->getHomePageUrl();
+
+        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem );
+        $haystack              = $AuthenticateShortcode->getOutput();
+        $needle                = '<p class="success">Welcome to HabitFree! <a href="' . $homeUrl . '">Click here</a> if you are not automatically redirected. <a href="' . $homeUrl . '">Onward!</a></p>';
+
+        $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
+    }
 }
