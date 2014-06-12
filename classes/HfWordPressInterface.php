@@ -70,7 +70,7 @@ class HfWordPressInterface implements Hf_iContentManagementSystem {
         $credentials['user_login']    = $username;
         $credentials['user_password'] = $password;
 
-        return wp_signon( $credentials );
+        return !$this->isError(wp_signon( $credentials ));
     }
 
     public function isError( $thing ) {

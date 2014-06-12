@@ -17,7 +17,9 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     public function getOutput() {
-        return $this->getTabs();
+        $loginError = $this->attemptLogin();
+
+        return $loginError . $this->getTabs();
     }
 
     private function generateLoginForm() {
@@ -123,6 +125,14 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
             return 2;
         } else {
             return 1;
+        }
+    }
+
+    private function attemptLogin() {
+        if ( $this->isLoggingIn() ) {
+            if (!$this->Cms->authenticateUser( $_POST['username'], $_POST['password'] )) {
+                return '<p class="error">That username and password combination is incorrect.</p>';
+            }
         }
     }
 } 

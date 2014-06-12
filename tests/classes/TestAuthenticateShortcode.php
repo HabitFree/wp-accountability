@@ -84,6 +84,7 @@ class TestAuthenticateShortcode extends HfTestCase {
         $_POST             = array();
         $_POST['login']    = '';
         $_POST['username'] = 'CharlieBrown';
+        $_POST['password'] = '';
 
         $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
         $html                  = $AuthenticateShortcode->getOutput();
@@ -295,6 +296,41 @@ class TestAuthenticateShortcode extends HfTestCase {
         $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
         $haystack              = $AuthenticateShortcode->getOutput();
         $needle                = '<p class="error">Please enter a password.</p>';
+
+        $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
+    }
+
+    public function testAuthenticateShortcodeAttemptsLogIn() {
+        $_POST             = array();
+        $_POST['login']    = '';
+        $_POST['username'] = 'Joe';
+        $_POST['password'] = 'bo';
+
+        $DisplayCodeGenerator = $this->Factory->makeHtmlGenerator();
+        $AssetLocator = $this->Factory->makeUrlFinder();
+        $ContentManagementSystem = $this->myMakeMock('HfWordPressInterface');
+
+        $this->myExpectOnce($ContentManagementSystem, 'authenticateUser', array('Joe', 'bo'));
+
+        $AuthenticateShortcode = new HfAuthenticateShortcode($DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem);
+        $AuthenticateShortcode->getOutput();
+    }
+
+    public function testAuthenticateShortcodeDisplaysLogInFailureError() {
+        $_POST             = array();
+        $_POST['login']    = '';
+        $_POST['username'] = 'Joe';
+        $_POST['password'] = 'bo';
+
+        $DisplayCodeGenerator = $this->Factory->makeHtmlGenerator();
+        $AssetLocator = $this->Factory->makeUrlFinder();
+        $ContentManagementSystem = $this->myMakeMock('HfWordPressInterface');
+
+        $this->mySetReturnValue($ContentManagementSystem, 'authenticateUser', false);
+
+        $AuthenticateShortcode = new HfAuthenticateShortcode($DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem);
+        $haystack = $AuthenticateShortcode->getOutput();
+        $needle = '<p class="error">That username and password combination is incorrect.</p>';
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }
