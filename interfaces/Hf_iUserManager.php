@@ -11,7 +11,7 @@ interface Hf_iUserManager {
 
     public function getCurrentUserId();
 
-    public function processNewUser( $userID );
+    public function processNewUser( $userId );
 
-    public function sendInvitation( $inviterID, $address, $daysToExpire );
+    public function sendInvitation( $inviterId, $address, $daysToExpire );
 }

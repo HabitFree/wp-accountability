@@ -71,8 +71,9 @@ class TestAuthenticateShortcode extends HfTestCase {
         $Cms                   = new HfWordPressInterface();
         $HtmlGenerator         = new HfHtmlGenerator( $Cms );
         $UrlLocator            = $this->myMakeMock( 'HfUrlFinder' );
+        $UserManager            = $this->Factory->makeUserManager();
         $currentUrl            = 'mysite.com';
-        $AuthenticateShortcode = new HfAuthenticateShortcode( $HtmlGenerator, $UrlLocator, $Cms );
+        $AuthenticateShortcode = new HfAuthenticateShortcode( $HtmlGenerator, $UrlLocator, $Cms, $UserManager );
 
         $this->mySetReturnValue( $UrlLocator, 'getCurrentPageUrl', $currentUrl );
         $result = $AuthenticateShortcode->getOutput();
@@ -309,10 +310,11 @@ class TestAuthenticateShortcode extends HfTestCase {
         $DisplayCodeGenerator    = $this->Factory->makeHtmlGenerator();
         $AssetLocator            = $this->Factory->makeUrlFinder();
         $ContentManagementSystem = $this->myMakeMock( 'HfWordPressInterface' );
+        $UserManager = $this->Factory->makeUserManager();
 
         $this->myExpectOnce( $ContentManagementSystem, 'authenticateUser', array('Joe', 'bo') );
 
-        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem );
+        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem, $UserManager );
         $AuthenticateShortcode->getOutput();
     }
 
@@ -325,10 +327,11 @@ class TestAuthenticateShortcode extends HfTestCase {
         $DisplayCodeGenerator    = $this->Factory->makeHtmlGenerator();
         $AssetLocator            = $this->Factory->makeUrlFinder();
         $ContentManagementSystem = $this->myMakeMock( 'HfWordPressInterface' );
+        $UserManager = $this->Factory->makeUserManager();
 
         $this->mySetReturnValue( $ContentManagementSystem, 'authenticateUser', false );
 
-        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem );
+        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem, $UserManager );
         $haystack              = $AuthenticateShortcode->getOutput();
         $needle                = '<p class="error">That username and password combination is incorrect.</p>';
 
@@ -344,10 +347,11 @@ class TestAuthenticateShortcode extends HfTestCase {
         $DisplayCodeGenerator    = $this->Factory->makeHtmlGenerator();
         $AssetLocator            = $this->Factory->makeUrlFinder();
         $ContentManagementSystem = $this->myMakeMock( 'HfWordPressInterface' );
+        $UserManager = $this->Factory->makeUserManager();
 
         $this->mySetReturnValue( $ContentManagementSystem, 'authenticateUser', false );
 
-        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem );
+        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem, $UserManager );
         $haystack              = $AuthenticateShortcode->getOutput();
         $needle                = '[su_tab title="Log In"]<p class="error">That username and password combination is incorrect.</p>';
 
@@ -363,10 +367,11 @@ class TestAuthenticateShortcode extends HfTestCase {
         $DisplayCodeGenerator    = $this->Factory->makeHtmlGenerator();
         $AssetLocator            = $this->Factory->makeUrlFinder();
         $ContentManagementSystem = $this->myMakeMock( 'HfWordPressInterface' );
+        $UserManager = $this->Factory->makeUserManager();
 
         $this->mySetReturnValue( $ContentManagementSystem, 'authenticateUser', true );
 
-        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem );
+        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem, $UserManager );
         $haystack              = $AuthenticateShortcode->getOutput();
         $needle                = '<p class="success">Welcome back!</p>';
 
@@ -382,12 +387,13 @@ class TestAuthenticateShortcode extends HfTestCase {
         $DisplayCodeGenerator    = $this->Factory->makeHtmlGenerator();
         $AssetLocator            = $this->Factory->makeUrlFinder();
         $ContentManagementSystem = $this->myMakeMock( 'HfWordPressInterface' );
+        $UserManager = $this->Factory->makeUserManager();
 
         $this->mySetReturnValue( $ContentManagementSystem, 'authenticateUser', true );
 
         $homeUrl = $AssetLocator->getHomePageUrl();
 
-        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem );
+        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem, $UserManager );
         $haystack              = $AuthenticateShortcode->getOutput();
         $needle                = '<script>setTimeout(function(){window.location.replace("' . $homeUrl . '")},5000);</script>';
 
@@ -403,10 +409,11 @@ class TestAuthenticateShortcode extends HfTestCase {
         $DisplayCodeGenerator    = $this->Factory->makeHtmlGenerator();
         $AssetLocator            = $this->Factory->makeUrlFinder();
         $ContentManagementSystem = $this->myMakeMock( 'HfWordPressInterface' );
+        $UserManager = $this->Factory->makeUserManager();
 
         $this->myExpectNever( $ContentManagementSystem, 'authenticateUser' );
 
-        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem );
+        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem, $UserManager );
         $AuthenticateShortcode->getOutput();
     }
 
@@ -421,10 +428,11 @@ class TestAuthenticateShortcode extends HfTestCase {
         $DisplayCodeGenerator    = $this->Factory->makeHtmlGenerator();
         $AssetLocator            = $this->Factory->makeUrlFinder();
         $ContentManagementSystem = $this->myMakeMock( 'HfWordPressInterface' );
+        $UserManager = $this->Factory->makeUserManager();
 
         $this->myExpectOnce( $ContentManagementSystem, 'createUser', array('Joe', 'bo', 'joe@wallysworld.com') );
 
-        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem );
+        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem, $UserManager );
         $AuthenticateShortcode->getOutput();
     }
 
@@ -439,10 +447,11 @@ class TestAuthenticateShortcode extends HfTestCase {
         $DisplayCodeGenerator    = $this->Factory->makeHtmlGenerator();
         $AssetLocator            = $this->Factory->makeUrlFinder();
         $ContentManagementSystem = $this->myMakeMock( 'HfWordPressInterface' );
+        $UserManager = $this->Factory->makeUserManager();
 
         $this->mySetReturnValue( $ContentManagementSystem, 'createUser', true );
 
-        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem );
+        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem, $UserManager );
         $haystack              = $AuthenticateShortcode->getOutput();
         $needle                = '<p class="success">Welcome to HabitFree!</p>';
 
@@ -460,15 +469,38 @@ class TestAuthenticateShortcode extends HfTestCase {
         $DisplayCodeGenerator    = $this->Factory->makeHtmlGenerator();
         $AssetLocator            = $this->Factory->makeUrlFinder();
         $ContentManagementSystem = $this->myMakeMock( 'HfWordPressInterface' );
+        $UserManager = $this->Factory->makeUserManager();
 
         $this->mySetReturnValue( $ContentManagementSystem, 'createUser', true );
 
         $homeUrl = $AssetLocator->getHomePageUrl();
 
-        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem );
+        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem, $UserManager );
         $haystack              = $AuthenticateShortcode->getOutput();
         $needle                = '<script>setTimeout(function(){window.location.replace("' . $homeUrl . '")},5000);</script>';
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
+    }
+
+    public function testAuthenticateShortcodeRegistrationProcessInvite() {
+        $_POST             = array();
+        $_POST['register']             = '';
+        $_POST['username']             = 'Joe';
+        $_POST['email']                = 'joe@wallysworld.com';
+        $_POST['password']             = 'bo';
+        $_POST['passwordConfirmation'] = 'bo';
+        $_GET['n'] = 555;
+
+        $DisplayCodeGenerator    = $this->Factory->makeHtmlGenerator();
+        $AssetLocator            = $this->Factory->makeUrlFinder();
+        $ContentManagementSystem = $this->myMakeMock( 'HfWordPressInterface' );
+        $UserManager = $this->myMakeMock('HfUserManager');
+
+        $this->mySetReturnValue( $ContentManagementSystem, 'createUser', true );
+        $this->myExpectOnce($UserManager, 'processInvite', array('joe@wallysworld.com', 555));
+
+        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem, $UserManager );
+
+        $AuthenticateShortcode->getOutput();
     }
 }

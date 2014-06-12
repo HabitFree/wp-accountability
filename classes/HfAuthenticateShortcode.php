@@ -4,6 +4,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private $DisplayCodeGenerator;
     private $AssetLocator;
     private $Cms;
+    private $UserManager;
 
     private $username;
     private $email;
@@ -12,10 +13,11 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private $registrationMessages;
     private $additionalHtml;
 
-    function __construct( Hf_iDisplayCodeGenerator $DisplayCodeGenerator, Hf_iAssetLocator $AssetLocator, Hf_iContentManagementSystem $ContentManagementSystem ) {
+    function __construct( Hf_iDisplayCodeGenerator $DisplayCodeGenerator, Hf_iAssetLocator $AssetLocator, Hf_iContentManagementSystem $ContentManagementSystem, Hf_iUserManager $UserManager ) {
         $this->DisplayCodeGenerator = $DisplayCodeGenerator;
         $this->AssetLocator         = $AssetLocator;
         $this->Cms                  = $ContentManagementSystem;
+        $this->UserManager = $UserManager;
     }
 
     public function getOutput() {
@@ -156,6 +158,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private function attemptRegistration() {
         if ($this->isRegistering() and empty($this->registrationMessages) ) {
             if ( $this->isRegistrationSuccessful() ) {
+                $this->processInvite();
                 $this->registrationMessages .= '<p class="success">Welcome to HabitFree!</p>';
                 $this->redirectUser();
             }
@@ -170,5 +173,15 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         $url = $this->AssetLocator->getHomePageUrl();
         $this->registrationMessages .= '<p class="info">Redirecting... <a href="' . $url . '">Click here</a> if you are not automatically redirected. <a href="' . $url . '">Onward!</a></p>';
         $this->additionalHtml .= '<script>setTimeout(function(){window.location.replace("' . $url . '")},5000);</script>';
+    }
+
+    private function processInvite() {
+        if (  $this->isInvite() ) {
+            $this->UserManager->processInvite( $_POST['email'], $_GET['n'] );
+        }
+    }
+
+    private function isInvite() {
+        return !empty( $_GET['n'] );
     }
 } 

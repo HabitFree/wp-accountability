@@ -3,10 +3,11 @@
 class HfFactory {
     public function makeAuthenticateShortcode() {
         $DisplayCodeGenerator = $this->makeHtmlGenerator();
-        $AssetLocator = $this->makeUrlFinder();
-        $Cms = $this->makeContentManagementSystem();
+        $AssetLocator         = $this->makeUrlFinder();
+        $Cms                  = $this->makeContentManagementSystem();
+        $UserManager          = $this->makeUserManager();
 
-        return new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $Cms );
+        return new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $Cms, $UserManager );
     }
 
     public function makeGoalsShortcode() {
@@ -76,13 +77,13 @@ class HfFactory {
     public function makeUrlFinder() {
         $Cms = $this->makeContentManagementSystem();
 
-        return new HfUrlFinder($Cms);
+        return new HfUrlFinder( $Cms );
     }
 
     public function makeHtmlGenerator() {
         $Cms = $this->makeContentManagementSystem();
 
-        return new HfHtmlGenerator($Cms);
+        return new HfHtmlGenerator( $Cms );
     }
 
     public function makeCodeLibrary() {
