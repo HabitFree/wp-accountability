@@ -38,4 +38,6 @@ interface Hf_iContentManagementSystem {
     public function isUsernameTaken( $username );
 
     public function expandShortcodes( $string );
+
+    public function getUserIdByEmail($email);
 }

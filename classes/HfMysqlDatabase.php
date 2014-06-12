@@ -478,10 +478,10 @@ class HfMysqlDatabase implements Hf_iDatabase {
         return intval( $this->Cms->getVar( $query ) );
     }
 
-    public function getInvite( $nonce ) {
+    public function getInviterID( $nonce ) {
         $whereInvite = "inviteID = '" . $nonce . "'";
-
-        return $this->getRow( 'hf_invite', $whereInvite );
+        $invite = $this->getRow( 'hf_invite', $whereInvite );
+        return intval( $invite->inviterID );
     }
 
     public function createRelationship( $userOneID, $userTwoID ) {

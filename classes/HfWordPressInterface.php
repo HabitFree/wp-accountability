@@ -96,4 +96,8 @@ class HfWordPressInterface implements Hf_iContentManagementSystem {
     public function expandShortcodes( $string ) {
         return do_shortcode( $string );
     }
+
+    public function getUserIdByEmail($email) {
+        return get_user_by('email', $email)->ID;
+    }
 } 

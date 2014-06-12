@@ -9,15 +9,14 @@ class TestUserManager extends HfTestCase {
         $Database  = $this->myMakeMock( 'HfMysqlDatabase' );
         $Messenger = $this->myMakeMock( 'HfMailer' );
         $Cms       = $this->myMakeMock( 'HfWordPressInterface' );
-        $PhpApi    = $this->myMakeMock( 'HfPhpLibrary' );
 
-        return array($UrlFinder, $Database, $Messenger, $Cms, $PhpApi);
+        return array($UrlFinder, $Database, $Messenger, $Cms);
     }
 
     // Tests
 
     public function testEmailInviteSendingUsingMocks() {
-        list( $UrlFinder, $Database, $Messenger, $Cms, $PhpApi ) = $this->makeUserManagerMockDependencies();
+        list( $UrlFinder, $Database, $Messenger, $Cms ) = $this->makeUserManagerMockDependencies();
 
         $this->mySetReturnValue( $Messenger, 'generateInviteID', 555 );
         $this->mySetReturnValue( $Database, 'generateEmailID', 5 );
@@ -29,7 +28,7 @@ class TestUserManager extends HfTestCase {
     }
 
     public function testInviteStorageInInviteTableUsingMocks() {
-        list( $UrlFinder, $Database, $MessengerMock, $Cms, $PhpApi ) = $this->makeUserManagerMockDependencies();
+        list( $UrlFinder, $Database, $MessengerMock, $Cms ) = $this->makeUserManagerMockDependencies();
 
         $Security = $this->myMakeMock( 'HfSecurity' );
 
@@ -61,5 +60,20 @@ class TestUserManager extends HfTestCase {
         $user        = wp_get_current_user();
 
         $this->assertEquals( $UserManager->getCurrentUserLogin(), $user->user_login );
+    }
+
+    public function testProcessInviteByInviteeEmail() {
+        list( $UrlFinder, $Database, $Messenger, $Cms ) = $this->makeUserManagerMockDependencies();
+
+        $RealCms = $this->Factory->makeContentManagementSystem();
+
+        $UserManager = new HfUserManager( $Database, $Messenger, $UrlFinder, $RealCms );
+
+        $user = get_user_by( 'email', 'taken@taken.com' );
+
+        $this->mySetReturnValue( $Database, 'getInviterID', 1 );
+        $this->myExpectOnce( $Database, 'createRelationship', array($user->ID, 1) );
+
+        $UserManager->processInvite( 'taken@taken.com', 555 );
     }
 }

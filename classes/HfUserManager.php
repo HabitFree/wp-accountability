@@ -4,13 +4,13 @@ class HfUserManager implements Hf_iUserManager {
     private $Database;
     private $Messenger;
     private $AssetLocator;
-    private $ContentManagementSystem;
+    private $Cms;
 
     function HfUserManager( Hf_iDatabase $Database, Hf_iMessenger $Messenger, Hf_iAssetLocator $PageLocator, Hf_iContentManagementSystem $ContentManagementSystem ) {
         $this->Database                = $Database;
         $this->Messenger               = $Messenger;
         $this->AssetLocator            = $PageLocator;
-        $this->ContentManagementSystem = $ContentManagementSystem;
+        $this->Cms = $ContentManagementSystem;
     }
 
     function processAllUsers() {
@@ -33,11 +33,11 @@ class HfUserManager implements Hf_iUserManager {
     }
 
     function getCurrentUserLogin() {
-        return $this->ContentManagementSystem->currentUser()->user_login;
+        return $this->Cms->currentUser()->user_login;
     }
 
     function getCurrentUserId() {
-        return $this->ContentManagementSystem->currentUser()->ID;
+        return $this->Cms->currentUser()->ID;
     }
 
     function userButtonsShortcode() {
@@ -85,17 +85,10 @@ class HfUserManager implements Hf_iUserManager {
         }
     }
 
-    public function processInvite( $inviteeID, $nonce ) {
-        $inviterID = $this->getInviterID();
+    public function processInvite( $inviteeEmail, $nonce ) {
+        $inviteeID = $this->Cms->getUserIdByEmail($inviteeEmail);
+        $inviterID = $this->Database->getInviterID($nonce);
         $this->Database->createRelationship( $inviteeID, $inviterID );
         $this->Database->deleteInvite( $nonce );
-    }
-
-    private function getInviterID() {
-        $nonce     = $_GET['n'];
-        $invite    = $this->Database->getInvite( $nonce );
-        $inviterID = intval( $invite->inviterID );
-
-        return $inviterID;
     }
 }

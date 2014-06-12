@@ -65,5 +65,5 @@ interface Hf_iDatabase {
 
     public function escapeData( $data );
 
-    public function getInvite( $nonce );
+    public function getInviterID( $nonce );
 }
