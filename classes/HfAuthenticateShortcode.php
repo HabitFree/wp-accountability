@@ -20,9 +20,12 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     public function getOutput() {
         $this->recallPostData();
 
-        $loginError = $this->attemptLogin();
+        $this->validateLoginForm();
+        $this->validateRegistrationForm();
 
-        return $loginError . $this->getTabs();
+        $this->attemptLogin();
+
+        return $this->getTabs();
     }
 
     private function generateLoginForm() {
@@ -60,9 +63,6 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private function getTabs() {
         $activeTabNumber = $this->determineActiveTab();
 
-        $this->validateLoginForm();
-        $this->validateRegistrationForm();
-
         $tabs = $this->DisplayCodeGenerator->generateTabs( array(
             'Log In'   => $this->loginErrors . $this->generateLoginForm(),
             'Register' => $this->registrationErrors . $this->generateRegistrationForm()
@@ -73,7 +73,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     private function validateLoginForm() {
         if ( $this->isLoggingIn() ) {
-            $this->loginErrors =
+            $this->loginErrors .=
                 $this->missingUsernameError() .
                 $this->missingPasswordError();
         }
@@ -81,7 +81,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     private function validateRegistrationForm() {
         if ( $this->isRegistering() ) {
-            $this->registrationErrors =
+            $this->registrationErrors .=
                 $this->missingUsernameError() .
                 $this->invalidEmailError() .
                 $this->emailTakenError() .
@@ -139,7 +139,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private function attemptLogin() {
         if ( $this->isLoggingIn() ) {
             if ( !$this->Cms->authenticateUser( $_POST['username'], $_POST['password'] ) ) {
-                return '<p class="error">That username and password combination is incorrect.</p>';
+                $this->loginErrors .= '<p class="error">That username and password combination is incorrect.</p>';
             }
         }
     }

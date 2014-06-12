@@ -334,4 +334,23 @@ class TestAuthenticateShortcode extends HfTestCase {
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }
+
+    public function testAuthenticateShortcodeDisplaysLogInFailureErrorWithinTab() {
+        $_POST             = array();
+        $_POST['login']    = '';
+        $_POST['username'] = 'Joe';
+        $_POST['password'] = 'bo';
+
+        $DisplayCodeGenerator = $this->Factory->makeHtmlGenerator();
+        $AssetLocator = $this->Factory->makeUrlFinder();
+        $ContentManagementSystem = $this->myMakeMock('HfWordPressInterface');
+
+        $this->mySetReturnValue($ContentManagementSystem, 'authenticateUser', false);
+
+        $AuthenticateShortcode = new HfAuthenticateShortcode($DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem);
+        $haystack = $AuthenticateShortcode->getOutput();
+        $needle = '[su_tab title="Log In"]<p class="error">That username and password combination is incorrect.</p>';
+
+        $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
+    }
 }
