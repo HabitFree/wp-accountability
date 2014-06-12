@@ -8,15 +8,18 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private $username;
     private $email;
 
+    private $loginErrors;
+    private $registrationErrors;
+
     function __construct( Hf_iDisplayCodeGenerator $DisplayCodeGenerator, Hf_iAssetLocator $AssetLocator, Hf_iContentManagementSystem $ContentManagementSystem ) {
         $this->DisplayCodeGenerator = $DisplayCodeGenerator;
         $this->AssetLocator         = $AssetLocator;
         $this->Cms                  = $ContentManagementSystem;
-
-        $this->recallPostData();
     }
 
     public function getOutput() {
+        $this->recallPostData();
+
         $loginError = $this->attemptLogin();
 
         return $loginError . $this->getTabs();
@@ -57,28 +60,33 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private function getTabs() {
         $activeTabNumber = $this->determineActiveTab();
 
+        $this->validateLoginForm();
+        $this->validateRegistrationForm();
+
         $tabs = $this->DisplayCodeGenerator->generateTabs( array(
-            'Log In'   => $this->getLoginErrors() . $this->generateLoginForm(),
-            'Register' => $this->getRegistrationErrors() . $this->generateRegistrationForm()
+            'Log In'   => $this->loginErrors . $this->generateLoginForm(),
+            'Register' => $this->registrationErrors . $this->generateRegistrationForm()
         ), $activeTabNumber );
 
         return $tabs;
     }
 
-    private function getLoginErrors() {
+    private function validateLoginForm() {
         if ( $this->isLoggingIn() ) {
-            return $this->missingUsernameError() .
-            $this->missingPasswordError();
+            $this->loginErrors =
+                $this->missingUsernameError() .
+                $this->missingPasswordError();
         }
     }
 
-    private function getRegistrationErrors() {
+    private function validateRegistrationForm() {
         if ( $this->isRegistering() ) {
-            return $this->missingUsernameError() .
-            $this->invalidEmailError() .
-            $this->emailTakenError() .
-            $this->missingPasswordError() .
-            $this->passwordMatchError();
+            $this->registrationErrors =
+                $this->missingUsernameError() .
+                $this->invalidEmailError() .
+                $this->emailTakenError() .
+                $this->missingPasswordError() .
+                $this->passwordMatchError();
         }
     }
 
@@ -130,7 +138,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     private function attemptLogin() {
         if ( $this->isLoggingIn() ) {
-            if (!$this->Cms->authenticateUser( $_POST['username'], $_POST['password'] )) {
+            if ( !$this->Cms->authenticateUser( $_POST['username'], $_POST['password'] ) ) {
                 return '<p class="error">That username and password combination is incorrect.</p>';
             }
         }
