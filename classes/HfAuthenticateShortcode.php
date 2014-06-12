@@ -10,6 +10,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     private $loginMessages;
     private $registrationMessages;
+    private $additionalHtml;
 
     function __construct( Hf_iDisplayCodeGenerator $DisplayCodeGenerator, Hf_iAssetLocator $AssetLocator, Hf_iContentManagementSystem $ContentManagementSystem ) {
         $this->DisplayCodeGenerator = $DisplayCodeGenerator;
@@ -25,7 +26,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
         $this->attemptLogin();
 
-        return $this->getTabs();
+        return $this->additionalHtml . $this->getTabs();
     }
 
     private function generateLoginForm() {
@@ -137,11 +138,13 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     private function attemptLogin() {
-        if ( $this->isLoggingIn() ) {
-            if ( !$this->Cms->authenticateUser( $_POST['username'], $_POST['password'] ) ) {
-                $this->loginMessages .= '<p class="error">That username and password combination is incorrect.</p>';
+        if ( $this->isLoggingIn() and empty($this->loginMessages) ) {
+            if ( $this->Cms->authenticateUser( $_POST['username'], $_POST['password'] ) ) {
+                $homeUrl = $this->AssetLocator->getHomePageUrl();
+                $this->loginMessages .= '<p class="success">Welcome back! <a href="'.$homeUrl.'">Click here</a> if you are not automatically redirected. <a href="'.$homeUrl.'">Onward!</a></p>';
+                $this->additionalHtml .= '<script>setTimeout(function(){window.location.replace("'.$homeUrl.'")},5000);</script>';
             } else {
-                $this->loginMessages .= '<p class="success">Welcome back!</p>';
+                $this->loginMessages .= '<p class="error">That username and password combination is incorrect.</p>';
             }
         }
     }

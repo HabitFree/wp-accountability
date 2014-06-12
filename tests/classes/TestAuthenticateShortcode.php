@@ -366,12 +366,51 @@ class TestAuthenticateShortcode extends HfTestCase {
 
         $this->mySetReturnValue($ContentManagementSystem, 'authenticateUser', true);
 
-//        $homeUrl = $AssetLocator->
+        $homeUrl = $AssetLocator->getHomePageUrl();
 
         $AuthenticateShortcode = new HfAuthenticateShortcode($DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem);
         $haystack = $AuthenticateShortcode->getOutput();
-        $needle = '<p class="success">Welcome back!</p>';
+        $needle = '<p class="success">Welcome back! <a href="'.$homeUrl.'">Click here</a> if you are not automatically redirected. <a href="'.$homeUrl.'">Onward!</a></p>';
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }
+
+    public function testAuthenticateShortcodeGeneratesRedirectScript() {
+        $_POST             = array();
+        $_POST['login']    = '';
+        $_POST['username'] = 'Joe';
+        $_POST['password'] = 'bo';
+
+        $DisplayCodeGenerator = $this->Factory->makeHtmlGenerator();
+        $AssetLocator = $this->Factory->makeUrlFinder();
+        $ContentManagementSystem = $this->myMakeMock('HfWordPressInterface');
+
+        $this->mySetReturnValue($ContentManagementSystem, 'authenticateUser', true);
+
+        $homeUrl = $AssetLocator->getHomePageUrl();
+
+        $AuthenticateShortcode = new HfAuthenticateShortcode($DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem);
+        $haystack = $AuthenticateShortcode->getOutput();
+        $needle = '<script>setTimeout(function(){window.location.replace("'.$homeUrl.'")},5000);</script>';
+
+        $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
+    }
+
+    public function testAuthenticateShortcodeDoesNotAttemptLogInWhenFormFailsToValidate() {
+        $_POST             = array();
+        $_POST['login']    = '';
+        $_POST['username'] = 'Joe';
+        $_POST['password'] = '';
+
+        $DisplayCodeGenerator = $this->Factory->makeHtmlGenerator();
+        $AssetLocator = $this->Factory->makeUrlFinder();
+        $ContentManagementSystem = $this->myMakeMock('HfWordPressInterface');
+
+        $this->myExpectNever($ContentManagementSystem, 'authenticateUser');
+
+        $AuthenticateShortcode = new HfAuthenticateShortcode($DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem);
+        $AuthenticateShortcode->getOutput();
+    }
+
+
 }
