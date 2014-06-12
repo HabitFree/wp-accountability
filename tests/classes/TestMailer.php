@@ -45,10 +45,7 @@ class TestMailer extends HfTestCase {
     }
 
     public function testIsThrottledReturnsFalse() {
-        $UrlFinder    = $this->myMakeMock( 'HfUrlFinder' );
-        $Security     = $this->myMakeMock( 'HfSecurity' );
-        $DbConnection = $this->myMakeMock( 'HfMysqlDatabase' );
-        $ApiInterface = $this->myMakeMock( 'HfWordPressInterface' );
+        list( $UrlFinder, $Security, $DbConnection, $ApiInterface ) = $this->makeDependencies();
 
         $this->mySetReturnValue( $DbConnection, 'daysSinceAnyReport', 100 );
         $this->mySetReturnValue( $DbConnection, 'daysSinceLastEmail', 10 );
@@ -61,10 +58,7 @@ class TestMailer extends HfTestCase {
     }
 
     public function testIsThrottledReturnsTrue() {
-        $UrlFinder    = $this->myMakeMock( 'HfUrlFinder' );
-        $Security     = $this->myMakeMock( 'HfSecurity' );
-        $DbConnection = $this->myMakeMock( 'HfMysqlDatabase' );
-        $ApiInterface = $this->myMakeMock( 'HfWordPressInterface' );
+        list( $UrlFinder, $Security, $DbConnection, $ApiInterface ) = $this->makeDependencies();
 
         $this->mySetReturnValue( $DbConnection, 'daysSinceAnyReport', 100 );
         $this->mySetReturnValue( $DbConnection, 'daysSinceLastEmail', 10 );
@@ -74,5 +68,18 @@ class TestMailer extends HfTestCase {
         $result = $Mailer->isThrottled( 1 );
 
         $this->assertEquals( $result, true );
+    }
+
+    public function testMailerPointsInviteUrlToRegistrationTab() {
+        list( $UrlFinder, $Security, $DbConnection, $ApiInterface ) = $this->makeDependencies();
+
+        $Mailer = new HfMailer( $UrlFinder, $Security, $DbConnection, $ApiInterface );
+
+        $this->mySetReturnValue($UrlFinder, 'getPageUrlByTitle', 'habitfree.org/authenticate');
+
+        $result = $Mailer->generateInviteURL(777);
+        $expected = 'habitfree.org/authenticate?n=777&tab=2';
+
+        $this->assertEquals($expected, $result);
     }
 }

@@ -92,7 +92,8 @@ class HfMailer implements Hf_iMessenger {
         $baseURL = $this->PageLocator->getPageUrlByTitle( 'Register' );
 
         $parameters = array(
-            'n' => $inviteID
+            'n'   => $inviteID,
+            'tab' => 2
         );
 
         return $this->addParametersToUrl( $baseURL, $parameters );

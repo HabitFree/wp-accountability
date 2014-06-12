@@ -26,6 +26,8 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     public function getOutput() {
         $this->recallPostData();
 
+        $this->informInvitedUser();
+
         $this->validateLoginForm();
         $this->validateRegistrationForm();
 
@@ -105,7 +107,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     private function missingUsernameError() {
         if ( empty( $_POST['username'] ) ) {
-            return '<p class="error">Please enter a username.</p>';
+            return '<p class="error">Please enter your username.</p>';
         }
     }
 
@@ -123,7 +125,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     private function missingPasswordError() {
         if ( empty( $_POST['password'] ) ) {
-            return '<p class="error">Please enter a password.</p>';
+            return '<p class="error">Please enter your password.</p>';
         }
     }
 
@@ -138,6 +140,10 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private function determineActiveTab() {
         if ( $this->isRegistering() ) {
             return 2;
+        } elseif ($this->isLoggingIn()) {
+            return 1;
+        } elseif (!empty($_GET['tab'])) {
+            return $_GET['tab'];
         } else {
             return 1;
         }
@@ -178,7 +184,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
                 $this->redirectUser();
             } else {
                 $this->registrationMessages .=
-                    "<p class='Error'>We're very sorry, but something seems to have gone wrong with your registration.</p>";
+                    "<p class='error'>We're very sorry, but something seems to have gone wrong with your registration.</p>";
             }
         }
     }
@@ -206,15 +212,22 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         }
     }
 
-    private function isInvite() {
-        return !empty( $_GET['n'] );
-    }
-
     private function isRegistrationFormValid() {
         return empty( $this->registrationMessages );
     }
 
     private function isLoginFormValid() {
         return empty( $this->loginMessages );
+    }
+
+    private function informInvitedUser() {
+        if ( $this->isInvite() ) {
+            $this->additionalHtml .=
+                "<p class='info'>Looks like you're responding to an invitation. Feel free to either register or log into an existing account—either way we'll automatically set up accountability between you and the user who invited you.</p>";
+        }
+    }
+
+    private function isInvite() {
+        return !empty( $_GET['n'] );
     }
 } 

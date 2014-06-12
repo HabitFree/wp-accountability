@@ -148,7 +148,7 @@ class TestAuthenticateShortcode extends HfTestCase {
 
         $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
         $haystack              = $AuthenticateShortcode->getOutput();
-        $needle                = '<p class="error">Please enter a username.</p>';
+        $needle                = '<p class="error">Please enter your username.</p>';
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }
@@ -163,7 +163,7 @@ class TestAuthenticateShortcode extends HfTestCase {
 
         $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
         $haystack              = $AuthenticateShortcode->getOutput();
-        $usernameNeedle        = '<p class="error">Please enter a username.</p>';
+        $usernameNeedle        = '<p class="error">Please enter your username.</p>';
         $passwordNeedle        = '<p class="error">Please make sure your passwords match.</p>';
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $usernameNeedle ) );
@@ -225,7 +225,7 @@ class TestAuthenticateShortcode extends HfTestCase {
 
         $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
         $haystack              = $AuthenticateShortcode->getOutput();
-        $needle                = '<p class="error">Please enter a password.</p>';
+        $needle                = '<p class="error">Please enter your password.</p>';
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }
@@ -283,7 +283,7 @@ class TestAuthenticateShortcode extends HfTestCase {
 
         $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
         $haystack              = $AuthenticateShortcode->getOutput();
-        $needle                = '<p class="error">Please enter a username.</p>';
+        $needle                = '<p class="error">Please enter your username.</p>';
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }
@@ -296,7 +296,7 @@ class TestAuthenticateShortcode extends HfTestCase {
 
         $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
         $haystack              = $AuthenticateShortcode->getOutput();
-        $needle                = '<p class="error">Please enter a password.</p>';
+        $needle                = '<p class="error">Please enter your password.</p>';
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }
@@ -551,7 +551,32 @@ class TestAuthenticateShortcode extends HfTestCase {
 
         $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem, $UserManager );
         $haystack              = $AuthenticateShortcode->getOutput();
-        $needle                = "<p class='Error'>We're very sorry, but something seems to have gone wrong with your registration.</p>";
+        $needle                = "<p class='error'>We're very sorry, but something seems to have gone wrong with your registration.</p>";
+
+        $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
+    }
+
+    public function testAuthenticateShortcodeDisplaysInvitationInfo() {
+        $_POST     = array();
+        $_GET      = array();
+        $_GET['n'] = 555;
+
+        $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
+        $haystack              = $AuthenticateShortcode->getOutput();
+        $needle                = "<p class='info'>Looks like you're responding to an invitation. Feel free to either register or log into an existing account—either way we'll automatically set up accountability between you and the user who invited you.</p>";
+
+        $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
+    }
+
+    public function testAuthenticateShortcodeChecksUrlGetForActiveTab() {
+        $_POST       = array();
+        $_GET        = array();
+        $_GET['n']   = 555;
+        $_GET['tab'] = 2;
+
+        $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
+        $haystack              = $AuthenticateShortcode->getOutput();
+        $needle                = '[su_tabs active="2"]';
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }
