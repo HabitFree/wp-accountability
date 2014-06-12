@@ -25,6 +25,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         $this->validateRegistrationForm();
 
         $this->attemptLogin();
+        $this->attemptRegistration();
 
         return $this->additionalHtml . $this->getTabs();
     }
@@ -139,13 +140,23 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     private function attemptLogin() {
         if ( $this->isLoggingIn() and empty($this->loginMessages) ) {
-            if ( $this->Cms->authenticateUser( $_POST['username'], $_POST['password'] ) ) {
+            if ( $this->isLoginSuccessful() ) {
                 $homeUrl = $this->AssetLocator->getHomePageUrl();
                 $this->loginMessages .= '<p class="success">Welcome back! <a href="'.$homeUrl.'">Click here</a> if you are not automatically redirected. <a href="'.$homeUrl.'">Onward!</a></p>';
                 $this->additionalHtml .= '<script>setTimeout(function(){window.location.replace("'.$homeUrl.'")},5000);</script>';
             } else {
                 $this->loginMessages .= '<p class="error">That username and password combination is incorrect.</p>';
             }
+        }
+    }
+
+    private function isLoginSuccessful() {
+        return $this->Cms->authenticateUser( $_POST['username'], $_POST['password'] );
+    }
+
+    private function attemptRegistration() {
+        if ($this->isRegistering() and empty($this->registrationMessages) ) {
+            $this->Cms->createUser($_POST['username'], $_POST['password'], $_POST['email']);
         }
     }
 } 
