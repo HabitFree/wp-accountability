@@ -141,9 +141,8 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private function attemptLogin() {
         if ( $this->isLoggingIn() and empty($this->loginMessages) ) {
             if ( $this->isLoginSuccessful() ) {
-                $homeUrl = $this->AssetLocator->getHomePageUrl();
-                $this->loginMessages .= '<p class="success">Welcome back! <a href="'.$homeUrl.'">Click here</a> if you are not automatically redirected. <a href="'.$homeUrl.'">Onward!</a></p>';
-                $this->additionalHtml .= '<script>setTimeout(function(){window.location.replace("'.$homeUrl.'")},5000);</script>';
+                $this->loginMessages .= '<p class="success">Welcome back!</p>';
+                $this->redirectUser();
             } else {
                 $this->loginMessages .= '<p class="error">That username and password combination is incorrect.</p>';
             }
@@ -157,13 +156,19 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private function attemptRegistration() {
         if ($this->isRegistering() and empty($this->registrationMessages) ) {
             if ( $this->isRegistrationSuccessful() ) {
-                $homeUrl = $this->AssetLocator->getHomePageUrl();
-                $this->registrationMessages .= '<p class="success">Welcome to HabitFree! <a href="' . $homeUrl . '">Click here</a> if you are not automatically redirected. <a href="' . $homeUrl . '">Onward!</a></p>';
+                $this->registrationMessages .= '<p class="success">Welcome to HabitFree!</p>';
+                $this->redirectUser();
             }
         }
     }
 
     private function isRegistrationSuccessful() {
         return $this->Cms->createUser( $_POST['username'], $_POST['password'], $_POST['email'] );
+    }
+
+    private function redirectUser() {
+        $url = $this->AssetLocator->getHomePageUrl();
+        $this->registrationMessages .= '<p class="info">Redirecting... <a href="' . $url . '">Click here</a> if you are not automatically redirected. <a href="' . $url . '">Onward!</a></p>';
+        $this->additionalHtml .= '<script>setTimeout(function(){window.location.replace("' . $url . '")},5000);</script>';
     }
 } 

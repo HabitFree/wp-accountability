@@ -366,11 +366,9 @@ class TestAuthenticateShortcode extends HfTestCase {
 
         $this->mySetReturnValue( $ContentManagementSystem, 'authenticateUser', true );
 
-        $homeUrl = $AssetLocator->getHomePageUrl();
-
         $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem );
         $haystack              = $AuthenticateShortcode->getOutput();
-        $needle                = '<p class="success">Welcome back! <a href="' . $homeUrl . '">Click here</a> if you are not automatically redirected. <a href="' . $homeUrl . '">Onward!</a></p>';
+        $needle                = '<p class="success">Welcome back!</p>';
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }
@@ -444,11 +442,32 @@ class TestAuthenticateShortcode extends HfTestCase {
 
         $this->mySetReturnValue( $ContentManagementSystem, 'createUser', true );
 
+        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem );
+        $haystack              = $AuthenticateShortcode->getOutput();
+        $needle                = '<p class="success">Welcome to HabitFree!</p>';
+
+        $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
+    }
+
+    public function testAuthenticateShortcodeGeneratesRedirectScriptOnRegistration() {
+        $_POST             = array();
+        $_POST['register']             = '';
+        $_POST['username']             = 'Joe';
+        $_POST['email']                = 'joe@wallysworld.com';
+        $_POST['password']             = 'bo';
+        $_POST['passwordConfirmation'] = 'bo';
+
+        $DisplayCodeGenerator    = $this->Factory->makeHtmlGenerator();
+        $AssetLocator            = $this->Factory->makeUrlFinder();
+        $ContentManagementSystem = $this->myMakeMock( 'HfWordPressInterface' );
+
+        $this->mySetReturnValue( $ContentManagementSystem, 'createUser', true );
+
         $homeUrl = $AssetLocator->getHomePageUrl();
 
         $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem );
         $haystack              = $AuthenticateShortcode->getOutput();
-        $needle                = '<p class="success">Welcome to HabitFree! <a href="' . $homeUrl . '">Click here</a> if you are not automatically redirected. <a href="' . $homeUrl . '">Onward!</a></p>';
+        $needle                = '<script>setTimeout(function(){window.location.replace("' . $homeUrl . '")},5000);</script>';
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }
