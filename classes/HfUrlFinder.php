@@ -8,13 +8,7 @@ class HfUrlFinder implements Hf_iAssetLocator {
     }
 
     public function getCurrentPageUrl() {
-        $pageURL = 'http';
-        if ( isset( $_SERVER["HTTPS"] ) ) {
-            if ( $_SERVER["HTTPS"] == "on" ) {
-                $pageURL .= "s";
-            }
-        }
-        $pageURL .= "://";
+        $pageURL = $this->getHttpOrHttps();
         if ( $_SERVER["SERVER_PORT"] != "80" ) {
             $pageURL .= $_SERVER["SERVER_NAME"] . ":" . $_SERVER["SERVER_PORT"] . $_SERVER["REQUEST_URI"];
         } else {
@@ -32,5 +26,28 @@ class HfUrlFinder implements Hf_iAssetLocator {
 
     public function getPluginAssetUrl( $fileName ) {
         return $this->Cms->getPluginAssetUrl( $fileName );
+    }
+
+    public function getHomePageUrl() {
+        $pageURL = $this->getHttpOrHttps();
+        if ( $_SERVER["SERVER_PORT"] != "80" ) {
+            $pageURL .= $_SERVER["SERVER_NAME"] . ":" . $_SERVER["SERVER_PORT"];
+        } else {
+            $pageURL .= $_SERVER["SERVER_NAME"];
+        }
+
+        return $pageURL;
+    }
+
+    private function getHttpOrHttps() {
+        $prefix = 'http';
+        if ( isset( $_SERVER["HTTPS"] ) ) {
+            if ( $_SERVER["HTTPS"] == "on" ) {
+                $prefix .= "s";
+            }
+        }
+        $prefix .= "://";
+
+        return $prefix;
     }
 }

@@ -6,4 +6,6 @@ interface Hf_iAssetLocator {
     public function getPageUrlByTitle( $title );
 
     public function getPluginAssetUrl( $fileName );
+
+    public function getHomePageUrl();
 }

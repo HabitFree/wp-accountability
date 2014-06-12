@@ -366,6 +366,8 @@ class TestAuthenticateShortcode extends HfTestCase {
 
         $this->mySetReturnValue($ContentManagementSystem, 'authenticateUser', true);
 
+//        $homeUrl = $AssetLocator->
+
         $AuthenticateShortcode = new HfAuthenticateShortcode($DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem);
         $haystack = $AuthenticateShortcode->getOutput();
         $needle = '<p class="success">Welcome back!</p>';
