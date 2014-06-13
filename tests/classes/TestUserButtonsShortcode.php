@@ -105,4 +105,21 @@ class TestUserButtonsShortcode extends HfTestCase {
 
         $this->assertTrue($this->haystackContainsNeedle($haystack, $needle));
     }
+
+    public function testUserButtonsShortcodeDisplaysSettingsLink() {
+        $AssetLocator = $this->myMakeMock('HfUrlFinder');
+        $UserManager = $this->myMakeMock('HfUserManager');
+
+        $this->mySetReturnValue($UserManager, 'getCurrentUserLogin', 'Rodney');
+        $this->mySetReturnValue($AssetLocator, 'getPageUrlByTitle', 'yahoo.com');
+        $this->myExpectAtLeastOnce($AssetLocator, 'getPageUrlByTitle', array('Settings'));
+        $this->mySetReturnValue($UserManager, 'isUserLoggedIn', true);
+
+        $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator);
+
+        $haystack = $UserButtonsShortcode->getOutput();
+        $needle = '<a href="yahoo.com">Settings</a>';
+
+        $this->assertTrue($this->haystackContainsNeedle($haystack, $needle));
+    }
 }
