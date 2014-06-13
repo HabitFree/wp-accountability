@@ -44,7 +44,7 @@ class TestDump extends HfTestCase {
     }
 
     public function testFactoryMakeUrlFinder() {
-        $UrlFinder = $this->Factory->makeUrlFinder();
+        $UrlFinder = $this->Factory->makeAssetLocator();
 
         $this->assertTrue( is_a( $UrlFinder, 'HfUrlFinder' ) );
     }
@@ -68,7 +68,7 @@ class TestDump extends HfTestCase {
     }
 
     public function testFactoryMakeWordPressInterface() {
-        $WordPressInterface = $this->Factory->makeContentManagementSystem();
+        $WordPressInterface = $this->Factory->makeCms();
 
         $this->assertTrue( is_a( $WordPressInterface, 'HfWordPressInterface' ) );
     }
@@ -159,7 +159,7 @@ class TestDump extends HfTestCase {
 
     public function testIsEmailTakenMethodExists() {
         $Factory = new HfFactory();
-        $Cms     = $Factory->makeContentManagementSystem();
+        $Cms     = $Factory->makeCms();
 
         $this->assertTrue( method_exists( $Cms, 'isEmailTaken' ) );
     }

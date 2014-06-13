@@ -2,92 +2,93 @@
 
 class HfFactory {
     public function makeUserButtonsShortcode() {
-        $UserManager = $this->makeUserManager();
+        $UserManager  = $this->makeUserManager();
+        $AssetLocator = $this->makeAssetLocator();
 
-        return new HfUserButtonsShortcode($UserManager);
+        return new HfUserButtonsShortcode( $UserManager, $AssetLocator );
     }
 
     public function makeAuthenticateShortcode() {
         $DisplayCodeGenerator = $this->makeHtmlGenerator();
-        $AssetLocator         = $this->makeUrlFinder();
-        $Cms                  = $this->makeContentManagementSystem();
+        $AssetLocator         = $this->makeAssetLocator();
+        $Cms                  = $this->makeCms();
         $UserManager          = $this->makeUserManager();
 
         return new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $Cms, $UserManager );
     }
 
     public function makeGoalsShortcode() {
-        $Database    = $this->makeDatabase();
-        $UrlFinder   = $this->makeUrlFinder();
-        $Messenger   = $this->makeMessenger();
-        $UserManager = $this->makeUserManager();
-        $Goals       = $this->makeGoals();
-        $Security    = $this->makeSecurity();
-        $Cms         = $this->makeContentManagementSystem();
+        $Database     = $this->makeDatabase();
+        $AssetLocator = $this->makeAssetLocator();
+        $Messenger    = $this->makeMessenger();
+        $UserManager  = $this->makeUserManager();
+        $Goals        = $this->makeGoals();
+        $Security     = $this->makeSecurity();
+        $Cms          = $this->makeCms();
 
-        return new HfGoalsShortcode( $UserManager, $Messenger, $UrlFinder, $Database, $Goals, $Security, $Cms );
+        return new HfGoalsShortcode( $UserManager, $Messenger, $AssetLocator, $Database, $Goals, $Security, $Cms );
     }
 
     public function makeGoals() {
-        $WordPressInterface = $this->makeContentManagementSystem();
-        $Database           = $this->makeDatabase();
-        $HtmlGenerator      = $this->makeHtmlGenerator();
-        $Mailer             = $this->makeMessenger();
+        $Cms           = $this->makeCms();
+        $Database      = $this->makeDatabase();
+        $HtmlGenerator = $this->makeHtmlGenerator();
+        $Mailer        = $this->makeMessenger();
 
-        return new HfGoals( $Mailer, $WordPressInterface, $HtmlGenerator, $Database );
+        return new HfGoals( $Mailer, $Cms, $HtmlGenerator, $Database );
     }
 
     public function makeAdminPanel() {
-        $Mailer       = $this->makeMessenger();
-        $URLFinder    = $this->makeUrlFinder();
-        $DbConnection = $this->makeDatabase();
+        $Messenger    = $this->makeMessenger();
+        $AssetLocator = $this->makeAssetLocator();
+        $Database     = $this->makeDatabase();
         $UserManager  = $this->makeUserManager();
-        $Cms          = $this->makeContentManagementSystem();
+        $Cms          = $this->makeCms();
 
-        return new HfAdminPanel( $Mailer, $URLFinder, $DbConnection, $UserManager, $Cms );
+        return new HfAdminPanel( $Messenger, $AssetLocator, $Database, $UserManager, $Cms );
     }
 
     public function makeSettingsShortcode() {
-        $UrlFinder   = $this->makeUrlFinder();
-        $UserManager = $this->makeUserManager();
-        $Security    = $this->makeSecurity();
+        $AssetLocator = $this->makeAssetLocator();
+        $UserManager  = $this->makeUserManager();
+        $Security     = $this->makeSecurity();
 
-        return new HfSettingsShortcode( $UrlFinder, $UserManager, $Security );
+        return new HfSettingsShortcode( $AssetLocator, $UserManager, $Security );
     }
 
     public function makeUserManager() {
-        $WordPressInterface = $this->makeContentManagementSystem();
-        $UrlFinder          = $this->makeUrlFinder();
-        $Mailer             = $this->makeMessenger();
-        $Database           = $this->makeDatabase();
+        $Cms          = $this->makeCms();
+        $AssetLocator = $this->makeAssetLocator();
+        $Mailer       = $this->makeMessenger();
+        $Database     = $this->makeDatabase();
 
-        return new HfUserManager( $Database, $Mailer, $UrlFinder, $WordPressInterface );
+        return new HfUserManager( $Database, $Mailer, $AssetLocator, $Cms );
     }
 
     public function makeMessenger() {
-        $WordPressInterface = $this->makeContentManagementSystem();
-        $Database           = $this->makeDatabase();
-        $Security           = $this->makeSecurity();
-        $UrlFinder          = $this->makeUrlFinder();
+        $Cms          = $this->makeCms();
+        $Database     = $this->makeDatabase();
+        $Security     = $this->makeSecurity();
+        $AssetLocator = $this->makeAssetLocator();
 
-        return new HfMailer( $UrlFinder, $Security, $Database, $WordPressInterface );
+        return new HfMailer( $AssetLocator, $Security, $Database, $Cms );
     }
 
     public function makeDatabase() {
-        $WordPressInterface = $this->makeContentManagementSystem();
-        $PhpLibrary         = $this->makeCodeLibrary();
+        $Cms         = $this->makeCms();
+        $CodeLibrary = $this->makeCodeLibrary();
 
-        return new HfMysqlDatabase( $WordPressInterface, $PhpLibrary );
+        return new HfMysqlDatabase( $Cms, $CodeLibrary );
     }
 
-    public function makeUrlFinder() {
-        $Cms = $this->makeContentManagementSystem();
+    public function makeAssetLocator() {
+        $Cms = $this->makeCms();
 
         return new HfUrlFinder( $Cms );
     }
 
     public function makeHtmlGenerator() {
-        $Cms = $this->makeContentManagementSystem();
+        $Cms = $this->makeCms();
 
         return new HfHtmlGenerator( $Cms );
     }
@@ -96,7 +97,7 @@ class HfFactory {
         return new HfPhpLibrary();
     }
 
-    public function makeContentManagementSystem() {
+    public function makeCms() {
         return new HfWordPressInterface();
     }
 

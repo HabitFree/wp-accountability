@@ -8,7 +8,7 @@ class TestUrlFinder extends HfTestCase {
     
     public function testGetHomePageUrl() {
         $homeUrl = get_home_url();
-        $UrlFinder = $this->Factory->makeUrlFinder();
+        $UrlFinder = $this->Factory->makeAssetLocator();
 
         $this->assertEquals($homeUrl, $UrlFinder->getHomePageUrl());
     }

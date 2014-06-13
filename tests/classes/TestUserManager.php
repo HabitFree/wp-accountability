@@ -65,7 +65,7 @@ class TestUserManager extends HfTestCase {
     public function testProcessInviteByInviteeEmail() {
         list( $UrlFinder, $Database, $Messenger, $Cms ) = $this->makeUserManagerMockDependencies();
 
-        $RealCms = $this->Factory->makeContentManagementSystem();
+        $RealCms = $this->Factory->makeCms();
 
         $UserManager = new HfUserManager( $Database, $Messenger, $UrlFinder, $RealCms );
 

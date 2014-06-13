@@ -50,4 +50,8 @@ class HfUrlFinder implements Hf_iAssetLocator {
 
         return $prefix;
     }
+
+    public function getLogoutUrl($redirect) {
+        return $this->Cms->getLogoutUrl($redirect);
+    }
 }

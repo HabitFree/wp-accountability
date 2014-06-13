@@ -45,7 +45,7 @@ class TestAuthenticateShortcode extends HfTestCase {
 
     public function testAuthenticateShortcodeIncludesLogInForm() {
         $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
-        $AssetLocator          = $this->Factory->makeUrlFinder();
+        $AssetLocator          = $this->Factory->makeAssetLocator();
 
         $result = $AuthenticateShortcode->getOutput();
         $url    = $AssetLocator->getCurrentPageUrl();
@@ -57,7 +57,7 @@ class TestAuthenticateShortcode extends HfTestCase {
 
     public function testAuthenticateShortcodeIncludesRegistrationForm() {
         $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
-        $AssetLocator          = $this->Factory->makeUrlFinder();
+        $AssetLocator          = $this->Factory->makeAssetLocator();
 
         $result = $AuthenticateShortcode->getOutput();
         $url    = $AssetLocator->getCurrentPageUrl();
@@ -308,7 +308,7 @@ class TestAuthenticateShortcode extends HfTestCase {
         $_POST['password'] = 'bo';
 
         $DisplayCodeGenerator    = $this->Factory->makeHtmlGenerator();
-        $AssetLocator            = $this->Factory->makeUrlFinder();
+        $AssetLocator            = $this->Factory->makeAssetLocator();
         $ContentManagementSystem = $this->myMakeMock( 'HfWordPressInterface' );
         $UserManager             = $this->Factory->makeUserManager();
 
@@ -325,7 +325,7 @@ class TestAuthenticateShortcode extends HfTestCase {
         $_POST['password'] = 'bo';
 
         $DisplayCodeGenerator    = $this->Factory->makeHtmlGenerator();
-        $AssetLocator            = $this->Factory->makeUrlFinder();
+        $AssetLocator            = $this->Factory->makeAssetLocator();
         $ContentManagementSystem = $this->myMakeMock( 'HfWordPressInterface' );
         $UserManager             = $this->Factory->makeUserManager();
 
@@ -345,7 +345,7 @@ class TestAuthenticateShortcode extends HfTestCase {
         $_POST['password'] = 'bo';
 
         $DisplayCodeGenerator    = $this->Factory->makeHtmlGenerator();
-        $AssetLocator            = $this->Factory->makeUrlFinder();
+        $AssetLocator            = $this->Factory->makeAssetLocator();
         $ContentManagementSystem = $this->myMakeMock( 'HfWordPressInterface' );
         $UserManager             = $this->Factory->makeUserManager();
 
@@ -365,7 +365,7 @@ class TestAuthenticateShortcode extends HfTestCase {
         $_POST['password'] = 'bo';
 
         $DisplayCodeGenerator    = $this->Factory->makeHtmlGenerator();
-        $AssetLocator            = $this->Factory->makeUrlFinder();
+        $AssetLocator            = $this->Factory->makeAssetLocator();
         $ContentManagementSystem = $this->myMakeMock( 'HfWordPressInterface' );
         $UserManager             = $this->Factory->makeUserManager();
 
@@ -385,7 +385,7 @@ class TestAuthenticateShortcode extends HfTestCase {
         $_POST['password'] = 'bo';
 
         $DisplayCodeGenerator    = $this->Factory->makeHtmlGenerator();
-        $AssetLocator            = $this->Factory->makeUrlFinder();
+        $AssetLocator            = $this->Factory->makeAssetLocator();
         $ContentManagementSystem = $this->myMakeMock( 'HfWordPressInterface' );
         $UserManager             = $this->Factory->makeUserManager();
 
@@ -407,7 +407,7 @@ class TestAuthenticateShortcode extends HfTestCase {
         $_POST['password'] = '';
 
         $DisplayCodeGenerator    = $this->Factory->makeHtmlGenerator();
-        $AssetLocator            = $this->Factory->makeUrlFinder();
+        $AssetLocator            = $this->Factory->makeAssetLocator();
         $ContentManagementSystem = $this->myMakeMock( 'HfWordPressInterface' );
         $UserManager             = $this->Factory->makeUserManager();
 
@@ -426,7 +426,7 @@ class TestAuthenticateShortcode extends HfTestCase {
         $_POST['passwordConfirmation'] = 'bo';
 
         $DisplayCodeGenerator    = $this->Factory->makeHtmlGenerator();
-        $AssetLocator            = $this->Factory->makeUrlFinder();
+        $AssetLocator            = $this->Factory->makeAssetLocator();
         $ContentManagementSystem = $this->myMakeMock( 'HfWordPressInterface' );
         $UserManager             = $this->Factory->makeUserManager();
 
@@ -445,7 +445,7 @@ class TestAuthenticateShortcode extends HfTestCase {
         $_POST['passwordConfirmation'] = 'bo';
 
         $DisplayCodeGenerator    = $this->Factory->makeHtmlGenerator();
-        $AssetLocator            = $this->Factory->makeUrlFinder();
+        $AssetLocator            = $this->Factory->makeAssetLocator();
         $ContentManagementSystem = $this->myMakeMock( 'HfWordPressInterface' );
         $UserManager             = $this->Factory->makeUserManager();
 
@@ -467,7 +467,7 @@ class TestAuthenticateShortcode extends HfTestCase {
         $_POST['passwordConfirmation'] = 'bo';
 
         $DisplayCodeGenerator    = $this->Factory->makeHtmlGenerator();
-        $AssetLocator            = $this->Factory->makeUrlFinder();
+        $AssetLocator            = $this->Factory->makeAssetLocator();
         $ContentManagementSystem = $this->myMakeMock( 'HfWordPressInterface' );
         $UserManager             = $this->Factory->makeUserManager();
 
@@ -492,7 +492,7 @@ class TestAuthenticateShortcode extends HfTestCase {
         $_GET['n']                     = 555;
 
         $DisplayCodeGenerator    = $this->Factory->makeHtmlGenerator();
-        $AssetLocator            = $this->Factory->makeUrlFinder();
+        $AssetLocator            = $this->Factory->makeAssetLocator();
         $ContentManagementSystem = $this->myMakeMock( 'HfWordPressInterface' );
         $UserManager             = $this->myMakeMock( 'HfUserManager' );
 
@@ -517,7 +517,7 @@ class TestAuthenticateShortcode extends HfTestCase {
         $_GET['n']         = 555;
 
         $DisplayCodeGenerator    = $this->Factory->makeHtmlGenerator();
-        $AssetLocator            = $this->Factory->makeUrlFinder();
+        $AssetLocator            = $this->Factory->makeAssetLocator();
         $ContentManagementSystem = $this->myMakeMock( 'HfWordPressInterface' );
         $UserManager             = $this->myMakeMock( 'HfUserManager' );
 
@@ -543,7 +543,7 @@ class TestAuthenticateShortcode extends HfTestCase {
         $_POST['passwordConfirmation'] = 'bo';
 
         $DisplayCodeGenerator    = $this->Factory->makeHtmlGenerator();
-        $AssetLocator            = $this->Factory->makeUrlFinder();
+        $AssetLocator            = $this->Factory->makeAssetLocator();
         $ContentManagementSystem = $this->myMakeMock( 'HfWordPressInterface' );
         $UserManager             = $this->Factory->makeUserManager();
 

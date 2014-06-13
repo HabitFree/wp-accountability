@@ -19,10 +19,17 @@ class TestUserButtonsShortcode extends HfTestCase {
     }
 
     public function testUserButtonsShortcodeWelcomesUser() {
+//        $credentials                  = array();
+//        $credentials['user_login']    = $username;
+//        $credentials['user_password'] = $password;
+//
+//        return !$this->isError(wp_signon( $credentials ));
+
+        $AssetLocator = $this->Factory->makeAssetLocator();
         $UserManager = $this->myMakeMock('HfUserManager');
         $this->mySetReturnValue($UserManager, 'getCurrentUserLogin', 'Admin');
 
-        $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager);
+        $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator);
 
         $haystack = $UserButtonsShortcode->getOutput();
         $needle = '<p>Welcome back, Admin';
@@ -31,10 +38,11 @@ class TestUserButtonsShortcode extends HfTestCase {
     }
 
     public function testUserButtonsShortcodeWelcomesDifferentUser() {
+        $AssetLocator = $this->Factory->makeAssetLocator();
         $UserManager = $this->myMakeMock('HfUserManager');
         $this->mySetReturnValue($UserManager, 'getCurrentUserLogin', 'Rodney');
 
-        $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager);
+        $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator);
 
         $haystack = $UserButtonsShortcode->getOutput();
         $needle = '<p>Welcome back, Rodney';
@@ -42,14 +50,18 @@ class TestUserButtonsShortcode extends HfTestCase {
         $this->assertTrue($this->haystackContainsNeedle($haystack, $needle));
     }
 
-    public function IGNOREtestUserButtonsShortcodeDisplaysLogOutLink() {
+    public function testUserButtonsShortcodeDisplaysLogOutLink() {
+        $AssetLocator = $this->myMakeMock('HfUrlFinder');
         $UserManager = $this->myMakeMock('HfUserManager');
         $this->mySetReturnValue($UserManager, 'getCurrentUserLogin', 'Rodney');
+        $this->mySetReturnValue($AssetLocator, 'getLogoutUrl', 'google.com');
+        $this->mySetReturnValue($AssetLocator, 'getCurrentPageUrl', 'bing.com');
+        $this->myExpectAtLeastOnce($AssetLocator, 'getLogoutUrl', array('bing.com'));
 
-        $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager);
+        $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator);
 
         $haystack = $UserButtonsShortcode->getOutput();
-        $needle = '';
+        $needle = '<a href="google.com">Log Out</a>';
 
         $this->assertTrue($this->haystackContainsNeedle($haystack, $needle));
     }

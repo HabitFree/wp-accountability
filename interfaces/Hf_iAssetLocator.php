@@ -8,4 +8,6 @@ interface Hf_iAssetLocator {
     public function getPluginAssetUrl( $fileName );
 
     public function getHomePageUrl();
+
+    public function getLogoutUrl($redirect);
 }
