@@ -21,11 +21,12 @@ class TestUserButtonsShortcode extends HfTestCase {
     public function testUserButtonsShortcodeWelcomesUser() {
         $AssetLocator = $this->myMakeMock('HfUrlFinder');
         $UserManager = $this->myMakeMock('HfUserManager');
+        $MarkupGenerator = $this->Factory->makeMarkupGenerator();
 
         $this->mySetReturnValue($UserManager, 'getCurrentUserLogin', 'Admin');
         $this->mySetReturnValue($UserManager, 'isUserLoggedIn', true);
 
-        $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator);
+        $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator, $MarkupGenerator);
 
         $haystack = $UserButtonsShortcode->getOutput();
         $needle = '<p>Welcome back, Admin';
@@ -36,10 +37,12 @@ class TestUserButtonsShortcode extends HfTestCase {
     public function testUserButtonsShortcodeWelcomesDifferentUser() {
         $AssetLocator = $this->myMakeMock('HfUrlFinder');
         $UserManager = $this->myMakeMock('HfUserManager');
+        $MarkupGenerator = $this->Factory->makeMarkupGenerator();
+
         $this->mySetReturnValue($UserManager, 'getCurrentUserLogin', 'Rodney');
         $this->mySetReturnValue($UserManager, 'isUserLoggedIn', true);
 
-        $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator);
+        $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator, $MarkupGenerator);
 
         $haystack = $UserButtonsShortcode->getOutput();
         $needle = '<p>Welcome back, Rodney';
@@ -50,6 +53,7 @@ class TestUserButtonsShortcode extends HfTestCase {
     public function testUserButtonsShortcodeDisplaysLogOutLink() {
         $AssetLocator = $this->myMakeMock('HfUrlFinder');
         $UserManager = $this->myMakeMock('HfUserManager');
+        $MarkupGenerator = $this->Factory->makeMarkupGenerator();
 
         $this->mySetReturnValue($UserManager, 'getCurrentUserLogin', 'Rodney');
         $this->mySetReturnValue($AssetLocator, 'getLogoutUrl', 'google.com');
@@ -57,7 +61,7 @@ class TestUserButtonsShortcode extends HfTestCase {
         $this->myExpectAtLeastOnce($AssetLocator, 'getLogoutUrl', array('bing.com'));
         $this->mySetReturnValue($UserManager, 'isUserLoggedIn', true);
 
-        $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator);
+        $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator, $MarkupGenerator);
 
         $haystack = $UserButtonsShortcode->getOutput();
         $needle = '<a href="google.com">Log Out</a>';
@@ -68,7 +72,9 @@ class TestUserButtonsShortcode extends HfTestCase {
     public function testUserButtonsShortcodeDoesntDisplayLogoutLinkWhenNotLoggedIn() {
         $UserManager = $this->myMakeMock('HfUserManager');
         $AssetLocator = $this->myMakeMock('HfUrlFinder');
-        $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator);
+        $MarkupGenerator = $this->Factory->makeMarkupGenerator();
+
+        $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator, $MarkupGenerator);
 
         $this->mySetReturnValue($UserManager, 'isUserLoggedIn', false);
 
@@ -81,7 +87,9 @@ class TestUserButtonsShortcode extends HfTestCase {
     public function testUserButtonsShortcodeIncludesClosingParagraphTag() {
         $UserManager = $this->Factory->makeUserManager();
         $AssetLocator = $this->myMakeMock('HfUrlFinder');
-        $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator);
+        $MarkupGenerator = $this->Factory->makeMarkupGenerator();
+
+        $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator, $MarkupGenerator);
 
         $haystack = $UserButtonsShortcode->getOutput();
         $needle = '</p>';
@@ -92,13 +100,14 @@ class TestUserButtonsShortcode extends HfTestCase {
     public function testUserButtonsShortcodeDisplaysLogInLink() {
         $AssetLocator = $this->myMakeMock('HfUrlFinder');
         $UserManager = $this->myMakeMock('HfUserManager');
+        $MarkupGenerator = $this->Factory->makeMarkupGenerator();
 
         $this->mySetReturnValue($UserManager, 'getCurrentUserLogin', 'Rodney');
         $this->mySetReturnValue($AssetLocator, 'getLoginUrl', 'google.com');
         $this->myExpectAtLeastOnce($AssetLocator, 'getLoginUrl');
         $this->mySetReturnValue($UserManager, 'isUserLoggedIn', false);
 
-        $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator);
+        $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator, $MarkupGenerator);
 
         $haystack = $UserButtonsShortcode->getOutput();
         $needle = '<a href="google.com">Log In</a>';
@@ -109,13 +118,14 @@ class TestUserButtonsShortcode extends HfTestCase {
     public function testUserButtonsShortcodeDisplaysSettingsLink() {
         $AssetLocator = $this->myMakeMock('HfUrlFinder');
         $UserManager = $this->myMakeMock('HfUserManager');
+        $MarkupGenerator = $this->Factory->makeMarkupGenerator();
 
         $this->mySetReturnValue($UserManager, 'getCurrentUserLogin', 'Rodney');
         $this->mySetReturnValue($AssetLocator, 'getPageUrlByTitle', 'yahoo.com');
         $this->myExpectAtLeastOnce($AssetLocator, 'getPageUrlByTitle', array('Settings'));
         $this->mySetReturnValue($UserManager, 'isUserLoggedIn', true);
 
-        $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator);
+        $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator, $MarkupGenerator);
 
         $haystack = $UserButtonsShortcode->getOutput();
         $needle = '<a href="yahoo.com">Settings</a>';

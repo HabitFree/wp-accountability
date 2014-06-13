@@ -23,4 +23,12 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         
         return $this->Cms->expandShortcodes($html . '[/su_tabs]');
     }
+
+    public function makeParagraph( $content ) {
+        return '<p>' . $content . '</p>';
+    }
+
+    public function makeLink($target, $content) {
+        return '<a href="' . $target . '">' . $content . '</a>';
+    }
 }

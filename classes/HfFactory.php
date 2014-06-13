@@ -4,8 +4,9 @@ class HfFactory {
     public function makeUserButtonsShortcode() {
         $UserManager  = $this->makeUserManager();
         $AssetLocator = $this->makeAssetLocator();
+        $MarkupGenerator = $this->makeMarkupGenerator();
 
-        return new HfUserButtonsShortcode( $UserManager, $AssetLocator );
+        return new HfUserButtonsShortcode( $UserManager, $AssetLocator, $MarkupGenerator );
     }
 
     public function makeAuthenticateShortcode() {
