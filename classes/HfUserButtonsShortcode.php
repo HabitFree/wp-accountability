@@ -12,18 +12,21 @@ class HfUserButtonsShortcode implements Hf_iShortcode {
     }
 
     public function getOutput() {
-        $sep  = ' | ';
-        $html = $this->welcomeMessage() . $sep . $this->logInOrOutLink() . $sep . $this->settingsLink();
+        $content = ( $this->UserManager->isUserLoggedIn() ) ? $this->userLinks() : $this->visitorLinks();
 
-        return $this->MarkupGenerator->makeParagraph( $html );
+        return $this->MarkupGenerator->makeParagraph( $content );
+    }
+
+    private function userLinks() {
+        return $this->welcomeMessage() . ' | ' . $this->logoutLink() . ' | ' . $this->settingsLink();
+    }
+
+    private function visitorLinks() {
+        return $this->loginLink() . ' | ' . $this->registerLink();
     }
 
     private function welcomeMessage() {
         return ( $this->UserManager->isUserLoggedIn() ) ? 'Welcome back, ' . $this->UserManager->getCurrentUserLogin() : '';
-    }
-
-    private function logInOrOutLink() {
-        return ( $this->UserManager->isUserLoggedIn() ) ? $this->logoutLink() : $this->loginLink();
     }
 
     private function logoutLink() {
@@ -43,5 +46,13 @@ class HfUserButtonsShortcode implements Hf_iShortcode {
         $settingsUrl = $this->AssetLocator->getPageUrlByTitle( 'Settings' );
 
         return $this->MarkupGenerator->makeLink( $settingsUrl, 'Settings' );
+
+    }
+
+    private function registerLink() {
+        $registerUrl = $this->AssetLocator->getPageUrlByTitle( 'Authenticate' );
+
+        return $this->MarkupGenerator->makeLink( $registerUrl, 'Register' );
+
     }
 }

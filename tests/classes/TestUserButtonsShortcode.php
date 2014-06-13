@@ -122,13 +122,31 @@ class TestUserButtonsShortcode extends HfTestCase {
 
         $this->mySetReturnValue($UserManager, 'getCurrentUserLogin', 'Rodney');
         $this->mySetReturnValue($AssetLocator, 'getPageUrlByTitle', 'yahoo.com');
-        $this->myExpectAtLeastOnce($AssetLocator, 'getPageUrlByTitle', array('Settings'));
+        $this->myExpectOnce($AssetLocator, 'getPageUrlByTitle', array('Settings'));
         $this->mySetReturnValue($UserManager, 'isUserLoggedIn', true);
 
         $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator, $MarkupGenerator);
 
         $haystack = $UserButtonsShortcode->getOutput();
         $needle = '<a href="yahoo.com">Settings</a>';
+
+        $this->assertTrue($this->haystackContainsNeedle($haystack, $needle));
+    }
+
+    public function testUserButtonsShortcodeDisplaysRegisterLink() {
+        $AssetLocator = $this->myMakeMock('HfUrlFinder');
+        $UserManager = $this->myMakeMock('HfUserManager');
+        $MarkupGenerator = $this->Factory->makeMarkupGenerator();
+
+        $this->mySetReturnValue($UserManager, 'getCurrentUserLogin', 'Rodney');
+        $this->mySetReturnValue($AssetLocator, 'getPageUrlByTitle', 'nathanarthur.com');
+        $this->myExpectOnce($AssetLocator, 'getPageUrlByTitle', array('Authenticate'));
+        $this->mySetReturnValue($UserManager, 'isUserLoggedIn', false);
+
+        $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator, $MarkupGenerator);
+
+        $haystack = $UserButtonsShortcode->getOutput();
+        $needle = '<a href="nathanarthur.com">Register</a>';
 
         $this->assertTrue($this->haystackContainsNeedle($haystack, $needle));
     }
