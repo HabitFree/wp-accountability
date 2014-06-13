@@ -9,12 +9,12 @@ class HfFactory {
     }
 
     public function makeAuthenticateShortcode() {
-        $DisplayCodeGenerator = $this->makeHtmlGenerator();
-        $AssetLocator         = $this->makeAssetLocator();
-        $Cms                  = $this->makeCms();
-        $UserManager          = $this->makeUserManager();
+        $MarkupGenerator = $this->makeMarkupGenerator();
+        $AssetLocator    = $this->makeAssetLocator();
+        $Cms             = $this->makeCms();
+        $UserManager     = $this->makeUserManager();
 
-        return new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $Cms, $UserManager );
+        return new HfAuthenticateShortcode( $MarkupGenerator, $AssetLocator, $Cms, $UserManager );
     }
 
     public function makeGoalsShortcode() {
@@ -29,10 +29,18 @@ class HfFactory {
         return new HfGoalsShortcode( $UserManager, $Messenger, $AssetLocator, $Database, $Goals, $Security, $Cms );
     }
 
+    public function makeSettingsShortcode() {
+        $AssetLocator = $this->makeAssetLocator();
+        $UserManager  = $this->makeUserManager();
+        $Security     = $this->makeSecurity();
+
+        return new HfSettingsShortcode( $AssetLocator, $UserManager, $Security );
+    }
+
     public function makeGoals() {
         $Cms           = $this->makeCms();
         $Database      = $this->makeDatabase();
-        $HtmlGenerator = $this->makeHtmlGenerator();
+        $HtmlGenerator = $this->makeMarkupGenerator();
         $Mailer        = $this->makeMessenger();
 
         return new HfGoals( $Mailer, $Cms, $HtmlGenerator, $Database );
@@ -46,14 +54,6 @@ class HfFactory {
         $Cms          = $this->makeCms();
 
         return new HfAdminPanel( $Messenger, $AssetLocator, $Database, $UserManager, $Cms );
-    }
-
-    public function makeSettingsShortcode() {
-        $AssetLocator = $this->makeAssetLocator();
-        $UserManager  = $this->makeUserManager();
-        $Security     = $this->makeSecurity();
-
-        return new HfSettingsShortcode( $AssetLocator, $UserManager, $Security );
     }
 
     public function makeUserManager() {
@@ -87,7 +87,7 @@ class HfFactory {
         return new HfUrlFinder( $Cms );
     }
 
-    public function makeHtmlGenerator() {
+    public function makeMarkupGenerator() {
         $Cms = $this->makeCms();
 
         return new HfHtmlGenerator( $Cms );

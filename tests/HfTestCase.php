@@ -1,5 +1,5 @@
 <?php
-require_once( dirname( dirname( __FILE__ ) ) . '/hf-accountability.php' );
+//require_once( dirname( dirname( __FILE__ ) ) . '/hf-accountability.php' );
 
 abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     protected $backupGlobals = false;

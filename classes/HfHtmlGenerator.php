@@ -1,6 +1,6 @@
 <?php
 
-class HfHtmlGenerator implements Hf_iDisplayCodeGenerator {
+class HfHtmlGenerator implements Hf_iMarkupGenerator {
     private $Cms;
 
     function __construct( Hf_iContentManagementSystem $ContentManagementSystem ) {

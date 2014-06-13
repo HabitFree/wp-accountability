@@ -16,7 +16,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private $isLoginSuccessful = false;
     private $isRegistrationSuccessful = false;
 
-    function __construct( Hf_iDisplayCodeGenerator $DisplayCodeGenerator, Hf_iAssetLocator $AssetLocator, Hf_iContentManagementSystem $ContentManagementSystem, Hf_iUserManager $UserManager ) {
+    function __construct( Hf_iMarkupGenerator $DisplayCodeGenerator, Hf_iAssetLocator $AssetLocator, Hf_iContentManagementSystem $ContentManagementSystem, Hf_iUserManager $UserManager ) {
         $this->DisplayCodeGenerator = $DisplayCodeGenerator;
         $this->AssetLocator         = $AssetLocator;
         $this->Cms                  = $ContentManagementSystem;

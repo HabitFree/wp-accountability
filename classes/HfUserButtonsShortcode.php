@@ -10,7 +10,13 @@ class HfUserButtonsShortcode implements Hf_iShortcode {
     }
 
     public function getOutput() {
-        return '<p>' . $this->welcomeMessage() . ' | ' . $this->logoutLink();
+        $html = $this->welcomeMessage();
+
+        if($this->UserManager->isUserLoggedIn()) {
+            $html .= ' | ' . $this->logoutLink();
+        }
+
+        return $this->wrapWithParagraphTags( $html );
     }
 
     private function welcomeMessage() {
@@ -22,5 +28,9 @@ class HfUserButtonsShortcode implements Hf_iShortcode {
         $logoutUrl = $this->AssetLocator->getLogoutUrl( $currentPageUrl );
 
         return '<a href="' . $logoutUrl . '">Log Out</a>';
+    }
+
+    private function wrapWithParagraphTags( $html ) {
+        return '<p>' . $html . '</p>';
     }
 }

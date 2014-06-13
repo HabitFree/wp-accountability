@@ -30,7 +30,7 @@ function hfDeactivate() {
     wp_clear_scheduled_hook( 'hfEmailCronHook' );
 }
 
-require_once( dirname( __FILE__ ) . '/interfaces/Hf_iDisplayCodeGenerator.php' );
+require_once( dirname( __FILE__ ) . '/interfaces/Hf_iMarkupGenerator.php' );
 require_once( dirname( __FILE__ ) . '/interfaces/Hf_iContentManagementSystem.php' );
 require_once( dirname( __FILE__ ) . '/interfaces/Hf_iCodeLibrary.php' );
 require_once( dirname( __FILE__ ) . '/interfaces/Hf_iView.php' );

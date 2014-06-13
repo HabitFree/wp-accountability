@@ -50,7 +50,7 @@ class TestDump extends HfTestCase {
     }
 
     public function testFactoryMakeHtmlGenerator() {
-        $HtmlGenerator = $this->Factory->makeHtmlGenerator();
+        $HtmlGenerator = $this->Factory->makeMarkupGenerator();
 
         $this->assertTrue( is_a( $HtmlGenerator, 'HfHtmlGenerator' ) );
     }
@@ -165,7 +165,7 @@ class TestDump extends HfTestCase {
     }
 
     public function testHtmlGeneratorCreatesTabs() {
-        $HtmlGenerator = $this->Factory->makeHtmlGenerator();
+        $HtmlGenerator = $this->Factory->makeMarkupGenerator();
 
         $contents = array(
             'duck1' => 'quack',
@@ -181,7 +181,7 @@ class TestDump extends HfTestCase {
     }
 
     public function testHtmlGeneratorCreatesDifferentTabs() {
-        $HtmlGenerator = $this->Factory->makeHtmlGenerator();
+        $HtmlGenerator = $this->Factory->makeMarkupGenerator();
 
         $contents = array(
             'duck1' => 'quack',

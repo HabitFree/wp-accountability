@@ -73,4 +73,8 @@ class HfUserManager implements Hf_iUserManager {
         $this->Database->createRelationship( $inviteeID, $inviterID );
         $this->Database->deleteInvite( $nonce );
     }
+
+    public function isUserLoggedIn() {
+        return $this->Cms->isUserLoggedIn();
+    }
 }
