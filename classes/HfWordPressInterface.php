@@ -100,4 +100,8 @@ class HfWordPressInterface implements Hf_iContentManagementSystem {
     public function getUserIdByEmail($email) {
         return get_user_by('email', $email)->ID;
     }
+
+    public function getLogoutUrl($redirect) {
+        return wp_logout_url( $redirect );
+    }
 } 

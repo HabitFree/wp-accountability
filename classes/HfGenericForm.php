@@ -25,4 +25,8 @@ class HfGenericForm extends HfForm {
         }
 
     }
+
+    public function addInfoMessage($message) {
+        $this->elements[] = '<p class="info">'.$message.'</p>';
+    }
 } 

@@ -62,7 +62,7 @@ class TestAuthenticateShortcode extends HfTestCase {
         $result = $AuthenticateShortcode->getOutput();
         $url    = $AssetLocator->getCurrentPageUrl();
 
-        $expectedHtml = '<form action="' . $url . '" method="post"><p><label for="username"><span class="required">*</span> Username: <input type="text" name="username" value="" required /></label></p><p><label for="email"><span class="required">*</span> Email: <input type="text" name="email" value="" required /></label></p><p><label for="password"><span class="required">*</span> Password: <input type="password" name="password" required /></label></p><p><label for="passwordConfirmation"><span class="required">*</span> Confirm Password: <input type="password" name="passwordConfirmation" required /></label></p><p><input type="submit" name="register" value="Register" /></p></form>';
+        $expectedHtml = '<form action="' . $url . '" method="post"><p class="info"><strong>Important:</strong> HabitFree is a support community. For this reason, please choose a non-personally-identifiable username.</p><p><label for="username"><span class="required">*</span> Username: <input type="text" name="username" value="" required /></label></p><p><label for="email"><span class="required">*</span> Email: <input type="text" name="email" value="" required /></label></p><p><label for="password"><span class="required">*</span> Password: <input type="password" name="password" required /></label></p><p><label for="passwordConfirmation"><span class="required">*</span> Confirm Password: <input type="password" name="passwordConfirmation" required /></label></p><p><input type="submit" name="register" value="Register" /></p></form>';
 
         $this->assertTrue( $this->haystackContainsNeedle( $result, $expectedHtml ) );
     }
@@ -577,6 +577,14 @@ class TestAuthenticateShortcode extends HfTestCase {
         $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
         $haystack              = $AuthenticateShortcode->getOutput();
         $needle                = '[su_tabs active="2"]';
+
+        $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
+    }
+
+    public function testAuthenticateShortcodeRegistrationAdvisesUserOnUsernameChoice() {
+        $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
+        $haystack = $AuthenticateShortcode->getOutput();
+        $needle = '<p class="info"><strong>Important:</strong> HabitFree is a support community. For this reason, please choose a non-personally-identifiable username.</p>';
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }

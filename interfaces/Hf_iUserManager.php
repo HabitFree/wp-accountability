@@ -1,8 +1,6 @@
 <?php
 
 interface Hf_iUserManager {
-    public function userButtonsShortcode();
-
     public function processAllUsers();
 
     public function getCurrentUserLogin();

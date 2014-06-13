@@ -42,4 +42,14 @@ class TestGenericForm extends HfTestCase {
 
         $this->assertEquals( $html, '<form action="test.com" method="post"><p><input type="submit" name="submit" value="Submit" /></p></form>' );
     }
+
+    public function testAddInfoBox() {
+        $Form = new HfGenericForm('test.com');
+        $Form->addInfoMessage('message');
+
+        $result = $Form->getHtml();
+        $expected = '<form action="test.com" method="post"><p class="info">message</p></form>';
+
+        $this->assertEquals($expected, $result);
+    }
 }

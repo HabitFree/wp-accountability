@@ -1,6 +1,12 @@
 <?php
 
 class HfFactory {
+    public function makeUserButtonsShortcode() {
+        $UserManager = $this->makeUserManager();
+
+        return new HfUserButtonsShortcode($UserManager);
+    }
+
     public function makeAuthenticateShortcode() {
         $DisplayCodeGenerator = $this->makeHtmlGenerator();
         $AssetLocator         = $this->makeUrlFinder();

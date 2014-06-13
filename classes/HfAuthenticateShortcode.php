@@ -37,28 +37,6 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         return $this->additionalHtml . $this->getTabs();
     }
 
-    private function generateLoginForm() {
-        $Form = new HfGenericForm( $this->AssetLocator->getCurrentPageUrl() );
-
-        $Form->addTextBox( 'username', 'Username', $this->username, true );
-        $Form->addPasswordBox( 'password', 'Password', true );
-        $Form->addSubmitButton( 'login', 'Log In' );
-
-        return $Form->getHtml();
-    }
-
-    private function generateRegistrationForm() {
-        $Form = new HfGenericForm( $this->AssetLocator->getCurrentPageUrl() );
-
-        $Form->addTextBox( 'username', 'Username', $this->username, true );
-        $Form->addTextBox( 'email', 'Email', $this->email, true );
-        $Form->addPasswordBox( 'password', 'Password', true );
-        $Form->addPasswordBox( 'passwordConfirmation', 'Confirm Password', true );
-        $Form->addSubmitButton( 'register', 'Register' );
-
-        return $Form->getHtml();
-    }
-
     private function recallPostData() {
         if ( $this->isRegistering() or $this->isLoggingIn() ) {
             $this->username = $_POST['username'];
@@ -78,6 +56,32 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         ), $activeTabNumber );
 
         return $tabs;
+    }
+
+    private function generateLoginForm() {
+        $Form = new HfGenericForm( $this->AssetLocator->getCurrentPageUrl() );
+
+        $Form->addTextBox( 'username', 'Username', $this->username, true );
+        $Form->addPasswordBox( 'password', 'Password', true );
+        $Form->addSubmitButton( 'login', 'Log In' );
+
+        return $Form->getHtml();
+    }
+
+    private function generateRegistrationForm() {
+        $Form = new HfGenericForm( $this->AssetLocator->getCurrentPageUrl() );
+
+        $usernameChoiceMessage =
+            '<strong>Important:</strong> HabitFree is a support community. For this reason, please choose a non-personally-identifiable username.';
+
+        $Form->addInfoMessage($usernameChoiceMessage);
+        $Form->addTextBox( 'username', 'Username', $this->username, true );
+        $Form->addTextBox( 'email', 'Email', $this->email, true );
+        $Form->addPasswordBox( 'password', 'Password', true );
+        $Form->addPasswordBox( 'passwordConfirmation', 'Confirm Password', true );
+        $Form->addSubmitButton( 'register', 'Register' );
+
+        return $Form->getHtml();
     }
 
     private function validateLoginForm() {

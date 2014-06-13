@@ -40,24 +40,6 @@ class HfUserManager implements Hf_iUserManager {
         return $this->Cms->currentUser()->ID;
     }
 
-    function userButtonsShortcode() {
-        $welcome = 'Welcome back, ' . $this->getCurrentUserLogin() . ' | ';
-
-        if ( is_user_logged_in() ) {
-            $logOutUrl   = wp_logout_url( $this->AssetLocator->getCurrentPageUrl() );
-            $settingsUrl = $this->AssetLocator->getPageUrlByTitle( 'Settings' );
-
-            return $welcome .
-            '<a href="' . $logOutUrl . '">Log Out</a> | <a href="' . $settingsUrl . '">Settings</a>';
-        } else {
-            $registerUrl = $this->AssetLocator->getPageUrlByTitle( 'Register' );
-            $loginUrl    = $this->AssetLocator->getPageUrlByTitle( 'Log In' );
-
-            return '<a href="' . $loginUrl . '">Log In</a> | <a href="' . $registerUrl . '">Register</a>';
-        }
-
-    }
-
     public function sendInvitation( $inviterId, $address, $daysToExpire ) {
         $inviteId        = $this->Messenger->generateInviteID();
         $inviteURL       = $this->Messenger->generateInviteURL( $inviteId );

@@ -40,4 +40,6 @@ interface Hf_iContentManagementSystem {
     public function expandShortcodes( $string );
 
     public function getUserIdByEmail($email);
+
+    public function getLogoutUrl($redirect);
 }
