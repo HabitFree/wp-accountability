@@ -19,15 +19,11 @@ class TestUserButtonsShortcode extends HfTestCase {
     }
 
     public function testUserButtonsShortcodeWelcomesUser() {
-//        $credentials                  = array();
-//        $credentials['user_login']    = $username;
-//        $credentials['user_password'] = $password;
-//
-//        return !$this->isError(wp_signon( $credentials ));
-
-        $AssetLocator = $this->Factory->makeAssetLocator();
+        $AssetLocator = $this->myMakeMock('HfUrlFinder');
         $UserManager = $this->myMakeMock('HfUserManager');
+
         $this->mySetReturnValue($UserManager, 'getCurrentUserLogin', 'Admin');
+        $this->mySetReturnValue($UserManager, 'isUserLoggedIn', true);
 
         $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator);
 
@@ -38,9 +34,10 @@ class TestUserButtonsShortcode extends HfTestCase {
     }
 
     public function testUserButtonsShortcodeWelcomesDifferentUser() {
-        $AssetLocator = $this->Factory->makeAssetLocator();
+        $AssetLocator = $this->myMakeMock('HfUrlFinder');
         $UserManager = $this->myMakeMock('HfUserManager');
         $this->mySetReturnValue($UserManager, 'getCurrentUserLogin', 'Rodney');
+        $this->mySetReturnValue($UserManager, 'isUserLoggedIn', true);
 
         $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator);
 
@@ -70,7 +67,7 @@ class TestUserButtonsShortcode extends HfTestCase {
 
     public function testUserButtonsShortcodeDoesntDisplayLogoutLinkWhenNotLoggedIn() {
         $UserManager = $this->myMakeMock('HfUserManager');
-        $AssetLocator = $this->Factory->makeAssetLocator();
+        $AssetLocator = $this->myMakeMock('HfUrlFinder');
         $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator);
 
         $this->mySetReturnValue($UserManager, 'isUserLoggedIn', false);
@@ -82,7 +79,9 @@ class TestUserButtonsShortcode extends HfTestCase {
     }
 
     public function testUserButtonsShortcodeIncludesClosingParagraphTag() {
-        $UserButtonsShortcode = $this->Factory->makeUserButtonsShortcode();
+        $UserManager = $this->Factory->makeUserManager();
+        $AssetLocator = $this->myMakeMock('HfUrlFinder');
+        $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator);
 
         $haystack = $UserButtonsShortcode->getOutput();
         $needle = '</p>';
@@ -90,21 +89,20 @@ class TestUserButtonsShortcode extends HfTestCase {
         $this->assertTrue($this->haystackContainsNeedle($haystack, $needle));
     }
 
-//    public function testUserButtonsShortcodeDisplaysLogInLink() {
-//        $AssetLocator = $this->myMakeMock('HfUrlFinder');
-//        $UserManager = $this->myMakeMock('HfUserManager');
-//
-//        $this->mySetReturnValue($UserManager, 'getCurrentUserLogin', 'Rodney');
-//        $this->mySetReturnValue($AssetLocator, 'getLoginUrl', 'google.com');
-//        $this->mySetReturnValue($AssetLocator, 'getCurrentPageUrl', 'bing.com');
-//        $this->myExpectAtLeastOnce($AssetLocator, 'getLoginUrl', array('bing.com'));
-//        $this->mySetReturnValue($UserManager, 'isUserLoggedIn', false);
-//
-//        $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator);
-//
-//        $haystack = $UserButtonsShortcode->getOutput();
-//        $needle = '<a href="google.com">Log Out</a>';
-//
-//        $this->assertTrue($this->haystackContainsNeedle($haystack, $needle));
-//    }
+    public function testUserButtonsShortcodeDisplaysLogInLink() {
+        $AssetLocator = $this->myMakeMock('HfUrlFinder');
+        $UserManager = $this->myMakeMock('HfUserManager');
+
+        $this->mySetReturnValue($UserManager, 'getCurrentUserLogin', 'Rodney');
+        $this->mySetReturnValue($AssetLocator, 'getLoginUrl', 'google.com');
+        $this->myExpectAtLeastOnce($AssetLocator, 'getLoginUrl');
+        $this->mySetReturnValue($UserManager, 'isUserLoggedIn', false);
+
+        $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator);
+
+        $haystack = $UserButtonsShortcode->getOutput();
+        $needle = '<a href="google.com">Log In</a>';
+
+        $this->assertTrue($this->haystackContainsNeedle($haystack, $needle));
+    }
 }

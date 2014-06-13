@@ -588,4 +588,32 @@ class TestAuthenticateShortcode extends HfTestCase {
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }
+
+    public function testAuthenticateShortcodeLoginDisplaysRedirectMessage() {
+        $_POST             = array();
+        $_GET = array();
+        $_POST['login']    = '';
+        $_POST['username'] = 'Joe';
+        $_POST['password'] = 'bo';
+
+        $DisplayCodeGenerator    = $this->Factory->makeMarkupGenerator();
+        $AssetLocator            = $this->Factory->makeAssetLocator();
+        $ContentManagementSystem = $this->myMakeMock( 'HfWordPressInterface' );
+        $UserManager             = $this->Factory->makeUserManager();
+
+        $this->mySetReturnValue( $ContentManagementSystem, 'authenticateUser', true );
+
+        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem, $UserManager );
+
+        $haystack = $AuthenticateShortcode->getOutput();
+
+        $openingTagPosition = stripos($haystack, '[su_tab title="Log In"]');
+        $closingTagPosition = stripos($haystack, '[/su_tab]');
+
+        $substring = substr($haystack, $openingTagPosition, $closingTagPosition);
+
+        $needle = '<p class="info">Redirecting...';
+
+        $this->assertTrue( $this->haystackContainsNeedle( $substring, $needle ) );
+    }
 }

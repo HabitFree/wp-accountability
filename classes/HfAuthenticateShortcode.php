@@ -202,8 +202,12 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     private function redirectUser() {
         $url = $this->AssetLocator->getHomePageUrl();
-        $this->registrationMessages .=
+        $redirectMessage =
             '<p class="info">Redirecting... <a href="' . $url . '">Click here</a> if you are not automatically redirected. <a href="' . $url . '">Onward!</a></p>';
+
+        $this->registrationMessages .= $redirectMessage;
+        $this->loginMessages .= $redirectMessage;
+
         $this->additionalHtml .=
             '<script>setTimeout(function(){window.location.replace("' . $url . '")},5000);</script>';
     }

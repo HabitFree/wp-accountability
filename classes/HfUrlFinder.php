@@ -54,4 +54,8 @@ class HfUrlFinder implements Hf_iAssetLocator {
     public function getLogoutUrl($redirect) {
         return $this->Cms->getLogoutUrl($redirect);
     }
+
+    public function getLoginUrl() {
+        $this->getPageUrlByTitle('Authenticate');
+    }
 }

@@ -10,4 +10,6 @@ interface Hf_iAssetLocator {
     public function getHomePageUrl();
 
     public function getLogoutUrl($redirect);
+
+    public function getLoginUrl();
 }

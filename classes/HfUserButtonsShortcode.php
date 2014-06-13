@@ -12,25 +12,33 @@ class HfUserButtonsShortcode implements Hf_iShortcode {
     public function getOutput() {
         $html = $this->welcomeMessage();
 
-        if($this->UserManager->isUserLoggedIn()) {
-            $html .= ' | ' . $this->logoutLink();
-        }
+        $html .= ' | ' . $this->logInOrOutLink( $html );
 
         return $this->wrapWithParagraphTags( $html );
     }
 
     private function welcomeMessage() {
-        return 'Welcome back, ' . $this->UserManager->getCurrentUserLogin();
-    }
-
-    private function logoutLink() {
-        $currentPageUrl = $this->AssetLocator->getCurrentPageUrl();
-        $logoutUrl = $this->AssetLocator->getLogoutUrl( $currentPageUrl );
-
-        return '<a href="' . $logoutUrl . '">Log Out</a>';
+        return ($this->UserManager->isUserLoggedIn()) ? 'Welcome back, ' . $this->UserManager->getCurrentUserLogin() : '';
     }
 
     private function wrapWithParagraphTags( $html ) {
         return '<p>' . $html . '</p>';
+    }
+
+    private function logInOrOutLink() {
+        return ( $this->UserManager->isUserLoggedIn() ) ? $this->logoutLink() : $this->loginLink();
+    }
+
+    private function logoutLink() {
+        $currentPageUrl = $this->AssetLocator->getCurrentPageUrl();
+        $logoutUrl      = $this->AssetLocator->getLogoutUrl( $currentPageUrl );
+
+        return '<a href="' . $logoutUrl . '">Log Out</a>';
+    }
+
+    private function loginLink() {
+        $loginUrl = $this->AssetLocator->getLoginUrl();
+
+        return '<a href="' . $loginUrl . '">Log In</a>';
     }
 }
