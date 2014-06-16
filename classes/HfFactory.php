@@ -2,8 +2,8 @@
 
 class HfFactory {
     public function makeUserButtonsShortcode() {
-        $UserManager  = $this->makeUserManager();
-        $AssetLocator = $this->makeAssetLocator();
+        $UserManager     = $this->makeUserManager();
+        $AssetLocator    = $this->makeAssetLocator();
         $MarkupGenerator = $this->makeMarkupGenerator();
 
         return new HfUserButtonsShortcode( $UserManager, $AssetLocator, $MarkupGenerator );
@@ -19,13 +19,14 @@ class HfFactory {
     }
 
     public function makeGoalsShortcode() {
-        $AssetLocator = $this->makeAssetLocator();
-        $Messenger    = $this->makeMessenger();
-        $UserManager  = $this->makeUserManager();
-        $Goals        = $this->makeGoals();
-        $Security     = $this->makeSecurity();
+        $AssetLocator    = $this->makeAssetLocator();
+        $Messenger       = $this->makeMessenger();
+        $UserManager     = $this->makeUserManager();
+        $Goals           = $this->makeGoals();
+        $Security        = $this->makeSecurity();
+        $MarkupGenerator = $this->makeMarkupGenerator();
 
-        return new HfGoalsShortcode( $UserManager, $Messenger, $AssetLocator, $Goals, $Security );
+        return new HfGoalsShortcode( $UserManager, $Messenger, $AssetLocator, $Goals, $Security, $MarkupGenerator );
     }
 
     public function makeSettingsShortcode() {

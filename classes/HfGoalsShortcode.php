@@ -6,13 +6,15 @@ class HfGoalsShortcode implements Hf_iShortcode {
     private $PageLocator;
     private $Goals;
     private $Security;
+    private $MarkupGenerator;
 
-    function __construct( Hf_iUserManager $UserManager, Hf_iMessenger $Messenger, Hf_iAssetLocator $PageLocator, Hf_iGoals $Goals, Hf_iSecurity $Security ) {
+    function __construct( Hf_iUserManager $UserManager, Hf_iMessenger $Messenger, Hf_iAssetLocator $PageLocator, Hf_iGoals $Goals, Hf_iSecurity $Security, Hf_iMarkupGenerator $MarkupGenerator ) {
         $this->UserManager = $UserManager;
         $this->Messenger   = $Messenger;
         $this->PageLocator = $PageLocator;
         $this->Goals       = $Goals;
         $this->Security    = $Security;
+        $this->MarkupGenerator = $MarkupGenerator;
     }
 
     public function getOutput() {
@@ -96,24 +98,36 @@ class HfGoalsShortcode implements Hf_iShortcode {
     }
 
     private function generatePartnerReportBody( $Partner, $reporterUsername ) {
-        $greeting = "<p>Hello, " . $Partner->user_login . ",</p>";
-        $intro    = "<p>Your friend " . $reporterUsername . " just reported on their progress. Here's how they're doing:</p>";
+        $greeting = $this->MarkupGenerator->makeParagraph("Hello, " . $Partner->user_login . ",");
+        $intro = $this->MarkupGenerator->makeParagraph(
+            "Your friend " . $reporterUsername . " just reported on their progress. Here's how they're doing:"
+        );
 
-        $reports = '';
-
-        foreach ( $_POST as $key => $value ) {
-            if ( $key == 'submit' ) {
-                continue;
-            } else {
-                $goalTitle = $this->Goals->getGoalTitle($key);
-                $reports .= '<li>' . $goalTitle . ': ';
-                $reports .= ($value === 1) ? 'Success</li>' : 'Failure</li>';
-            }
-        }
-
-        $reports  = '<ul>'.$reports.'</ul>';
+        $reports = $this->generateReportsList();
         $body     = $greeting . $intro . $reports;
 
         return $body;
+    }
+
+    private function generateReportsList() {
+        $reports = array();
+
+        foreach ( $_POST as $goalId => $value ) {
+            if ( $goalId == 'submit' ) {
+                continue;
+            } else {
+                $reports[] = $this->generateReportsListItem( $goalId, $value );
+            }
+        };
+
+        return $this->MarkupGenerator->makeList($reports);
+    }
+
+    private function generateReportsListItem( $goalId, $value ) {
+        $goalTitle = $this->Goals->getGoalTitle( $goalId );
+        $report = $goalTitle . ': ';
+        $report .= ( $value === 0 ) ? 'Success' : 'Failure';
+
+        return $report;
     }
 }

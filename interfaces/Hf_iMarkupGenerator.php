@@ -8,4 +8,6 @@ interface Hf_iMarkupGenerator {
     public function makeParagraph($content);
 
     public function makeLink($target, $content);
+
+    public function makeList($items);
 }

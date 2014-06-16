@@ -31,4 +31,12 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     public function makeLink($target, $content) {
         return '<a href="' . $target . '">' . $content . '</a>';
     }
+
+    public function makeList($items) {
+        $html = '';
+        foreach ($items as $item) {
+            $html .= '<li>'.$item.'</li>';
+        }
+        return '<ul>'.$html.'</ul>';
+    }
 }
