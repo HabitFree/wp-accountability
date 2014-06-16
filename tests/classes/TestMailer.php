@@ -45,35 +45,35 @@ class TestMailer extends HfTestCase {
     }
 
     public function testIsThrottledReturnsFalse() {
-        list( $UrlFinder, $Security, $DbConnection, $ApiInterface ) = $this->makeDependencies();
+        list( $UrlFinder, $Security, $Database, $ApiInterface ) = $this->makeDependencies();
 
-        $this->mySetReturnValue( $DbConnection, 'daysSinceAnyReport', 100 );
-        $this->mySetReturnValue( $DbConnection, 'daysSinceLastEmail', 10 );
-        $this->mySetReturnValue( $DbConnection, 'daysSinceSecondToLastEmail', 12 );
+        $this->mySetReturnValue( $Database, 'daysSinceAnyReport', 100 );
+        $this->mySetReturnValue( $Database, 'daysSinceLastEmail', 10 );
+        $this->mySetReturnValue( $Database, 'daysSinceSecondToLastEmail', 12 );
 
-        $Mailer = new HfMailer( $UrlFinder, $Security, $DbConnection, $ApiInterface );
+        $Mailer = new HfMailer( $UrlFinder, $Security, $Database, $ApiInterface );
         $result = $Mailer->isThrottled( 1 );
 
         $this->assertEquals( $result, false );
     }
 
     public function testIsThrottledReturnsTrue() {
-        list( $UrlFinder, $Security, $DbConnection, $ApiInterface ) = $this->makeDependencies();
+        list( $UrlFinder, $Security, $Database, $ApiInterface ) = $this->makeDependencies();
 
-        $this->mySetReturnValue( $DbConnection, 'daysSinceAnyReport', 100 );
-        $this->mySetReturnValue( $DbConnection, 'daysSinceLastEmail', 10 );
-        $this->mySetReturnValue( $DbConnection, 'daysSinceSecondToLastEmail', 17 );
+        $this->mySetReturnValue( $Database, 'daysSinceAnyReport', 100 );
+        $this->mySetReturnValue( $Database, 'daysSinceLastEmail', 10 );
+        $this->mySetReturnValue( $Database, 'daysSinceSecondToLastEmail', 17 );
 
-        $Mailer = new HfMailer( $UrlFinder, $Security, $DbConnection, $ApiInterface );
+        $Mailer = new HfMailer( $UrlFinder, $Security, $Database, $ApiInterface );
         $result = $Mailer->isThrottled( 1 );
 
         $this->assertEquals( $result, true );
     }
 
     public function testMailerPointsInviteUrlToRegistrationTab() {
-        list( $UrlFinder, $Security, $DbConnection, $ApiInterface ) = $this->makeDependencies();
+        list( $UrlFinder, $Security, $Database, $ApiInterface ) = $this->makeDependencies();
 
-        $Mailer = new HfMailer( $UrlFinder, $Security, $DbConnection, $ApiInterface );
+        $Mailer = new HfMailer( $UrlFinder, $Security, $Database, $ApiInterface );
 
         $this->mySetReturnValue($UrlFinder, 'getPageUrlByTitle', 'habitfree.org/authenticate');
 
@@ -81,5 +81,15 @@ class TestMailer extends HfTestCase {
         $expected = 'habitfree.org/authenticate?n=777&tab=2';
 
         $this->assertEquals($expected, $result);
+    }
+
+    public function testIsEmailValid() {
+        list( $UrlFinder, $Security, $Database, $ApiInterface ) = $this->makeDependencies();
+
+        $Mailer = new HfMailer( $UrlFinder, $Security, $Database, $ApiInterface );
+
+        $this->mySetReturnValue($Database, 'isEmailValid', true);
+
+        $this->assertTrue($Mailer->isEmailValid(1,1));
     }
 }

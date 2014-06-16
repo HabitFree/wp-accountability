@@ -21,6 +21,8 @@ interface Hf_iContentManagementSystem {
 
     public function getRows( $table, $where, $outputType = OBJECT );
 
+    public function getRow( $table, $criterion );
+
     public function deleteRows( $table, $where );
 
     public function isEmailTaken( $email );
@@ -42,4 +44,6 @@ interface Hf_iContentManagementSystem {
     public function getUserIdByEmail($email);
 
     public function getLogoutUrl($redirect);
+
+    public function getResults($query);
 }

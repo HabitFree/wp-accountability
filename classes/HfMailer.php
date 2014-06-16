@@ -89,7 +89,7 @@ class HfMailer implements Hf_iMessenger {
     }
 
     function generateInviteURL( $inviteID ) {
-        $baseURL = $this->PageLocator->getPageUrlByTitle( 'Register' );
+        $baseURL = $this->PageLocator->getPageUrlByTitle( 'Authenticate' );
 
         $parameters = array(
             'n'   => $inviteID,
@@ -150,5 +150,9 @@ class HfMailer implements Hf_iMessenger {
         }
 
         return $url;
+    }
+
+    public function isEmailValid($userId, $emailId) {
+        return $this->Database->isEmailValid($userId, $emailId);
     }
 }

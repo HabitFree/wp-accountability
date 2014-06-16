@@ -14,4 +14,6 @@ interface Hf_iUserManager {
     public function sendInvitation( $inviterId, $address, $daysToExpire );
 
     public function isUserLoggedIn();
+
+    public function getPartners( $userId );
 }

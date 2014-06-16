@@ -16,6 +16,6 @@ class HfAccountabilityForm extends HfForm {
             $this->elements[] = $this->Goals->generateGoalCard($sub);
         }
 
-        $this->elements[] = '<p></p><input class="submit" type="submit" name="submit" value="Submit" /></p>';
+        $this->elements[] = '<p><input class="submit" type="submit" name="submit" value="Submit" /></p>';
     }
 } 

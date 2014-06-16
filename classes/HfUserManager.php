@@ -7,10 +7,10 @@ class HfUserManager implements Hf_iUserManager {
     private $Cms;
 
     function HfUserManager( Hf_iDatabase $Database, Hf_iMessenger $Messenger, Hf_iAssetLocator $PageLocator, Hf_iContentManagementSystem $ContentManagementSystem ) {
-        $this->Database                = $Database;
-        $this->Messenger               = $Messenger;
-        $this->AssetLocator            = $PageLocator;
-        $this->Cms = $ContentManagementSystem;
+        $this->Database     = $Database;
+        $this->Messenger    = $Messenger;
+        $this->AssetLocator = $PageLocator;
+        $this->Cms          = $ContentManagementSystem;
     }
 
     function processAllUsers() {
@@ -68,13 +68,17 @@ class HfUserManager implements Hf_iUserManager {
     }
 
     public function processInvite( $inviteeEmail, $nonce ) {
-        $inviteeID = $this->Cms->getUserIdByEmail($inviteeEmail);
-        $inviterID = $this->Database->getInviterID($nonce);
+        $inviteeID = $this->Cms->getUserIdByEmail( $inviteeEmail );
+        $inviterID = $this->Database->getInviterID( $nonce );
         $this->Database->createRelationship( $inviteeID, $inviterID );
         $this->Database->deleteInvite( $nonce );
     }
 
     public function isUserLoggedIn() {
         return $this->Cms->isUserLoggedIn();
+    }
+
+    public function getPartners( $userId ) {
+        return $this->Database->getPartners( $userId );
     }
 }

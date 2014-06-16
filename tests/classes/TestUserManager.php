@@ -76,4 +76,17 @@ class TestUserManager extends HfTestCase {
 
         $UserManager->processInvite( 'taken@taken.com', 555 );
     }
+
+    public function testGetFriends() {
+        $Database = $this->myMakeMock('HfMysqlDatabase');
+        $this->mySetReturnValue($Database, 'getPartners', 'duck');
+
+        $Messenger = $this->myMakeMock('HfMailer');
+        $AssetLocator = $this->myMakeMock('HfUrlFinder');
+        $Cms = $this->myMakeMock('HfWordPressInterface');
+
+        $UserManager = new HfUserManager($Database, $Messenger, $AssetLocator, $Cms);
+
+        $this->assertEquals('duck', $UserManager->getPartners(1));
+    }
 }

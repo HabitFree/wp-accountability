@@ -57,6 +57,12 @@ class HfWordPressInterface implements Hf_iContentManagementSystem {
         }
     }
 
+    function getRow( $table, $criterion ) {
+        $prefix = $this->getDbPrefix();
+
+        return $this->wpdb->get_row( "SELECT * FROM " . $prefix . $table . " WHERE " . $criterion );
+    }
+
     public function deleteRows( $table, $where ) {
         return $this->wpdb->delete( $table, $where );
     }
@@ -103,5 +109,9 @@ class HfWordPressInterface implements Hf_iContentManagementSystem {
 
     public function getLogoutUrl($redirect) {
         return wp_logout_url( $redirect );
+    }
+
+    public function getResults($query) {
+        return $this->wpdb->get_results($query);
     }
 } 

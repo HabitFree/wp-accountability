@@ -43,16 +43,16 @@ class HfGoals implements Hf_iGoals {
         return $wrapperOpen . $main . $stats . $wrapperClose;
     }
 
-    function levelPercentComplete( $goalID, $userID ) {
-        $daysOfSuccess = $this->daysOfSuccess( $goalID, $userID );
+    function levelPercentComplete( $goalId, $userId ) {
+        $daysOfSuccess = $this->daysOfSuccess( $goalId, $userId );
 
-        return ( $this->daysOfSuccess( $goalID, $userID ) / $this->currentLevelTarget( $daysOfSuccess ) ) * 100;
+        return ( $this->daysOfSuccess( $goalId, $userId ) / $this->currentLevelTarget( $daysOfSuccess ) ) * 100;
     }
 
-    function daysOfSuccess( $goalID, $userID ) {
-        $dateInSecondsOfFirstSuccess = $this->Database->timeOfFirstSuccess( $goalID, $userID );
-        $dateInSecondsOfLastSuccess  = $this->Database->timeOfLastSuccess( $goalID, $userID );
-        $dateInSecondsOfLastFail     = $this->Database->timeOfLastFail( $goalID, $userID );
+    function daysOfSuccess( $goalId, $userId ) {
+        $dateInSecondsOfFirstSuccess = $this->Database->timeOfFirstSuccess( $goalId, $userId );
+        $dateInSecondsOfLastSuccess  = $this->Database->timeOfLastSuccess( $goalId, $userId );
+        $dateInSecondsOfLastFail     = $this->Database->timeOfLastFail( $goalId, $userId );
 
         $secondsInADay = 86400;
 
@@ -77,15 +77,15 @@ class HfGoals implements Hf_iGoals {
         return $level->target;
     }
 
-    function daysToNextLevel( $goalID, $userID ) {
-        $daysOfSuccess = $this->daysOfSuccess( $goalID, $userID );
+    function daysToNextLevel( $goalId, $userId ) {
+        $daysOfSuccess = $this->daysOfSuccess( $goalId, $userId );
         $target        = $this->currentLevelTarget( $daysOfSuccess );
 
         return $target - $daysOfSuccess;
     }
 
-    function levelBarForGoal( $goalID, $userID ) {
-        $percent = $this->levelPercentComplete( $goalID, $userID );
+    function levelBarForGoal( $goalId, $userId ) {
+        $percent = $this->levelPercentComplete( $goalId, $userId );
 
         return $this->View->progressBar( $percent, '' );
     }
@@ -100,10 +100,10 @@ class HfGoals implements Hf_iGoals {
         }
     }
 
-    private function isAnyGoalDue( $userID ) {
-        $goalSubs = $this->Database->getRows( 'hf_user_goal', 'userID = ' . $userID );
+    private function isAnyGoalDue( $userId ) {
+        $goalSubs = $this->Database->getRows( 'hf_user_goal', 'userID = ' . $userId );
         foreach ( $goalSubs as $goalSub ) {
-            if ( $this->isGoalDue( $goalSub->goalID, $userID ) ) {
+            if ( $this->isGoalDue( $goalSub->goalID, $userId ) ) {
                 return true;
             }
         }
@@ -111,12 +111,24 @@ class HfGoals implements Hf_iGoals {
         return false;
     }
 
-    private function isGoalDue( $goalID, $userID ) {
-        $daysOfSuccess       = $this->daysOfSuccess( $goalID, $userID );
-        $level               = $this->Database->level( $goalID, $userID, $daysOfSuccess );
+    private function isGoalDue( $goalId, $userId ) {
+        $daysOfSuccess       = $this->daysOfSuccess( $goalId, $userId );
+        $level               = $this->Database->level( $goalId, $userId, $daysOfSuccess );
         $emailInterval       = $level->emailInterval;
-        $daysSinceLastReport = $this->Database->daysSinceLastReport( $goalID, $userID );
+        $daysSinceLastReport = $this->Database->daysSinceLastReport( $goalId, $userId );
 
         return $daysSinceLastReport > $emailInterval;
+    }
+
+    public function getGoalTitle( $goalId ) {
+        return $this->Database->getGoal( $goalId )->title;
+    }
+
+    public function recordAccountabilityReport( $userId, $goalId, $isSuccessful, $emailId = null ) {
+        $this->Database->recordAccountabilityReport( $userId, $goalId, $isSuccessful, $emailId );
+    }
+
+    public function getGoalSubscriptions( $userId ) {
+        return $this->Database->getGoalSubscriptions( $userId );
     }
 } 

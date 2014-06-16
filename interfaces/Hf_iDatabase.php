@@ -37,7 +37,7 @@ interface Hf_iDatabase {
 
     public function timeOfFirstSuccess( $goalID, $userID );
 
-    public function emailIsValid( $userID, $emailID );
+    public function isEmailValid( $userID, $emailID );
 
     public function getRow( $table, $criterion );
 
@@ -49,7 +49,7 @@ interface Hf_iDatabase {
 
     public function countRowsInTable( $table );
 
-    public function submitAccountabilityReport( $userID, $goalID, $isSuccessful, $emailID = null );
+    public function recordAccountabilityReport( $userID, $goalID, $isSuccessful, $emailID = null );
 
     public function updateRows( $table, $data, $where );
 
@@ -66,4 +66,8 @@ interface Hf_iDatabase {
     public function escapeData( $data );
 
     public function getInviterID( $nonce );
+
+    public function getPartners( $userId );
+
+    public function getGoal( $goalId );
 }

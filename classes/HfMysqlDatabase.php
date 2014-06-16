@@ -500,7 +500,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $this->insertIgnoreIntoDb( 'hf_relationship', $row );
     }
 
-    public function submitAccountabilityReport( $userID, $goalID, $isSuccessful, $emailID = null ) {
+    public function recordAccountabilityReport( $userID, $goalID, $isSuccessful, $emailID = null ) {
         $data = array(
             'userID'           => $userID,
             'goalID'           => $goalID,
@@ -509,7 +509,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $this->insertIntoDb( 'hf_report', $data );
     }
 
-    public function emailIsValid( $userID, $emailID ) {
+    public function isEmailValid( $userID, $emailID ) {
         $email = $this->getRow( 'hf_email',
             'userID = ' . $userID .
             ' AND emailID = ' . $emailID );
@@ -526,5 +526,18 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $where = array('inviteID' => $inviteID);
 
         $this->Cms->deleteRows( $table, $where );
+    }
+
+    public function getPartners( $userId ) {
+        $query = 'SELECT * FROM `wp_users`
+            INNER JOIN `wp_hf_relationship`
+            WHERE (userID1 = ID OR userID2 = ID)
+            AND (userID1 = '.$userId.' OR userID2 = '.$userId.') AND ID != '.$userId;
+        return $this->Cms->getResults($query);
+    }
+
+    public function getGoal( $goalId ) {
+        $where = 'goalID = ' . $goalId;
+        return $this->Cms->getRow('hf_goal', $where);
     }
 }

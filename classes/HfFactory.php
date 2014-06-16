@@ -19,15 +19,13 @@ class HfFactory {
     }
 
     public function makeGoalsShortcode() {
-        $Database     = $this->makeDatabase();
         $AssetLocator = $this->makeAssetLocator();
         $Messenger    = $this->makeMessenger();
         $UserManager  = $this->makeUserManager();
         $Goals        = $this->makeGoals();
         $Security     = $this->makeSecurity();
-        $Cms          = $this->makeCms();
 
-        return new HfGoalsShortcode( $UserManager, $Messenger, $AssetLocator, $Database, $Goals, $Security, $Cms );
+        return new HfGoalsShortcode( $UserManager, $Messenger, $AssetLocator, $Goals, $Security );
     }
 
     public function makeSettingsShortcode() {
