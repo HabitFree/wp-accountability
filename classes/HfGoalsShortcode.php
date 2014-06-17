@@ -112,21 +112,21 @@ class HfGoalsShortcode implements Hf_iShortcode {
     private function generateReportsList() {
         $reports = array();
 
-        foreach ( $_POST as $goalId => $value ) {
+        foreach ( $_POST as $goalId => $isSuccessful ) {
             if ( $goalId == 'submit' ) {
                 continue;
             } else {
-                $reports[] = $this->generateReportsListItem( $goalId, $value );
+                $reports[] = $this->generateReportsListItem( $goalId, $isSuccessful );
             }
         };
 
         return $this->MarkupGenerator->makeList($reports);
     }
 
-    private function generateReportsListItem( $goalId, $value ) {
+    private function generateReportsListItem( $goalId, $isSuccessful ) {
         $goalTitle = $this->Goals->getGoalTitle( $goalId );
         $report = $goalTitle . ': ';
-        $report .= ( $value === 0 ) ? 'Success' : 'Failure';
+        $report .= ( $isSuccessful ) ? 'Success' : 'Failure';
 
         return $report;
     }

@@ -27,8 +27,8 @@ class TestGoalsShortcode extends HfTestCase {
 
         $_POST           = array();
         $_POST['submit'] = '';
-        $_POST[1]        = 0;
-        $_POST[2]        = 1;
+        $_POST[1]        = '1';
+        $_POST[2]        = '0';
 
         $MarkupGenerator = $this->Factory->makeMarkupGenerator();
 
@@ -67,7 +67,7 @@ class TestGoalsShortcode extends HfTestCase {
 
         $_POST           = array();
         $_POST['submit'] = '';
-        $_POST[1]        = 1;
+        $_POST[1]        = '0';
 
         $MarkupGenerator = $this->Factory->makeMarkupGenerator();
 
