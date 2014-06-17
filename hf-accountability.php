@@ -7,77 +7,83 @@ Version: 1.0
 Author URI: http://NathanArthur.com/
 */
 
-/*global $wp_version;
-
-if ( !version_compare($wp_version,"3.0",">=") ) {
-	die("You need at least version 3.0 of Wordpress to use the copyright plugin");
-}*/
-
-#error_log("hello", 0, "/home/habitfree1/wp.habitfree.org/logs/debug.log");
-
-register_activation_hook(__FILE__,"hfActivate");
-register_deactivation_hook(__FILE__,"hfDeactivate");
+register_activation_hook( __FILE__, "hfActivate" );
+register_deactivation_hook( __FILE__, "hfDeactivate" );
 
 function hfActivate() {
-    $WebsiteApi     = new HfWordPressInterface();
-    $PHPAPI         = new HfPhpInterface();
-	$DbConnection   = new HfDatabase($WebsiteApi, $PHPAPI);
-    $HtmlGenerator  = new HfHtmlGenerator();
-    $UrlFinder      = new HfUrlFinder();
-    $UrlGenerator   = new HfUrlGenerator();
-    $Security       = new HfSecurity();
-    $Messenger      = new HfMailer($UrlFinder, $UrlGenerator, $Security, $DbConnection, $WebsiteApi);
-	$HfUserMain     = new HfUserManager($DbConnection, $HtmlGenerator, $Messenger, $UrlFinder, $WebsiteApi);
+    $Factory = new HfFactory();
 
-    wp_clear_scheduled_hook('hfEmailCronHook');
-    wp_schedule_event(time(), 'daily', 'hfEmailCronHook');
+    $Database    = $Factory->makeDatabase();
+    $UserManager = $Factory->makeUserManager();
 
-    $DbConnection->installDb();
-	$HfUserMain->processAllUsers();
+    wp_clear_scheduled_hook( 'hfEmailCronHook' );
+    wp_schedule_event( time(), 'daily', 'hfEmailCronHook' );
 
-    error_log("my plugin activated", 0);
+    $Database->installDb();
+
+    add_action( 'wp_loaded', array($UserManager, 'processAllUsers') );
+
+    error_log( "my plugin activated", 0 );
 }
 
 function hfDeactivate() {
-	wp_clear_scheduled_hook('hfEmailCronHook');
+    wp_clear_scheduled_hook( 'hfEmailCronHook' );
 }
 
-require_once(dirname(__FILE__) . '/php/class-HfUrlFinder.php');
-require_once(dirname(__FILE__) . '/php/class-HfUrlGenerator.php');
-require_once(dirname(__FILE__) . '/php/class-HfSecurity.php');
-require_once(dirname(__FILE__) . '/php/class-HfMain.php');
-require_once(dirname(__FILE__) . '/php/class-HfMailer.php');
-require_once(dirname(__FILE__) . '/php/class-HfDatabase.php');
-require_once(dirname(__FILE__) . '/php/class-HfUserManager.php');
-require_once(dirname(__FILE__) . '/php/class-HfAdminPanel.php');
-require_once(dirname(__FILE__) . '/php/class-HfHtmlGenerator.php');
-require_once(dirname(__FILE__) . '/php/class-HfWordPressInterface.php');
-require_once(dirname(__FILE__) . '/php/class-HfGoals.php');
-require_once(dirname(__FILE__) . '/php/class-HfPhpInterface.php');
+require_once( dirname( __FILE__ ) . '/interfaces/Hf_iMarkupGenerator.php' );
+require_once( dirname( __FILE__ ) . '/interfaces/Hf_iContentManagementSystem.php' );
+require_once( dirname( __FILE__ ) . '/interfaces/Hf_iCodeLibrary.php' );
+require_once( dirname( __FILE__ ) . '/interfaces/Hf_iView.php' );
+require_once( dirname( __FILE__ ) . '/interfaces/Hf_iShortcode.php' );
+require_once( dirname( __FILE__ ) . '/interfaces/Hf_iGoals.php' );
+require_once( dirname( __FILE__ ) . '/interfaces/Hf_iMessenger.php' );
+require_once( dirname( __FILE__ ) . '/interfaces/Hf_iAssetLocator.php' );
+require_once( dirname( __FILE__ ) . '/interfaces/Hf_iDatabase.php' );
+require_once( dirname( __FILE__ ) . '/interfaces/Hf_iUserManager.php' );
+require_once( dirname( __FILE__ ) . '/interfaces/Hf_iSecurity.php' );
 
-if (class_exists("HfMain")) {
-    $HfWordPressInterface   = new HfWordPressInterface();
-    $HfPhpApi               = new HfPhpInterface();
-    $HfDbConnection         = new HfDatabase($HfWordPressInterface, $HfPhpApi);
-    $HfHtmlGenerator        = new HfHtmlGenerator();
-    $HfUrlFinder            = new HfUrlFinder();
-    $HfSecurity             = new HfSecurity();
-    $HfUrlGenerator         = new HfUrlGenerator();
-    $HfMailer               = new HfMailer($HfUrlFinder, $HfUrlGenerator, $HfSecurity, $HfDbConnection, $HfWordPressInterface);
-    $HfUserManager          = new HfUserManager($HfDbConnection, $HfMailer, $HfUrlFinder, $HfWordPressInterface);
-    $HfGoals                = new HfGoals($HfMailer, $HfWordPressInterface, $HfHtmlGenerator, $HfDbConnection);
-	$HfMain                 = new HfMain($HfHtmlGenerator, $HfUserManager, $HfMailer, $HfUrlFinder, $HfDbConnection, $HfGoals, $HfPhpApi);
-}
+require_once( dirname( __FILE__ ) . '/abstractClasses/abstractClass-HfForm.php' );
 
-//Actions and Filters
-if (isset($HfMain)) {
-	date_default_timezone_set('America/Chicago');
+require_once( dirname( __FILE__ ) . '/classes/HfUrlFinder.php' );
+require_once( dirname( __FILE__ ) . '/classes/HfSecurity.php' );
+require_once( dirname( __FILE__ ) . '/classes/HfMailer.php' );
+require_once( dirname( __FILE__ ) . '/classes/HfMysqlDatabase.php' );
+require_once( dirname( __FILE__ ) . '/classes/HfUserManager.php' );
+require_once( dirname( __FILE__ ) . '/classes/HfAdminPanel.php' );
+require_once( dirname( __FILE__ ) . '/classes/HfHtmlGenerator.php' );
+require_once( dirname( __FILE__ ) . '/classes/HfWordPressInterface.php' );
+require_once( dirname( __FILE__ ) . '/classes/HfGoals.php' );
+require_once( dirname( __FILE__ ) . '/classes/HfPhpLibrary.php' );
+require_once( dirname( __FILE__ ) . '/classes/HfGenericForm.php' );
+require_once( dirname( __FILE__ ) . '/classes/HfSettingsShortcode.php' );
+require_once( dirname( __FILE__ ) . '/classes/HfFactory.php' );
+require_once( dirname( __FILE__ ) . '/classes/HfGoalsShortcode.php' );
+require_once( dirname( __FILE__ ) . '/classes/HfAccountabilityForm.php' );
+require_once( dirname( __FILE__ ) . '/classes/HfAuthenticateShortcode.php' );
+require_once( dirname( __FILE__ ) . '/classes/HfUserButtonsShortcode.php' );
 
-	//Actions
-	add_action( 'hfEmailCronHook', array( $HfGoals, 'sendReportRequestEmails' ) );
-	add_action( 'user_register', array( $HfUserManager, 'processNewUser' ) );
-	add_action( 'admin_menu', array( new HfAdminPanel($HfMailer, $HfUrlFinder, $HfDbConnection), 'registerAdminPanel' ) );
-	add_action( 'admin_head', array( new HfAdminPanel($HfMailer, $HfUrlFinder, $HfDbConnection), 'addToAdminHead' ) );
-	
-	//Filters
+date_default_timezone_set( 'America/Chicago' );
+
+$HfFactory     = new HfFactory();
+$HfGoals       = $HfFactory->makeGoals();
+$HfUserManager = $HfFactory->makeUserManager();
+$HfAdminPanel  = $HfFactory->makeAdminPanel();
+
+add_action( 'hfEmailCronHook', array($HfGoals, 'sendReportRequestEmails') );
+add_action( 'user_register', array($HfUserManager, 'processNewUser') );
+add_action( 'admin_menu', array($HfAdminPanel, 'registerAdminPanel') );
+add_action( 'admin_head', array($HfAdminPanel, 'addToAdminHead') );
+add_action( 'init', 'hfRegisterShortcodes' );
+
+function hfRegisterShortcodes() {
+    $Factory               = new HfFactory();
+    $SettingsShortcode     = $Factory->makeSettingsShortcode();
+    $GoalsShortcode        = $Factory->makeGoalsShortcode();
+    $AuthenticateShortcode = $Factory->makeAuthenticateShortcode();
+    $UserButtonsShortcode = $Factory->makeUserButtonsShortcode();
+
+    add_shortcode( 'hfSettings', array($SettingsShortcode, 'getOutput') );
+    add_shortcode( 'hfGoals', array($GoalsShortcode, 'getOutput') );
+    add_shortcode( 'hfUserButtons', array($UserButtonsShortcode, 'getOutput') );
+    add_shortcode( 'hfAuthenticate', array($AuthenticateShortcode, 'getOutput') );
 }
