@@ -1,6 +1,6 @@
 <?php
 
-class HfWordPressInterface implements Hf_iContentManagementSystem {
+class HfWordPress implements Hf_iContentManagementSystem {
     private $wpdb;
 
     function __construct() {
@@ -113,5 +113,9 @@ class HfWordPressInterface implements Hf_iContentManagementSystem {
 
     public function getResults($query) {
         return $this->wpdb->get_results($query);
+    }
+
+    public function insertIntoDb($table, $data) {
+        $this->wpdb->insert($table, $data);
     }
 } 

@@ -98,7 +98,7 @@ class HfFactory {
     }
 
     public function makeCms() {
-        return new HfWordPressInterface();
+        return new HfWordPress();
     }
 
     public function makeSecurity() {

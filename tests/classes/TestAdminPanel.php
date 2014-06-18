@@ -11,7 +11,7 @@ class TestAdminPanel extends HfTestCase {
         $URLFinder    = $this->myMakeMock( 'HfUrlFinder' );
         $DbConnection = $this->myMakeMock( 'HfMysqlDatabase' );
         $UserManager  = $this->myMakeMock( 'HfUserManager' );
-        $Cms          = $this->myMakeMock( 'HfWordPressInterface' );
+        $Cms          = $this->myMakeMock( 'HfWordPress' );
 
         $this->mySetReturnValue( $URLFinder, 'getCurrentPageURL', 'test.com' );
 

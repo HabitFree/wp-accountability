@@ -230,9 +230,8 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $prefix    = $wpdb->prefix;
         $tableName = $prefix . $table;
         $data      = $this->removeNullValuePairs( $data );
-        $success   = $wpdb->insert( $tableName, $data );
 
-        return $success;
+        $this->Cms->insertIntoDb($tableName, $data);
     }
 
     function insertMultipleRows( $table, $rows ) {

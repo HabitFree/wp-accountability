@@ -6,7 +6,7 @@ class TestGoals extends HfTestCase {
 
     private function makeMockDependencies() {
         $Messenger     = $this->myMakeMock( 'HfMailer' );
-        $WebsiteApi    = $this->myMakeMock( 'HfWordPressInterface' );
+        $WebsiteApi    = $this->myMakeMock( 'HfWordPress' );
         $HtmlGenerator = $this->myMakeMock( 'HfHtmlGenerator' );
         $Database      = $this->myMakeMock( 'HfMysqlDatabase' );
 
@@ -17,7 +17,7 @@ class TestGoals extends HfTestCase {
 
     public function testSendReportRequestEmailsChecksThrottling() {
         $Messenger     = $this->myMakeMock( 'HfMailer' );
-        $WebsiteApi    = $this->myMakeMock( 'HfWordPressInterface' );
+        $WebsiteApi    = $this->myMakeMock( 'HfWordPress' );
         $HtmlGenerator = $this->myMakeMock( 'HfHtmlGenerator' );
         $DbConnection  = $this->myMakeMock( 'HfMysqlDatabase' );
         $CodeLibrary   = $this->myMakeMock( 'HfPhpLibrary' );
@@ -47,7 +47,7 @@ class TestGoals extends HfTestCase {
 
     public function testSendReportRequestEmailsSendsEmailWhenReportDue() {
         $Messenger     = $this->myMakeMock( 'HfMailer' );
-        $WebsiteApi    = $this->myMakeMock( 'HfWordPressInterface' );
+        $WebsiteApi    = $this->myMakeMock( 'HfWordPress' );
         $HtmlGenerator = $this->myMakeMock( 'HfHtmlGenerator' );
         $DbConnection  = $this->myMakeMock( 'HfMysqlDatabase' );
         $CodeLibrary   = $this->myMakeMock( 'HfPhpLibrary' );
@@ -78,7 +78,7 @@ class TestGoals extends HfTestCase {
 
     public function testSendReportRequestEmailsDoesNotSendEmailWhenReportNotDue() {
         $Messenger     = $this->myMakeMock( 'HfMailer' );
-        $WebsiteApi    = $this->myMakeMock( 'HfWordPressInterface' );
+        $WebsiteApi    = $this->myMakeMock( 'HfWordPress' );
         $HtmlGenerator = $this->myMakeMock( 'HfHtmlGenerator' );
         $DbConnection  = $this->myMakeMock( 'HfMysqlDatabase' );
         $CodeLibrary   = $this->myMakeMock( 'HfPhpLibrary' );
@@ -108,7 +108,7 @@ class TestGoals extends HfTestCase {
 
     public function testSendReportRequestEmailsDoesNotSendEmailWhenUserThrottled() {
         $Messenger     = $this->myMakeMock( 'HfMailer' );
-        $WebsiteApi    = $this->myMakeMock( 'HfWordPressInterface' );
+        $WebsiteApi    = $this->myMakeMock( 'HfWordPress' );
         $HtmlGenerator = $this->myMakeMock( 'HfHtmlGenerator' );
         $DbConnection  = $this->myMakeMock( 'HfMysqlDatabase' );
         $CodeLibrary   = $this->myMakeMock( 'HfPhpLibrary' );
@@ -139,7 +139,7 @@ class TestGoals extends HfTestCase {
 
     public function testCurrentLevelTarget() {
         $Messenger     = $this->myMakeMock( 'HfMailer' );
-        $WebsiteApi    = $this->myMakeMock( 'HfWordPressInterface' );
+        $WebsiteApi    = $this->myMakeMock( 'HfWordPress' );
         $HtmlGenerator = $this->myMakeMock( 'HfHtmlGenerator' );
         $DbConnection  = $this->myMakeMock( 'HfMysqlDatabase' );
 
@@ -190,5 +190,11 @@ class TestGoals extends HfTestCase {
         $actual = $Goals->getGoalSubscriptions(1);
 
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testSendEmailReportRequests() {
+        $Factory = new HfFactory();
+        $Goals   = $Factory->makeGoals();
+        $Goals->sendReportRequestEmails();
     }
 } 

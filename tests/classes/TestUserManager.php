@@ -8,7 +8,7 @@ class TestUserManager extends HfTestCase {
         $UrlFinder = $this->myMakeMock( 'HfUrlFinder' );
         $Database  = $this->myMakeMock( 'HfMysqlDatabase' );
         $Messenger = $this->myMakeMock( 'HfMailer' );
-        $Cms       = $this->myMakeMock( 'HfWordPressInterface' );
+        $Cms       = $this->myMakeMock( 'HfWordPress' );
 
         return array($UrlFinder, $Database, $Messenger, $Cms);
     }
@@ -83,7 +83,7 @@ class TestUserManager extends HfTestCase {
 
         $Messenger = $this->myMakeMock('HfMailer');
         $AssetLocator = $this->myMakeMock('HfUrlFinder');
-        $Cms = $this->myMakeMock('HfWordPressInterface');
+        $Cms = $this->myMakeMock('HfWordPress');
 
         $UserManager = new HfUserManager($Database, $Messenger, $AssetLocator, $Cms);
 

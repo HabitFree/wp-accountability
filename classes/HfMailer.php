@@ -70,7 +70,7 @@ class HfMailer implements Hf_iMessenger {
                        'emailID'        => $emailID,
                        'expirationDate' => $expirationDate);
 
-        return $this->Database->insertIntoDb( $table, $data );
+        $this->Database->insertIntoDb( $table, $data );
     }
 
     function generateSecureEmailId() {

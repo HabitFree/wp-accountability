@@ -100,4 +100,15 @@ class TestGoalsShortcode extends HfTestCase {
 
         $Goals->getOutput();
     }
+
+    public function testGoalsShortcodeClassExists() {
+        $this->assertTrue( class_exists( 'HfGoalsShortcode' ) );
+    }
+
+    public function testGoalsShortcodeOutputsAnything() {
+        $GoalsShortcode = $this->Factory->makeGoalsShortcode();
+        $output         = $GoalsShortcode->getOutput();
+
+        $this->assertTrue( strlen( $output ) > 0 );
+    }
 }
