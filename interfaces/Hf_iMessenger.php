@@ -9,11 +9,11 @@ interface Hf_iMessenger {
 
     public function generateInviteURL( $inviteID );
 
-    public function sendReportRequestEmail( $userID );
+    public function sendReportRequestEmail( $userId );
 
     public function markAsDelivered( $emailID );
 
-    public function generateReportURL( $userID, $emailID );
+    public function generateReportURL( $reportRequestId );
 
     public function sendEmailToUser( $userID, $subject, $body );
 

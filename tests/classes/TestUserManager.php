@@ -2,44 +2,29 @@
 require_once( dirname( dirname( __FILE__ ) ) . '/HfTestCase.php' );
 
 class TestUserManager extends HfTestCase {
+
     // Helper Functions
-
-    private function makeUserManagerMockDependencies() {
-        $UrlFinder = $this->myMakeMock( 'HfUrlFinder' );
-        $Database  = $this->myMakeMock( 'HfMysqlDatabase' );
-        $Messenger = $this->myMakeMock( 'HfMailer' );
-        $Cms       = $this->myMakeMock( 'HfWordPress' );
-
-        return array($UrlFinder, $Database, $Messenger, $Cms);
-    }
 
     // Tests
 
     public function testEmailInviteSendingUsingMocks() {
-        list( $UrlFinder, $Database, $Messenger, $Cms ) = $this->makeUserManagerMockDependencies();
+        $this->setReturnValue( $this->MockMessenger, 'generateSecureEmailId', 555 );
+        $this->setReturnValue( $this->MockDatabase, 'generateEmailID', 5 );
 
-        $this->mySetReturnValue( $Messenger, 'generateSecureEmailId', 555 );
-        $this->mySetReturnValue( $Database, 'generateEmailID', 5 );
-
-        $UserManager = new HfUserManager( $Database, $Messenger, $UrlFinder, $Cms );
-        $result      = $UserManager->sendInvitation( 1, 'me@test.com', 3 );
+        $result = $this->UserManagerWithMockedDependencies->sendInvitation( 1, 'me@test.com', 3 );
 
         $this->assertEquals( $result, 555 );
     }
 
     public function testInviteStorageInInviteTableUsingMocks() {
-        list( $UrlFinder, $Database, $MessengerMock, $Cms ) = $this->makeUserManagerMockDependencies();
+        $expirationTime = strtotime( '+' . 3 . ' days' );
+        $expirationDate = date( 'Y-m-d H:i:s', $expirationTime );
 
-        $Security = $this->myMakeMock( 'HfSecurity' );
-
-        $Messenger = new HfMailer( $UrlFinder, $Security, $Database, $Cms );
-
-        $this->mySetReturnValue( $Database, 'idOfLastEmail', 5 );
-        $this->mySetReturnValue( $Database, 'generateEmailID', 5 );
-        $this->mySetReturnValue( $Cms, 'sendWpEmail', true );
-        $this->mySetReturnValue( $Security, 'createRandomString', 555 );
-
-        $expirationDate = date( 'Y-m-d H:i:s', strtotime( '+' . 3 . ' days' ) );
+        $this->setReturnValue( $this->MockDatabase, 'idOfLastEmail', 5 );
+        $this->setReturnValue( $this->MockDatabase, 'generateEmailID', 5 );
+        $this->setReturnValue( $this->MockCms, 'sendWpEmail', true );
+        $this->setReturnValue( $this->MockSecurity, 'createRandomString', 555 );
+        $this->setReturnValue( $this->MockCodeLibrary, 'convertStringToTime', $expirationTime );
 
         $expectedRecord = array(
             'inviteID'       => 555,
@@ -49,9 +34,16 @@ class TestUserManager extends HfTestCase {
             'expirationDate' => $expirationDate
         );
 
-        $this->myExpectAtLeastOnce( $Database, 'insertIntoDb', array('hf_invite', $expectedRecord) );
+        $this->expectAtLeastOnce( $this->MockDatabase, 'insertIntoDb', array('hf_invite', $expectedRecord) );
 
-        $UserManager = new HfUserManager( $Database, $Messenger, $UrlFinder, $Cms );
+        $UserManager = new HfUserManager(
+            $this->MockDatabase,
+            $this->MailerWithMockedDependencies,
+            $this->MockAssetLocator,
+            $this->MockCms,
+            $this->MockCodeLibrary
+        );
+
         $UserManager->sendInvitation( 1, 'me@test.com', 3 );
     }
 
@@ -63,30 +55,32 @@ class TestUserManager extends HfTestCase {
     }
 
     public function testProcessInviteByInviteeEmail() {
-        list( $UrlFinder, $Database, $Messenger, $Cms ) = $this->makeUserManagerMockDependencies();
 
-        $RealCms = $this->Factory->makeCms();
-
-        $UserManager = new HfUserManager( $Database, $Messenger, $UrlFinder, $RealCms );
+        $UserManager = new HfUserManager(
+            $this->MockDatabase,
+            $this->MockMessenger,
+            $this->MockAssetLocator,
+            $this->Factory->makeCms(),
+            $this->MockCodeLibrary
+        );
 
         $user = get_user_by( 'email', 'taken@taken.com' );
 
-        $this->mySetReturnValue( $Database, 'getInviterID', 1 );
-        $this->myExpectOnce( $Database, 'createRelationship', array($user->ID, 1) );
+        $this->setReturnValue( $this->MockDatabase, 'getInviterID', 1 );
+        $this->expectOnce( $this->MockDatabase, 'createRelationship', array($user->ID, 1) );
 
         $UserManager->processInvite( 'taken@taken.com', 555 );
     }
 
     public function testGetFriends() {
-        $Database = $this->myMakeMock('HfMysqlDatabase');
-        $this->mySetReturnValue($Database, 'getPartners', 'duck');
+        $this->setReturnValue( $this->MockDatabase, 'getPartners', 'duck' );
 
-        $Messenger = $this->myMakeMock('HfMailer');
-        $AssetLocator = $this->myMakeMock('HfUrlFinder');
-        $Cms = $this->myMakeMock('HfWordPress');
+        $this->assertEquals( 'duck', $this->UserManagerWithMockedDependencies->getPartners( 1 ) );
+    }
 
-        $UserManager = new HfUserManager($Database, $Messenger, $AssetLocator, $Cms);
+    public function testSendInvitationUsesCodeLibraryToConvertStringToTime() {
+        $this->expectOnce( $this->MockCodeLibrary, 'convertStringToTime', array('+5 days') );
 
-        $this->assertEquals('duck', $UserManager->getPartners(1));
+        $this->UserManagerWithMockedDependencies->sendInvitation( 1, 'me@my.com', 5 );
     }
 }

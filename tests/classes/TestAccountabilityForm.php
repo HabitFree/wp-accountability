@@ -11,7 +11,7 @@ class TestAccountabilityForm extends HfTestCase {
     }
 
     public function testHfAccountabilityFormClassHasPopulateMethod() {
-        $Goals              = $this->myMakeMock( 'HfGoals' );
+        $Goals              = $this->makeMock( 'HfGoals' );
         $AccountabilityForm = new HfAccountabilityForm( 'test.com', $Goals );
         $this->assertTrue( method_exists( $AccountabilityForm, 'populate' ) );
     }

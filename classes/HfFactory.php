@@ -61,8 +61,9 @@ class HfFactory {
         $AssetLocator = $this->makeAssetLocator();
         $Mailer       = $this->makeMessenger();
         $Database     = $this->makeDatabase();
+        $CodeLibrary = $this->makeCodeLibrary();
 
-        return new HfUserManager( $Database, $Mailer, $AssetLocator, $Cms );
+        return new HfUserManager( $Database, $Mailer, $AssetLocator, $Cms, $CodeLibrary );
     }
 
     public function makeMessenger() {

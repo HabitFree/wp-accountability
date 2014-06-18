@@ -3,21 +3,19 @@ require_once( dirname( dirname( __FILE__ ) ) . '/HfTestCase.php' );
 
 class TestGoalsShortcode extends HfTestCase {
     private $MockUserManager;
-    private $MockMessenger;
     private $MockPageLocator;
     private $MockGoals;
-    private $MockSecurity;
     private $MockMarkupGenerator;
 
     // Helper Functions
 
     private function resetMocks() {
-        $this->MockUserManager     = $this->myMakeMock( 'HfUserManager' );
-        $this->MockMessenger       = $this->myMakeMock( 'HfMailer' );
-        $this->MockPageLocator     = $this->myMakeMock( 'HfUrlFinder' );
-        $this->MockGoals           = $this->myMakeMock( 'HfGoals' );
-        $this->MockSecurity        = $this->myMakeMock( 'HfSecurity' );
-        $this->MockMarkupGenerator = $this->myMakeMock( 'HfHtmlGenerator' );
+        $this->MockUserManager     = $this->makeMock( 'HfUserManager' );
+        $this->MockMessenger       = $this->makeMock( 'HfMailer' );
+        $this->MockPageLocator     = $this->makeMock( 'HfUrlFinder' );
+        $this->MockGoals           = $this->makeMock( 'HfGoals' );
+        $this->MockSecurity        = $this->makeMock( 'HfSecurity' );
+        $this->MockMarkupGenerator = $this->makeMock( 'HfHtmlGenerator' );
     }
 
     // Tests
@@ -36,14 +34,14 @@ class TestGoalsShortcode extends HfTestCase {
         $mockPartner->ID         = 1;
         $mockPartner->user_login = 'Dan';
         $mockPartners            = array($mockPartner);
-        $this->mySetReturnValue( $this->MockUserManager, 'getPartners', $mockPartners );
+        $this->setReturnValue( $this->MockUserManager, 'getPartners', $mockPartners );
 
         $mockGoalSubs = array(new stdClass());
-        $this->mySetReturnValue( $this->MockGoals, 'getGoalSubscriptions', $mockGoalSubs );
+        $this->setReturnValue( $this->MockGoals, 'getGoalSubscriptions', $mockGoalSubs );
 
-        $this->mySetReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
-        $this->mySetReturnValue( $this->MockUserManager, 'getCurrentUserLogin', 'Don' );
-        $this->mySetReturnValues( $this->MockGoals, 'getGoalTitle', array('Eat durian', 'Go running') );
+        $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
+        $this->setReturnValue( $this->MockUserManager, 'getCurrentUserLogin', 'Don' );
+        $this->setReturnValues( $this->MockGoals, 'getGoalTitle', array('Eat durian', 'Go running') );
 
         $Goals = new HfGoalsShortcode(
             $this->MockUserManager,
@@ -57,7 +55,7 @@ class TestGoalsShortcode extends HfTestCase {
         $expectedBody =
             "<p>Hello, Dan,</p><p>Your friend Don just reported on their progress. Here's how they're doing:</p><ul><li>Eat durian: Success</li><li>Go running: Failure</li></ul>";
 
-        $this->myExpectOnce( $this->MockMessenger, 'sendEmailToUser', array(1, 'Don just reported', $expectedBody) );
+        $this->expectOnce( $this->MockMessenger, 'sendEmailToUser', array(1, 'Don just reported', $expectedBody) );
 
         $Goals->getOutput();
     }
@@ -75,14 +73,14 @@ class TestGoalsShortcode extends HfTestCase {
         $mockPartner->ID         = 1;
         $mockPartner->user_login = 'Jack';
         $mockPartners            = array($mockPartner);
-        $this->mySetReturnValue( $this->MockUserManager, 'getPartners', $mockPartners );
+        $this->setReturnValue( $this->MockUserManager, 'getPartners', $mockPartners );
 
         $mockGoalSubs = array(new stdClass());
-        $this->mySetReturnValue( $this->MockGoals, 'getGoalSubscriptions', $mockGoalSubs );
+        $this->setReturnValue( $this->MockGoals, 'getGoalSubscriptions', $mockGoalSubs );
 
-        $this->mySetReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
-        $this->mySetReturnValue( $this->MockUserManager, 'getCurrentUserLogin', 'Jim' );
-        $this->mySetReturnValue( $this->MockGoals, 'getGoalTitle', 'Eat durian' );
+        $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
+        $this->setReturnValue( $this->MockUserManager, 'getCurrentUserLogin', 'Jim' );
+        $this->setReturnValue( $this->MockGoals, 'getGoalTitle', 'Eat durian' );
 
         $Goals = new HfGoalsShortcode(
             $this->MockUserManager,
@@ -96,7 +94,7 @@ class TestGoalsShortcode extends HfTestCase {
         $expectedBody =
             "<p>Hello, Jack,</p><p>Your friend Jim just reported on their progress. Here's how they're doing:</p><ul><li>Eat durian: Failure</li></ul>";
 
-        $this->myExpectOnce( $this->MockMessenger, 'sendEmailToUser', array(1, 'Jim just reported', $expectedBody) );
+        $this->expectOnce( $this->MockMessenger, 'sendEmailToUser', array(1, 'Jim just reported', $expectedBody) );
 
         $Goals->getOutput();
     }

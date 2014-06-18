@@ -34,25 +34,33 @@ class HfMailer implements Hf_iMessenger {
         }
     }
 
-    function sendReportRequestEmail( $userID ) {
-        $subject   = "How's it going?";
-        $emailID   = $this->Database->generateEmailID();
-        $reportURL = $this->generateReportURL( $userID, $emailID );
-        $message   = "<p>Time to <a href='" . $reportURL . "'>check in</a>.</p>";
-        $this->sendEmailToUserAndSpecifyEmailID( $userID, $subject, $message, $emailID );
+    function sendReportRequestEmail( $userId ) {
+        $subject = "How's it going?";
+        $emailId = $this->Database->generateEmailId();
+
+        $nonce     = $this->Security->createRandomString( 250 );
+        $reportUrl = $this->generateReportURL( $nonce );
+        $message   = "<p>Time to <a href='" . $reportUrl . "'>check in</a>.</p>";
+
+        $this->sendEmailToUserAndSpecifyEmailID( $userId, $subject, $message, $emailId );
+        $this->Database->recordReportRequest( $nonce, $userId, $emailId );
+    }
+
+    function generateReportURL( $reportRequestId ) {
+        $baseURL = $this->PageLocator->getPageUrlByTitle( 'Goals' );
+
+        $parameters = array(
+            'n' => $reportRequestId
+        );
+
+        return $this->addParametersToUrl( $baseURL, $parameters );
     }
 
     function sendEmailToUserAndSpecifyEmailID( $userID, $subject, $body, $emailID ) {
-        $to      = $this->ContentManagementSystem->getUserEmail( $userID );
-        $success = $this->ContentManagementSystem->sendWpEmail( $to, $subject, $body );
+        $to = $this->ContentManagementSystem->getUserEmail( $userID );
 
-        if ( $success ) {
-            $this->Database->recordEmail( $userID, $subject, $body, $emailID, $to );
-
-            return $emailID;
-        } else {
-            return false;
-        }
+        $this->ContentManagementSystem->sendWpEmail( $to, $subject, $body );
+        $this->Database->recordEmail( $userID, $subject, $body, $emailID, $to );
     }
 
     function markAsDelivered( $emailID ) {
@@ -64,28 +72,19 @@ class HfMailer implements Hf_iMessenger {
 
     function recordInvite( $inviteID, $inviterID, $inviteeEmail, $emailID, $expirationDate ) {
         $table = "hf_invite";
-        $data  = array('inviteID'       => $inviteID,
-                       'inviterID'      => $inviterID,
-                       'inviteeEmail'   => $inviteeEmail,
-                       'emailID'        => $emailID,
-                       'expirationDate' => $expirationDate);
+        $data  = array(
+            'inviteID'       => $inviteID,
+            'inviterID'      => $inviterID,
+            'inviteeEmail'   => $inviteeEmail,
+            'emailID'        => $emailID,
+            'expirationDate' => $expirationDate
+        );
 
         $this->Database->insertIntoDb( $table, $data );
     }
 
     function generateSecureEmailId() {
         return $this->Security->createRandomString( 250 );
-    }
-
-    function generateReportURL( $userID, $emailID ) {
-        $baseURL = $this->PageLocator->getPageUrlByTitle( 'Goals' );
-
-        $parameters = array(
-            'userID'  => $userID,
-            'emailID' => $emailID
-        );
-
-        return $this->addParametersToUrl( $baseURL, $parameters );
     }
 
     function generateInviteURL( $inviteID ) {
@@ -152,7 +151,7 @@ class HfMailer implements Hf_iMessenger {
         return $url;
     }
 
-    public function isEmailValid($userId, $emailId) {
-        return $this->Database->isEmailValid($userId, $emailId);
+    public function isEmailValid( $userId, $emailId ) {
+        return $this->Database->isEmailValid( $userId, $emailId );
     }
 }

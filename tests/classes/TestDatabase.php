@@ -3,16 +3,13 @@
 require_once( dirname( dirname( __FILE__ ) ) . '/HfTestCase.php' );
 
 class TestDatabase extends HfTestCase {
-    private $MockCms;
-    private $MockCodeLibrary;
-
     private $DatabaseWithMockedDependencies;
 
     // Helper Functions
 
     protected function setUp() {
-        $this->MockCms         = $this->myMakeMock( 'HfWordPress' );
-        $this->MockCodeLibrary = $this->myMakeMock( 'HfPhpLibrary' );
+        $this->MockCms         = $this->makeMock( 'HfWordPress' );
+        $this->MockCodeLibrary = $this->makeMock( 'HfPhpLibrary' );
 
         $this->DatabaseWithMockedDependencies = new HfMysqlDatabase(
             $this->MockCms,
@@ -21,8 +18,8 @@ class TestDatabase extends HfTestCase {
     }
 
     private function makeDatabaseMockDependencies() {
-        $Cms         = $this->myMakeMock( 'HfWordPress' );
-        $CodeLibrary = $this->myMakeMock( 'HfPhpLibrary' );
+        $Cms         = $this->makeMock( 'HfWordPress' );
+        $CodeLibrary = $this->makeMock( 'HfPhpLibrary' );
 
         return array($Cms, $CodeLibrary);
     }
@@ -193,9 +190,9 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testDaysSinceLastEmail() {
-        $this->mySetReturnValue( $this->MockCms, 'getVar', '2014-05-27 16:04:29' );
-        $this->mySetReturnValue( $this->MockCodeLibrary, 'convertStringToTime', 1401224669.0 );
-        $this->mySetReturnValue( $this->MockCodeLibrary, 'getCurrentTime', 1401483869.0 );
+        $this->setReturnValue( $this->MockCms, 'getVar', '2014-05-27 16:04:29' );
+        $this->setReturnValue( $this->MockCodeLibrary, 'convertStringToTime', 1401224669.0 );
+        $this->setReturnValue( $this->MockCodeLibrary, 'getCurrentTime', 1401483869.0 );
 
         $result = $this->DatabaseWithMockedDependencies->daysSinceLastEmail( 1 );
 
@@ -215,7 +212,7 @@ class TestDatabase extends HfTestCase {
 
         $Database = new HfMysqlDatabase( $Cms, $CodeLibrary );
 
-        $this->myExpectOnce( $Cms, 'deleteRows' );
+        $this->expectOnce( $Cms, 'deleteRows' );
 
         $Database->deleteInvite( 777 );
     }
@@ -223,7 +220,7 @@ class TestDatabase extends HfTestCase {
     public function testGetGoalSubscriptions() {
         list( $Cms, $CodeLibrary ) = $this->makeDatabaseMockDependencies();
 
-        $this->myExpectOnce( $Cms, 'getRows' );
+        $this->expectOnce( $Cms, 'getRows' );
 
         $Database = new HfMysqlDatabase( $Cms, $CodeLibrary );
 
@@ -231,7 +228,7 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testInsertIntoDbCallsCmsInsert() {
-        $this->myExpectOnce($this->MockCms, 'insertIntoDb', array('wptests_duck', array('bill')));
+        $this->expectOnce($this->MockCms, 'insertIntoDb', array('wptests_duck', array('bill')));
         $this->DatabaseWithMockedDependencies->insertIntoDb('duck', array('bill'));
     }
 
@@ -240,16 +237,14 @@ class TestDatabase extends HfTestCase {
         $requestId = 555;
         $userId = 1;
         $emailId = 7;
-        $expirationDate = '2014-05-27 16:04:29';
         $data  = array(
             'requestID'      => $requestId,
             'userID'         => $userId,
-            'emailID'        => $emailId,
-            'expirationDate' => $expirationDate
+            'emailID'        => $emailId
         );
 
-        $this->myExpectOnce($this->MockCms, 'insertIntoDb', array('wptests_' . $table, $data));
+        $this->expectOnce($this->MockCms, 'insertIntoDb', array('wptests_' . $table, $data));
 
-        $this->DatabaseWithMockedDependencies->recordReportRequest($requestId, $userId, $emailId, $expirationDate);
+        $this->DatabaseWithMockedDependencies->recordReportRequest($requestId, $userId, $emailId);
     }
 }

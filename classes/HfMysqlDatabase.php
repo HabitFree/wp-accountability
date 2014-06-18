@@ -1,7 +1,7 @@
 <?php
 
 class HfMysqlDatabase implements Hf_iDatabase {
-    private $dbVersion = "4.0";
+    private $dbVersion = "4.1";
     private $Cms;
     private $CodeLibrary;
 
@@ -94,7 +94,6 @@ class HfMysqlDatabase implements Hf_iDatabase {
 					requestID varchar(250) NOT NULL,
 					userID int NOT NULL,
 					emailID int NOT NULL,
-					expirationDate datetime NOT NULL,
 					KEY requestID (requestID),
 					KEY userID (userID),
 					KEY emailID (emailID),
@@ -294,7 +293,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
         }
     }
 
-    function generateEmailID() {
+    function generateEmailId() {
         $table     = 'hf_email';
         $tableName = $this->Cms->getDbPrefix() . $table;
         $query     = 'SELECT max(emailID) FROM ' . $tableName;
@@ -552,12 +551,11 @@ class HfMysqlDatabase implements Hf_iDatabase {
         return $this->Cms->getRow('hf_goal', $where);
     }
 
-    public function recordReportRequest($requestId, $userId, $emailId, $expirationDate) {
+    public function recordReportRequest($requestId, $userId, $emailId) {
         $data = array (
             'requestID' => $requestId,
             'userID' => $userId,
-            'emailID' => $emailId,
-            'expirationDate' => $expirationDate
+            'emailID' => $emailId
         );
 
         $this->insertIntoDb('hf_report_request', $data);

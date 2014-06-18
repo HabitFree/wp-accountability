@@ -5,12 +5,14 @@ class HfUserManager implements Hf_iUserManager {
     private $Messenger;
     private $AssetLocator;
     private $Cms;
+    private $CodeLibrary;
 
-    function HfUserManager( Hf_iDatabase $Database, Hf_iMessenger $Messenger, Hf_iAssetLocator $PageLocator, Hf_iContentManagementSystem $ContentManagementSystem ) {
+    function HfUserManager( Hf_iDatabase $Database, Hf_iMessenger $Messenger, Hf_iAssetLocator $PageLocator, Hf_iContentManagementSystem $ContentManagementSystem, Hf_iCodeLibrary $CodeLibrary ) {
         $this->Database     = $Database;
         $this->Messenger    = $Messenger;
         $this->AssetLocator = $PageLocator;
         $this->Cms          = $ContentManagementSystem;
+        $this->CodeLibrary  = $CodeLibrary;
     }
 
     function processAllUsers() {
@@ -22,8 +24,10 @@ class HfUserManager implements Hf_iUserManager {
 
     function processNewUser( $userId ) {
         $table = "hf_user_goal";
-        $data  = array('userID' => $userId,
-                       'goalID' => 1);
+        $data  = array(
+            'userID' => $userId,
+            'goalID' => 1
+        );
         $this->Database->insertIgnoreIntoDb( $table, $data );
         $settingsPageURL = $this->AssetLocator->getPageUrlByTitle( 'Settings' );
         $message         = "<p>Welcome to HabitFree!
@@ -49,13 +53,19 @@ class HfUserManager implements Hf_iUserManager {
 
         $emailId = $this->Messenger->sendEmailToAddress( $address, $subject, $body );
 
-        $expirationDate = date( 'Y-m-d H:i:s', strtotime( '+' . $daysToExpire . ' days' ) );
+        $expirationDate = $this->generateExpirationDate( $daysToExpire );
 
         if ( $emailId !== false ) {
             $this->Messenger->recordInvite( $inviteId, $inviterId, $address, $emailId, $expirationDate );
         }
 
         return $inviteId;
+    }
+
+    private function generateExpirationDate( $daysToExpire ) {
+        $expirationTime = $this->CodeLibrary->convertStringToTime( '+' . $daysToExpire . ' days' );
+
+        return date( 'Y-m-d H:i:s', $expirationTime );
     }
 
     private function getUsernameById( $userId, $initialCaps = false ) {
