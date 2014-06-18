@@ -156,6 +156,20 @@ class TestDatabase extends HfTestCase {
         $this->assertEquals( $currentSchema, $expectedSchema );
     }
 
+    public function testReportRequestTableSchema() {
+        $Database      = $this->Factory->makeDatabase();
+        $currentSchema = $Database->getTableSchema( 'hf_report_request' );
+
+        $expectedSchema = array(
+            'requestID'       => $Database->createColumnSchemaObject( 'requestID', 'varchar(250)', 'NO', 'PRI', null, '' ),
+            'userID'      => $Database->createColumnSchemaObject( 'userID', 'int(11)', 'NO', 'MUL', null, '' ),
+            'emailID'        => $Database->createColumnSchemaObject( 'emailID', 'int(11)', 'NO', 'MUL', null, '' ),
+            'expirationDate' => $Database->createColumnSchemaObject( 'expirationDate', 'datetime', 'NO', '', null, '' )
+        );
+
+        $this->assertEquals( $expectedSchema, $currentSchema );
+    }
+
     public function testDaysSinceLastEmail() {
         $WebsiteAPI = $this->myMakeMock( 'HfWordPressInterface' );
         $PhpApi     = $this->myMakeMock( 'HfPhpLibrary' );

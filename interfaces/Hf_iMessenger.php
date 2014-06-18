@@ -3,7 +3,7 @@
 interface Hf_iMessenger {
     public function sendEmailToAddress( $address, $subject, $body );
 
-    public function generateInviteID();
+    public function generateSecureEmailId();
 
     public function isThrottled( $userID );
 

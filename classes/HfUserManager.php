@@ -41,7 +41,7 @@ class HfUserManager implements Hf_iUserManager {
     }
 
     public function sendInvitation( $inviterId, $address, $daysToExpire ) {
-        $inviteId        = $this->Messenger->generateInviteID();
+        $inviteId        = $this->Messenger->generateSecureEmailId();
         $inviteURL       = $this->Messenger->generateInviteURL( $inviteId );
         $inviterUsername = $this->getUsernameById( $inviterId, true );
         $subject         = $inviterUsername . ' just invited you to partner with them at HabitFree!';

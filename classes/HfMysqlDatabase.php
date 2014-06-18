@@ -1,7 +1,7 @@
 <?php
 
 class HfMysqlDatabase implements Hf_iDatabase {
-    private $dbVersion = "3.8";
+    private $dbVersion = "4.0";
     private $Cms;
     private $CodeLibrary;
 
@@ -90,6 +90,17 @@ class HfMysqlDatabase implements Hf_iDatabase {
 					PRIMARY KEY  (userID1, userID2)
 				);";
 
+            $reportRequestTableSql = "CREATE TABLE " . $prefix . "hf_report_request (
+					requestID varchar(250) NOT NULL,
+					userID int NOT NULL,
+					emailID int NOT NULL,
+					expirationDate datetime NOT NULL,
+					KEY requestID (requestID),
+					KEY userID (userID),
+					KEY emailID (emailID),
+					PRIMARY KEY  (requestID)
+				);";
+
             require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
             dbDelta( $emailTableSql );
             dbDelta( $goalTableSql );
@@ -98,6 +109,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
             dbDelta( $levelTableSql );
             dbDelta( $inviteTableSql );
             dbDelta( $relationshipTableSql );
+            dbDelta( $reportRequestTableSql );
 
             $defaultGoal = array('goalID'     => 1,
                                  'title'      => 'Pornography Abstinence',

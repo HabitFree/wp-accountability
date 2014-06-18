@@ -73,7 +73,7 @@ class HfMailer implements Hf_iMessenger {
         return $this->Database->insertIntoDb( $table, $data );
     }
 
-    function generateInviteID() {
+    function generateSecureEmailId() {
         return $this->Security->createRandomString( 250 );
     }
 

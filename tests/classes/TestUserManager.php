@@ -18,7 +18,7 @@ class TestUserManager extends HfTestCase {
     public function testEmailInviteSendingUsingMocks() {
         list( $UrlFinder, $Database, $Messenger, $Cms ) = $this->makeUserManagerMockDependencies();
 
-        $this->mySetReturnValue( $Messenger, 'generateInviteID', 555 );
+        $this->mySetReturnValue( $Messenger, 'generateSecureEmailId', 555 );
         $this->mySetReturnValue( $Database, 'generateEmailID', 5 );
 
         $UserManager = new HfUserManager( $Database, $Messenger, $UrlFinder, $Cms );
