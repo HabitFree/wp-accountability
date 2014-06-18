@@ -76,4 +76,6 @@ interface Hf_iDatabase {
     public function isReportRequestValid($requestId);
 
     public function deleteReportRequest($requestId);
+
+    public function getReportRequestUserId($requestId);
 }

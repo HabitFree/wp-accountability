@@ -124,4 +124,24 @@ class TestGoalsShortcode extends HfTestCase {
 
         $this->GoalsShortcodeWithMockDependencies->getOutput();
     }
+
+    public function testGoalsShortcodeGetsUserIdFromReportRequest() {
+        $_GET['n'] = 555;
+        $this->expectOnce( $this->MockMessenger, 'getReportRequestUserId', array(555) );
+        $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', false );
+        $this->setReturnValue( $this->MockMessenger, 'isReportRequestValid', true );
+        $this->setReturnValue( $this->MockGoals, 'getGoalSubscriptions', array() );
+
+        $this->GoalsShortcodeWithMockDependencies->getOutput();
+    }
+
+    public function testGoalsShortcodeGetsUserIdFromUserManager() {
+        $_GET['n'] = 555;
+        $this->expectOnce( $this->MockUserManager, 'getCurrentUserId' );
+        $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
+        $this->setReturnValue( $this->MockMessenger, 'isReportRequestValid', true );
+        $this->setReturnValue( $this->MockGoals, 'getGoalSubscriptions', array() );
+
+        $this->GoalsShortcodeWithMockDependencies->getOutput();
+    }
 }

@@ -263,4 +263,25 @@ class TestDatabase extends HfTestCase {
         $this->expectOnce($this->MockCms, 'deleteRows', array('wptests_hf_report_request', array('requestID' => 555)));
         $this->DatabaseWithMockedDependencies->deleteReportRequest(555);
     }
+
+    public function testGetReportRequestUserId() {
+        $mockReportRequest = new stdClass();
+        $mockReportRequest->userID = 5;
+
+        $this->setReturnValue($this->MockCms, 'getRow', $mockReportRequest);
+
+        $actual = $this->DatabaseWithMockedDependencies->getReportRequestUserId(555);
+
+        $this->assertEquals(5, $actual);
+    }
+
+    public function testGetReportRequestIdQueryFormat() {
+        $mockReportRequest = new stdClass();
+        $mockReportRequest->userID = 5;
+
+        $this->setReturnValue($this->MockCms, 'getRow', $mockReportRequest);
+        $this->expectOnce($this->MockCms, 'getRow', array('hf_report_request', "requestID = '555'"));
+
+        $this->DatabaseWithMockedDependencies->getReportRequestUserId(555);
+    }
 }

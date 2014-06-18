@@ -48,27 +48,19 @@ class HfGoalsShortcode implements Hf_iShortcode {
     }
 
     private function determineUserID() {
-        if ( isset( $_GET['userID'] ) && $this->Messenger->isEmailValid( $_GET['userID'], $_GET['emailID'] ) ) {
-            $this->Messenger->markAsDelivered( $_GET['emailID'] );
-
-            return $_GET['userID'];
-        } else {
+        if ($this->UserManager->isUserLoggedIn()) {
             return $this->UserManager->getCurrentUserId();
+        } else if ($this->isRequested()) {
+            return $this->Messenger->getReportRequestUserId($_GET['n']);
         }
     }
 
     private function submitAccountabilityReports( $userID ) {
-        if ( isset( $_GET['emailID'] ) ) {
-            $emailID = $_GET['emailID'];
-        } else {
-            $emailID = null;
-        }
-
         foreach ( $_POST as $key => $value ) {
             if ( $key == 'submit' ) {
                 continue;
             }
-            $this->Goals->recordAccountabilityReport( $userID, $key, $value, $emailID );
+            $this->Goals->recordAccountabilityReport( $userID, $key, $value, null );
         }
 
         $this->notifyPartners( $userID );
@@ -133,9 +125,6 @@ class HfGoalsShortcode implements Hf_iShortcode {
         return $report;
     }
 
-    /**
-     * @return bool
-     */
     private function isRequested() {
         return !empty( $_GET['n'] );
     }

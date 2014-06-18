@@ -573,4 +573,8 @@ class HfMysqlDatabase implements Hf_iDatabase {
 
         $this->Cms->deleteRows( $table, $where );
     }
+
+    public function getReportRequestUserId($requestId) {
+        return $this->Cms->getRow('hf_report_request', "requestID = '" . $requestId . "'")->userID;
+    }
 }

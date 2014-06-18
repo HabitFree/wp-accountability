@@ -120,4 +120,9 @@ class TestMailer extends HfTestCase {
         $this->expectOnce($this->MockDatabase, 'deleteReportRequest', array(555));
         $this->MailerWithMockedDependencies->deleteReportRequest(555);
     }
+
+    public function testGetReportRequestUserId() {
+        $this->expectOnce($this->MockDatabase, 'getReportRequestUserId', array(555));
+        $this->MailerWithMockedDependencies->getReportRequestUserId(555);
+    }
 }

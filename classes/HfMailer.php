@@ -162,4 +162,8 @@ class HfMailer implements Hf_iMessenger {
     public function deleteReportRequest( $requestId ) {
         $this->Database->deleteReportRequest( $requestId );
     }
+
+    public function getReportRequestUserId( $requestId ) {
+        $this->Database->getReportRequestUserId( $requestId );
+    }
 }
