@@ -202,25 +202,6 @@ class TestDatabase extends HfTestCase {
         $this->assertEquals( $result, 3 );
     }
 
-    public function testInsertIntoDbCallsCmsInsert() {
-        $this->myExpectOnce($this->MockCms, 'insertIntoDb', array('wptests_duck', array('bill')));
-        $this->DatabaseWithMockedDependencies->insertIntoDb('duck', array('bill'));
-    }
-
-    public function IGNOREtestRecordReportRequest() {
-        $table = "hf_report_request";
-        $requestId = 555;
-        $userId = 1;
-        $emailId = 7;
-        $expirationDate = '2014-05-27 16:04:29';
-        $data  = array(
-            'requestID'      => $requestId,
-            'userID'         => $userId,
-            'emailID'        => $emailId,
-            'expirationDate' => $expirationDate
-        );
-    }
-
     public function testDatabaseHasDeleteInvitationMethod() {
         list( $Cms, $CodeLibrary ) = $this->makeDatabaseMockDependencies();
 
@@ -247,5 +228,28 @@ class TestDatabase extends HfTestCase {
         $Database = new HfMysqlDatabase( $Cms, $CodeLibrary );
 
         $Database->getGoalSubscriptions( 1 );
+    }
+
+    public function testInsertIntoDbCallsCmsInsert() {
+        $this->myExpectOnce($this->MockCms, 'insertIntoDb', array('wptests_duck', array('bill')));
+        $this->DatabaseWithMockedDependencies->insertIntoDb('duck', array('bill'));
+    }
+
+    public function testRecordReportRequest() {
+        $table = "hf_report_request";
+        $requestId = 555;
+        $userId = 1;
+        $emailId = 7;
+        $expirationDate = '2014-05-27 16:04:29';
+        $data  = array(
+            'requestID'      => $requestId,
+            'userID'         => $userId,
+            'emailID'        => $emailId,
+            'expirationDate' => $expirationDate
+        );
+
+        $this->myExpectOnce($this->MockCms, 'insertIntoDb', array('wptests_' . $table, $data));
+
+        $this->DatabaseWithMockedDependencies->recordReportRequest($requestId, $userId, $emailId, $expirationDate);
     }
 }

@@ -551,4 +551,15 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $where = 'goalID = ' . $goalId;
         return $this->Cms->getRow('hf_goal', $where);
     }
+
+    public function recordReportRequest($requestId, $userId, $emailId, $expirationDate) {
+        $data = array (
+            'requestID' => $requestId,
+            'userID' => $userId,
+            'emailID' => $emailId,
+            'expirationDate' => $expirationDate
+        );
+
+        $this->insertIntoDb('hf_report_request', $data);
+    }
 }

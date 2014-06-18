@@ -70,4 +70,6 @@ interface Hf_iDatabase {
     public function getPartners( $userId );
 
     public function getGoal( $goalId );
+
+    public function recordReportRequest($requestId, $userId, $emailId, $daysToExpire);
 }
