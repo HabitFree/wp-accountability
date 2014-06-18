@@ -2,28 +2,11 @@
 require_once( dirname( dirname( __FILE__ ) ) . '/HfTestCase.php' );
 
 class TestGoalsShortcode extends HfTestCase {
-    private $MockUserManager;
-    private $MockPageLocator;
-    private $MockGoals;
-    private $MockMarkupGenerator;
-
     // Helper Functions
-
-    private function resetMocks() {
-        $this->MockUserManager     = $this->makeMock( 'HfUserManager' );
-        $this->MockMessenger       = $this->makeMock( 'HfMailer' );
-        $this->MockPageLocator     = $this->makeMock( 'HfUrlFinder' );
-        $this->MockGoals           = $this->makeMock( 'HfGoals' );
-        $this->MockSecurity        = $this->makeMock( 'HfSecurity' );
-        $this->MockMarkupGenerator = $this->makeMock( 'HfHtmlGenerator' );
-    }
 
     // Tests
 
     public function testGoalsShortcodeGenerateReportNoticeEmail() {
-        $this->resetMocks();
-
-        $_POST           = array();
         $_POST['submit'] = '';
         $_POST[1]        = '1';
         $_POST[2]        = '0';
@@ -61,9 +44,6 @@ class TestGoalsShortcode extends HfTestCase {
     }
 
     public function testGoalsShortcodeGenerateReportNoticeEmailScenarioTwo() {
-        $this->resetMocks();
-
-        $_POST           = array();
         $_POST['submit'] = '';
         $_POST[1]        = '0';
 
@@ -108,5 +88,40 @@ class TestGoalsShortcode extends HfTestCase {
         $output         = $GoalsShortcode->getOutput();
 
         $this->assertTrue( strlen( $output ) > 0 );
+    }
+
+    public function testGoalsShortcodeChecksNonce() {
+        $_GET['n'] = 555;
+        $this->expectOnce( $this->MockMessenger, 'isReportRequestValid', array(555) );
+        $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', false );
+
+        $this->GoalsShortcodeWithMockDependencies->getOutput();
+    }
+
+    public function testGoalsShortcodeDoesNotAuthenticateUserWhenNoNonce() {
+        $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', false );
+        $this->expectOnce( $this->MockSecurity, 'requireLogin' );
+
+        $this->GoalsShortcodeWithMockDependencies->getOutput();
+    }
+
+    public function testGoalsShortcodeDeletesReportRequest() {
+        $_GET['n'] = 555;
+        $this->expectOnce( $this->MockMessenger, 'deleteReportRequest', array(555) );
+        $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', false );
+        $this->setReturnValue( $this->MockMessenger, 'isReportRequestValid', true );
+        $this->setReturnValue( $this->MockGoals, 'getGoalSubscriptions', array() );
+
+        $this->GoalsShortcodeWithMockDependencies->getOutput();
+    }
+
+    public function testGoalsShortcodeDeletesReportRequestEvenWhenUserLoggedIn() {
+        $_GET['n'] = 555;
+        $this->expectOnce( $this->MockMessenger, 'deleteReportRequest', array(555) );
+        $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
+        $this->setReturnValue( $this->MockMessenger, 'isReportRequestValid', true );
+        $this->setReturnValue( $this->MockGoals, 'getGoalSubscriptions', array() );
+
+        $this->GoalsShortcodeWithMockDependencies->getOutput();
     }
 }

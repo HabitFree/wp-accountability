@@ -228,23 +228,39 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testInsertIntoDbCallsCmsInsert() {
-        $this->expectOnce($this->MockCms, 'insertIntoDb', array('wptests_duck', array('bill')));
-        $this->DatabaseWithMockedDependencies->insertIntoDb('duck', array('bill'));
+        $this->expectOnce( $this->MockCms, 'insertIntoDb', array('wptests_duck', array('bill')) );
+        $this->DatabaseWithMockedDependencies->insertIntoDb( 'duck', array('bill') );
     }
 
     public function testRecordReportRequest() {
-        $table = "hf_report_request";
+        $table     = "hf_report_request";
         $requestId = 555;
-        $userId = 1;
-        $emailId = 7;
-        $data  = array(
-            'requestID'      => $requestId,
-            'userID'         => $userId,
-            'emailID'        => $emailId
+        $userId    = 1;
+        $emailId   = 7;
+        $data      = array(
+            'requestID' => $requestId,
+            'userID'    => $userId,
+            'emailID'   => $emailId
         );
 
-        $this->expectOnce($this->MockCms, 'insertIntoDb', array('wptests_' . $table, $data));
+        $this->expectOnce( $this->MockCms, 'insertIntoDb', array('wptests_' . $table, $data) );
 
-        $this->DatabaseWithMockedDependencies->recordReportRequest($requestId, $userId, $emailId);
+        $this->DatabaseWithMockedDependencies->recordReportRequest( $requestId, $userId, $emailId );
+    }
+
+    public function testIsReportRequestValid() {
+        $this->setReturnValue($this->MockCms, 'getResults', array(new stdClass()));
+
+        $this->assertTrue( $this->DatabaseWithMockedDependencies->isReportRequestValid( 555 ) );
+    }
+
+    public function testIsReportRequestValidReturnsFalse() {
+        $this->assertFalse( $this->DatabaseWithMockedDependencies->isReportRequestValid( 555 ) );
+    }
+
+    public function testDeleteReportRequest() {
+        $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptests_' );
+        $this->expectOnce($this->MockCms, 'deleteRows', array('wptests_hf_report_request', array('requestID' => 555)));
+        $this->DatabaseWithMockedDependencies->deleteReportRequest(555);
     }
 }

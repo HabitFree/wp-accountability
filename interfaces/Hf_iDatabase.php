@@ -72,4 +72,8 @@ interface Hf_iDatabase {
     public function getGoal( $goalId );
 
     public function recordReportRequest($requestId, $userId, $emailId);
+
+    public function isReportRequestValid($requestId);
+
+    public function deleteReportRequest($requestId);
 }

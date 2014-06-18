@@ -105,4 +105,19 @@ class TestMailer extends HfTestCase {
 
         $this->MailerWithMockedDependencies->sendReportRequestEmail($userId);
     }
+
+    public function testIsReportRequestValid() {
+        $this->setReturnValue($this->MockDatabase, 'isReportrequestValid', true);
+        $this->assertTrue($this->MailerWithMockedDependencies->isReportRequestValid(555));
+    }
+
+    public function testIsReportRequestValidReturnsFalse() {
+        $this->setReturnValue($this->MockDatabase, 'isReportrequestValid', false);
+        $this->assertFalse($this->MailerWithMockedDependencies->isReportRequestValid(555));
+    }
+
+    public function testDeleteReportRequest() {
+        $this->expectOnce($this->MockDatabase, 'deleteReportRequest', array(555));
+        $this->MailerWithMockedDependencies->deleteReportRequest(555);
+    }
 }

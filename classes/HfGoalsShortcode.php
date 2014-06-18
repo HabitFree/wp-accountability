@@ -20,6 +20,8 @@ class HfGoalsShortcode implements Hf_iShortcode {
     public function getOutput() {
         if ( !$this->isUserAuthorized() ) {
             return $this->Security->requireLogin();
+        } else if ( $this->isRequested() ) {
+            $this->Messenger->deleteReportRequest($_GET['n']);
         }
 
         $userID = $this->determineUserID();
@@ -36,9 +38,9 @@ class HfGoalsShortcode implements Hf_iShortcode {
     private function isUserAuthorized() {
         if ( $this->UserManager->isUserLoggedIn() ) {
             return true;
-        } elseif ( empty( $_GET['userID'] ) ) {
+        } elseif ( !$this->isRequested() ) {
             return false;
-        } elseif ( $this->Messenger->isEmailValid( $_GET['userID'], $_GET['emailID'] ) ) {
+        } elseif ( $this->Messenger->isReportRequestValid($_GET['n']) ) {
             return true;
         } else {
             return false;
@@ -129,5 +131,12 @@ class HfGoalsShortcode implements Hf_iShortcode {
         $report .= ( $isSuccessful ) ? 'Success' : 'Failure';
 
         return $report;
+    }
+
+    /**
+     * @return bool
+     */
+    private function isRequested() {
+        return !empty( $_GET['n'] );
     }
 }

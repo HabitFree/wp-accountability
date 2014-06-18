@@ -560,4 +560,17 @@ class HfMysqlDatabase implements Hf_iDatabase {
 
         $this->insertIntoDb('hf_report_request', $data);
     }
+
+    public function isReportRequestValid( $requestId ) {
+        $table = $this->Cms->getDbPrefix() . 'hf_report_request';
+        $query = "SELECT * FROM ".$table." WHERE requestID = '".$requestId."'";
+        return $this->Cms->getResults($query) != null;
+    }
+
+    public function deleteReportRequest($requestId) {
+        $table = $this->Cms->getDbPrefix() . 'hf_report_request';
+        $where = array('requestID' => $requestId);
+
+        $this->Cms->deleteRows( $table, $where );
+    }
 }

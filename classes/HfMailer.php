@@ -154,4 +154,12 @@ class HfMailer implements Hf_iMessenger {
     public function isEmailValid( $userId, $emailId ) {
         return $this->Database->isEmailValid( $userId, $emailId );
     }
+
+    public function isReportRequestValid( $requestId ) {
+        return $this->Database->isReportRequestValid( $requestId );
+    }
+
+    public function deleteReportRequest( $requestId ) {
+        $this->Database->deleteReportRequest( $requestId );
+    }
 }

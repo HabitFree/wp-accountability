@@ -22,4 +22,8 @@ interface Hf_iMessenger {
     public function recordInvite( $inviteID, $inviterID, $inviteeEmail, $emailID, $expirationDate );
 
     public function isEmailValid($userId, $emailId);
+
+    public function isReportRequestValid($requestId);
+
+    public function deleteReportRequest($requestId);
 }
