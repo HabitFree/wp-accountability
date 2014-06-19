@@ -9,22 +9,24 @@ class HfGoalsShortcode implements Hf_iShortcode {
     private $MarkupGenerator;
 
     function __construct( Hf_iUserManager $UserManager, Hf_iMessenger $Messenger, Hf_iAssetLocator $PageLocator, Hf_iGoals $Goals, Hf_iSecurity $Security, Hf_iMarkupGenerator $MarkupGenerator ) {
-        $this->UserManager = $UserManager;
-        $this->Messenger   = $Messenger;
-        $this->PageLocator = $PageLocator;
-        $this->Goals       = $Goals;
-        $this->Security    = $Security;
+        $this->UserManager     = $UserManager;
+        $this->Messenger       = $Messenger;
+        $this->PageLocator     = $PageLocator;
+        $this->Goals           = $Goals;
+        $this->Security        = $Security;
         $this->MarkupGenerator = $MarkupGenerator;
     }
 
     public function getOutput() {
         if ( !$this->isUserAuthorized() ) {
             return $this->Security->requireLogin();
-        } else if ( $this->isRequested() ) {
-            $this->Messenger->deleteReportRequest($_GET['n']);
         }
 
         $userID = $this->determineUserID();
+
+        if ( $this->isRequested() ) {
+            $this->Messenger->deleteReportRequest( $_GET['n'] );
+        }
 
         if ( isset( $_POST['submit'] ) ) {
             $this->submitAccountabilityReports( $userID );
@@ -40,7 +42,7 @@ class HfGoalsShortcode implements Hf_iShortcode {
             return true;
         } elseif ( !$this->isRequested() ) {
             return false;
-        } elseif ( $this->Messenger->isReportRequestValid($_GET['n']) ) {
+        } elseif ( $this->Messenger->isReportRequestValid( $_GET['n'] ) ) {
             return true;
         } else {
             return false;
@@ -48,10 +50,10 @@ class HfGoalsShortcode implements Hf_iShortcode {
     }
 
     private function determineUserID() {
-        if ($this->UserManager->isUserLoggedIn()) {
+        if ( $this->UserManager->isUserLoggedIn() ) {
             return $this->UserManager->getCurrentUserId();
-        } else if ($this->isRequested()) {
-            return $this->Messenger->getReportRequestUserId($_GET['n']);
+        } elseif ( $this->isRequested() ) {
+            return $this->Messenger->getReportRequestUserId( $_GET['n'] );
         }
     }
 
@@ -92,13 +94,13 @@ class HfGoalsShortcode implements Hf_iShortcode {
     }
 
     private function generatePartnerReportBody( $Partner, $reporterUsername ) {
-        $greeting = $this->MarkupGenerator->makeParagraph("Hello, " . $Partner->user_login . ",");
-        $intro = $this->MarkupGenerator->makeParagraph(
+        $greeting = $this->MarkupGenerator->makeParagraph( "Hello, " . $Partner->user_login . "," );
+        $intro    = $this->MarkupGenerator->makeParagraph(
             "Your friend " . $reporterUsername . " just reported on their progress. Here's how they're doing:"
         );
 
         $reports = $this->generateReportsList();
-        $body     = $greeting . $intro . $reports;
+        $body    = $greeting . $intro . $reports;
 
         return $body;
     }
@@ -114,12 +116,12 @@ class HfGoalsShortcode implements Hf_iShortcode {
             }
         };
 
-        return $this->MarkupGenerator->makeList($reports);
+        return $this->MarkupGenerator->makeList( $reports );
     }
 
     private function generateReportsListItem( $goalId, $isSuccessful ) {
         $goalTitle = $this->Goals->getGoalTitle( $goalId );
-        $report = $goalTitle . ': ';
+        $report    = $goalTitle . ': ';
         $report .= ( $isSuccessful ) ? 'Success' : 'Failure';
 
         return $report;

@@ -125,4 +125,10 @@ class TestMailer extends HfTestCase {
         $this->expectOnce($this->MockDatabase, 'getReportRequestUserId', array(555));
         $this->MailerWithMockedDependencies->getReportRequestUserId(555);
     }
+
+    public function testGetReportRequestUserIdReturnsValue() {
+        $this->setReturnValue($this->MockDatabase, 'getReportRequestUserId', 5);
+        $actual = $this->MailerWithMockedDependencies->getReportRequestUserId(555);
+        $this->assertEquals(5, $actual);
+    }
 }

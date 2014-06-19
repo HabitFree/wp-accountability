@@ -164,6 +164,6 @@ class HfMailer implements Hf_iMessenger {
     }
 
     public function getReportRequestUserId( $requestId ) {
-        $this->Database->getReportRequestUserId( $requestId );
+        return $this->Database->getReportRequestUserId( $requestId );
     }
 }

@@ -59,8 +59,9 @@ class HfWordPress implements Hf_iContentManagementSystem {
 
     function getRow( $table, $criterion ) {
         $prefix = $this->getDbPrefix();
+        $query = "SELECT * FROM " . $prefix . $table . " WHERE " . $criterion;
 
-        return $this->wpdb->get_row( "SELECT * FROM " . $prefix . $table . " WHERE " . $criterion );
+        return $this->wpdb->get_row( $query );
     }
 
     public function deleteRows( $table, $where ) {

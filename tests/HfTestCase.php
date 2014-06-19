@@ -104,6 +104,9 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     }
 
     protected function expectAt( $Mock, $method, $at, $args = array() ) {
+        // Any failure of at() expectations returns "Mocked method does not exist"
+        // See http://stackoverflow.com/questions/3367513/phpunit-mocked-method-does-not-exist-when-using-mock-expectsthis-at
+
         $ExpectantMock = $Mock->expects( $this->at( $at ) )->method( $method );
 
         $this->addWithArgsExpectation( $args, $ExpectantMock );
