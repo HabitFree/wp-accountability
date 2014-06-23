@@ -1,6 +1,6 @@
 <?php
 
-class HfWordPressInterface implements Hf_iContentManagementSystem {
+class HfWordPress implements Hf_iContentManagementSystem {
     private $wpdb;
 
     function __construct() {
@@ -59,8 +59,9 @@ class HfWordPressInterface implements Hf_iContentManagementSystem {
 
     function getRow( $table, $criterion ) {
         $prefix = $this->getDbPrefix();
+        $query = "SELECT * FROM " . $prefix . $table . " WHERE " . $criterion;
 
-        return $this->wpdb->get_row( "SELECT * FROM " . $prefix . $table . " WHERE " . $criterion );
+        return $this->wpdb->get_row( $query );
     }
 
     public function deleteRows( $table, $where ) {
@@ -113,5 +114,13 @@ class HfWordPressInterface implements Hf_iContentManagementSystem {
 
     public function getResults($query) {
         return $this->wpdb->get_results($query);
+    }
+
+    public function insertIntoDb($table, $data) {
+        $this->wpdb->insert($table, $data);
+    }
+
+    public function updateRowsSafe($table, $data, $where) {
+        $this->wpdb->update($table, $data, $where);
     }
 } 

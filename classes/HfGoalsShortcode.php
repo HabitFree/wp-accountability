@@ -7,14 +7,16 @@ class HfGoalsShortcode implements Hf_iShortcode {
     private $Goals;
     private $Security;
     private $MarkupGenerator;
+    private $CodeLibrary;
 
-    function __construct( Hf_iUserManager $UserManager, Hf_iMessenger $Messenger, Hf_iAssetLocator $PageLocator, Hf_iGoals $Goals, Hf_iSecurity $Security, Hf_iMarkupGenerator $MarkupGenerator ) {
-        $this->UserManager = $UserManager;
-        $this->Messenger   = $Messenger;
-        $this->PageLocator = $PageLocator;
-        $this->Goals       = $Goals;
-        $this->Security    = $Security;
+    function __construct( Hf_iUserManager $UserManager, Hf_iMessenger $Messenger, Hf_iAssetLocator $PageLocator, Hf_iGoals $Goals, Hf_iSecurity $Security, Hf_iMarkupGenerator $MarkupGenerator, Hf_iCodeLibrary $CodeLibrary ) {
+        $this->UserManager     = $UserManager;
+        $this->Messenger       = $Messenger;
+        $this->PageLocator     = $PageLocator;
+        $this->Goals           = $Goals;
+        $this->Security        = $Security;
         $this->MarkupGenerator = $MarkupGenerator;
+        $this->CodeLibrary     = $CodeLibrary;
     }
 
     public function getOutput() {
@@ -23,8 +25,9 @@ class HfGoalsShortcode implements Hf_iShortcode {
         }
 
         $userID = $this->determineUserID();
+        $this->updateReportRequest();
 
-        if ( isset( $_POST['submit'] ) ) {
+        if ( $this->isSubmitted() ) {
             $this->submitAccountabilityReports( $userID );
 
             return '<p class="success">Thanks for checking in!</p>' . $this->buildForm( $userID );
@@ -36,9 +39,9 @@ class HfGoalsShortcode implements Hf_iShortcode {
     private function isUserAuthorized() {
         if ( $this->UserManager->isUserLoggedIn() ) {
             return true;
-        } elseif ( empty( $_GET['userID'] ) ) {
+        } elseif ( !$this->isRequested() ) {
             return false;
-        } elseif ( $this->Messenger->isEmailValid( $_GET['userID'], $_GET['emailID'] ) ) {
+        } elseif ( $this->Messenger->isReportRequestValid( $_GET['n'] ) ) {
             return true;
         } else {
             return false;
@@ -46,27 +49,38 @@ class HfGoalsShortcode implements Hf_iShortcode {
     }
 
     private function determineUserID() {
-        if ( isset( $_GET['userID'] ) && $this->Messenger->isEmailValid( $_GET['userID'], $_GET['emailID'] ) ) {
-            $this->Messenger->markAsDelivered( $_GET['emailID'] );
-
-            return $_GET['userID'];
-        } else {
+        if ( $this->UserManager->isUserLoggedIn() ) {
             return $this->UserManager->getCurrentUserId();
+        } elseif ( $this->isRequested() ) {
+            return $this->Messenger->getReportRequestUserId( $_GET['n'] );
         }
     }
 
-    private function submitAccountabilityReports( $userID ) {
-        if ( isset( $_GET['emailID'] ) ) {
-            $emailID = $_GET['emailID'];
-        } else {
-            $emailID = null;
+    private function updateReportRequest() {
+        if ( $this->isRequested() and $this->Messenger->isReportRequestValid( $_GET['n'] ) ) {
+            if ( $this->isSubmitted() ) {
+                $this->Messenger->deleteReportRequest( $_GET['n'] );
+            } else {
+                $this->updateReportRequestExpirationDateToOneHourFromNow();
+            }
         }
+    }
 
+    private function isSubmitted() {
+        return isset( $_POST['submit'] );
+    }
+
+    private function updateReportRequestExpirationDateToOneHourFromNow() {
+        $oneHour = 60 * 60;
+        $this->Messenger->updateReportRequestExpirationDate( $_GET['n'], $this->CodeLibrary->getCurrentTime() + $oneHour );
+    }
+
+    private function submitAccountabilityReports( $userID ) {
         foreach ( $_POST as $key => $value ) {
             if ( $key == 'submit' ) {
                 continue;
             }
-            $this->Goals->recordAccountabilityReport( $userID, $key, $value, $emailID );
+            $this->Goals->recordAccountabilityReport( $userID, $key, $value, null );
         }
 
         $this->notifyPartners( $userID );
@@ -75,8 +89,28 @@ class HfGoalsShortcode implements Hf_iShortcode {
     private function notifyPartners( $userID ) {
         $Partners = $this->UserManager->getPartners( $userID );
         foreach ( $Partners as $Partner ) {
-            $this->notifyPartner( $Partner );
+            $this->notifyPartner( $Partner, $userID );
         }
+    }
+
+    private function notifyPartner( $Partner, $userId ) {
+        $reporterUsername = $this->UserManager->getUsernameById($userId);
+        $subject          = $reporterUsername . ' just reported';
+        $body             = $this->generatePartnerReportBody( $Partner, $reporterUsername );
+
+        $this->Messenger->sendEmailToUser( $Partner->ID, $subject, $body );
+    }
+
+    private function generatePartnerReportBody( $Partner, $reporterUsername ) {
+        $greeting = $this->MarkupGenerator->makeParagraph( "Hello, " . $Partner->user_login . "," );
+        $intro    = $this->MarkupGenerator->makeParagraph(
+            "Your friend " . $reporterUsername . " just reported on their progress. Here's how they're doing:"
+        );
+
+        $reports = $this->generateReportsList();
+        $body    = $greeting . $intro . $reports;
+
+        return $body;
     }
 
     private function buildForm( $userID ) {
@@ -87,26 +121,6 @@ class HfGoalsShortcode implements Hf_iShortcode {
         $AccountabilityForm->populate( $goalSubs );
 
         return $AccountabilityForm->getHtml();
-    }
-
-    private function notifyPartner( $Partner ) {
-        $reporterUsername = $this->UserManager->getCurrentUserLogin();
-        $subject          = $reporterUsername . ' just reported';
-        $body             = $this->generatePartnerReportBody( $Partner, $reporterUsername );
-
-        $this->Messenger->sendEmailToUser( $Partner->ID, $subject, $body );
-    }
-
-    private function generatePartnerReportBody( $Partner, $reporterUsername ) {
-        $greeting = $this->MarkupGenerator->makeParagraph("Hello, " . $Partner->user_login . ",");
-        $intro = $this->MarkupGenerator->makeParagraph(
-            "Your friend " . $reporterUsername . " just reported on their progress. Here's how they're doing:"
-        );
-
-        $reports = $this->generateReportsList();
-        $body     = $greeting . $intro . $reports;
-
-        return $body;
     }
 
     private function generateReportsList() {
@@ -120,14 +134,18 @@ class HfGoalsShortcode implements Hf_iShortcode {
             }
         };
 
-        return $this->MarkupGenerator->makeList($reports);
+        return $this->MarkupGenerator->makeList( $reports );
     }
 
     private function generateReportsListItem( $goalId, $isSuccessful ) {
         $goalTitle = $this->Goals->getGoalTitle( $goalId );
-        $report = $goalTitle . ': ';
+        $report    = $goalTitle . ': ';
         $report .= ( $isSuccessful ) ? 'Success' : 'Failure';
 
         return $report;
+    }
+
+    private function isRequested() {
+        return !empty( $_GET['n'] );
     }
 }

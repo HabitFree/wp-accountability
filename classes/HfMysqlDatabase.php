@@ -1,7 +1,7 @@
 <?php
 
 class HfMysqlDatabase implements Hf_iDatabase {
-    private $dbVersion = "3.8";
+    private $dbVersion = "4.1";
     private $Cms;
     private $CodeLibrary;
 
@@ -90,6 +90,16 @@ class HfMysqlDatabase implements Hf_iDatabase {
 					PRIMARY KEY  (userID1, userID2)
 				);";
 
+            $reportRequestTableSql = "CREATE TABLE " . $prefix . "hf_report_request (
+					requestID varchar(250) NOT NULL,
+					userID int NOT NULL,
+					emailID int NOT NULL,
+					KEY requestID (requestID),
+					KEY userID (userID),
+					KEY emailID (emailID),
+					PRIMARY KEY  (requestID)
+				);";
+
             require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
             dbDelta( $emailTableSql );
             dbDelta( $goalTableSql );
@@ -98,6 +108,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
             dbDelta( $levelTableSql );
             dbDelta( $inviteTableSql );
             dbDelta( $relationshipTableSql );
+            dbDelta( $reportRequestTableSql );
 
             $defaultGoal = array('goalID'     => 1,
                                  'title'      => 'Pornography Abstinence',
@@ -218,9 +229,8 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $prefix    = $wpdb->prefix;
         $tableName = $prefix . $table;
         $data      = $this->removeNullValuePairs( $data );
-        $success   = $wpdb->insert( $tableName, $data );
 
-        return $success;
+        $this->Cms->insertIntoDb( $tableName, $data );
     }
 
     function insertMultipleRows( $table, $rows ) {
@@ -283,7 +293,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
         }
     }
 
-    function generateEmailID() {
+    function generateEmailId() {
         $table     = 'hf_email';
         $tableName = $this->Cms->getDbPrefix() . $table;
         $query     = 'SELECT max(emailID) FROM ' . $tableName;
@@ -480,7 +490,8 @@ class HfMysqlDatabase implements Hf_iDatabase {
 
     public function getInviterID( $nonce ) {
         $whereInvite = "inviteID = '" . $nonce . "'";
-        $invite = $this->getRow( 'hf_invite', $whereInvite );
+        $invite      = $this->getRow( 'hf_invite', $whereInvite );
+
         return intval( $invite->inviterID );
     }
 
@@ -532,12 +543,57 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $query = 'SELECT * FROM `wp_users`
             INNER JOIN `wp_hf_relationship`
             WHERE (userID1 = ID OR userID2 = ID)
-            AND (userID1 = '.$userId.' OR userID2 = '.$userId.') AND ID != '.$userId;
-        return $this->Cms->getResults($query);
+            AND (userID1 = ' . $userId . ' OR userID2 = ' . $userId . ') AND ID != ' . $userId;
+
+        return $this->Cms->getResults( $query );
     }
 
     public function getGoal( $goalId ) {
         $where = 'goalID = ' . $goalId;
-        return $this->Cms->getRow('hf_goal', $where);
+
+        return $this->Cms->getRow( 'hf_goal', $where );
+    }
+
+    public function recordReportRequest( $requestId, $userId, $emailId, $expirationDate ) {
+        $data = array(
+            'requestID' => $requestId,
+            'userID'    => $userId,
+            'emailID'   => $emailId,
+            'expirationDate' => $expirationDate
+        );
+
+        $this->insertIntoDb( 'hf_report_request', $data );
+    }
+
+    public function isReportRequestValid( $requestId ) {
+        $table = $this->Cms->getDbPrefix() . 'hf_report_request';
+        $query = "SELECT * FROM " . $table . " WHERE requestID = '" . $requestId . "'";
+
+        return $this->Cms->getResults( $query ) != null;
+    }
+
+    public function deleteReportRequest( $requestId ) {
+        $table = $this->Cms->getDbPrefix() . 'hf_report_request';
+        $where = array('requestID' => $requestId);
+
+        $this->Cms->deleteRows( $table, $where );
+    }
+
+    public function getReportRequestUserId( $requestId ) {
+        return $this->Cms->getRow( 'hf_report_request', "requestID = '" . $requestId . "'" )->userID;
+    }
+
+    public function updateReportRequestExpirationDate( $requestId, $expirationTime ) {
+        $data = array(
+            'expirationDate' => date( 'Y-m-d H:i:s', $expirationTime )
+        );
+
+        $where = array(
+            'requestID' => $requestId
+        );
+
+        $tableName = $this->Cms->getDbPrefix() . 'hf_report_request';
+
+        $this->Cms->updateRowsSafe( $tableName, $data, $where );
     }
 }

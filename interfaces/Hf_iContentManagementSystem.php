@@ -46,4 +46,8 @@ interface Hf_iContentManagementSystem {
     public function getLogoutUrl($redirect);
 
     public function getResults($query);
+
+    public function insertIntoDb($table, $data);
+
+    public function updateRowsSafe($table, $data, $where);
 }

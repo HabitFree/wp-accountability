@@ -16,4 +16,6 @@ interface Hf_iUserManager {
     public function isUserLoggedIn();
 
     public function getPartners( $userId );
+
+    public function getUsernameById( $userId );
 }

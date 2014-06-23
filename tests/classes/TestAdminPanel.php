@@ -7,13 +7,13 @@ class TestAdminPanel extends HfTestCase {
     // Tests
 
     public function testGenerateAdminPanelButtons() {
-        $Mailer       = $this->myMakeMock( 'HfMailer' );
-        $URLFinder    = $this->myMakeMock( 'HfUrlFinder' );
-        $DbConnection = $this->myMakeMock( 'HfMysqlDatabase' );
-        $UserManager  = $this->myMakeMock( 'HfUserManager' );
-        $Cms          = $this->myMakeMock( 'HfWordPressInterface' );
+        $Mailer       = $this->makeMock( 'HfMailer' );
+        $URLFinder    = $this->makeMock( 'HfUrlFinder' );
+        $DbConnection = $this->makeMock( 'HfMysqlDatabase' );
+        $UserManager  = $this->makeMock( 'HfUserManager' );
+        $Cms          = $this->makeMock( 'HfWordPress' );
 
-        $this->mySetReturnValue( $URLFinder, 'getCurrentPageURL', 'test.com' );
+        $this->setReturnValue( $URLFinder, 'getCurrentPageURL', 'test.com' );
 
         $AdminPanel = new HfAdminPanel( $Mailer, $URLFinder, $DbConnection, $UserManager, $Cms );
 

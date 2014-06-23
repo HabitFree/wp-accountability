@@ -39,8 +39,6 @@ function _manually_load_plugin() {
 
     add_action( 'init', 'hfDoStuffOnInit' );
 
-    //hfCreateTestPages();
-
     $_SERVER['SERVER_NAME'] = 'localhost';
     $_SERVER["SERVER_PORT"] = 8080;
 
@@ -51,7 +49,6 @@ tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
 
 function hfDoStuffOnInit() {
     wp_create_user( 'hare', 'boundless', 'taken@taken.com' );
-
 
     $settingsPage = array(
         'post_title'  => 'Settings',
@@ -67,10 +64,8 @@ function hfDoStuffOnInit() {
         'post_author' => 1
     );
 
-    print('<br />creating a page...<br />');
     wp_insert_post( $settingsPage );
     wp_insert_post( $logInPage );
-    print('<br />created a page...<br />');
 }
 
 /**

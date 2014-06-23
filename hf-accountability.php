@@ -51,7 +51,7 @@ require_once( dirname( __FILE__ ) . '/classes/HfMysqlDatabase.php' );
 require_once( dirname( __FILE__ ) . '/classes/HfUserManager.php' );
 require_once( dirname( __FILE__ ) . '/classes/HfAdminPanel.php' );
 require_once( dirname( __FILE__ ) . '/classes/HfHtmlGenerator.php' );
-require_once( dirname( __FILE__ ) . '/classes/HfWordPressInterface.php' );
+require_once( dirname( __FILE__ ) . '/classes/HfWordPress.php' );
 require_once( dirname( __FILE__ ) . '/classes/HfGoals.php' );
 require_once( dirname( __FILE__ ) . '/classes/HfPhpLibrary.php' );
 require_once( dirname( __FILE__ ) . '/classes/HfGenericForm.php' );

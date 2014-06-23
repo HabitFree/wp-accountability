@@ -5,10 +5,10 @@ class TestGoals extends HfTestCase {
     // Helper Functions
 
     private function makeMockDependencies() {
-        $Messenger     = $this->myMakeMock( 'HfMailer' );
-        $WebsiteApi    = $this->myMakeMock( 'HfWordPressInterface' );
-        $HtmlGenerator = $this->myMakeMock( 'HfHtmlGenerator' );
-        $Database      = $this->myMakeMock( 'HfMysqlDatabase' );
+        $Messenger     = $this->makeMock( 'HfMailer' );
+        $WebsiteApi    = $this->makeMock( 'HfWordPress' );
+        $HtmlGenerator = $this->makeMock( 'HfHtmlGenerator' );
+        $Database      = $this->makeMock( 'HfMysqlDatabase' );
 
         return array($Messenger, $WebsiteApi, $HtmlGenerator, $Database);
     }
@@ -16,136 +16,136 @@ class TestGoals extends HfTestCase {
     // Tests
 
     public function testSendReportRequestEmailsChecksThrottling() {
-        $Messenger     = $this->myMakeMock( 'HfMailer' );
-        $WebsiteApi    = $this->myMakeMock( 'HfWordPressInterface' );
-        $HtmlGenerator = $this->myMakeMock( 'HfHtmlGenerator' );
-        $DbConnection  = $this->myMakeMock( 'HfMysqlDatabase' );
-        $CodeLibrary   = $this->myMakeMock( 'HfPhpLibrary' );
+        $Messenger     = $this->makeMock( 'HfMailer' );
+        $WebsiteApi    = $this->makeMock( 'HfWordPress' );
+        $HtmlGenerator = $this->makeMock( 'HfHtmlGenerator' );
+        $DbConnection  = $this->makeMock( 'HfMysqlDatabase' );
+        $CodeLibrary   = $this->makeMock( 'HfPhpLibrary' );
 
         $mockUser     = new stdClass();
         $mockUser->ID = 1;
         $mockUsers    = array($mockUser);
-        $this->mySetReturnValue( $WebsiteApi, 'getSubscribedUsers', $mockUsers );
+        $this->setReturnValue( $WebsiteApi, 'getSubscribedUsers', $mockUsers );
 
         $mockGoalSub         = new stdClass();
         $mockGoalSub->goalID = 1;
         $mockGoalSubs        = array($mockGoalSub);
-        $this->mySetReturnValue( $DbConnection, 'getRows', $mockGoalSubs );
+        $this->setReturnValue( $DbConnection, 'getRows', $mockGoalSubs );
 
         $mockLevel                = new stdClass();
         $mockLevel->emailInterval = 1;
-        $this->mySetReturnValue( $DbConnection, 'level', $mockLevel );
+        $this->setReturnValue( $DbConnection, 'level', $mockLevel );
 
-        $this->mySetReturnValue( $DbConnection, 'daysSinceLastReport', 2 );
-        $this->mySetReturnValue( $Messenger, 'isThrottled', true );
+        $this->setReturnValue( $DbConnection, 'daysSinceLastReport', 2 );
+        $this->setReturnValue( $Messenger, 'isThrottled', true );
 
-        $this->myExpectAtLeastOnce( $Messenger, 'isThrottled' );
+        $this->expectAtLeastOnce( $Messenger, 'isThrottled' );
 
         $Goals = new HfGoals( $Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection );
         $Goals->sendReportRequestEmails();
     }
 
     public function testSendReportRequestEmailsSendsEmailWhenReportDue() {
-        $Messenger     = $this->myMakeMock( 'HfMailer' );
-        $WebsiteApi    = $this->myMakeMock( 'HfWordPressInterface' );
-        $HtmlGenerator = $this->myMakeMock( 'HfHtmlGenerator' );
-        $DbConnection  = $this->myMakeMock( 'HfMysqlDatabase' );
-        $CodeLibrary   = $this->myMakeMock( 'HfPhpLibrary' );
+        $Messenger     = $this->makeMock( 'HfMailer' );
+        $WebsiteApi    = $this->makeMock( 'HfWordPress' );
+        $HtmlGenerator = $this->makeMock( 'HfHtmlGenerator' );
+        $DbConnection  = $this->makeMock( 'HfMysqlDatabase' );
+        $CodeLibrary   = $this->makeMock( 'HfPhpLibrary' );
 
         $mockUser     = new stdClass();
         $mockUser->ID = 1;
         $mockUsers    = array($mockUser);
-        $this->mySetReturnValue( $WebsiteApi, 'getSubscribedUsers', $mockUsers );
+        $this->setReturnValue( $WebsiteApi, 'getSubscribedUsers', $mockUsers );
 
         $mockGoalSub         = new stdClass();
         $mockGoalSub->goalID = 1;
         $mockGoalSubs        = array($mockGoalSub);
-        $this->mySetReturnValue( $DbConnection, 'getRows', $mockGoalSubs );
+        $this->setReturnValue( $DbConnection, 'getRows', $mockGoalSubs );
 
         $mockLevel                = new stdClass();
         $mockLevel->emailInterval = 1;
-        $this->mySetReturnValue( $DbConnection, 'level', $mockLevel );
+        $this->setReturnValue( $DbConnection, 'level', $mockLevel );
 
-        $this->mySetReturnValue( $DbConnection, 'daysSinceLastEmail', 2 );
-        $this->mySetReturnValue( $DbConnection, 'daysSinceLastReport', 2 );
-        $this->mySetReturnValue( $Messenger, 'isThrottled', false );
+        $this->setReturnValue( $DbConnection, 'daysSinceLastEmail', 2 );
+        $this->setReturnValue( $DbConnection, 'daysSinceLastReport', 2 );
+        $this->setReturnValue( $Messenger, 'isThrottled', false );
 
-        $this->myExpectAtLeastOnce( $Messenger, 'sendReportRequestEmail' );
+        $this->expectAtLeastOnce( $Messenger, 'sendReportRequestEmail' );
 
         $Goals = new HfGoals( $Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection );
         $Goals->sendReportRequestEmails();
     }
 
     public function testSendReportRequestEmailsDoesNotSendEmailWhenReportNotDue() {
-        $Messenger     = $this->myMakeMock( 'HfMailer' );
-        $WebsiteApi    = $this->myMakeMock( 'HfWordPressInterface' );
-        $HtmlGenerator = $this->myMakeMock( 'HfHtmlGenerator' );
-        $DbConnection  = $this->myMakeMock( 'HfMysqlDatabase' );
-        $CodeLibrary   = $this->myMakeMock( 'HfPhpLibrary' );
+        $Messenger     = $this->makeMock( 'HfMailer' );
+        $WebsiteApi    = $this->makeMock( 'HfWordPress' );
+        $HtmlGenerator = $this->makeMock( 'HfHtmlGenerator' );
+        $DbConnection  = $this->makeMock( 'HfMysqlDatabase' );
+        $CodeLibrary   = $this->makeMock( 'HfPhpLibrary' );
 
         $mockUser     = new stdClass();
         $mockUser->ID = 1;
         $mockUsers    = array($mockUser);
-        $this->mySetReturnValue( $WebsiteApi, 'getSubscribedUsers', $mockUsers );
+        $this->setReturnValue( $WebsiteApi, 'getSubscribedUsers', $mockUsers );
 
         $mockGoalSub         = new stdClass();
         $mockGoalSub->goalID = 1;
         $mockGoalSubs        = array($mockGoalSub);
-        $this->mySetReturnValue( $DbConnection, 'getRows', $mockGoalSubs );
+        $this->setReturnValue( $DbConnection, 'getRows', $mockGoalSubs );
 
         $mockLevel                = new stdClass();
         $mockLevel->emailInterval = 1;
-        $this->mySetReturnValue( $DbConnection, 'level', $mockLevel );
+        $this->setReturnValue( $DbConnection, 'level', $mockLevel );
 
-        $this->mySetReturnValue( $DbConnection, 'daysSinceLastEmail', 2 );
-        $this->mySetReturnValue( $DbConnection, 'daysSinceLastReport', 0 );
+        $this->setReturnValue( $DbConnection, 'daysSinceLastEmail', 2 );
+        $this->setReturnValue( $DbConnection, 'daysSinceLastReport', 0 );
 
-        $this->myExpectNever( $Messenger, 'sendReportRequestEmail' );
+        $this->expectNever( $Messenger, 'sendReportRequestEmail' );
 
         $Goals = new HfGoals( $Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection );
         $Goals->sendReportRequestEmails();
     }
 
     public function testSendReportRequestEmailsDoesNotSendEmailWhenUserThrottled() {
-        $Messenger     = $this->myMakeMock( 'HfMailer' );
-        $WebsiteApi    = $this->myMakeMock( 'HfWordPressInterface' );
-        $HtmlGenerator = $this->myMakeMock( 'HfHtmlGenerator' );
-        $DbConnection  = $this->myMakeMock( 'HfMysqlDatabase' );
-        $CodeLibrary   = $this->myMakeMock( 'HfPhpLibrary' );
+        $Messenger     = $this->makeMock( 'HfMailer' );
+        $WebsiteApi    = $this->makeMock( 'HfWordPress' );
+        $HtmlGenerator = $this->makeMock( 'HfHtmlGenerator' );
+        $DbConnection  = $this->makeMock( 'HfMysqlDatabase' );
+        $CodeLibrary   = $this->makeMock( 'HfPhpLibrary' );
 
         $mockUser     = new stdClass();
         $mockUser->ID = 1;
         $mockUsers    = array($mockUser);
-        $this->mySetReturnValue( $WebsiteApi, 'getSubscribedUsers', $mockUsers );
+        $this->setReturnValue( $WebsiteApi, 'getSubscribedUsers', $mockUsers );
 
         $mockGoalSub         = new stdClass();
         $mockGoalSub->goalID = 1;
         $mockGoalSubs        = array($mockGoalSub);
-        $this->mySetReturnValue( $DbConnection, 'getRows', $mockGoalSubs );
+        $this->setReturnValue( $DbConnection, 'getRows', $mockGoalSubs );
 
         $mockLevel                = new stdClass();
         $mockLevel->emailInterval = 1;
-        $this->mySetReturnValue( $DbConnection, 'level', $mockLevel );
+        $this->setReturnValue( $DbConnection, 'level', $mockLevel );
 
-        $this->mySetReturnValue( $DbConnection, 'daysSinceLastEmail', 2 );
-        $this->mySetReturnValue( $DbConnection, 'daysSinceLastReport', 5 );
-        $this->mySetReturnValue( $Messenger, 'IsThrottled', true );
+        $this->setReturnValue( $DbConnection, 'daysSinceLastEmail', 2 );
+        $this->setReturnValue( $DbConnection, 'daysSinceLastReport', 5 );
+        $this->setReturnValue( $Messenger, 'IsThrottled', true );
 
-        $this->myExpectNever( $Messenger, 'sendReportRequestEmail' );
+        $this->expectNever( $Messenger, 'sendReportRequestEmail' );
 
         $Goals = new HfGoals( $Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection );
         $Goals->sendReportRequestEmails();
     }
 
     public function testCurrentLevelTarget() {
-        $Messenger     = $this->myMakeMock( 'HfMailer' );
-        $WebsiteApi    = $this->myMakeMock( 'HfWordPressInterface' );
-        $HtmlGenerator = $this->myMakeMock( 'HfHtmlGenerator' );
-        $DbConnection  = $this->myMakeMock( 'HfMysqlDatabase' );
+        $Messenger     = $this->makeMock( 'HfMailer' );
+        $WebsiteApi    = $this->makeMock( 'HfWordPress' );
+        $HtmlGenerator = $this->makeMock( 'HfHtmlGenerator' );
+        $DbConnection  = $this->makeMock( 'HfMysqlDatabase' );
 
         $mockLevel         = new stdClass();
         $mockLevel->target = 14;
-        $this->mySetReturnValue( $DbConnection, 'level', $mockLevel );
+        $this->setReturnValue( $DbConnection, 'level', $mockLevel );
 
         $Goals = new HfGoals( $Messenger, $WebsiteApi, $HtmlGenerator, $DbConnection );
 
@@ -159,7 +159,7 @@ class TestGoals extends HfTestCase {
 
         $mockGoal         = new stdClass();
         $mockGoal->title  = 'Eat durian';
-        $this->mySetReturnValue($Database, 'getGoal', $mockGoal);
+        $this->setReturnValue($Database, 'getGoal', $mockGoal);
 
         $Goals = new HfGoals( $Messenger, $WebsiteApi, $HtmlGenerator, $Database );
 
@@ -173,7 +173,7 @@ class TestGoals extends HfTestCase {
 
         $Goals = new HfGoals( $Messenger, $WebsiteApi, $HtmlGenerator, $Database );
 
-        $this->myExpectOnce($Database, 'recordAccountabilityReport', array(1, 2, 3, 4));
+        $this->expectOnce($Database, 'recordAccountabilityReport', array(1, 2, 3, 4));
 
         $Goals->recordAccountabilityReport(1, 2, 3, 4);
     }
@@ -185,10 +185,16 @@ class TestGoals extends HfTestCase {
 
         $expected = array(1, 2, 3, 4);
 
-        $this->mySetReturnValue($Database, 'getGoalSubscriptions', $expected);
+        $this->setReturnValue($Database, 'getGoalSubscriptions', $expected);
 
         $actual = $Goals->getGoalSubscriptions(1);
 
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testSendEmailReportRequests() {
+        $Factory = new HfFactory();
+        $Goals   = $Factory->makeGoals();
+        $Goals->sendReportRequestEmails();
     }
 } 

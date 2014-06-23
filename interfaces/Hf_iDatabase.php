@@ -5,7 +5,7 @@ interface Hf_iDatabase {
 
     public function insertMultipleRows( $table, $rows );
 
-    public function generateEmailID();
+    public function generateEmailId();
 
     public function daysSinceLastEmail( $userID );
 
@@ -70,4 +70,14 @@ interface Hf_iDatabase {
     public function getPartners( $userId );
 
     public function getGoal( $goalId );
+
+    public function recordReportRequest( $requestId, $userId, $emailId, $expirationDate );
+
+    public function isReportRequestValid( $requestId );
+
+    public function deleteReportRequest( $requestId );
+
+    public function getReportRequestUserId( $requestId );
+
+    public function updateReportRequestExpirationDate( $requestId, $expirationTime );
 }
