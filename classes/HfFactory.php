@@ -25,8 +25,9 @@ class HfFactory {
         $Goals           = $this->makeGoals();
         $Security        = $this->makeSecurity();
         $MarkupGenerator = $this->makeMarkupGenerator();
+        $CodeLibrary     = $this->makeCodeLibrary();
 
-        return new HfGoalsShortcode( $UserManager, $Messenger, $AssetLocator, $Goals, $Security, $MarkupGenerator );
+        return new HfGoalsShortcode( $UserManager, $Messenger, $AssetLocator, $Goals, $Security, $MarkupGenerator, $CodeLibrary );
     }
 
     public function makeSettingsShortcode() {
@@ -61,7 +62,7 @@ class HfFactory {
         $AssetLocator = $this->makeAssetLocator();
         $Mailer       = $this->makeMessenger();
         $Database     = $this->makeDatabase();
-        $CodeLibrary = $this->makeCodeLibrary();
+        $CodeLibrary  = $this->makeCodeLibrary();
 
         return new HfUserManager( $Database, $Mailer, $AssetLocator, $Cms, $CodeLibrary );
     }
@@ -71,8 +72,9 @@ class HfFactory {
         $Database     = $this->makeDatabase();
         $Security     = $this->makeSecurity();
         $AssetLocator = $this->makeAssetLocator();
+        $CodeLibrary  = $this->makeCodeLibrary();
 
-        return new HfMailer( $AssetLocator, $Security, $Database, $Cms );
+        return new HfMailer( $AssetLocator, $Security, $Database, $Cms, $CodeLibrary );
     }
 
     public function makeDatabase() {

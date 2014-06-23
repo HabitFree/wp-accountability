@@ -119,4 +119,8 @@ class HfWordPress implements Hf_iContentManagementSystem {
     public function insertIntoDb($table, $data) {
         $this->wpdb->insert($table, $data);
     }
+
+    public function updateRowsSafe($table, $data, $where) {
+        $this->wpdb->update($table, $data, $where);
+    }
 } 

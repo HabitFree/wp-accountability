@@ -5,12 +5,14 @@ class HfMailer implements Hf_iMessenger {
     private $Database;
     private $PageLocator;
     private $ContentManagementSystem;
+    private $CodeLibrary;
 
-    function HfMailer( Hf_iAssetLocator $PageLocator, Hf_iSecurity $Security, Hf_iDatabase $Database, Hf_iContentManagementSystem $ContentManagementSystem ) {
+    function HfMailer( Hf_iAssetLocator $PageLocator, Hf_iSecurity $Security, Hf_iDatabase $Database, Hf_iContentManagementSystem $ContentManagementSystem, Hf_iCodeLibrary $CodeLibrary ) {
         $this->Database                = $Database;
         $this->Security                = $Security;
         $this->PageLocator             = $PageLocator;
         $this->ContentManagementSystem = $ContentManagementSystem;
+        $this->CodeLibrary             = $CodeLibrary;
     }
 
     function sendEmailToUser( $userID, $subject, $body ) {
@@ -43,7 +45,9 @@ class HfMailer implements Hf_iMessenger {
         $message   = "<p>Time to <a href='" . $reportUrl . "'>check in</a>.</p>";
 
         $this->sendEmailToUserAndSpecifyEmailID( $userId, $subject, $message, $emailId );
-        $this->Database->recordReportRequest( $nonce, $userId, $emailId );
+
+        $expirationDate = $this->generateReportRequestExpirationDate();
+        $this->Database->recordReportRequest( $nonce, $userId, $emailId, $expirationDate );
     }
 
     function generateReportURL( $reportRequestId ) {
@@ -61,6 +65,13 @@ class HfMailer implements Hf_iMessenger {
 
         $this->ContentManagementSystem->sendWpEmail( $to, $subject, $body );
         $this->Database->recordEmail( $userID, $subject, $body, $emailID, $to );
+    }
+
+    private function generateReportRequestExpirationDate() {
+        $oneWeek         = 7 * 24 * 60 * 60;
+        $timePlusOneWeek = $this->CodeLibrary->getCurrentTime() + $oneWeek;
+
+        return date( 'Y-m-d H:i:s', $timePlusOneWeek );
     }
 
     function markAsDelivered( $emailID ) {
@@ -165,5 +176,9 @@ class HfMailer implements Hf_iMessenger {
 
     public function getReportRequestUserId( $requestId ) {
         return $this->Database->getReportRequestUserId( $requestId );
+    }
+
+    public function updateReportRequestExpirationDate( $requestId, $expirationTime ) {
+        $this->Database->updateReportRequestExpirationDate( $requestId, $expirationTime );
     }
 }

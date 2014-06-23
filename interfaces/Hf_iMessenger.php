@@ -28,4 +28,6 @@ interface Hf_iMessenger {
     public function deleteReportRequest( $requestId );
 
     public function getReportRequestUserId( $requestId );
+
+    public function updateReportRequestExpirationDate( $requestId, $expirationTime );
 }

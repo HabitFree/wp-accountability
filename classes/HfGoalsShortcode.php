@@ -7,14 +7,16 @@ class HfGoalsShortcode implements Hf_iShortcode {
     private $Goals;
     private $Security;
     private $MarkupGenerator;
+    private $CodeLibrary;
 
-    function __construct( Hf_iUserManager $UserManager, Hf_iMessenger $Messenger, Hf_iAssetLocator $PageLocator, Hf_iGoals $Goals, Hf_iSecurity $Security, Hf_iMarkupGenerator $MarkupGenerator ) {
+    function __construct( Hf_iUserManager $UserManager, Hf_iMessenger $Messenger, Hf_iAssetLocator $PageLocator, Hf_iGoals $Goals, Hf_iSecurity $Security, Hf_iMarkupGenerator $MarkupGenerator, Hf_iCodeLibrary $CodeLibrary ) {
         $this->UserManager     = $UserManager;
         $this->Messenger       = $Messenger;
         $this->PageLocator     = $PageLocator;
         $this->Goals           = $Goals;
         $this->Security        = $Security;
         $this->MarkupGenerator = $MarkupGenerator;
+        $this->CodeLibrary     = $CodeLibrary;
     }
 
     public function getOutput() {
@@ -23,12 +25,9 @@ class HfGoalsShortcode implements Hf_iShortcode {
         }
 
         $userID = $this->determineUserID();
+        $this->updateReportRequest();
 
-        if ( $this->isRequested() ) {
-            $this->Messenger->deleteReportRequest( $_GET['n'] );
-        }
-
-        if ( isset( $_POST['submit'] ) ) {
+        if ( $this->isSubmitted() ) {
             $this->submitAccountabilityReports( $userID );
 
             return '<p class="success">Thanks for checking in!</p>' . $this->buildForm( $userID );
@@ -57,6 +56,25 @@ class HfGoalsShortcode implements Hf_iShortcode {
         }
     }
 
+    private function updateReportRequest() {
+        if ( $this->isRequested() and $this->Messenger->isReportRequestValid( $_GET['n'] ) ) {
+            if ( $this->isSubmitted() ) {
+                $this->Messenger->deleteReportRequest( $_GET['n'] );
+            } else {
+                $this->updateReportRequestExpirationDateToOneHourFromNow();
+            }
+        }
+    }
+
+    private function isSubmitted() {
+        return isset( $_POST['submit'] );
+    }
+
+    private function updateReportRequestExpirationDateToOneHourFromNow() {
+        $oneHour = 60 * 60;
+        $this->Messenger->updateReportRequestExpirationDate( $_GET['n'], $this->CodeLibrary->getCurrentTime() + $oneHour );
+    }
+
     private function submitAccountabilityReports( $userID ) {
         foreach ( $_POST as $key => $value ) {
             if ( $key == 'submit' ) {
@@ -71,22 +89,12 @@ class HfGoalsShortcode implements Hf_iShortcode {
     private function notifyPartners( $userID ) {
         $Partners = $this->UserManager->getPartners( $userID );
         foreach ( $Partners as $Partner ) {
-            $this->notifyPartner( $Partner );
+            $this->notifyPartner( $Partner, $userID );
         }
     }
 
-    private function buildForm( $userID ) {
-        $currentURL         = $this->PageLocator->getCurrentPageURL();
-        $goalSubs           = $this->Goals->getGoalSubscriptions( $userID );
-        $AccountabilityForm = new HfAccountabilityForm( $currentURL, $this->Goals );
-
-        $AccountabilityForm->populate( $goalSubs );
-
-        return $AccountabilityForm->getHtml();
-    }
-
-    private function notifyPartner( $Partner ) {
-        $reporterUsername = $this->UserManager->getCurrentUserLogin();
+    private function notifyPartner( $Partner, $userId ) {
+        $reporterUsername = $this->UserManager->getUsernameById($userId);
         $subject          = $reporterUsername . ' just reported';
         $body             = $this->generatePartnerReportBody( $Partner, $reporterUsername );
 
@@ -103,6 +111,16 @@ class HfGoalsShortcode implements Hf_iShortcode {
         $body    = $greeting . $intro . $reports;
 
         return $body;
+    }
+
+    private function buildForm( $userID ) {
+        $currentURL         = $this->PageLocator->getCurrentPageURL();
+        $goalSubs           = $this->Goals->getGoalSubscriptions( $userID );
+        $AccountabilityForm = new HfAccountabilityForm( $currentURL, $this->Goals );
+
+        $AccountabilityForm->populate( $goalSubs );
+
+        return $AccountabilityForm->getHtml();
     }
 
     private function generateReportsList() {

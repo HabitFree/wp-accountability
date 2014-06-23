@@ -68,7 +68,7 @@ class HfUserManager implements Hf_iUserManager {
         return date( 'Y-m-d H:i:s', $expirationTime );
     }
 
-    private function getUsernameById( $userId, $initialCaps = false ) {
+    public function getUsernameById( $userId, $initialCaps = false ) {
         $user = get_userdata( $userId );
         if ( $initialCaps === true ) {
             return ucwords( $user->user_login );

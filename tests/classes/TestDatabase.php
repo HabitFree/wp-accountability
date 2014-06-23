@@ -3,26 +3,7 @@
 require_once( dirname( dirname( __FILE__ ) ) . '/HfTestCase.php' );
 
 class TestDatabase extends HfTestCase {
-    private $DatabaseWithMockedDependencies;
-
     // Helper Functions
-
-    protected function setUp() {
-        $this->MockCms         = $this->makeMock( 'HfWordPress' );
-        $this->MockCodeLibrary = $this->makeMock( 'HfPhpLibrary' );
-
-        $this->DatabaseWithMockedDependencies = new HfMysqlDatabase(
-            $this->MockCms,
-            $this->MockCodeLibrary
-        );
-    }
-
-    private function makeDatabaseMockDependencies() {
-        $Cms         = $this->makeMock( 'HfWordPress' );
-        $CodeLibrary = $this->makeMock( 'HfPhpLibrary' );
-
-        return array($Cms, $CodeLibrary);
-    }
 
     // Tests
 
@@ -200,31 +181,17 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testDatabaseHasDeleteInvitationMethod() {
-        list( $Cms, $CodeLibrary ) = $this->makeDatabaseMockDependencies();
-
-        $Database = new HfMysqlDatabase( $Cms, $CodeLibrary );
-
-        $this->assertTrue( method_exists( $Database, 'deleteInvite' ) );
+        $this->assertTrue( method_exists( $this->DatabaseWithMockedDependencies, 'deleteInvite' ) );
     }
 
     public function testDatabaseCallsDeleteRowsMethod() {
-        list( $Cms, $CodeLibrary ) = $this->makeDatabaseMockDependencies();
-
-        $Database = new HfMysqlDatabase( $Cms, $CodeLibrary );
-
-        $this->expectOnce( $Cms, 'deleteRows' );
-
-        $Database->deleteInvite( 777 );
+        $this->expectOnce( $this->MockCms, 'deleteRows' );
+        $this->DatabaseWithMockedDependencies->deleteInvite( 777 );
     }
 
     public function testGetGoalSubscriptions() {
-        list( $Cms, $CodeLibrary ) = $this->makeDatabaseMockDependencies();
-
-        $this->expectOnce( $Cms, 'getRows' );
-
-        $Database = new HfMysqlDatabase( $Cms, $CodeLibrary );
-
-        $Database->getGoalSubscriptions( 1 );
+        $this->expectOnce( $this->MockCms, 'getRows' );
+        $this->DatabaseWithMockedDependencies->getGoalSubscriptions( 1 );
     }
 
     public function testInsertIntoDbCallsCmsInsert() {
@@ -237,19 +204,21 @@ class TestDatabase extends HfTestCase {
         $requestId = 555;
         $userId    = 1;
         $emailId   = 7;
+        $expirationDate = 'fakeDate';
         $data      = array(
             'requestID' => $requestId,
             'userID'    => $userId,
-            'emailID'   => $emailId
+            'emailID'   => $emailId,
+            'expirationDate' => $expirationDate
         );
 
         $this->expectOnce( $this->MockCms, 'insertIntoDb', array('wptests_' . $table, $data) );
 
-        $this->DatabaseWithMockedDependencies->recordReportRequest( $requestId, $userId, $emailId );
+        $this->DatabaseWithMockedDependencies->recordReportRequest( $requestId, $userId, $emailId, $expirationDate );
     }
 
     public function testIsReportRequestValid() {
-        $this->setReturnValue($this->MockCms, 'getResults', array(new stdClass()));
+        $this->setReturnValue( $this->MockCms, 'getResults', array(new stdClass()) );
 
         $this->assertTrue( $this->DatabaseWithMockedDependencies->isReportRequestValid( 555 ) );
     }
@@ -260,28 +229,43 @@ class TestDatabase extends HfTestCase {
 
     public function testDeleteReportRequest() {
         $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptests_' );
-        $this->expectOnce($this->MockCms, 'deleteRows', array('wptests_hf_report_request', array('requestID' => 555)));
-        $this->DatabaseWithMockedDependencies->deleteReportRequest(555);
+        $this->expectOnce( $this->MockCms, 'deleteRows', array('wptests_hf_report_request', array('requestID' => 555)) );
+        $this->DatabaseWithMockedDependencies->deleteReportRequest( 555 );
     }
 
     public function testGetReportRequestUserId() {
-        $mockReportRequest = new stdClass();
+        $mockReportRequest         = new stdClass();
         $mockReportRequest->userID = 5;
 
-        $this->setReturnValue($this->MockCms, 'getRow', $mockReportRequest);
+        $this->setReturnValue( $this->MockCms, 'getRow', $mockReportRequest );
 
-        $actual = $this->DatabaseWithMockedDependencies->getReportRequestUserId(555);
+        $actual = $this->DatabaseWithMockedDependencies->getReportRequestUserId( 555 );
 
-        $this->assertEquals(5, $actual);
+        $this->assertEquals( 5, $actual );
     }
 
     public function testGetReportRequestIdQueryFormat() {
-        $mockReportRequest = new stdClass();
+        $mockReportRequest         = new stdClass();
         $mockReportRequest->userID = 5;
 
-        $this->setReturnValue($this->MockCms, 'getRow', $mockReportRequest);
-        $this->expectOnce($this->MockCms, 'getRow', array('hf_report_request', "requestID = '555'"));
+        $this->setReturnValue( $this->MockCms, 'getRow', $mockReportRequest );
+        $this->expectOnce( $this->MockCms, 'getRow', array('hf_report_request', "requestID = '555'") );
 
-        $this->DatabaseWithMockedDependencies->getReportRequestUserId(555);
+        $this->DatabaseWithMockedDependencies->getReportRequestUserId( 555 );
+    }
+
+    public function testUpdateExpirationDate() {
+        $data = array(
+            'expirationDate' => '2014-06-19 15:58:37'
+        );
+
+        $where = array(
+            'requestID' => 555
+        );
+
+        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptests_');
+        $this->expectOnce( $this->MockCms, 'updateRowsSafe', array('wptests_hf_report_request', $data, $where) );
+
+        $this->DatabaseWithMockedDependencies->updateReportRequestExpirationDate( 555, 1403211517 );
     }
 }
