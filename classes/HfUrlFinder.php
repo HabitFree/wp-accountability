@@ -18,12 +18,6 @@ class HfUrlFinder implements Hf_iAssetLocator {
         return $pageURL;
     }
 
-    public function getPageUrlByTitle( $title ) {
-        $page = get_page_by_title( $title );
-
-        return get_permalink( $page->ID );
-    }
-
     public function getPluginAssetUrl( $fileName ) {
         return $this->Cms->getPluginAssetUrl( $fileName );
     }
@@ -56,6 +50,12 @@ class HfUrlFinder implements Hf_iAssetLocator {
     }
 
     public function getLoginUrl() {
-        $this->getPageUrlByTitle('Authenticate');
+        return $this->getPageUrlByTitle('Authenticate');
+    }
+
+    public function getPageUrlByTitle( $title ) {
+        $page = $this->Cms->getPageByTitle($title);
+
+        return $this->Cms->getPermalink( $page->ID );
     }
 }

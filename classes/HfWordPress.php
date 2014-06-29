@@ -123,4 +123,12 @@ class HfWordPress implements Hf_iContentManagementSystem {
     public function updateRowsSafe($table, $data, $where) {
         $this->wpdb->update($table, $data, $where);
     }
+
+    public function getPageByTitle($title) {
+        return get_page_by_title( $title );
+    }
+
+    public function getPermalink($pageId) {
+        return get_permalink( $pageId );
+    }
 } 

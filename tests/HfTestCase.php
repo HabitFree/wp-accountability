@@ -21,6 +21,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     protected $MailerWithMockedDependencies;
     protected $GoalsShortcodeWithMockDependencies;
     protected $DatabaseWithMockedDependencies;
+    protected $AssetLocatorWithMockedDependencies;
 
     function __construct() {
         $this->Factory = new HfFactory();
@@ -51,10 +52,9 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->resetUserManagerWithMockedDependencies();
         $this->resetMailerWithMockedDependencies();
         $this->resetGoalsShortcodeWithMockDependencies();
-        $this->DatabaseWithMockedDependencies = new HfMysqlDatabase(
-            $this->MockCms,
-            $this->MockCodeLibrary
-        );
+        $this->resetDatabaseWithMockedDependencies();
+        $this->AssetLocatorWithMockedDependencies = new HfUrlFinder( $this->MockCms );
+
     }
 
     private function resetUserManagerWithMockedDependencies() {
@@ -85,6 +85,13 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
             $this->MockGoals,
             $this->MockSecurity,
             $this->MockMarkupGenerator,
+            $this->MockCodeLibrary
+        );
+    }
+
+    private function resetDatabaseWithMockedDependencies() {
+        $this->DatabaseWithMockedDependencies = new HfMysqlDatabase(
+            $this->MockCms,
             $this->MockCodeLibrary
         );
     }
