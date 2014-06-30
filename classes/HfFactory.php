@@ -1,6 +1,12 @@
 <?php
 
 class HfFactory {
+    public function makeInvitePartnerShortcode() {
+        $AssetLocator = $this->makeAssetLocator();
+
+        return new HfInvitePartnerShortcode($AssetLocator);
+    }
+
     public function makeUserButtonsShortcode() {
         $UserManager     = $this->makeUserManager();
         $AssetLocator    = $this->makeAssetLocator();

@@ -17,6 +17,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     protected $MockGoals;
     protected $MockMarkupGenerator;
 
+    protected $InvitePartnerShortcodeWithMockedDependencies;
     protected $UserManagerWithMockedDependencies;
     protected $MailerWithMockedDependencies;
     protected $GoalsShortcodeWithMockDependencies;
@@ -53,8 +54,8 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->resetMailerWithMockedDependencies();
         $this->resetGoalsShortcodeWithMockDependencies();
         $this->resetDatabaseWithMockedDependencies();
-        $this->AssetLocatorWithMockedDependencies = new HfUrlFinder( $this->MockCms );
-
+        $this->resetAssetLocatorWithMockedDependencies();
+        $this->resetInvitePartnerShortcodeWithMockedDependencies();
     }
 
     private function resetUserManagerWithMockedDependencies() {
@@ -94,6 +95,14 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
             $this->MockCms,
             $this->MockCodeLibrary
         );
+    }
+
+    private function resetAssetLocatorWithMockedDependencies() {
+        $this->AssetLocatorWithMockedDependencies = new HfUrlFinder( $this->MockCms );
+    }
+
+    private function resetInvitePartnerShortcodeWithMockedDependencies() {
+        $this->InvitePartnerShortcodeWithMockedDependencies = new HfInvitePartnerShortcode( $this->MockAssetLocator );
     }
 
     protected function makeMock( $className ) {
