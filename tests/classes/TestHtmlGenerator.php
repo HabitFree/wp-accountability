@@ -57,4 +57,10 @@ class TestHtmlGenerator extends HfTestCase {
         $isStringThere = ( strstr( $result, $expected ) != false );
         $this->assertTrue( $isStringThere );
     }
+
+    public function testMakeError() {
+        $HtmlGenerator = $this->Factory->makeMarkupGenerator();
+        $result = $HtmlGenerator->makeError('duck');
+        $this->assertEquals('<p class="error">duck</p>', $result);
+    }
 }

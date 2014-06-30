@@ -3,8 +3,9 @@
 class HfFactory {
     public function makeInvitePartnerShortcode() {
         $AssetLocator = $this->makeAssetLocator();
+        $MarkupGenerator = $this->makeMarkupGenerator();
 
-        return new HfInvitePartnerShortcode($AssetLocator);
+        return new HfInvitePartnerShortcode($AssetLocator, $MarkupGenerator);
     }
 
     public function makeUserButtonsShortcode() {

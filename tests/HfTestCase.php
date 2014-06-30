@@ -102,7 +102,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     }
 
     private function resetInvitePartnerShortcodeWithMockedDependencies() {
-        $this->InvitePartnerShortcodeWithMockedDependencies = new HfInvitePartnerShortcode( $this->MockAssetLocator );
+        $this->InvitePartnerShortcodeWithMockedDependencies = new HfInvitePartnerShortcode( $this->MockAssetLocator, $this->MockMarkupGenerator );
     }
 
     protected function makeMock( $className ) {

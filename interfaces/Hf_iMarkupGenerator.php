@@ -10,4 +10,6 @@ interface Hf_iMarkupGenerator {
     public function makeLink($target, $content);
 
     public function makeList($items);
+
+    public function makeError($content);
 }
