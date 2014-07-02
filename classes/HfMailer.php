@@ -182,8 +182,17 @@ class HfMailer implements Hf_iMessenger {
         $this->Database->updateReportRequestExpirationDate( $requestId, $expirationTime );
     }
 
-    private function isInviteExpired( $invite ) {
-        $ExpirationDate = date_create_from_format( 'Y-m-d H:i:s', $invite->expirationDate );
+    public function deleteExpiredInvites() {
+        $invites = $this->Database->getAllInvites();
+        foreach ($invites as $invite) {
+            if ($this->isInviteOrReportRequestExpired($invite)) {
+                $this->Database->deleteInvite($invite->inviteID);
+            }
+        }
+    }
+
+    private function isInviteOrReportRequestExpired( $inviteOrReportRequest ) {
+        $ExpirationDate = date_create_from_format( 'Y-m-d H:i:s', $inviteOrReportRequest->expirationDate );
         $expirationTime = $ExpirationDate->getTimestamp();
         $isExpired      = $expirationTime < $this->CodeLibrary->getCurrentTime();
 

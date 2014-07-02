@@ -278,4 +278,9 @@ class TestDatabase extends HfTestCase {
         $this->setReturnValue( $this->MockCms, 'getRows', 'duck' );
         $this->assertEquals( $this->DatabaseWithMockedDependencies->getAllInvites(), 'duck' );
     }
+
+    public function testGetAllReportRequestsGetsReportRequests() {
+        $this->expectOnce( $this->MockCms, 'getRows', array('hf_report_request', null) );
+        $this->DatabaseWithMockedDependencies->getAllReportRequests();
+    }
 }

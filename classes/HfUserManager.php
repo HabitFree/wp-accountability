@@ -78,8 +78,11 @@ class HfUserManager implements Hf_iUserManager {
     }
 
     public function processInvite( $inviteeEmail, $nonce ) {
+        $this->Messenger->deleteExpiredInvites();
+
         $inviteeID = $this->Cms->getUserIdByEmail( $inviteeEmail );
         $inviterID = $this->Database->getInviterID( $nonce );
+
         $this->Database->createRelationship( $inviteeID, $inviterID );
         $this->Database->deleteInvite( $nonce );
     }
