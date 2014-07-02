@@ -55,7 +55,6 @@ class TestUserManager extends HfTestCase {
     }
 
     public function testProcessInviteByInviteeEmail() {
-
         $UserManager = new HfUserManager(
             $this->MockDatabase,
             $this->MockMessenger,
@@ -82,5 +81,11 @@ class TestUserManager extends HfTestCase {
         $this->expectOnce( $this->MockCodeLibrary, 'convertStringToTime', array('+7 days') );
 
         $this->UserManagerWithMockedDependencies->sendInvitation( 1, 'me@my.com' );
+    }
+
+    public function testProcessInviteDeletesExpiredInvites() {
+        $this->expectOnce($this->MockMessenger, 'deleteExpiredInvites');
+
+        $this->UserManagerWithMockedDependencies->processInvite('', '');
     }
 }
