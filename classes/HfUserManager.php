@@ -44,7 +44,7 @@ class HfUserManager implements Hf_iUserManager {
         return $this->Cms->currentUser()->ID;
     }
 
-    public function sendInvitation( $inviterId, $address, $daysToExpire ) {
+    public function sendInvitation( $inviterId, $address ) {
         $inviteId        = $this->Messenger->generateSecureEmailId();
         $inviteURL       = $this->Messenger->generateInviteURL( $inviteId );
         $inviterUsername = $this->getUsernameById( $inviterId, true );
@@ -53,7 +53,7 @@ class HfUserManager implements Hf_iUserManager {
 
         $emailId = $this->Messenger->sendEmailToAddress( $address, $subject, $body );
 
-        $expirationDate = $this->generateExpirationDate( $daysToExpire );
+        $expirationDate = $this->generateExpirationDate( 7 );
 
         if ( $emailId !== false ) {
             $this->Messenger->recordInvite( $inviteId, $inviterId, $address, $emailId, $expirationDate );

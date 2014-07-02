@@ -40,14 +40,24 @@ class TestInvitePartnerShortcode extends HfTestCase {
     public function testInviteShortcodeErrsOnEmptyEmail() {
         $_POST['submit'] = '';
         $_POST['email'] = '';
-        $output = $this->Factory->makeInvitePartnerShortcode()->getOutput();
+        $InviteShortcode = new HfInvitePartnerShortcode(
+            $this->MockAssetLocator,
+            $this->Factory->makeMarkupGenerator(),
+            $this->MockUserManager
+        );
+        $output = $InviteShortcode->getOutput();
         $this->assertContains('<p class="error">Please enter a valid email address.</p>', $output);
     }
 
     public function testInviteShortcodeDoesNotErrOnValidEmail() {
         $_POST['submit'] = '';
         $_POST['email'] = 'narthur.a@gmail.com';
-        $output = $this->Factory->makeInvitePartnerShortcode()->getOutput();
+        $InviteShortcode = new HfInvitePartnerShortcode(
+            $this->MockAssetLocator,
+            $this->Factory->makeMarkupGenerator(),
+            $this->MockUserManager
+        );
+        $output = $InviteShortcode->getOutput();
         $this->assertFalse($this->haystackContainsNeedle($output, '<p class="error">Please enter a valid email address.</p>'));
     }
 
@@ -59,7 +69,12 @@ class TestInvitePartnerShortcode extends HfTestCase {
     public function testInviteShortcodeErrsOnInvalidEmail() {
         $_POST['submit'] = '';
         $_POST['email'] = 'fakeItTilYouMakeIt';
-        $output = $this->Factory->makeInvitePartnerShortcode()->getOutput();
+        $InviteShortcode = new HfInvitePartnerShortcode(
+            $this->MockAssetLocator,
+            $this->Factory->makeMarkupGenerator(),
+            $this->MockUserManager
+        );
+        $output = $InviteShortcode->getOutput();
         $this->assertContains('<p class="error">Please enter a valid email address.</p>', $output);
     }
 
@@ -71,5 +86,45 @@ class TestInvitePartnerShortcode extends HfTestCase {
         $haystack = $this->Factory->makeInvitePartnerShortcode()->getOutput();
         $needle = '<p class="info">NOTE: By inviting someone to become a partner you grant them access to all your goals and progress history.</p>';
         $this->assertContains($needle, $haystack);
+    }
+
+    public function testInvitePartnerShortcodeSendsInvitation() {
+        $_POST['submit'] = '';
+        $_POST['email'] = 'test@test.com';
+
+        $this->expectOnce($this->MockUserManager, 'sendInvitation', array(1, 'test@test.com'));
+        $this->setReturnValue($this->MockUserManager, 'getCurrentUserId', 1);
+
+        $this->InvitePartnerShortcodeWithMockedDependencies->getOutput();
+    }
+
+    public function testInvitePartnerShortcodeDisplaysSuccessMessage() {
+        $_POST['submit'] = '';
+        $_POST['email'] = 'test@test.com';
+
+        $InviteShortcode = new HfInvitePartnerShortcode(
+            $this->MockAssetLocator,
+            $this->Factory->makeMarkupGenerator(),
+            $this->MockUserManager
+        );
+
+        $output = $InviteShortcode->getOutput();
+
+        $this->assertContains('<p class="success">test@test.com has been successfully invited to partner with you.</p>', $output);
+    }
+
+    public function testInvitePartnerShortcodeDoesNotInviteUserWhenEmailMalformed() {
+        $_POST['submit'] = '';
+        $_POST['email'] = 'fakeItTilYouMakeIt';
+
+        $this->expectNever($this->MockUserManager, 'sendInvitation');
+
+        $InviteShortcode = new HfInvitePartnerShortcode(
+            $this->MockAssetLocator,
+            $this->Factory->makeMarkupGenerator(),
+            $this->MockUserManager
+        );
+
+        $InviteShortcode->getOutput();
     }
 }

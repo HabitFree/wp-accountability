@@ -3,32 +3,39 @@
 class HfInvitePartnerShortcode implements Hf_iShortcode {
     private $AssetLocator;
     private $MarkupGenerator;
+    private $UserManager;
 
-    function __construct( Hf_iAssetLocator $AssetLocator, Hf_iMarkupGenerator $MarkupGenerator ) {
-        $this->AssetLocator = $AssetLocator;
+    private $messages;
+
+    function __construct( Hf_iAssetLocator $AssetLocator, Hf_iMarkupGenerator $MarkupGenerator, Hf_iUserManager $UserManager ) {
+        $this->AssetLocator    = $AssetLocator;
         $this->MarkupGenerator = $MarkupGenerator;
+        $this->UserManager     = $UserManager;
     }
 
     public function getOutput() {
-        $currentUrl = $this->AssetLocator->getCurrentPageUrl();
-        $form       = $this->generateForm( $currentUrl );
 
-        return $this->emailError() . $form->getHtml();
+        $this->processForm();
+
+        $form = $this->generateForm();
+
+        return $this->messages . $form->getHtml();
     }
 
-    private function generateForm( $currentUrl ) {
-        $form = new HfGenericForm( $currentUrl );
+    private function generateForm() {
+        $currentUrl = $this->AssetLocator->getCurrentPageUrl();
+        $form       = new HfGenericForm( $currentUrl );
 
-        $form->addInfoMessage('NOTE: By inviting someone to become a partner you grant them access to all your goals and progress history.');
+        $form->addInfoMessage( 'NOTE: By inviting someone to become a partner you grant them access to all your goals and progress history.' );
         $form->addTextBox( 'email', 'Email', '', true );
         $form->addSubmitButton( 'submit', 'Invite' );
 
         return $form;
     }
 
-    private function emailError() {
+    private function validateForm() {
         if ( $this->isFormSubmitted() and $this->isEmailInvalid() ) {
-            return $this->MarkupGenerator->makeError('Please enter a valid email address.');
+            $this->messages .= $this->MarkupGenerator->makeError( 'Please enter a valid email address.' );
         }
     }
 
@@ -38,5 +45,20 @@ class HfInvitePartnerShortcode implements Hf_iShortcode {
 
     private function isEmailInvalid() {
         return !filter_var( $_POST['email'], FILTER_VALIDATE_EMAIL );
+    }
+
+    private function processForm() {
+        if ( $this->isFormSubmitted() ) {
+            $this->validateForm();
+            $this->sendInvitation();
+        }
+    }
+
+    private function sendInvitation() {
+        if ( empty( $this->messages ) ) {
+            $inviterId = $this->UserManager->getCurrentUserId();
+            $this->UserManager->sendInvitation( $inviterId, $_POST['email'] );
+            $this->messages .= '<p class="success">' . $_POST['email'] . ' has been successfully invited to partner with you.</p>';
+        }
     }
 }
