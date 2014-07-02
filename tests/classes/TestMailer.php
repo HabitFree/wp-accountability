@@ -136,13 +136,6 @@ class TestMailer extends HfTestCase {
     }
 
     public function testMailerCreatesLigitExpirationDateForReportRequests() {
-//        $time = time();
-//        var_dump($time);
-//        var_dump(date('Y-m-d H:i:s', $time + (7 * 24 * 60 * 60)));
-//
-//        int(1403551104)
-//        string(19) "2014-06-30 14:18:24"
-
         $this->setReturnValue($this->MockSecurity, 'createRandomString', 123);
         $this->setReturnValue($this->MockDatabase, 'generateEmailId', 5);
         $this->setReturnValue($this->MockCodeLibrary, 'getCurrentTime', 1403551104);
@@ -150,5 +143,26 @@ class TestMailer extends HfTestCase {
         $this->expectOnce($this->MockDatabase, 'recordReportRequest', array(123, 1, 5, "2014-06-30 14:18:24"));
 
         $this->MailerWithMockedDependencies->sendReportRequestEmail(1);
+    }
+
+    public function testIsInviteExpiredSaysYesToExpiredInvite() {
+        $mockInvite                 = new stdClass();
+        $mockInvite->expirationDate = '2014-6-20 13:22:12';
+
+        $this->setReturnValue($this->MockCodeLibrary, 'getCurrentTime', time());
+
+        $this->assertTrue($this->MailerWithMockedDependencies->isInviteExpired($mockInvite));
+    }
+
+    public function testIsInviteExpiredSaysNoToExpiredInvite() {
+        $expirationTime = strtotime( '+' . 3 . ' days' );
+        $expirationDate = date( 'Y-m-d H:i:s', $expirationTime );
+
+        $this->setReturnValue($this->MockCodeLibrary, 'getCurrentTime', time());
+
+        $mockInvite                 = new stdClass();
+        $mockInvite->expirationDate = $expirationDate;
+
+        $this->assertFalse($this->MailerWithMockedDependencies->isInviteExpired($mockInvite));
     }
 }

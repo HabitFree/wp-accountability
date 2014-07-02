@@ -556,9 +556,9 @@ class HfMysqlDatabase implements Hf_iDatabase {
 
     public function recordReportRequest( $requestId, $userId, $emailId, $expirationDate ) {
         $data = array(
-            'requestID' => $requestId,
-            'userID'    => $userId,
-            'emailID'   => $emailId,
+            'requestID'      => $requestId,
+            'userID'         => $userId,
+            'emailID'        => $emailId,
             'expirationDate' => $expirationDate
         );
 
@@ -595,5 +595,9 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $tableName = $this->Cms->getDbPrefix() . 'hf_report_request';
 
         $this->Cms->updateRowsSafe( $tableName, $data, $where );
+    }
+
+    public function getAllInvites() {
+        return $this->Cms->getRows( 'hf_invite', null );
     }
 }

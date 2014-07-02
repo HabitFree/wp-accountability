@@ -83,4 +83,8 @@ class TestUserManager extends HfTestCase {
 
         $this->UserManagerWithMockedDependencies->sendInvitation( 1, 'me@my.com' );
     }
+
+    public function IGNOREtestProcessInviteChecksNonceValidity() {
+
+    }
 }

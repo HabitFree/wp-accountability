@@ -80,4 +80,6 @@ interface Hf_iDatabase {
     public function getReportRequestUserId( $requestId );
 
     public function updateReportRequestExpirationDate( $requestId, $expirationTime );
+
+    public function getAllInvites();
 }
