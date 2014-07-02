@@ -62,4 +62,14 @@ class TestInvitePartnerShortcode extends HfTestCase {
         $output = $this->Factory->makeInvitePartnerShortcode()->getOutput();
         $this->assertContains('<p class="error">Please enter a valid email address.</p>', $output);
     }
+
+    public function testInvitePartnerShortcodeExists() {
+        $this->assertTrue( shortcode_exists( 'hfInvitePartner' ) );
+    }
+
+    public function testInvitePartnerShortcodeWarnsUserOfPrivacy() {
+        $haystack = $this->Factory->makeInvitePartnerShortcode()->getOutput();
+        $needle = '<p class="info">NOTE: By inviting someone to become a partner you grant them access to all your goals and progress history.</p>';
+        $this->assertContains($needle, $haystack);
+    }
 }

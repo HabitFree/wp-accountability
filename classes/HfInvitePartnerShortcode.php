@@ -19,6 +19,7 @@ class HfInvitePartnerShortcode implements Hf_iShortcode {
     private function generateForm( $currentUrl ) {
         $form = new HfGenericForm( $currentUrl );
 
+        $form->addInfoMessage('NOTE: By inviting someone to become a partner you grant them access to all your goals and progress history.');
         $form->addTextBox( 'email', 'Email', '', true );
         $form->addSubmitButton( 'submit', 'Invite' );
 

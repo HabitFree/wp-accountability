@@ -81,10 +81,12 @@ function hfRegisterShortcodes() {
     $SettingsShortcode     = $Factory->makeSettingsShortcode();
     $GoalsShortcode        = $Factory->makeGoalsShortcode();
     $AuthenticateShortcode = $Factory->makeAuthenticateShortcode();
-    $UserButtonsShortcode = $Factory->makeUserButtonsShortcode();
+    $UserButtonsShortcode  = $Factory->makeUserButtonsShortcode();
+    $InvitePartnerShortcode = $Factory->makeInvitePartnerShortcode();
 
     add_shortcode( 'hfSettings', array($SettingsShortcode, 'getOutput') );
     add_shortcode( 'hfGoals', array($GoalsShortcode, 'getOutput') );
     add_shortcode( 'hfUserButtons', array($UserButtonsShortcode, 'getOutput') );
     add_shortcode( 'hfAuthenticate', array($AuthenticateShortcode, 'getOutput') );
+    add_shortcode( 'hfInvitePartner', array($InvitePartnerShortcode, 'getOutput') );
 }
