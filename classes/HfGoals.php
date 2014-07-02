@@ -20,7 +20,7 @@ class HfGoals implements Hf_iGoals {
         $daysOfSuccess = $this->daysOfSuccess( $goalID, $userID );
         $level         = $this->Database->level( $daysOfSuccess );
         $wrapperOpen   = '<div class="report-card">';
-        $info          = '<div class="info"><h2>' . $goal->title . '</h2>';
+        $info          = '<div class="about"><h2>' . $goal->title . '</h2>';
         if ( $goal->description != '' ) {
             $info .= '<p>' . $goal->description . '</p></div>';
         } else {

@@ -17,10 +17,12 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     protected $MockGoals;
     protected $MockMarkupGenerator;
 
+    protected $InvitePartnerShortcodeWithMockedDependencies;
     protected $UserManagerWithMockedDependencies;
     protected $MailerWithMockedDependencies;
     protected $GoalsShortcodeWithMockDependencies;
     protected $DatabaseWithMockedDependencies;
+    protected $AssetLocatorWithMockedDependencies;
 
     function __construct() {
         $this->Factory = new HfFactory();
@@ -51,10 +53,9 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->resetUserManagerWithMockedDependencies();
         $this->resetMailerWithMockedDependencies();
         $this->resetGoalsShortcodeWithMockDependencies();
-        $this->DatabaseWithMockedDependencies = new HfMysqlDatabase(
-            $this->MockCms,
-            $this->MockCodeLibrary
-        );
+        $this->resetDatabaseWithMockedDependencies();
+        $this->resetAssetLocatorWithMockedDependencies();
+        $this->resetInvitePartnerShortcodeWithMockedDependencies();
     }
 
     private function resetUserManagerWithMockedDependencies() {
@@ -86,6 +87,25 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
             $this->MockSecurity,
             $this->MockMarkupGenerator,
             $this->MockCodeLibrary
+        );
+    }
+
+    private function resetDatabaseWithMockedDependencies() {
+        $this->DatabaseWithMockedDependencies = new HfMysqlDatabase(
+            $this->MockCms,
+            $this->MockCodeLibrary
+        );
+    }
+
+    private function resetAssetLocatorWithMockedDependencies() {
+        $this->AssetLocatorWithMockedDependencies = new HfUrlFinder( $this->MockCms );
+    }
+
+    private function resetInvitePartnerShortcodeWithMockedDependencies() {
+        $this->InvitePartnerShortcodeWithMockedDependencies = new HfInvitePartnerShortcode(
+            $this->MockAssetLocator,
+            $this->MockMarkupGenerator,
+            $this->MockUserManager
         );
     }
 

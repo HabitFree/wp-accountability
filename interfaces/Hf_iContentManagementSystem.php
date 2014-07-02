@@ -50,4 +50,8 @@ interface Hf_iContentManagementSystem {
     public function insertIntoDb($table, $data);
 
     public function updateRowsSafe($table, $data, $where);
+
+    public function getPageByTitle($title);
+
+    public function getPermalink($pageId);
 }

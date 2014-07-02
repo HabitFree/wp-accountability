@@ -79,8 +79,8 @@ class TestUserManager extends HfTestCase {
     }
 
     public function testSendInvitationUsesCodeLibraryToConvertStringToTime() {
-        $this->expectOnce( $this->MockCodeLibrary, 'convertStringToTime', array('+5 days') );
+        $this->expectOnce( $this->MockCodeLibrary, 'convertStringToTime', array('+7 days') );
 
-        $this->UserManagerWithMockedDependencies->sendInvitation( 1, 'me@my.com', 5 );
+        $this->UserManagerWithMockedDependencies->sendInvitation( 1, 'me@my.com' );
     }
 }

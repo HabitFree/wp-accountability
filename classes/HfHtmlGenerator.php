@@ -39,4 +39,8 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         }
         return '<ul>'.$html.'</ul>';
     }
+
+    public function makeError($content) {
+        return '<p class="error">'.$content.'</p>';
+    }
 }
