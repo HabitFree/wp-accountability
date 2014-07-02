@@ -12,6 +12,21 @@ class TestMailer extends HfTestCase {
         return $mockInvite;
     }
 
+    private function makeMockReportRequest($expirationDate, $requestId) {
+        $reportRequest                 = new stdClass();
+        $reportRequest->expirationDate = $expirationDate;
+        $reportRequest->requestID      = $requestId;
+
+        return $reportRequest;
+    }
+
+    private function makeFreshExpirationDate() {
+        $freshExpirationTime = strtotime( '+' . 3 . ' days' );
+        $freshExpirationDate = date( 'Y-m-d H:i:s', $freshExpirationTime );
+
+        return $freshExpirationDate;
+    }
+
     // Tests
 
     public function testSendEmailByUserID() {
@@ -195,8 +210,7 @@ class TestMailer extends HfTestCase {
     public function testDeleteExpiredInviteDeletesStaleKeepsFresh() {
         $this->setReturnValue( $this->MockCodeLibrary, 'getCurrentTime', time() );
 
-        $freshExpirationTime = strtotime( '+' . 3 . ' days' );
-        $freshExpirationDate = date( 'Y-m-d H:i:s', $freshExpirationTime );
+        $freshExpirationDate = $this->makeFreshExpirationDate();
 
         $freshMockInvite = $this->makeMockInvite( $freshExpirationDate, 'fresh' );
         $staleMockInvite = $this->makeMockInvite( '2014-6-20 13:22:12', 'stale' );
@@ -209,5 +223,51 @@ class TestMailer extends HfTestCase {
         $this->expectOnce( $this->MockDatabase, 'deleteInvite', array('stale') );
 
         $this->MailerWithMockedDependencies->deleteExpiredInvites();
+    }
+
+    public function testDeleteExpiredReportRequestsGetsReportRequests() {
+        $staleReportRequest = $this->makeMockReportRequest('2014-6-20 13:22:12', 'stale');
+        $this->setReturnValue($this->MockDatabase, 'getAllReportRequests', array($staleReportRequest));
+
+        $this->expectOnce($this->MockDatabase, 'getAllReportRequests');
+        $this->MailerWithMockedDependencies->deleteExpiredReportRequests();
+    }
+
+    public function testDeleteExpiredReportRequestsDeletesExpiredReportRequest() {
+        $this->setReturnValue( $this->MockCodeLibrary, 'getCurrentTime', time() );
+
+        $staleReportRequest = $this->makeMockReportRequest('2014-6-20 13:22:12', 'stale');
+        $this->setReturnValue($this->MockDatabase, 'getAllReportRequests', array($staleReportRequest));
+
+        $this->expectOnce($this->MockDatabase, 'deleteReportRequest', array('stale'));
+        $this->MailerWithMockedDependencies->deleteExpiredReportRequests();
+    }
+
+    public function testDeleteExpiredReportRequestsDoesNotDeleteFreshReportRequest() {
+        $this->setReturnValue( $this->MockCodeLibrary, 'getCurrentTime', time() );
+
+        $freshExpirationDate = $this->makeFreshExpirationDate();
+
+        $freshReportRequest = $this->makeMockReportRequest($freshExpirationDate, 'fresh');
+        $this->setReturnValue($this->MockDatabase, 'getAllReportRequests', array($freshReportRequest));
+
+        $this->expectNever($this->MockDatabase, 'deleteReportRequest');
+        $this->MailerWithMockedDependencies->deleteExpiredReportRequests();
+    }
+
+    public function testDeleteExpiredReportRequestsDeletesStaleAndKeepsFresh() {
+        $this->setReturnValue( $this->MockCodeLibrary, 'getCurrentTime', time() );
+
+        $freshExpirationDate = $this->makeFreshExpirationDate();
+
+        $freshReportRequest = $this->makeMockReportRequest($freshExpirationDate, 'fresh');
+        $staleReportRequest = $this->makeMockReportRequest('2014-6-20 13:22:12', 'stale');
+
+        $this->setReturnValue($this->MockDatabase, 'getAllReportRequests', array($freshReportRequest, $staleReportRequest));
+
+        $this->expectOnce($this->MockDatabase, 'deleteReportRequest');
+        $this->expectOnce($this->MockDatabase, 'deleteReportRequest', array('stale'));
+
+        $this->MailerWithMockedDependencies->deleteExpiredReportRequests();
     }
 }

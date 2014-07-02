@@ -32,4 +32,6 @@ interface Hf_iMessenger {
     public function updateReportRequestExpirationDate( $requestId, $expirationTime );
 
     public function deleteExpiredInvites();
+
+    public function deleteExpiredReportRequests();
 }

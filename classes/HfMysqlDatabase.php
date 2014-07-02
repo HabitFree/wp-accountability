@@ -600,4 +600,8 @@ class HfMysqlDatabase implements Hf_iDatabase {
     public function getAllInvites() {
         return $this->Cms->getRows( 'hf_invite', null );
     }
+
+    public function getAllReportRequests() {
+        return $this->Cms->getRows( 'hf_report_request', null );
+    }
 }

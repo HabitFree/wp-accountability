@@ -208,4 +208,10 @@ class TestGoalsShortcode extends HfTestCase {
 
         $this->GoalsShortcodeWithMockDependencies->getOutput();
     }
+
+    public function testGoalsShortcodeDeletesExpiredReportRequests() {
+        $this->expectOnce($this->MockMessenger, 'deleteExpiredReportRequests');
+
+        $this->GoalsShortcodeWithMockDependencies->getOutput();
+    }
 }

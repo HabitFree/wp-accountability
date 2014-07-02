@@ -37,6 +37,8 @@ class HfGoalsShortcode implements Hf_iShortcode {
     }
 
     private function isUserAuthorized() {
+        $this->Messenger->deleteExpiredReportRequests();
+
         if ( $this->UserManager->isUserLoggedIn() ) {
             return true;
         } elseif ( !$this->isRequested() ) {
