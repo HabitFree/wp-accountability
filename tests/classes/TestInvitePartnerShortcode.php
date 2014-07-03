@@ -84,7 +84,7 @@ class TestInvitePartnerShortcode extends HfTestCase {
 
     public function testInvitePartnerShortcodeWarnsUserOfPrivacy() {
         $haystack = $this->Factory->makeInvitePartnerShortcode()->getOutput();
-        $needle = '<p class="info">NOTE: By inviting someone to become a partner you grant them access to all your goals and progress history.</p>';
+        $needle = '<p class="info"><strong>Note:</strong> By inviting someone to become a partner you grant them access to all your goals and progress history.</p>';
         $this->assertContains($needle, $haystack);
     }
 
