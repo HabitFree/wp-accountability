@@ -344,4 +344,20 @@ class TestDatabase extends HfTestCase {
 
         $this->assertEquals($actual, $expected);
     }
+
+    public function testGetQuotationsGetsQuotations() {
+        $expectedQuery = 'SELECT quotation.* FROM wp_hf_quotation AS quotation LEFT JOIN wp_hf_quotation_context AS quotation_context ON quotation.quotationID = quotation_context.quotationID WHERE quotation_context.contextID = 1';
+        $this->expectOnce($this->MockCms, 'getResults', array($expectedQuery));
+        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wp_');
+        $this->DatabaseWithMockedDependencies->getQuotations(1);
+    }
+
+    public function testGetQuotationReturnsQuotations() {
+        $this->setReturnValue($this->MockCms, 'getResults', 'duck');
+
+        $actual = $this->DatabaseWithMockedDependencies->getQuotations(1);
+        $expected = 'duck';
+
+        $this->assertEquals($expected, $actual);
+    }
 }
