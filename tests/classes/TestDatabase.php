@@ -316,4 +316,32 @@ class TestDatabase extends HfTestCase {
         $this->setReturnValue( $this->MockCms, 'getRows', 'duck' );
         $this->assertEquals( $this->DatabaseWithMockedDependencies->getAllReportRequests(), 'duck' );
     }
+
+    public function testDefaultContextsExistence() {
+        $Database = $this->Factory->makeDatabase();
+        $actual = $Database->getRows('hf_context', null);
+
+        $forSetbackArray = array(
+            'contextID'     => 1,
+            'title'      => 'For Setback'
+        );
+
+        $forSuccessArray = array(
+            'contextID'     => 2,
+            'title'      => 'For Success'
+        );
+
+        $forMentorArray = array(
+            'contextID'     => 3,
+            'title'      => 'For Mentor'
+        );
+
+        $forSetback = (object) $forSetbackArray;
+        $forSuccess = (object) $forSuccessArray;
+        $forMentor = (object) $forMentorArray;
+
+        $expected = array($forSetback, $forSuccess, $forMentor);
+
+        $this->assertEquals($actual, $expected);
+    }
 }

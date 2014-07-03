@@ -10,13 +10,14 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     function installDb() {
-        $currentDbVersion = "4.4";
+        $currentDbVersion = "4.7";
         $previousDbVersion = get_option( "hfDbVersion" );
 
         if ( $previousDbVersion != $currentDbVersion ) {
             $this->updateDatabaseSchema();
             $this->populateGoalTable();
             $this->populateLevelsTable();
+            $this->populateContextTable();
 
             update_option( "hfDbVersion", $currentDbVersion );
         }
@@ -579,7 +580,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $quotationTableSql = "CREATE TABLE " . $prefix . "hf_quotation (
                     quotationID int NOT NULL AUTO_INCREMENT,
 					quotation text NOT NULL,
-					reference varchar(500) NOT NULL
+					reference varchar(500) NOT NULL,
 					PRIMARY KEY  (quotationID)
 				);";
 
@@ -616,5 +617,26 @@ class HfMysqlDatabase implements Hf_iDatabase {
                              'isPrivate'  => 0);
 
         $this->insertUpdateIntoDb( 'hf_goal', $defaultGoal );
+    }
+
+    private function populateContextTable() {
+        $forSetback = array(
+            'contextID'     => 1,
+            'title'      => 'For Setback'
+        );
+
+        $forSuccess = array(
+            'contextID'     => 2,
+            'title'      => 'For Success'
+        );
+
+        $forMentor = array(
+            'contextID'     => 3,
+            'title'      => 'For Mentor'
+        );
+
+        $this->insertUpdateIntoDb( 'hf_context', $forSetback);
+        $this->insertUpdateIntoDb( 'hf_context', $forSuccess);
+        $this->insertUpdateIntoDb( 'hf_context', $forMentor);
     }
 }
