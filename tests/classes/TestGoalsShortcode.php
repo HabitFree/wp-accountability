@@ -48,7 +48,8 @@ class TestGoalsShortcode extends HfTestCase {
             $this->MockGoals,
             $this->MockSecurity,
             $this->Factory->makeMarkupGenerator(),
-            $this->MockCodeLibrary
+            $this->MockCodeLibrary,
+            $this->MockDatabase
         );
 
         $expectedBody =
@@ -75,7 +76,8 @@ class TestGoalsShortcode extends HfTestCase {
             $this->MockGoals,
             $this->MockSecurity,
             $this->Factory->makeMarkupGenerator(),
-            $this->MockCodeLibrary
+            $this->MockCodeLibrary,
+            $this->MockDatabase
         );
 
         $expectedBody =
@@ -210,7 +212,30 @@ class TestGoalsShortcode extends HfTestCase {
     }
 
     public function testGoalsShortcodeDeletesExpiredReportRequests() {
-        $this->expectOnce($this->MockMessenger, 'deleteExpiredReportRequests');
+        $this->expectOnce( $this->MockMessenger, 'deleteExpiredReportRequests' );
+
+        $this->GoalsShortcodeWithMockDependencies->getOutput();
+    }
+
+    public function testGoalsShortcodeAsksForQuotationForSuccess() {
+        $this->setDefaultIterables();
+        $_POST['submit'] = '';
+        $_POST[1]        = '1';
+        $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
+
+        $this->expectOnce( $this->MockDatabase, 'getQuotations', array(2) );
+
+        $this->GoalsShortcodeWithMockDependencies->getOutput();
+    }
+
+    public function testGoalsShortcodeSelectsRandomQuotation() {
+        $this->setDefaultIterables();
+        $_POST['submit'] = '';
+        $_POST[1]        = '1';
+        $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
+        $this->setReturnValue($this->MockDatabase, 'getQuotations', 'duck');
+
+        $this->expectOnce($this->MockCodeLibrary, 'randomKeyFromArray', array('duck'));
 
         $this->GoalsShortcodeWithMockDependencies->getOutput();
     }

@@ -80,4 +80,6 @@ interface Hf_iDatabase {
     public function getAllInvites();
 
     public function getAllReportRequests();
+
+    public function getQuotations( $context );
 }

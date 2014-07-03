@@ -34,8 +34,9 @@ class HfFactory {
         $Security        = $this->makeSecurity();
         $MarkupGenerator = $this->makeMarkupGenerator();
         $CodeLibrary     = $this->makeCodeLibrary();
+        $Database = $this->makeDatabase();
 
-        return new HfGoalsShortcode( $UserManager, $Messenger, $AssetLocator, $Goals, $Security, $MarkupGenerator, $CodeLibrary );
+        return new HfGoalsShortcode( $UserManager, $Messenger, $AssetLocator, $Goals, $Security, $MarkupGenerator, $CodeLibrary, $Database );
     }
 
     public function makeSettingsShortcode() {

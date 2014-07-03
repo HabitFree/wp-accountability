@@ -9,7 +9,7 @@ class HfGoalsShortcode implements Hf_iShortcode {
     private $MarkupGenerator;
     private $CodeLibrary;
 
-    function __construct( Hf_iUserManager $UserManager, Hf_iMessenger $Messenger, Hf_iAssetLocator $PageLocator, Hf_iGoals $Goals, Hf_iSecurity $Security, Hf_iMarkupGenerator $MarkupGenerator, Hf_iCodeLibrary $CodeLibrary ) {
+    function __construct( Hf_iUserManager $UserManager, Hf_iMessenger $Messenger, Hf_iAssetLocator $PageLocator, Hf_iGoals $Goals, Hf_iSecurity $Security, Hf_iMarkupGenerator $MarkupGenerator, Hf_iCodeLibrary $CodeLibrary, Hf_iDatabase $Database ) {
         $this->UserManager     = $UserManager;
         $this->Messenger       = $Messenger;
         $this->PageLocator     = $PageLocator;
@@ -17,6 +17,7 @@ class HfGoalsShortcode implements Hf_iShortcode {
         $this->Security        = $Security;
         $this->MarkupGenerator = $MarkupGenerator;
         $this->CodeLibrary     = $CodeLibrary;
+        $this->Database        = $Database;
     }
 
     public function getOutput() {
@@ -29,6 +30,7 @@ class HfGoalsShortcode implements Hf_iShortcode {
 
         if ( $this->isSubmitted() ) {
             $this->submitAccountabilityReports( $userID );
+            $this->selectQuotation();
 
             return '<p class="success">Thanks for checking in!</p>' . $this->buildForm( $userID );
         } else {
@@ -72,11 +74,6 @@ class HfGoalsShortcode implements Hf_iShortcode {
         return isset( $_POST['submit'] );
     }
 
-    private function updateReportRequestExpirationDateToOneHourFromNow() {
-        $oneHour = 60 * 60;
-        $this->Messenger->updateReportRequestExpirationDate( $_GET['n'], $this->CodeLibrary->getCurrentTime() + $oneHour );
-    }
-
     private function submitAccountabilityReports( $userID ) {
         foreach ( $_POST as $key => $value ) {
             if ( $key == 'submit' ) {
@@ -88,6 +85,30 @@ class HfGoalsShortcode implements Hf_iShortcode {
         $this->notifyPartners( $userID );
     }
 
+    private function selectQuotation() {
+        $quotations = $this->Database->getQuotations( 2 );
+        $this->CodeLibrary->randomKeyFromArray( $quotations );
+    }
+
+    private function buildForm( $userID ) {
+        $currentURL         = $this->PageLocator->getCurrentPageURL();
+        $goalSubs           = $this->Goals->getGoalSubscriptions( $userID );
+        $AccountabilityForm = new HfAccountabilityForm( $currentURL, $this->Goals );
+
+        $AccountabilityForm->populate( $goalSubs );
+
+        return $AccountabilityForm->getHtml();
+    }
+
+    private function isRequested() {
+        return !empty( $_GET['n'] );
+    }
+
+    private function updateReportRequestExpirationDateToOneHourFromNow() {
+        $oneHour = 60 * 60;
+        $this->Messenger->updateReportRequestExpirationDate( $_GET['n'], $this->CodeLibrary->getCurrentTime() + $oneHour );
+    }
+
     private function notifyPartners( $userID ) {
         $Partners = $this->UserManager->getPartners( $userID );
         foreach ( $Partners as $Partner ) {
@@ -96,7 +117,7 @@ class HfGoalsShortcode implements Hf_iShortcode {
     }
 
     private function notifyPartner( $Partner, $userId ) {
-        $reporterUsername = $this->UserManager->getUsernameById($userId);
+        $reporterUsername = $this->UserManager->getUsernameById( $userId );
         $subject          = $reporterUsername . ' just reported';
         $body             = $this->generatePartnerReportBody( $Partner, $reporterUsername );
 
@@ -113,16 +134,6 @@ class HfGoalsShortcode implements Hf_iShortcode {
         $body    = $greeting . $intro . $reports;
 
         return $body;
-    }
-
-    private function buildForm( $userID ) {
-        $currentURL         = $this->PageLocator->getCurrentPageURL();
-        $goalSubs           = $this->Goals->getGoalSubscriptions( $userID );
-        $AccountabilityForm = new HfAccountabilityForm( $currentURL, $this->Goals );
-
-        $AccountabilityForm->populate( $goalSubs );
-
-        return $AccountabilityForm->getHtml();
     }
 
     private function generateReportsList() {
@@ -145,9 +156,5 @@ class HfGoalsShortcode implements Hf_iShortcode {
         $report .= ( $isSuccessful ) ? 'Success' : 'Failure';
 
         return $report;
-    }
-
-    private function isRequested() {
-        return !empty( $_GET['n'] );
     }
 }
