@@ -21,8 +21,6 @@ interface Hf_iDatabase {
 
     public function daysSinceLastReport( $goalID, $userID );
 
-    public function createColumnSchemaObject( $field, $type, $null, $key, $default, $extra );
-
     public function getRows( $table, $where, $outputType = OBJECT );
 
     public function insertUpdateIntoDb( $table, $data );
@@ -60,8 +58,6 @@ interface Hf_iDatabase {
     public function deleteInvite( $inviteID );
 
     public function getGoalSubscriptions( $userID );
-
-    public function getTableSchema( $table );
 
     public function escapeData( $data );
 

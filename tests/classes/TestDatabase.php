@@ -5,6 +5,31 @@ require_once( dirname( dirname( __FILE__ ) ) . '/HfTestCase.php' );
 class TestDatabase extends HfTestCase {
     // Helper Functions
 
+    private function getTableSchema( $table ) {
+        global $wpdb;
+        $prefix    = $wpdb->prefix;
+        $tableName = $prefix . $table;
+
+        return $wpdb->get_results( 'SHOW COLUMNS FROM ' . $tableName, OBJECT_K );
+    }
+
+    private function createColumnSchemaObject( $field, $type, $null, $key, $default, $extra ) {
+        $column          = new StdClass;
+        $column->Field   = $field;
+        $column->Type    = $type;
+        $column->Null    = $null;
+        $column->Key     = $key;
+        $column->Default = $default;
+        $column->Extra   = $extra;
+
+        return $column;
+    }
+
+    private function assertTableImplementsSchema( $expectedSchema, $table ) {
+        $currentSchema = $this->getTableSchema( $table );
+        $this->assertEquals( $expectedSchema, $currentSchema );
+    }
+
     // Tests
 
     public function testDbDataNullRemoval() {
@@ -33,8 +58,7 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testSchemaColumnObjectCreation() {
-        $Database     = $this->Factory->makeDatabase();
-        $columnObject = $Database->createColumnSchemaObject( 'openTime', 'timestamp', 'YES', '', null, '' );
+        $columnObject = $this->createColumnSchemaObject( 'openTime', 'timestamp', 'YES', '', null, '' );
 
         $expected          = new StdClass;
         $expected->Field   = 'openTime';
@@ -48,126 +72,130 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testEmailTableSchema() {
-        $Database      = $this->Factory->makeDatabase();
-        $currentSchema = $Database->getTableSchema( 'hf_email' );
-
         $expectedSchema = array(
-            'emailID'        => $Database->createColumnSchemaObject( 'emailID', 'int(11)', 'NO', 'PRI', null, 'auto_increment' ),
-            'sendTime'       => $Database->createColumnSchemaObject( 'sendTime', 'timestamp', 'NO', '', 'CURRENT_TIMESTAMP', '' ),
-            'subject'        => $Database->createColumnSchemaObject( 'subject', 'varchar(500)', 'NO', '', null, '' ),
-            'body'           => $Database->createColumnSchemaObject( 'body', 'text', 'NO', '', null, '' ),
-            'userID'         => $Database->createColumnSchemaObject( 'userID', 'int(11)', 'NO', 'MUL', null, '' ),
-            'deliveryStatus' => $Database->createColumnSchemaObject( 'deliveryStatus', 'bit(1)', 'NO', '', "b'0'", '' ),
-            'openTime'       => $Database->createColumnSchemaObject( 'openTime', 'datetime', 'YES', '', null, '' ),
-            'address'        => $Database->createColumnSchemaObject( 'address', 'varchar(80)', 'YES', '', null, '' )
+            'emailID'        => $this->createColumnSchemaObject( 'emailID', 'int(11)', 'NO', 'PRI', null, 'auto_increment' ),
+            'sendTime'       => $this->createColumnSchemaObject( 'sendTime', 'timestamp', 'NO', '', 'CURRENT_TIMESTAMP', '' ),
+            'subject'        => $this->createColumnSchemaObject( 'subject', 'varchar(500)', 'NO', '', null, '' ),
+            'body'           => $this->createColumnSchemaObject( 'body', 'text', 'NO', '', null, '' ),
+            'userID'         => $this->createColumnSchemaObject( 'userID', 'int(11)', 'NO', 'MUL', null, '' ),
+            'deliveryStatus' => $this->createColumnSchemaObject( 'deliveryStatus', 'bit(1)', 'NO', '', "b'0'", '' ),
+            'openTime'       => $this->createColumnSchemaObject( 'openTime', 'datetime', 'YES', '', null, '' ),
+            'address'        => $this->createColumnSchemaObject( 'address', 'varchar(80)', 'YES', '', null, '' )
         );
 
-        $this->assertEquals( $currentSchema, $expectedSchema );
+        $this->assertTableImplementsSchema( $expectedSchema, 'hf_email' );
     }
 
     public function testGoalTableSchema() {
-        $Database      = $this->Factory->makeDatabase();
-        $currentSchema = $Database->getTableSchema( 'hf_goal' );
-
         $expectedSchema = array(
-            'goalID'      => $Database->createColumnSchemaObject( 'goalID', 'int(11)', 'NO', 'PRI', null, 'auto_increment' ),
-            'title'       => $Database->createColumnSchemaObject( 'title', 'varchar(500)', 'NO', '', null, '' ),
-            'description' => $Database->createColumnSchemaObject( 'description', 'text', 'YES', '', null, '' ),
-            'thumbnail'   => $Database->createColumnSchemaObject( 'thumbnail', 'varchar(80)', 'YES', '', null, '' ),
-            'isPositive'  => $Database->createColumnSchemaObject( 'isPositive', 'bit(1)', 'NO', '', "b'0'", '' ),
-            'isPrivate'   => $Database->createColumnSchemaObject( 'isPrivate', 'bit(1)', 'NO', '', "b'1'", '' ),
-            'creatorID'   => $Database->createColumnSchemaObject( 'creatorID', 'int(11)', 'YES', 'MUL', null, '' ),
-            'dateCreated' => $Database->createColumnSchemaObject( 'dateCreated', 'timestamp', 'NO', '', 'CURRENT_TIMESTAMP', '' )
+            'goalID'      => $this->createColumnSchemaObject( 'goalID', 'int(11)', 'NO', 'PRI', null, 'auto_increment' ),
+            'title'       => $this->createColumnSchemaObject( 'title', 'varchar(500)', 'NO', '', null, '' ),
+            'description' => $this->createColumnSchemaObject( 'description', 'text', 'YES', '', null, '' ),
+            'thumbnail'   => $this->createColumnSchemaObject( 'thumbnail', 'varchar(80)', 'YES', '', null, '' ),
+            'isPositive'  => $this->createColumnSchemaObject( 'isPositive', 'bit(1)', 'NO', '', "b'0'", '' ),
+            'isPrivate'   => $this->createColumnSchemaObject( 'isPrivate', 'bit(1)', 'NO', '', "b'1'", '' ),
+            'creatorID'   => $this->createColumnSchemaObject( 'creatorID', 'int(11)', 'YES', 'MUL', null, '' ),
+            'dateCreated' => $this->createColumnSchemaObject( 'dateCreated', 'timestamp', 'NO', '', 'CURRENT_TIMESTAMP', '' )
         );
 
-        $this->assertEquals( $currentSchema, $expectedSchema );
+        $this->assertTableImplementsSchema( $expectedSchema, 'hf_goal' );
     }
 
     public function testReportTableSchema() {
-        $Database      = $this->Factory->makeDatabase();
-        $currentSchema = $Database->getTableSchema( 'hf_report' );
-
         $expectedSchema = array(
-            'reportID'         => $Database->createColumnSchemaObject( 'reportID', 'int(11)', 'NO', 'PRI', null, 'auto_increment' ),
-            'userID'           => $Database->createColumnSchemaObject( 'userID', 'int(11)', 'NO', 'MUL', null, '' ),
-            'goalID'           => $Database->createColumnSchemaObject( 'goalID', 'int(11)', 'NO', 'MUL', null, '' ),
-            'referringEmailID' => $Database->createColumnSchemaObject( 'referringEmailID', 'int(11)', 'YES', 'MUL', null, '' ),
-            'isSuccessful'     => $Database->createColumnSchemaObject( 'isSuccessful', 'tinyint(4)', 'NO', '', null, '' ),
-            'date'             => $Database->createColumnSchemaObject( 'date', 'timestamp', 'NO', '', 'CURRENT_TIMESTAMP', '' )
+            'reportID'         => $this->createColumnSchemaObject( 'reportID', 'int(11)', 'NO', 'PRI', null, 'auto_increment' ),
+            'userID'           => $this->createColumnSchemaObject( 'userID', 'int(11)', 'NO', 'MUL', null, '' ),
+            'goalID'           => $this->createColumnSchemaObject( 'goalID', 'int(11)', 'NO', 'MUL', null, '' ),
+            'referringEmailID' => $this->createColumnSchemaObject( 'referringEmailID', 'int(11)', 'YES', 'MUL', null, '' ),
+            'isSuccessful'     => $this->createColumnSchemaObject( 'isSuccessful', 'tinyint(4)', 'NO', '', null, '' ),
+            'date'             => $this->createColumnSchemaObject( 'date', 'timestamp', 'NO', '', 'CURRENT_TIMESTAMP', '' )
         );
 
-        $this->assertEquals( $currentSchema, $expectedSchema );
+        $this->assertTableImplementsSchema( $expectedSchema, 'hf_report' );
     }
 
     public function testUserGoalTableSchema() {
-        $Database      = $this->Factory->makeDatabase();
-        $currentSchema = $Database->getTableSchema( 'hf_user_goal' );
-
         $expectedSchema = array(
-            'userID'      => $Database->createColumnSchemaObject( 'userID', 'int(11)', 'NO', 'PRI', null, '' ),
-            'goalID'      => $Database->createColumnSchemaObject( 'goalID', 'int(11)', 'NO', 'PRI', null, '' ),
-            'dateStarted' => $Database->createColumnSchemaObject( 'dateStarted', 'timestamp', 'NO', '', 'CURRENT_TIMESTAMP', '' ),
-            'isActive'    => $Database->createColumnSchemaObject( 'isActive', 'bit(1)', 'NO', '', "b'1'", '' )
+            'userID'      => $this->createColumnSchemaObject( 'userID', 'int(11)', 'NO', 'PRI', null, '' ),
+            'goalID'      => $this->createColumnSchemaObject( 'goalID', 'int(11)', 'NO', 'PRI', null, '' ),
+            'dateStarted' => $this->createColumnSchemaObject( 'dateStarted', 'timestamp', 'NO', '', 'CURRENT_TIMESTAMP', '' ),
+            'isActive'    => $this->createColumnSchemaObject( 'isActive', 'bit(1)', 'NO', '', "b'1'", '' )
         );
 
-        $this->assertEquals( $currentSchema, $expectedSchema );
+        $this->assertTableImplementsSchema( $expectedSchema, 'hf_user_goal' );
     }
 
     public function testLevelTableSchema() {
-        $Database      = $this->Factory->makeDatabase();
-        $currentSchema = $Database->getTableSchema( 'hf_level' );
-
         $expectedSchema = array(
-            'levelID'       => $Database->createColumnSchemaObject( 'levelID', 'int(11)', 'NO', 'PRI', null, '' ),
-            'title'         => $Database->createColumnSchemaObject( 'title', 'varchar(500)', 'NO', '', null, '' ),
-            'description'   => $Database->createColumnSchemaObject( 'description', 'text', 'YES', '', null, '' ),
-            'size'          => $Database->createColumnSchemaObject( 'size', 'int(11)', 'NO', '', null, '' ),
-            'emailInterval' => $Database->createColumnSchemaObject( 'emailInterval', 'int(11)', 'NO', '', null, '' ),
-            'target'        => $Database->createColumnSchemaObject( 'target', 'int(11)', 'NO', '', null, '' ),
+            'levelID'       => $this->createColumnSchemaObject( 'levelID', 'int(11)', 'NO', 'PRI', null, '' ),
+            'title'         => $this->createColumnSchemaObject( 'title', 'varchar(500)', 'NO', '', null, '' ),
+            'description'   => $this->createColumnSchemaObject( 'description', 'text', 'YES', '', null, '' ),
+            'size'          => $this->createColumnSchemaObject( 'size', 'int(11)', 'NO', '', null, '' ),
+            'emailInterval' => $this->createColumnSchemaObject( 'emailInterval', 'int(11)', 'NO', '', null, '' ),
+            'target'        => $this->createColumnSchemaObject( 'target', 'int(11)', 'NO', '', null, '' ),
         );
 
-        $this->assertEquals( $currentSchema, $expectedSchema );
+        $this->assertTableImplementsSchema( $expectedSchema, 'hf_level' );
     }
 
     public function testInviteTableSchema() {
-        $Database      = $this->Factory->makeDatabase();
-        $currentSchema = $Database->getTableSchema( 'hf_invite' );
-
         $expectedSchema = array(
-            'inviteID'       => $Database->createColumnSchemaObject( 'inviteID', 'varchar(250)', 'NO', 'PRI', null, '' ),
-            'inviterID'      => $Database->createColumnSchemaObject( 'inviterID', 'int(11)', 'NO', 'MUL', null, '' ),
-            'inviteeEmail'   => $Database->createColumnSchemaObject( 'inviteeEmail', 'varchar(80)', 'NO', '', null, '' ),
-            'emailID'        => $Database->createColumnSchemaObject( 'emailID', 'int(11)', 'NO', 'MUL', null, '' ),
-            'expirationDate' => $Database->createColumnSchemaObject( 'expirationDate', 'datetime', 'NO', '', null, '' )
+            'inviteID'       => $this->createColumnSchemaObject( 'inviteID', 'varchar(250)', 'NO', 'PRI', null, '' ),
+            'inviterID'      => $this->createColumnSchemaObject( 'inviterID', 'int(11)', 'NO', 'MUL', null, '' ),
+            'inviteeEmail'   => $this->createColumnSchemaObject( 'inviteeEmail', 'varchar(80)', 'NO', '', null, '' ),
+            'emailID'        => $this->createColumnSchemaObject( 'emailID', 'int(11)', 'NO', 'MUL', null, '' ),
+            'expirationDate' => $this->createColumnSchemaObject( 'expirationDate', 'datetime', 'NO', '', null, '' )
         );
 
-        $this->assertEquals( $currentSchema, $expectedSchema );
+        $this->assertTableImplementsSchema( $expectedSchema, 'hf_invite' );
     }
 
     public function testRelationshipTableSchema() {
-        $Database      = $this->Factory->makeDatabase();
-        $currentSchema = $Database->getTableSchema( 'hf_relationship' );
-
         $expectedSchema = array(
-            'userID1' => $Database->createColumnSchemaObject( 'userID1', 'int(11)', 'NO', 'PRI', null, '' ),
-            'userID2' => $Database->createColumnSchemaObject( 'userID2', 'int(11)', 'NO', 'PRI', null, '' )
+            'userID1' => $this->createColumnSchemaObject( 'userID1', 'int(11)', 'NO', 'PRI', null, '' ),
+            'userID2' => $this->createColumnSchemaObject( 'userID2', 'int(11)', 'NO', 'PRI', null, '' )
         );
 
-        $this->assertEquals( $currentSchema, $expectedSchema );
+        $this->assertTableImplementsSchema( $expectedSchema, 'hf_relationship' );
     }
 
     public function testReportRequestTableSchema() {
-        $Database      = $this->Factory->makeDatabase();
-        $currentSchema = $Database->getTableSchema( 'hf_report_request' );
-
         $expectedSchema = array(
-            'requestID'      => $Database->createColumnSchemaObject( 'requestID', 'varchar(250)', 'NO', 'PRI', null, '' ),
-            'userID'         => $Database->createColumnSchemaObject( 'userID', 'int(11)', 'NO', 'MUL', null, '' ),
-            'emailID'        => $Database->createColumnSchemaObject( 'emailID', 'int(11)', 'NO', 'MUL', null, '' ),
-            'expirationDate' => $Database->createColumnSchemaObject( 'expirationDate', 'datetime', 'NO', '', null, '' )
+            'requestID'      => $this->createColumnSchemaObject( 'requestID', 'varchar(250)', 'NO', 'PRI', null, '' ),
+            'userID'         => $this->createColumnSchemaObject( 'userID', 'int(11)', 'NO', 'MUL', null, '' ),
+            'emailID'        => $this->createColumnSchemaObject( 'emailID', 'int(11)', 'NO', 'MUL', null, '' ),
+            'expirationDate' => $this->createColumnSchemaObject( 'expirationDate', 'datetime', 'NO', '', null, '' )
         );
 
-        $this->assertEquals( $expectedSchema, $currentSchema );
+        $this->assertTableImplementsSchema( $expectedSchema, 'hf_report_request' );
+    }
+
+    public function testQuotationTableSchema() {
+        $expectedSchema = array(
+            'quotationID' => $this->createColumnSchemaObject( 'quotationID', 'int(11)', 'NO', 'PRI', null, 'auto_increment' ),
+            'quotation'   => $this->createColumnSchemaObject( 'quotation', 'text', 'NO', '', null, '' ),
+            'reference'   => $this->createColumnSchemaObject( 'reference', 'varchar(500)', 'NO', '', null, '' )
+        );
+
+        $this->assertTableImplementsSchema( $expectedSchema, 'hf_quotation' );
+    }
+
+    public function testContextTableSchema() {
+        $expectedSchema = array(
+            'contextID' => $this->createColumnSchemaObject( 'contextID', 'int(11)', 'NO', 'PRI', null, 'auto_increment' ),
+            'title'     => $this->createColumnSchemaObject( 'title', 'varchar(500)', 'NO', '', null, '' )
+        );
+
+        $this->assertTableImplementsSchema( $expectedSchema, 'hf_context' );
+    }
+
+    public function testQuotationContextTableSchema() {
+        $expectedSchema = array(
+            'quotationID' => $this->createColumnSchemaObject( 'quotationID', 'int(11)', 'NO', 'PRI', null, '' ),
+            'contextID'   => $this->createColumnSchemaObject( 'contextID', 'int(11)', 'NO', 'PRI', null, '' )
+        );
+
+        $this->assertTableImplementsSchema( $expectedSchema, 'hf_quotation_context' );
     }
 
     public function testDaysSinceLastEmail() {
