@@ -32,10 +32,10 @@ class HfGoalsShortcode implements Hf_iShortcode {
         if ( $this->isSubmitted() ) {
             $this->submitAccountabilityReports( $userID );
 
-            $quotation = $this->makeQuotationMessage();
-            $successMessage = $this->MarkupGenerator->makeSuccessMessage( 'Thanks for checking in!' );
+            $quotationMessage = $this->makeQuotationMessage();
+            $successMessage   = $this->MarkupGenerator->makeSuccessMessage( 'Thanks for checking in!' );
 
-            return $successMessage . $quotation . $this->buildForm( $userID );
+            return $successMessage . $quotationMessage . $this->buildForm( $userID );
         } else {
             return $this->buildForm( $userID );
         }
@@ -90,6 +90,7 @@ class HfGoalsShortcode implements Hf_iShortcode {
 
     private function makeQuotationMessage() {
         $quotation = $this->selectQuotation();
+
         return $this->MarkupGenerator->makeQuoteMessage( $quotation );
     }
 
@@ -120,8 +121,10 @@ class HfGoalsShortcode implements Hf_iShortcode {
     }
 
     private function selectQuotation() {
-        $quotations = $this->Database->getQuotations( 2 );
-        $key = $this->CodeLibrary->randomKeyFromArray( $quotations );
+        $context    = $this->determineQuotationContext();
+        $quotations = $this->Database->getQuotations( $context );
+        $key        = $this->CodeLibrary->randomKeyFromArray( $quotations );
+
         return $quotations[$key];
     }
 
@@ -131,6 +134,10 @@ class HfGoalsShortcode implements Hf_iShortcode {
         $body             = $this->generatePartnerReportBody( $Partner, $reporterUsername );
 
         $this->Messenger->sendEmailToUser( $Partner->ID, $subject, $body );
+    }
+
+    private function determineQuotationContext() {
+        return ( $this->didReportSetback() ) ? 1 : 2;
     }
 
     private function generatePartnerReportBody( $Partner, $reporterUsername ) {
@@ -143,6 +150,10 @@ class HfGoalsShortcode implements Hf_iShortcode {
         $body    = $greeting . $intro . $reports;
 
         return $body;
+    }
+
+    private function didReportSetback() {
+        return in_array( '0', $_POST, true );
     }
 
     private function generateReportsList() {
@@ -162,7 +173,7 @@ class HfGoalsShortcode implements Hf_iShortcode {
     private function generateReportsListItem( $goalId, $isSuccessful ) {
         $goalTitle = $this->Goals->getGoalTitle( $goalId );
         $report    = $goalTitle . ': ';
-        $report .= ( $isSuccessful ) ? 'Success' : 'Failure';
+        $report .= ( $isSuccessful ) ? 'Success' : 'Setback';
 
         return $report;
     }

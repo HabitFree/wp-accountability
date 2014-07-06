@@ -76,7 +76,7 @@ class TestGoalsShortcode extends HfTestCase {
         );
 
         $expectedBody =
-            "<p>Hello, Dan,</p><p>Your friend Don just reported on their progress. Here's how they're doing:</p><ul><li>Eat durian: Success</li><li>Go running: Failure</li></ul>";
+            "<p>Hello, Dan,</p><p>Your friend Don just reported on their progress. Here's how they're doing:</p><ul><li>Eat durian: Success</li><li>Go running: Setback</li></ul>";
 
         $this->expectOnce( $this->MockMessenger, 'sendEmailToUser', array(1, 'Don just reported', $expectedBody) );
 
@@ -106,7 +106,7 @@ class TestGoalsShortcode extends HfTestCase {
         );
 
         $expectedBody =
-            "<p>Hello, Jack,</p><p>Your friend Jim just reported on their progress. Here's how they're doing:</p><ul><li>Eat durian: Failure</li></ul>";
+            "<p>Hello, Jack,</p><p>Your friend Jim just reported on their progress. Here's how they're doing:</p><ul><li>Eat durian: Setback</li></ul>";
 
         $this->expectOnce( $this->MockMessenger, 'sendEmailToUser', array(1, 'Jim just reported', $expectedBody) );
 
@@ -315,5 +315,17 @@ class TestGoalsShortcode extends HfTestCase {
         $needle = '<p class="quote">"hello" — Nathan</p>';
 
         $this->assertContains($needle, $haystack);
+    }
+
+    public function testGoalsShortcodeGetsQuotationForSetbackWhenSetbackOccurred() {
+        $this->setDefaultIterables();
+        $_POST['submit'] = '';
+        $_POST[1]        = '0';
+        $this->setDefaultQuotationValues();
+        $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
+
+        $this->expectOnce($this->MockDatabase, 'getQuotations', array(1));
+
+        $this->GoalsShortcodeWithMockDependencies->getOutput();
     }
 }
