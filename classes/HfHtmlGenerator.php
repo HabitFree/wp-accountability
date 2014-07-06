@@ -48,4 +48,8 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     public function makeSuccessMessage( $content ) {
         return '<p class="success">' . $content . '</p>';
     }
+
+    public function makeQuoteMessage( $quotation ) {
+        return '<p class="quote">"' . $quotation->quotation . '" — ' . $quotation->reference . '</p>';
+    }
 }

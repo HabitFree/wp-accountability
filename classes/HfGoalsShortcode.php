@@ -31,11 +31,11 @@ class HfGoalsShortcode implements Hf_iShortcode {
 
         if ( $this->isSubmitted() ) {
             $this->submitAccountabilityReports( $userID );
-            $this->selectQuotation();
 
+            $quotation = $this->makeQuotationMessage();
             $successMessage = $this->MarkupGenerator->makeSuccessMessage( 'Thanks for checking in!' );
 
-            return $successMessage . $this->buildForm( $userID );
+            return $successMessage . $quotation . $this->buildForm( $userID );
         } else {
             return $this->buildForm( $userID );
         }
@@ -88,9 +88,9 @@ class HfGoalsShortcode implements Hf_iShortcode {
         $this->notifyPartners( $userID );
     }
 
-    private function selectQuotation() {
-        $quotations = $this->Database->getQuotations( 2 );
-        $this->CodeLibrary->randomKeyFromArray( $quotations );
+    private function makeQuotationMessage() {
+        $quotation = $this->selectQuotation();
+        return $this->MarkupGenerator->makeQuoteMessage( $quotation );
     }
 
     private function buildForm( $userID ) {
@@ -117,6 +117,12 @@ class HfGoalsShortcode implements Hf_iShortcode {
         foreach ( $Partners as $Partner ) {
             $this->notifyPartner( $Partner, $userID );
         }
+    }
+
+    private function selectQuotation() {
+        $quotations = $this->Database->getQuotations( 2 );
+        $key = $this->CodeLibrary->randomKeyFromArray( $quotations );
+        return $quotations[$key];
     }
 
     private function notifyPartner( $Partner, $userId ) {

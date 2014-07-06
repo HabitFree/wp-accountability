@@ -14,4 +14,6 @@ interface Hf_iMarkupGenerator {
     public function makeError( $content );
 
     public function makeSuccessMessage( $content );
+
+    public function makeQuoteMessage( $content );
 }
