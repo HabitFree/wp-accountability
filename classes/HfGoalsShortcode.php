@@ -8,6 +8,7 @@ class HfGoalsShortcode implements Hf_iShortcode {
     private $Security;
     private $MarkupGenerator;
     private $CodeLibrary;
+    private $Database;
 
     function __construct( Hf_iUserManager $UserManager, Hf_iMessenger $Messenger, Hf_iAssetLocator $PageLocator, Hf_iGoals $Goals, Hf_iSecurity $Security, Hf_iMarkupGenerator $MarkupGenerator, Hf_iCodeLibrary $CodeLibrary, Hf_iDatabase $Database ) {
         $this->UserManager     = $UserManager;
@@ -32,7 +33,9 @@ class HfGoalsShortcode implements Hf_iShortcode {
             $this->submitAccountabilityReports( $userID );
             $this->selectQuotation();
 
-            return '<p class="success">Thanks for checking in!</p>' . $this->buildForm( $userID );
+            $successMessage = $this->MarkupGenerator->makeSuccessMessage( 'Thanks for checking in!' );
+
+            return $successMessage . $this->buildForm( $userID );
         } else {
             return $this->buildForm( $userID );
         }

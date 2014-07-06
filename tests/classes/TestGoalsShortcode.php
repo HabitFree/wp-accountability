@@ -239,4 +239,15 @@ class TestGoalsShortcode extends HfTestCase {
 
         $this->GoalsShortcodeWithMockDependencies->getOutput();
     }
+
+    public function testGoalsShortcodeUsesMarkupGeneratorToCreateSuccessMessage() {
+        $this->setDefaultIterables();
+        $_POST['submit'] = '';
+        $_POST[1]        = '1';
+        $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
+
+        $this->expectOnce( $this->MockMarkupGenerator, 'makeSuccessMessage', array('Thanks for checking in!') );
+
+        $this->GoalsShortcodeWithMockDependencies->getOutput();
+    }
 }

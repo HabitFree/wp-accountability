@@ -28,8 +28,8 @@ class HfGoals implements Hf_iGoals {
         }
 
         $controls     = "<div class='controls'>
-					<label><input type='radio' name='" . $goalID . "' value='0'> &#x2714;</label>
-					<label><input type='radio' name='" . $goalID . "' value='1'> &#x2718;</label>
+					<label class='success'><input type='radio' name='" . $goalID . "' value='1'> No</label>
+                    <label class='setback'><input type='radio' name='" . $goalID . "' value='0'> Yes</label>
 				</div>";
         $report       = "<div class='report'>Have you fallen since your last check-in?" . $controls . "</div>";
         $main         = '<div class="main">' . $info . $report . '</div>';
