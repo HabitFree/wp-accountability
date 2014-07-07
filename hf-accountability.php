@@ -76,13 +76,17 @@ add_action( 'user_register', array($HfUserManager, 'processNewUser') );
 add_action( 'admin_menu', array($HfAdminPanel, 'registerAdminPanel') );
 add_action( 'admin_head', array($HfAdminPanel, 'addToAdminHead') );
 add_action( 'init', 'hfRegisterShortcodes' );
+add_action('init', 'hfAddPostTypes');
+
+add_filter('user_can_richedit', 'hfDisableWysiwygForQuotes');
+add_filter( 'enter_title_here', 'hfChangeEditTitleLabelForQuotations' );
 
 function hfRegisterShortcodes() {
-    $Factory               = new HfFactory();
-    $SettingsShortcode     = $Factory->makeSettingsShortcode();
-    $GoalsShortcode        = $Factory->makeGoalsShortcode();
-    $AuthenticateShortcode = $Factory->makeAuthenticateShortcode();
-    $UserButtonsShortcode  = $Factory->makeUserButtonsShortcode();
+    $Factory                = new HfFactory();
+    $SettingsShortcode      = $Factory->makeSettingsShortcode();
+    $GoalsShortcode         = $Factory->makeGoalsShortcode();
+    $AuthenticateShortcode  = $Factory->makeAuthenticateShortcode();
+    $UserButtonsShortcode   = $Factory->makeUserButtonsShortcode();
     $InvitePartnerShortcode = $Factory->makeInvitePartnerShortcode();
 
     add_shortcode( 'hfSettings', array($SettingsShortcode, 'getOutput') );
@@ -91,3 +95,42 @@ function hfRegisterShortcodes() {
     add_shortcode( 'hfAuthenticate', array($AuthenticateShortcode, 'getOutput') );
     add_shortcode( 'hfInvitePartner', array($InvitePartnerShortcode, 'getOutput') );
 }
+
+function hfAddPostTypes() {
+    register_post_type( 'hf_quotation',
+        array(
+            'labels' => array(
+                'name' => __( 'Quotations' ),
+                'singular_name' => __( 'Quotation' ),
+                'menu_name'           => __( 'Quotations', 'text_domain' ),
+                'parent_item_colon'   => __( 'Parent Quotation:', 'text_domain' ),
+                'all_items'           => __( 'All Quotations', 'text_domain' ),
+                'view_item'           => __( 'View Quotation', 'text_domain' ),
+                'add_new_item'        => __( 'Add New Quotation', 'text_domain' ),
+                'edit_item'           => __( 'Edit Quotation', 'text_domain' ),
+                'update_item'         => __( 'Update Quotation', 'text_domain' ),
+                'search_items'        => __( 'Search Quotation', 'text_domain' )
+            ),
+            'public' => true,
+            'has_archive' => true,
+        )
+    );
+}
+
+function hfDisableWysiwygForQuotes($default) {
+    global $post;
+    if ('hf_quotation' == get_post_type($post))
+        return false;
+    return $default;
+}
+
+function hfChangeEditTitleLabelForQuotations( $title ){
+    $screen = get_current_screen();
+
+    if  ( 'hf_quotation' == $screen->post_type ) {
+        $title = 'Enter reference here';
+    }
+
+    return $title;
+}
+
