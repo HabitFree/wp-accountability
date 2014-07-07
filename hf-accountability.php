@@ -62,6 +62,7 @@ require_once( dirname( __FILE__ ) . '/classes/HfAccountabilityForm.php' );
 require_once( dirname( __FILE__ ) . '/classes/HfAuthenticateShortcode.php' );
 require_once( dirname( __FILE__ ) . '/classes/HfUserButtonsShortcode.php' );
 require_once( dirname( __FILE__ ) . '/classes/HfInvitePartnerShortcode.php' );
+require_once( dirname( __FILE__ ) . '/classes/HfPartnerListShortcode.php' );
 
 date_default_timezone_set( 'America/Chicago' );
 
