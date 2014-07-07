@@ -14,33 +14,42 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
 				</div>';
     }
 
-    public function generateTabs($contents, $defaultTabNumber) {
-        $html = '[su_tabs active="'.$defaultTabNumber.'"]';
+    public function generateTabs( $contents, $defaultTabNumber ) {
+        $html = '[su_tabs active="' . $defaultTabNumber . '"]';
 
-        foreach ($contents as $title => $content) {
-            $html .= '[su_tab title="'.$title.'"]'.$content.'[/su_tab]';
+        foreach ( $contents as $title => $content ) {
+            $html .= '[su_tab title="' . $title . '"]' . $content . '[/su_tab]';
         }
-        
-        return $this->Cms->expandShortcodes($html . '[/su_tabs]');
+
+        return $this->Cms->expandShortcodes( $html . '[/su_tabs]' );
     }
 
     public function makeParagraph( $content ) {
         return '<p>' . $content . '</p>';
     }
 
-    public function makeLink($target, $content) {
+    public function makeLink( $target, $content ) {
         return '<a href="' . $target . '">' . $content . '</a>';
     }
 
-    public function makeList($items) {
+    public function makeList( $items ) {
         $html = '';
-        foreach ($items as $item) {
-            $html .= '<li>'.$item.'</li>';
+        foreach ( $items as $item ) {
+            $html .= '<li>' . $item . '</li>';
         }
-        return '<ul>'.$html.'</ul>';
+
+        return '<ul>' . $html . '</ul>';
     }
 
-    public function makeError($content) {
-        return '<p class="error">'.$content.'</p>';
+    public function makeError( $content ) {
+        return '<p class="error">' . $content . '</p>';
+    }
+
+    public function makeSuccessMessage( $content ) {
+        return '<p class="success">' . $content . '</p>';
+    }
+
+    public function makeQuoteMessage( $quotation ) {
+        return '<p class="quote">"' . $quotation->quotation . '" — ' . $quotation->reference . '</p>';
     }
 }

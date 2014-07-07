@@ -63,4 +63,22 @@ class TestHtmlGenerator extends HfTestCase {
         $result = $HtmlGenerator->makeError('duck');
         $this->assertEquals('<p class="error">duck</p>', $result);
     }
+
+    public function testMakeSuccessMessage() {
+        $HtmlGenerator = $this->Factory->makeMarkupGenerator();
+        $result = $HtmlGenerator->makeSuccessMessage('duck');
+        $this->assertEquals('<p class="success">duck</p>', $result);
+    }
+
+    public function testMakeQuoteMessage() {
+        $HtmlGenerator = $this->Factory->makeMarkupGenerator();
+
+        $MockQuotation = new stdClass();
+        $MockQuotation->quotation = 'hello';
+        $MockQuotation->reference = 'Nathan';
+
+        $result = $HtmlGenerator->makeQuoteMessage($MockQuotation);
+
+        $this->assertEquals('<p class="quote">"hello" — Nathan</p>', $result);
+    }
 }

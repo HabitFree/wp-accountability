@@ -10,15 +10,12 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     function installDb() {
-        $currentDbVersion = "4.7";
+        $currentDbVersion  = "4.7";
         $previousDbVersion = get_option( "hfDbVersion" );
 
         if ( $previousDbVersion != $currentDbVersion ) {
             $this->updateDatabaseSchema();
-            $this->populateGoalTable();
-            $this->populateLevelsTable();
-            $this->populateContextTable();
-
+            $this->populateTables();
             update_option( "hfDbVersion", $currentDbVersion );
         }
     }
@@ -208,11 +205,13 @@ class HfMysqlDatabase implements Hf_iDatabase {
 
     function recordEmail( $userID, $subject, $message, $emailID = null, $emailAddress = null ) {
         $table = "hf_email";
-        $data  = array('subject' => $subject,
-                       'body'    => $message,
-                       'userID'  => $userID,
-                       'emailID' => $emailID,
-                       'address' => $emailAddress);
+        $data  = array(
+            'subject' => $subject,
+            'body'    => $message,
+            'userID'  => $userID,
+            'emailID' => $emailID,
+            'address' => $emailAddress
+        );
         $this->insertIntoDb( $table, $data );
     }
 
@@ -491,7 +490,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
 
     private function updateDatabaseSchema() {
         global $wpdb;
-        $prefix             = $wpdb->prefix;
+        $prefix = $wpdb->prefix;
 
         $emailTableSql = "CREATE TABLE " . $prefix . "hf_email (
 					emailID int NOT NULL AUTO_INCREMENT,
@@ -611,32 +610,47 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     private function populateGoalTable() {
-        $defaultGoal = array('goalID'     => 1,
-                             'title'      => 'Pornography Abstinence',
-                             'isPositive' => 1,
-                             'isPrivate'  => 0);
+        $defaultGoal = array(
+            'goalID'     => 1,
+            'title'      => 'Pornography Abstinence',
+            'isPositive' => 1,
+            'isPrivate'  => 0
+        );
 
         $this->insertUpdateIntoDb( 'hf_goal', $defaultGoal );
     }
 
     private function populateContextTable() {
         $forSetback = array(
-            'contextID'     => 1,
-            'title'      => 'For Setback'
+            'contextID' => 1,
+            'title'     => 'For Setback'
         );
 
         $forSuccess = array(
-            'contextID'     => 2,
-            'title'      => 'For Success'
+            'contextID' => 2,
+            'title'     => 'For Success'
         );
 
         $forMentor = array(
-            'contextID'     => 3,
-            'title'      => 'For Mentor'
+            'contextID' => 3,
+            'title'     => 'For Mentor'
         );
 
-        $this->insertUpdateIntoDb( 'hf_context', $forSetback);
-        $this->insertUpdateIntoDb( 'hf_context', $forSuccess);
-        $this->insertUpdateIntoDb( 'hf_context', $forMentor);
+        $this->insertUpdateIntoDb( 'hf_context', $forSetback );
+        $this->insertUpdateIntoDb( 'hf_context', $forSuccess );
+        $this->insertUpdateIntoDb( 'hf_context', $forMentor );
+    }
+
+    private function populateTables() {
+        $this->populateGoalTable();
+        $this->populateLevelsTable();
+        $this->populateContextTable();
+    }
+
+    public function getQuotations( $contextId ) {
+        $prefix = $this->Cms->getDbPrefix();
+        $query  = "SELECT quotation.* FROM " . $prefix . "hf_quotation AS quotation LEFT JOIN " . $prefix . "hf_quotation_context AS quotation_context ON quotation.quotationID = quotation_context.quotationID WHERE quotation_context.contextID = " . $contextId;
+
+        return $this->Cms->getResults( $query );
     }
 }

@@ -20,7 +20,6 @@ class TestGoals extends HfTestCase {
         $WebsiteApi    = $this->makeMock( 'HfWordPress' );
         $HtmlGenerator = $this->makeMock( 'HfHtmlGenerator' );
         $DbConnection  = $this->makeMock( 'HfMysqlDatabase' );
-        $CodeLibrary   = $this->makeMock( 'HfPhpLibrary' );
 
         $mockUser     = new stdClass();
         $mockUser->ID = 1;
@@ -50,7 +49,6 @@ class TestGoals extends HfTestCase {
         $WebsiteApi    = $this->makeMock( 'HfWordPress' );
         $HtmlGenerator = $this->makeMock( 'HfHtmlGenerator' );
         $DbConnection  = $this->makeMock( 'HfMysqlDatabase' );
-        $CodeLibrary   = $this->makeMock( 'HfPhpLibrary' );
 
         $mockUser     = new stdClass();
         $mockUser->ID = 1;
@@ -81,7 +79,6 @@ class TestGoals extends HfTestCase {
         $WebsiteApi    = $this->makeMock( 'HfWordPress' );
         $HtmlGenerator = $this->makeMock( 'HfHtmlGenerator' );
         $DbConnection  = $this->makeMock( 'HfMysqlDatabase' );
-        $CodeLibrary   = $this->makeMock( 'HfPhpLibrary' );
 
         $mockUser     = new stdClass();
         $mockUser->ID = 1;
@@ -111,7 +108,6 @@ class TestGoals extends HfTestCase {
         $WebsiteApi    = $this->makeMock( 'HfWordPress' );
         $HtmlGenerator = $this->makeMock( 'HfHtmlGenerator' );
         $DbConnection  = $this->makeMock( 'HfMysqlDatabase' );
-        $CodeLibrary   = $this->makeMock( 'HfPhpLibrary' );
 
         $mockUser     = new stdClass();
         $mockUser->ID = 1;
