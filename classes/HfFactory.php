@@ -1,6 +1,13 @@
 <?php
 
 class HfFactory {
+    public function makePartnerListShortcode() {
+        $UserManager = $this->makeUserManager();
+        $MarkupGenerator = $this->makeMarkupGenerator();
+
+        return new HfPartnerListShortcode($UserManager, $MarkupGenerator);
+    }
+
     public function makeInvitePartnerShortcode() {
         $AssetLocator = $this->makeAssetLocator();
         $MarkupGenerator = $this->makeMarkupGenerator();

@@ -88,12 +88,14 @@ function hfRegisterShortcodes() {
     $AuthenticateShortcode  = $Factory->makeAuthenticateShortcode();
     $UserButtonsShortcode   = $Factory->makeUserButtonsShortcode();
     $InvitePartnerShortcode = $Factory->makeInvitePartnerShortcode();
+    $PartnerListShortcode   = $Factory->makePartnerListShortcode();
 
     add_shortcode( 'hfSettings', array($SettingsShortcode, 'getOutput') );
     add_shortcode( 'hfGoals', array($GoalsShortcode, 'getOutput') );
     add_shortcode( 'hfUserButtons', array($UserButtonsShortcode, 'getOutput') );
     add_shortcode( 'hfAuthenticate', array($AuthenticateShortcode, 'getOutput') );
     add_shortcode( 'hfInvitePartner', array($InvitePartnerShortcode, 'getOutput') );
+    add_shortcode( 'hfPartnerList', array($PartnerListShortcode, 'getOutput') );
 }
 
 function hfAddPostTypes() {
