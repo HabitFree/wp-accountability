@@ -115,6 +115,28 @@ function hfAddPostTypes() {
             'has_archive' => true,
         )
     );
+
+    register_taxonomy(
+        'hfContext',
+        'hf_quotation',
+        array(
+            'label' => __( 'Context' ),
+            'rewrite' => array( 'slug' => 'context' ),
+            'hierarchical' => true,
+            'capabilities' => array(
+                'manage_terms'=> 'noone',
+                'edit_terms'=> 'noone',
+                'delete_terms'=> 'noone',
+                'assign_terms' => 'edit_posts'
+            )
+        )
+    );
+
+    $taxonomy = 'hfContext';
+
+    wp_insert_term( 'For Success', $taxonomy, $args = array() );
+    wp_insert_term( 'For Setback', $taxonomy, $args = array() );
+    wp_insert_term( 'For Mentor', $taxonomy, $args = array() );
 }
 
 function hfDisableWysiwygForQuotes($default) {
@@ -128,7 +150,7 @@ function hfChangeEditTitleLabelForQuotations( $title ){
     $screen = get_current_screen();
 
     if  ( 'hf_quotation' == $screen->post_type ) {
-        $title = 'Enter reference here';
+        $title = 'Enter source / reference here';
     }
 
     return $title;

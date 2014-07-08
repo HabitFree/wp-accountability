@@ -74,8 +74,8 @@ class TestHtmlGenerator extends HfTestCase {
         $HtmlGenerator = $this->Factory->makeMarkupGenerator();
 
         $MockQuotation = new stdClass();
-        $MockQuotation->quotation = 'hello';
-        $MockQuotation->reference = 'Nathan';
+        $MockQuotation->post_content = 'hello';
+        $MockQuotation->post_title = 'Nathan';
 
         $result = $HtmlGenerator->makeQuoteMessage($MockQuotation);
 

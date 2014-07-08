@@ -346,18 +346,35 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testGetQuotationsGetsQuotations() {
-        $expectedQuery = 'SELECT quotation.* FROM wp_hf_quotation AS quotation LEFT JOIN wp_hf_quotation_context AS quotation_context ON quotation.quotationID = quotation_context.quotationID WHERE quotation_context.contextID = 1';
+        $expectedQuery = "SELECT * FROM wptest_posts INNER JOIN wptest_term_relationships WHERE post_type =  'hf_quotation' AND post_status =  'publish' AND object_id = id AND term_taxonomy_id = 1";
         $this->expectOnce($this->MockCms, 'getResults', array($expectedQuery));
-        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wp_');
-        $this->DatabaseWithMockedDependencies->getQuotations(1);
+        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptest_');
+        $this->setReturnValue($this->MockCms, 'getVar', 1);
+        $this->DatabaseWithMockedDependencies->getQuotations('For Setback');
     }
 
-    public function testGetQuotationReturnsQuotations() {
+    public function testGetQuotationsReturnsQuotations() {
         $this->setReturnValue($this->MockCms, 'getResults', 'duck');
 
-        $actual = $this->DatabaseWithMockedDependencies->getQuotations(1);
+        $actual = $this->DatabaseWithMockedDependencies->getQuotations('For Setback');
         $expected = 'duck';
 
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetQuotationsLooksUpTermId() {
+        $expectedQuery = "SELECT term_id FROM wptest_terms WHERE name = 'For Setback'";
+        $this->expectOnce($this->MockCms, 'getVar', array($expectedQuery));
+        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptest_');
+
+        $this->DatabaseWithMockedDependencies->getQuotations('For Setback');
+    }
+
+    public function testGetQuotationsLooksUpPassedTermName() {
+        $expectedQuery = "SELECT term_id FROM wptest_terms WHERE name = 'For Success'";
+        $this->expectOnce($this->MockCms, 'getVar', array($expectedQuery));
+        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptest_');
+
+        $this->DatabaseWithMockedDependencies->getQuotations('For Success');
     }
 }

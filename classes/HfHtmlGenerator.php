@@ -50,6 +50,6 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     }
 
     public function makeQuoteMessage( $quotation ) {
-        return '<p class="quote">"' . $quotation->quotation . '" — ' . $quotation->reference . '</p>';
+        return '<p class="quote">"' . $quotation->post_content . '" — ' . $quotation->post_title . '</p>';
     }
 }
