@@ -170,34 +170,6 @@ class TestDatabase extends HfTestCase {
         $this->assertTableImplementsSchema( $expectedSchema, 'hf_report_request' );
     }
 
-    public function testQuotationTableSchema() {
-        $expectedSchema = array(
-            'quotationID' => $this->createColumnSchemaObject( 'quotationID', 'int(11)', 'NO', 'PRI', null, 'auto_increment' ),
-            'quotation'   => $this->createColumnSchemaObject( 'quotation', 'text', 'NO', '', null, '' ),
-            'reference'   => $this->createColumnSchemaObject( 'reference', 'varchar(500)', 'NO', '', null, '' )
-        );
-
-        $this->assertTableImplementsSchema( $expectedSchema, 'hf_quotation' );
-    }
-
-    public function testContextTableSchema() {
-        $expectedSchema = array(
-            'contextID' => $this->createColumnSchemaObject( 'contextID', 'int(11)', 'NO', 'PRI', null, 'auto_increment' ),
-            'title'     => $this->createColumnSchemaObject( 'title', 'varchar(500)', 'NO', '', null, '' )
-        );
-
-        $this->assertTableImplementsSchema( $expectedSchema, 'hf_context' );
-    }
-
-    public function testQuotationContextTableSchema() {
-        $expectedSchema = array(
-            'quotationID' => $this->createColumnSchemaObject( 'quotationID', 'int(11)', 'NO', 'PRI', null, '' ),
-            'contextID'   => $this->createColumnSchemaObject( 'contextID', 'int(11)', 'NO', 'PRI', null, '' )
-        );
-
-        $this->assertTableImplementsSchema( $expectedSchema, 'hf_quotation_context' );
-    }
-
     public function testDaysSinceLastEmail() {
         $this->setReturnValue( $this->MockCms, 'getVar', '2014-05-27 16:04:29' );
         $this->setReturnValue( $this->MockCodeLibrary, 'convertStringToTime', 1401224669.0 );
@@ -315,34 +287,6 @@ class TestDatabase extends HfTestCase {
     public function testGetAllReportRequestsReturnsReportRequests() {
         $this->setReturnValue( $this->MockCms, 'getRows', 'duck' );
         $this->assertEquals( $this->DatabaseWithMockedDependencies->getAllReportRequests(), 'duck' );
-    }
-
-    public function testDefaultContextsExistence() {
-        $Database = $this->Factory->makeDatabase();
-        $actual = $Database->getRows('hf_context', null);
-
-        $forSetbackArray = array(
-            'contextID'     => 1,
-            'title'      => 'For Setback'
-        );
-
-        $forSuccessArray = array(
-            'contextID'     => 2,
-            'title'      => 'For Success'
-        );
-
-        $forMentorArray = array(
-            'contextID'     => 3,
-            'title'      => 'For Mentor'
-        );
-
-        $forSetback = (object) $forSetbackArray;
-        $forSuccess = (object) $forSuccessArray;
-        $forMentor = (object) $forMentorArray;
-
-        $expected = array($forSetback, $forSuccess, $forMentor);
-
-        $this->assertEquals($actual, $expected);
     }
 
     public function testGetQuotationsGetsQuotations() {

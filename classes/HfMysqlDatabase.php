@@ -108,25 +108,6 @@ class HfMysqlDatabase implements Hf_iDatabase {
 					PRIMARY KEY  (requestID)
 				);";
 
-        $quotationTableSql = "CREATE TABLE " . $prefix . "hf_quotation (
-                    quotationID int NOT NULL AUTO_INCREMENT,
-					quotation text NOT NULL,
-					reference varchar(500) NOT NULL,
-					PRIMARY KEY  (quotationID)
-				);";
-
-        $contextTableSql = "CREATE TABLE " . $prefix . "hf_context (
-                    contextID int NOT NULL AUTO_INCREMENT,
-					title varchar(500) NOT NULL,
-					PRIMARY KEY  (contextID)
-				);";
-
-        $quotationContextTableSql = "CREATE TABLE " . $prefix . "hf_quotation_context (
-					quotationID int NOT NULL,
-					contextID int NOT NULL,
-					PRIMARY KEY  (quotationID, contextID)
-				);";
-
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
         dbDelta( $emailTableSql );
         dbDelta( $goalTableSql );
@@ -136,15 +117,11 @@ class HfMysqlDatabase implements Hf_iDatabase {
         dbDelta( $inviteTableSql );
         dbDelta( $relationshipTableSql );
         dbDelta( $reportRequestTableSql );
-        dbDelta( $quotationTableSql );
-        dbDelta( $contextTableSql );
-        dbDelta( $quotationContextTableSql );
     }
 
     private function populateTables() {
         $this->populateGoalTable();
         $this->populateLevelsTable();
-        $this->populateContextTable();
     }
 
     private function populateGoalTable() {
@@ -231,27 +208,6 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $this->insertUpdateIntoDb( 'hf_level', $defaultLevel5 );
         $this->insertUpdateIntoDb( 'hf_level', $defaultLevel6 );
         $this->insertUpdateIntoDb( 'hf_level', $defaultLevel7 );
-    }
-
-    private function populateContextTable() {
-        $forSetback = array(
-            'contextID' => 1,
-            'title'     => 'For Setback'
-        );
-
-        $forSuccess = array(
-            'contextID' => 2,
-            'title'     => 'For Success'
-        );
-
-        $forMentor = array(
-            'contextID' => 3,
-            'title'     => 'For Mentor'
-        );
-
-        $this->insertUpdateIntoDb( 'hf_context', $forSetback );
-        $this->insertUpdateIntoDb( 'hf_context', $forSuccess );
-        $this->insertUpdateIntoDb( 'hf_context', $forMentor );
     }
 
     function insertUpdateIntoDb( $table, $data ) {
