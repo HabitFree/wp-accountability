@@ -60,7 +60,7 @@ class TestHtmlGenerator extends HfTestCase {
 
     public function testMakeError() {
         $HtmlGenerator = $this->Factory->makeMarkupGenerator();
-        $result = $HtmlGenerator->makeError('duck');
+        $result = $HtmlGenerator->makeErrorMessage('duck');
         $this->assertEquals('<p class="error">duck</p>', $result);
     }
 
@@ -104,5 +104,11 @@ class TestHtmlGenerator extends HfTestCase {
         $actual = $HtmlGenerator->makeHiddenField('ghost');
         $expected = '<input type="hidden" name="ghost" />';
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testMakeInfoMessage() {
+        $HtmlGenerator = $this->Factory->makeMarkupGenerator();
+        $result = $HtmlGenerator->makeInfoMessage('duck');
+        $this->assertEquals('<p class="info">duck</p>', $result);
     }
 }

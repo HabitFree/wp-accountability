@@ -68,7 +68,7 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeUsesCurrentUrl() {
-        $currentUrl            = 'mysite.com';
+        $currentUrl = 'mysite.com';
 
         $AuthenticateShortcode = new HfAuthenticateShortcode(
             $this->Factory->makeMarkupGenerator(),
@@ -553,7 +553,7 @@ class TestAuthenticateShortcode extends HfTestCase {
 
         $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem, $UserManager );
         $haystack              = $AuthenticateShortcode->getOutput();
-        $needle                = "<p class='error'>We're very sorry, but something seems to have gone wrong with your registration.</p>";
+        $needle                = "<p class=\"error\">We're very sorry, but something seems to have gone wrong with your registration.</p>";
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }
@@ -565,7 +565,7 @@ class TestAuthenticateShortcode extends HfTestCase {
 
         $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
         $haystack              = $AuthenticateShortcode->getOutput();
-        $needle                = "<p class='info'>Looks like you're responding to an invitation. Feel free to either register or log into an existing account—either way we'll automatically set up accountability between you and the user who invited you.</p>";
+        $needle                = "<p class=\"info\">Looks like you're responding to an invitation. Feel free to either register or log into an existing account—either way we'll automatically set up accountability between you and the user who invited you.</p>";
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }
@@ -598,14 +598,14 @@ class TestAuthenticateShortcode extends HfTestCase {
         $_POST['username'] = 'Joe';
         $_POST['password'] = 'bo';
 
-        $DisplayCodeGenerator    = $this->Factory->makeMarkupGenerator();
-        $AssetLocator            = $this->Factory->makeAssetLocator();
-        $ContentManagementSystem = $this->makeMock( 'HfWordPress' );
-        $UserManager             = $this->Factory->makeUserManager();
+        $this->setReturnValue( $this->MockCms, 'authenticateUser', true );
 
-        $this->setReturnValue( $ContentManagementSystem, 'authenticateUser', true );
-
-        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem, $UserManager );
+        $AuthenticateShortcode = new HfAuthenticateShortcode(
+            $this->Factory->makeMarkupGenerator(),
+            $this->Factory->makeAssetLocator(),
+            $this->MockCms,
+            $this->Factory->makeUserManager()
+        );
 
         $haystack = $AuthenticateShortcode->getOutput();
 
@@ -646,8 +646,16 @@ class TestAuthenticateShortcode extends HfTestCase {
     public function testAuthenticationShortcodeDoesntMentionRegisteringWhenUserLoggedInAndInvited() {
         $_GET['n'] = 555;
         $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
-        $this->setReturnValue( $this->MockAssetLocator, 'getCurrentPageUrl', 'here.there' );
 
+        $AuthenticateShortcode = $this->makeExpressiveAuthenticateShortcode();
+
+        $needle   = 'register';
+        $haystack = $AuthenticateShortcode->getOutput();
+
+        $this->assertFalse( $this->haystackContainsNeedle( $haystack, $needle ) );
+    }
+
+    private function makeExpressiveAuthenticateShortcode() {
         $AuthenticateShortcode = new HfAuthenticateShortcode(
             $this->Factory->makeMarkupGenerator(),
             $this->MockAssetLocator,
@@ -655,11 +663,30 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->MockUserManager
         );
 
-        $needle   = 'register';
+        return $AuthenticateShortcode;
+    }
+
+    public function testAuthenticateShortcodeHasAcceptButton() {
+        $_GET['n'] = 555;
+        $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
+
+        $AuthenticateShortcode = $this->makeExpressiveAuthenticateShortcode();
+
+        $needle   = '<input type="submit" name="accept" value="Accept invitation" />';
         $haystack = $AuthenticateShortcode->getOutput();
 
-        var_dump($haystack);
+        $this->assertContains( $needle, $haystack );
+    }
 
-        $this->assertFalse($this->haystackContainsNeedle( $haystack, $needle ));
+    public function testAuthenticateShortcodeHasDeleteButton() {
+        $_GET['n'] = 555;
+        $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
+
+        $AuthenticateShortcode = $this->makeExpressiveAuthenticateShortcode();
+
+        $needle   = '<input type="submit" name="delete" value="Delete invitation" />';
+        $haystack = $AuthenticateShortcode->getOutput();
+
+        $this->assertContains( $needle, $haystack );
     }
 }
