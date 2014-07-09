@@ -52,4 +52,12 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     public function makeQuoteMessage( $quotation ) {
         return '<p class="quote">"' . $quotation->post_content . '" — ' . $quotation->post_title . '</p>';
     }
+
+    public function makeForm($url, $content, $name) {
+        return '<form action="'.$url.'" method="post" name="'.$name.'">'.$content.'</form>';
+    }
+
+    public function makeButton($name, $label, $onclick) {
+        return '<input type="button" name="'.$name.'" value="'.$label.'" onclick="'.$onclick.'" />';
+    }
 }

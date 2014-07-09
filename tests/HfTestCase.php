@@ -13,7 +13,6 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     protected $MockSecurity;
     protected $MockCodeLibrary;
     protected $MockUserManager;
-    protected $MockPageLocator;
     protected $MockGoals;
     protected $MockMarkupGenerator;
 
@@ -31,7 +30,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
 
     protected function setUp() {
         $_POST = array();
-        $_GET = array();
+        $_GET  = array();
 
         $this->resetMocks();
         $this->resetObjectsWithMockDependencies();
@@ -57,7 +56,11 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->resetDatabaseWithMockedDependencies();
         $this->resetAssetLocatorWithMockedDependencies();
         $this->resetInvitePartnerShortcodeWithMockedDependencies();
-        $this->PartnerListShortcodeWithMockedDependencies = new HfPartnerListShortcode($this->MockUserManager, $this->MockMarkupGenerator);
+        $this->resetPartnerListShortcodeWithMockedDependencies();
+    }
+
+    protected function makeMock( $className ) {
+        return $this->getMockBuilder( $className )->disableOriginalConstructor()->getMock();
     }
 
     private function resetUserManagerWithMockedDependencies() {
@@ -112,8 +115,12 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         );
     }
 
-    protected function makeMock( $className ) {
-        return $this->getMockBuilder( $className )->disableOriginalConstructor()->getMock();
+    private function resetPartnerListShortcodeWithMockedDependencies() {
+        $this->PartnerListShortcodeWithMockedDependencies = new HfPartnerListShortcode(
+            $this->MockUserManager,
+            $this->MockMarkupGenerator,
+            $this->MockAssetLocator
+        );
     }
 
     protected function setReturnValue( $Mock, $method, $value ) {
@@ -131,6 +138,18 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $ExpectantMock = $Mock->expects( $this->atLeastOnce() )->method( $method );
 
         $this->addWithArgsExpectation( $args, $ExpectantMock );
+    }
+
+    private function addWithArgsExpectation( $args, $ExpectantMock ) {
+        if ( !empty( $args ) ) {
+            $expectations = array();
+
+            foreach ( $args as $arg ) {
+                $expectations[] = $this->equalTo( $arg );
+            }
+
+            call_user_func_array( array($ExpectantMock, "with"), $expectations );
+        }
     }
 
     protected function expectAt( $Mock, $method, $at, $args = array() ) {
@@ -152,18 +171,6 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $ExpectantMock = $Mock->expects( $this->once() )->method( $method );
 
         $this->addWithArgsExpectation( $args, $ExpectantMock );
-    }
-
-    private function addWithArgsExpectation( $args, $ExpectantMock ) {
-        if ( !empty( $args ) ) {
-            $expectations = array();
-
-            foreach ( $args as $arg ) {
-                $expectations[] = $this->equalTo( $arg );
-            }
-
-            call_user_func_array( array($ExpectantMock, "with"), $expectations );
-        }
     }
 
     protected function classImplementsInterface( $class, $interface ) {

@@ -16,4 +16,8 @@ interface Hf_iMarkupGenerator {
     public function makeSuccessMessage( $content );
 
     public function makeQuoteMessage( $content );
+
+    public function makeForm($url, $content, $name);
+
+    public function makeButton($name, $label, $onclick);
 }

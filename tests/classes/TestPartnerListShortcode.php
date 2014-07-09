@@ -16,6 +16,7 @@ class TestPartnerListShortcode extends HfTestCase {
     private function setDefaultReturnValues() {
         $MockPartner                = new stdClass();
         $MockPartner->user_nicename = 'ludwig';
+        $MockPartner->ID            = 7;
         $this->setReturnValue( $this->MockUserManager, 'getPartners', array($MockPartner) );
     }
 
@@ -32,7 +33,8 @@ class TestPartnerListShortcode extends HfTestCase {
 
         $PartnerListShortcode = new HfPartnerListShortcode(
             $this->MockUserManager,
-            $this->Factory->makeMarkupGenerator()
+            $this->Factory->makeMarkupGenerator(),
+            $this->MockAssetLocator
         );
 
         $haystack = $PartnerListShortcode->getOutput();
@@ -47,15 +49,8 @@ class TestPartnerListShortcode extends HfTestCase {
         $this->PartnerListShortcodeWithMockedDependencies->getOutput();
     }
 
-    public function testPartnerListShortcodeReturnsMarkupList() {
-        $this->setDefaultReturnValues();
-        $this->setReturnValue( $this->MockMarkupGenerator, 'makeList', 'duck' );
-        $actual = $this->PartnerListShortcodeWithMockedDependencies->getOutput();
-        $this->assertEquals( 'duck', $actual );
-    }
-
     public function testShortcodeExists() {
-        $this->assertTrue(shortcode_exists('hfPartnerList'));
+        $this->assertTrue( shortcode_exists( 'hfPartnerList' ) );
     }
 
     public function testShortcodeListIncludesWordUnpartner() {
@@ -63,12 +58,55 @@ class TestPartnerListShortcode extends HfTestCase {
 
         $PartnerListShortcode = new HfPartnerListShortcode(
             $this->MockUserManager,
-            $this->Factory->makeMarkupGenerator()
+            $this->Factory->makeMarkupGenerator(),
+            $this->MockAssetLocator
         );
 
         $haystack = $PartnerListShortcode->getOutput();
         $needle   = 'unpartner';
 
         $this->assertContains( $needle, $haystack );
+    }
+
+    public function testShortcodeGetsCurrentPageUrl() {
+        $this->setDefaultReturnValues();
+        $this->expectOnce( $this->MockAssetLocator, 'getCurrentPageUrl' );
+        $this->PartnerListShortcodeWithMockedDependencies->getOutput();
+    }
+
+    public function testShortcodeMakesForm() {
+        $this->setDefaultReturnValues();
+        $this->expectOnce( $this->MockMarkupGenerator, 'makeForm' );
+        $this->PartnerListShortcodeWithMockedDependencies->getOutput();
+    }
+
+    public function testShortcodeUsesCurrentPageUrlAndListWhenCallingForm() {
+        $this->setDefaultReturnValues();
+        $this->setReturnValue( $this->MockAssetLocator, 'getCurrentPageUrl', 'pond.net' );
+        $this->setReturnValue( $this->MockMarkupGenerator, 'makeList', 'duck' );
+        $this->expectOnce( $this->MockMarkupGenerator, 'makeForm', array('pond.net', 'duck', 'partnerlist') );
+        $this->PartnerListShortcodeWithMockedDependencies->getOutput();
+    }
+
+    public function testShortcodeReturnsForm() {
+        $this->setDefaultReturnValues();
+        $this->setReturnValue( $this->MockMarkupGenerator, 'makeForm', 'duck' );
+        $actual   = $this->PartnerListShortcodeWithMockedDependencies->getOutput();
+        $expected = 'duck';
+        $this->assertEquals( $expected, $actual );
+    }
+
+    public function testShortcodeMakesUnpartnerSubmitButton() {
+        $this->setDefaultReturnValues();
+
+        $PartnerListShortcode = new HfPartnerListShortcode(
+            $this->MockUserManager,
+            $this->Factory->makeMarkupGenerator(),
+            $this->MockAssetLocator
+        );
+
+        $needle   = '<input type="button" name="7" value="unpartner" onclick="if (confirm(\'Sure?\')) { document.partnerlist.submit();}" />';
+        $haystack = $PartnerListShortcode->getOutput();
+        $this->assertContains($needle, $haystack);
     }
 }

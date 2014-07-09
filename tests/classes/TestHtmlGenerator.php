@@ -81,4 +81,21 @@ class TestHtmlGenerator extends HfTestCase {
 
         $this->assertEquals('<p class="quote">"hello" — Nathan</p>', $result);
     }
+
+    public function testMakeForm() {
+        $HtmlGenerator = $this->Factory->makeMarkupGenerator();
+        $expected = '<form action="pond.net" method="post" name="waterform">duck</form>';
+        $actual = $HtmlGenerator->makeForm('pond.net', 'duck', 'waterform');
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testMakeButton() {
+        $HtmlGenerator = $this->Factory->makeMarkupGenerator();
+        $name = 'DUCK';
+        $label = 'duck';
+        $onclick = 'quack';
+        $expected = '<input type="button" name="'.$name.'" value="'.$label.'" onclick="'.$onclick.'" />';
+        $actual = $HtmlGenerator->makeButton($name, $label, $onclick);
+        $this->assertEquals($expected, $actual);
+    }
 }
