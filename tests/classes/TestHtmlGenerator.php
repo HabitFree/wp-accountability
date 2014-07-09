@@ -98,4 +98,11 @@ class TestHtmlGenerator extends HfTestCase {
         $actual = $HtmlGenerator->makeButton($name, $label, $onclick);
         $this->assertEquals($expected, $actual);
     }
+
+    public function testMakeHiddenField() {
+        $HtmlGenerator = $this->Factory->makeMarkupGenerator();
+        $actual = $HtmlGenerator->makeHiddenField('ghost');
+        $expected = '<input type="hidden" name="ghost" />';
+        $this->assertEquals($expected, $actual);
+    }
 }

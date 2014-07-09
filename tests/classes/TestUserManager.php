@@ -88,4 +88,9 @@ class TestUserManager extends HfTestCase {
 
         $this->UserManagerWithMockedDependencies->processInvite('', '');
     }
+
+    public function testDeleteRelationship() {
+        $this->expectOnce($this->MockDatabase, 'deleteRelationship', array('dog', 'cat'));
+        $this->UserManagerWithMockedDependencies->deleteRelationship('dog', 'cat');
+    }
 }

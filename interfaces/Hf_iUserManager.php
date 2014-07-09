@@ -18,4 +18,6 @@ interface Hf_iUserManager {
     public function getPartners( $userId );
 
     public function getUsernameById( $userId );
+
+    public function deleteRelationship($userId1, $userId2);
 }

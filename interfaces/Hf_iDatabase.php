@@ -82,4 +82,6 @@ interface Hf_iDatabase {
     public function getAllReportRequests();
 
     public function getQuotations( $context );
+
+    public function deleteRelationship($userId1, $userId2);
 }

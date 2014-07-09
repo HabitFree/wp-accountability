@@ -616,4 +616,20 @@ class HfMysqlDatabase implements Hf_iDatabase {
 
         return $this->Cms->getVar( "SELECT term_id FROM " . $prefix . "terms WHERE name = '" . $context . "'" );
     }
+
+    public function deleteRelationship( $userId1, $userId2 ) {
+        $userId1 = intval($userId1);
+        $userId2 = intval($userId2);
+        $table = $this->Cms->getDbPrefix() . 'hf_relationship';
+        $where = $this->createDeleteRelationshipWhereCriteria( $userId1, $userId2 );
+        $this->Cms->deleteRows( $table, $where );
+    }
+
+    private function createDeleteRelationshipWhereCriteria( $userId1, $userId2 ) {
+        if ( $userId1 < $userId2 ) {
+            return array('userID1' => $userId1, 'userID2' => $userId2);
+        } else {
+            return array('userID1' => $userId2, 'userID2' => $userId1);
+        }
+    }
 }

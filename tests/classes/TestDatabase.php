@@ -321,4 +321,30 @@ class TestDatabase extends HfTestCase {
 
         $this->DatabaseWithMockedDependencies->getQuotations('For Success');
     }
+
+    public function testDeleteRelationshipDeletesRelationship() {
+        $table = 'wptest_hf_relationship';
+        $where = array(
+            'userID1' => 4,
+            'userID2' => 5
+        );
+
+        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptest_');
+        $this->expectOnce($this->MockCms, 'deleteRows', array($table, $where));
+
+        $this->DatabaseWithMockedDependencies->deleteRelationship(4, 5);
+    }
+
+    public function testDeleteRelationshipSortsIds() {
+        $table = 'wptest_hf_relationship';
+        $where = array(
+            'userID1' => 4,
+            'userID2' => 5
+        );
+
+        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptest_');
+        $this->expectOnce($this->MockCms, 'deleteRows', array($table, $where));
+
+        $this->DatabaseWithMockedDependencies->deleteRelationship(5, 4);
+    }
 }
