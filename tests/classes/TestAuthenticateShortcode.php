@@ -346,16 +346,17 @@ class TestAuthenticateShortcode extends HfTestCase {
         $_POST['username'] = 'Joe';
         $_POST['password'] = 'bo';
 
-        $DisplayCodeGenerator    = $this->Factory->makeMarkupGenerator();
-        $AssetLocator            = $this->Factory->makeAssetLocator();
-        $ContentManagementSystem = $this->makeMock( 'HfWordPress' );
-        $UserManager             = $this->Factory->makeUserManager();
+        $this->setReturnValue( $this->MockCms, 'authenticateUser', false );
 
-        $this->setReturnValue( $ContentManagementSystem, 'authenticateUser', false );
+        $AuthenticateShortcode = new HfAuthenticateShortcode(
+            $this->Factory->makeMarkupGenerator(),
+            $this->Factory->makeAssetLocator(),
+            $this->MockCms,
+            $this->Factory->makeUserManager()
+        );
 
-        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem, $UserManager );
-        $haystack              = $AuthenticateShortcode->getOutput();
-        $needle                = '[su_tab title="Log In"]<p class="error">That username and password combination is incorrect.</p>';
+        $haystack = $AuthenticateShortcode->getOutput();
+        $needle   = '[su_tab title="Log In"]<p class="error">That username and password combination is incorrect.</p>';
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }
@@ -366,16 +367,17 @@ class TestAuthenticateShortcode extends HfTestCase {
         $_POST['username'] = 'Joe';
         $_POST['password'] = 'bo';
 
-        $DisplayCodeGenerator    = $this->Factory->makeMarkupGenerator();
-        $AssetLocator            = $this->Factory->makeAssetLocator();
-        $ContentManagementSystem = $this->makeMock( 'HfWordPress' );
-        $UserManager             = $this->Factory->makeUserManager();
+        $this->setReturnValue( $this->MockCms, 'authenticateUser', true );
 
-        $this->setReturnValue( $ContentManagementSystem, 'authenticateUser', true );
+        $AuthenticateShortcode = new HfAuthenticateShortcode(
+            $this->Factory->makeMarkupGenerator(),
+            $this->Factory->makeAssetLocator(),
+            $this->MockCms,
+            $this->Factory->makeUserManager()
+        );
 
-        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem, $UserManager );
-        $haystack              = $AuthenticateShortcode->getOutput();
-        $needle                = '<p class="success">Welcome back!</p>';
+        $haystack = $AuthenticateShortcode->getOutput();
+        $needle   = '<p class="success">Welcome back!</p>';
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }
@@ -386,106 +388,108 @@ class TestAuthenticateShortcode extends HfTestCase {
         $_POST['username'] = 'Joe';
         $_POST['password'] = 'bo';
 
-        $DisplayCodeGenerator    = $this->Factory->makeMarkupGenerator();
-        $AssetLocator            = $this->Factory->makeAssetLocator();
-        $ContentManagementSystem = $this->makeMock( 'HfWordPress' );
-        $UserManager             = $this->Factory->makeUserManager();
-
-        $this->setReturnValue( $ContentManagementSystem, 'authenticateUser', true );
+        $AssetLocator = $this->Factory->makeAssetLocator();
+        $this->setReturnValue( $this->MockCms, 'authenticateUser', true );
 
         $homeUrl = $AssetLocator->getHomePageUrl();
 
-        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem, $UserManager );
-        $haystack              = $AuthenticateShortcode->getOutput();
-        $needle                = '<script>setTimeout(function(){window.location.replace("' . $homeUrl . '")},5000);</script>';
+        $AuthenticateShortcode = new HfAuthenticateShortcode(
+            $this->Factory->makeMarkupGenerator(),
+            $this->Factory->makeAssetLocator(),
+            $this->MockCms,
+            $this->Factory->makeUserManager()
+        );
+
+        $haystack = $AuthenticateShortcode->getOutput();
+        $needle   = '<script>setTimeout(function(){window.location.replace("' . $homeUrl . '")},5000);</script>';
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }
 
     public function testAuthenticateShortcodeDoesNotAttemptLogInWhenFormFailsToValidate() {
-        $_POST             = array();
         $_POST['login']    = '';
         $_POST['username'] = 'Joe';
         $_POST['password'] = '';
 
-        $DisplayCodeGenerator    = $this->Factory->makeMarkupGenerator();
-        $AssetLocator            = $this->Factory->makeAssetLocator();
-        $ContentManagementSystem = $this->makeMock( 'HfWordPress' );
-        $UserManager             = $this->Factory->makeUserManager();
+        $this->expectNever( $this->MockCms, 'authenticateUser' );
 
-        $this->expectNever( $ContentManagementSystem, 'authenticateUser' );
+        $AuthenticateShortcode = new HfAuthenticateShortcode(
+            $this->Factory->makeMarkupGenerator(),
+            $this->Factory->makeAssetLocator(),
+            $this->MockCms,
+            $this->Factory->makeUserManager()
+        );
 
-        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem, $UserManager );
         $AuthenticateShortcode->getOutput();
     }
 
     public function testAuthenticateShortcodeAttemptsRegistration() {
-        $_POST                         = array();
         $_POST['register']             = '';
         $_POST['username']             = 'Joe';
         $_POST['email']                = 'joe@wallysworld.com';
         $_POST['password']             = 'bo';
         $_POST['passwordConfirmation'] = 'bo';
 
-        $DisplayCodeGenerator    = $this->Factory->makeMarkupGenerator();
-        $AssetLocator            = $this->Factory->makeAssetLocator();
-        $ContentManagementSystem = $this->makeMock( 'HfWordPress' );
-        $UserManager             = $this->Factory->makeUserManager();
+        $this->expectOnce( $this->MockCms, 'createUser', array('Joe', 'bo', 'joe@wallysworld.com') );
 
-        $this->expectOnce( $ContentManagementSystem, 'createUser', array('Joe', 'bo', 'joe@wallysworld.com') );
+        $AuthenticateShortcode = new HfAuthenticateShortcode(
+            $this->Factory->makeMarkupGenerator(),
+            $this->Factory->makeAssetLocator(),
+            $this->MockCms,
+            $this->Factory->makeUserManager()
+        );
 
-        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem, $UserManager );
         $AuthenticateShortcode->getOutput();
     }
 
     public function testAuthenticateShortcodeDisplaysRegistrationSuccessMessage() {
-        $_POST                         = array();
         $_POST['register']             = '';
         $_POST['username']             = 'Joe';
         $_POST['email']                = 'joe@wallysworld.com';
         $_POST['password']             = 'bo';
         $_POST['passwordConfirmation'] = 'bo';
 
-        $DisplayCodeGenerator    = $this->Factory->makeMarkupGenerator();
-        $AssetLocator            = $this->Factory->makeAssetLocator();
-        $ContentManagementSystem = $this->makeMock( 'HfWordPress' );
-        $UserManager             = $this->Factory->makeUserManager();
+        $this->setReturnValue( $this->MockCms, 'createUser', true );
 
-        $this->setReturnValue( $ContentManagementSystem, 'createUser', true );
+        $AuthenticateShortcode = new HfAuthenticateShortcode(
+            $this->Factory->makeMarkupGenerator(),
+            $this->Factory->makeAssetLocator(),
+            $this->MockCms,
+            $this->Factory->makeUserManager()
+        );
 
-        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem, $UserManager );
-        $haystack              = $AuthenticateShortcode->getOutput();
-        $needle                = '<p class="success">Welcome to HabitFree!</p>';
+        $haystack = $AuthenticateShortcode->getOutput();
+        $needle   = '<p class="success">Welcome to HabitFree!</p>';
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }
 
     public function testAuthenticateShortcodeGeneratesRedirectScriptOnRegistration() {
-        $_POST                         = array();
         $_POST['register']             = '';
         $_POST['username']             = 'Joe';
         $_POST['email']                = 'joe@wallysworld.com';
         $_POST['password']             = 'bo';
         $_POST['passwordConfirmation'] = 'bo';
 
-        $DisplayCodeGenerator    = $this->Factory->makeMarkupGenerator();
-        $AssetLocator            = $this->Factory->makeAssetLocator();
-        $ContentManagementSystem = $this->makeMock( 'HfWordPress' );
-        $UserManager             = $this->Factory->makeUserManager();
+        $this->setReturnValue( $this->MockCms, 'createUser', true );
 
-        $this->setReturnValue( $ContentManagementSystem, 'createUser', true );
+        $AssetLocator = $this->Factory->makeAssetLocator();
+        $homeUrl      = $AssetLocator->getHomePageUrl();
 
-        $homeUrl = $AssetLocator->getHomePageUrl();
+        $AuthenticateShortcode = new HfAuthenticateShortcode(
+            $this->Factory->makeMarkupGenerator(),
+            $this->Factory->makeAssetLocator(),
+            $this->MockCms,
+            $this->Factory->makeUserManager()
+        );
 
-        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem, $UserManager );
-        $haystack              = $AuthenticateShortcode->getOutput();
-        $needle                = '<script>setTimeout(function(){window.location.replace("' . $homeUrl . '")},5000);</script>';
+        $haystack = $AuthenticateShortcode->getOutput();
+        $needle   = '<script>setTimeout(function(){window.location.replace("' . $homeUrl . '")},5000);</script>';
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }
 
     public function testAuthenticateShortcodeRegistrationProcessInvite() {
-        $_POST                         = array();
         $_POST['register']             = '';
         $_POST['username']             = 'Joe';
         $_POST['email']                = 'joe@wallysworld.com';
@@ -493,74 +497,71 @@ class TestAuthenticateShortcode extends HfTestCase {
         $_POST['passwordConfirmation'] = 'bo';
         $_GET['n']                     = 555;
 
-        $DisplayCodeGenerator    = $this->Factory->makeMarkupGenerator();
-        $AssetLocator            = $this->Factory->makeAssetLocator();
-        $ContentManagementSystem = $this->makeMock( 'HfWordPress' );
-        $UserManager             = $this->makeMock( 'HfUserManager' );
-
         $mockUser     = new stdClass();
         $mockUser->ID = 7;
 
-        $this->setReturnValue( $ContentManagementSystem, 'createUser', true );
-        $this->setReturnValue( $ContentManagementSystem, 'currentUser', $mockUser );
-        $this->setReturnValue( $ContentManagementSystem, 'getUserEmail', 'joe@wallysworld.com' );
-        $this->expectOnce( $UserManager, 'processInvite', array('joe@wallysworld.com', 555) );
+        $this->setReturnValue( $this->MockCms, 'createUser', true );
+        $this->setReturnValue( $this->MockCms, 'currentUser', $mockUser );
+        $this->setReturnValue( $this->MockCms, 'getUserEmail', 'joe@wallysworld.com' );
+        $this->expectOnce( $this->MockUserManager, 'processInvite', array('joe@wallysworld.com', 555) );
 
-        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem, $UserManager );
+        $AuthenticateShortcode = new HfAuthenticateShortcode(
+            $this->Factory->makeMarkupGenerator(),
+            $this->Factory->makeAssetLocator(),
+            $this->MockCms,
+            $this->MockUserManager
+        );
 
         $AuthenticateShortcode->getOutput();
     }
 
     public function testAuthenticateShortcodeLoginProcessInvite() {
-        $_POST             = array();
         $_POST['login']    = '';
         $_POST['username'] = 'Joe';
         $_POST['password'] = 'bo';
         $_GET['n']         = 555;
 
-        $DisplayCodeGenerator    = $this->Factory->makeMarkupGenerator();
-        $AssetLocator            = $this->Factory->makeAssetLocator();
-        $ContentManagementSystem = $this->makeMock( 'HfWordPress' );
-        $UserManager             = $this->makeMock( 'HfUserManager' );
-
         $mockUser     = new stdClass();
         $mockUser->ID = 7;
 
-        $this->setReturnValue( $ContentManagementSystem, 'authenticateUser', true );
-        $this->setReturnValue( $ContentManagementSystem, 'currentUser', $mockUser );
-        $this->setReturnValue( $ContentManagementSystem, 'getUserEmail', 'joe@wallysworld.com' );
-        $this->expectOnce( $UserManager, 'processInvite', array('joe@wallysworld.com', 555) );
+        $this->setReturnValue( $this->MockCms, 'authenticateUser', true );
+        $this->setReturnValue( $this->MockCms, 'currentUser', $mockUser );
+        $this->setReturnValue( $this->MockCms, 'getUserEmail', 'joe@wallysworld.com' );
+        $this->expectOnce( $this->MockUserManager, 'processInvite', array('joe@wallysworld.com', 555) );
 
-        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem, $UserManager );
+        $AuthenticateShortcode = new HfAuthenticateShortcode(
+            $this->Factory->makeMarkupGenerator(),
+            $this->Factory->makeAssetLocator(),
+            $this->MockCms,
+            $this->MockUserManager
+        );
 
         $AuthenticateShortcode->getOutput();
     }
 
     public function testAuthenticateShortcodeDisplaysRegistrationErrorMessage() {
-        $_POST                         = array();
         $_POST['register']             = '';
         $_POST['username']             = 'Joe';
         $_POST['email']                = 'joe@wallysworld.com';
         $_POST['password']             = 'bo';
         $_POST['passwordConfirmation'] = 'bo';
 
-        $DisplayCodeGenerator    = $this->Factory->makeMarkupGenerator();
-        $AssetLocator            = $this->Factory->makeAssetLocator();
-        $ContentManagementSystem = $this->makeMock( 'HfWordPress' );
-        $UserManager             = $this->Factory->makeUserManager();
+        $this->setReturnValue( $this->MockCms, 'createUser', false );
 
-        $this->setReturnValue( $ContentManagementSystem, 'createUser', false );
+        $AuthenticateShortcode = new HfAuthenticateShortcode(
+            $this->Factory->makeMarkupGenerator(),
+            $this->Factory->makeAssetLocator(),
+            $this->MockCms,
+            $this->Factory->makeUserManager()
+        );
 
-        $AuthenticateShortcode = new HfAuthenticateShortcode( $DisplayCodeGenerator, $AssetLocator, $ContentManagementSystem, $UserManager );
-        $haystack              = $AuthenticateShortcode->getOutput();
-        $needle                = "<p class=\"error\">We're very sorry, but something seems to have gone wrong with your registration.</p>";
+        $haystack = $AuthenticateShortcode->getOutput();
+        $needle   = "<p class=\"error\">We're very sorry, but something seems to have gone wrong with your registration.</p>";
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }
 
     public function testAuthenticateShortcodeDisplaysInvitationInfo() {
-        $_POST     = array();
-        $_GET      = array();
         $_GET['n'] = 555;
 
         $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
@@ -571,8 +572,6 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeChecksUrlGetForActiveTab() {
-        $_POST       = array();
-        $_GET        = array();
         $_GET['n']   = 555;
         $_GET['tab'] = 2;
 
@@ -592,8 +591,6 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeLoginDisplaysRedirectMessage() {
-        $_POST             = array();
-        $_GET              = array();
         $_POST['login']    = '';
         $_POST['username'] = 'Joe';
         $_POST['password'] = 'bo';

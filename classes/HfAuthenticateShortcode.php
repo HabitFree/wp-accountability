@@ -115,7 +115,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
             if ( $this->isLoginSuccessful ) {
                 $this->processInvite();
-                $this->loginMessages .= $this->MarkupGenerator->makeSuccessMessage('Welcome back!');
+                $this->loginMessages .= $this->MarkupGenerator->makeSuccessMessage( 'Welcome back!' );
                 $this->redirectUser();
             } else {
                 $errorMessageText = 'That username and password combination is incorrect.';
@@ -191,13 +191,13 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     private function missingUsernameError() {
         if ( empty( $_POST['username'] ) ) {
-            return $this->MarkupGenerator->makeErrorMessage('Please enter your username.');
+            return $this->MarkupGenerator->makeErrorMessage( 'Please enter your username.' );
         }
     }
 
     private function missingPasswordError() {
         if ( empty( $_POST['password'] ) ) {
-            return $this->MarkupGenerator->makeErrorMessage('Please enter your password.');
+            return $this->MarkupGenerator->makeErrorMessage( 'Please enter your password.' );
         }
     }
 
