@@ -68,14 +68,16 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeUsesCurrentUrl() {
-        $Cms                   = new HfWordPress();
-        $HtmlGenerator         = new HfHtmlGenerator( $Cms );
-        $UrlLocator            = $this->makeMock( 'HfUrlFinder' );
-        $UserManager           = $this->Factory->makeUserManager();
         $currentUrl            = 'mysite.com';
-        $AuthenticateShortcode = new HfAuthenticateShortcode( $HtmlGenerator, $UrlLocator, $Cms, $UserManager );
 
-        $this->setReturnValue( $UrlLocator, 'getCurrentPageUrl', $currentUrl );
+        $AuthenticateShortcode = new HfAuthenticateShortcode(
+            $this->Factory->makeMarkupGenerator(),
+            $this->MockAssetLocator,
+            $this->Factory->makeCms(),
+            $this->Factory->makeUserManager()
+        );
+
+        $this->setReturnValue( $this->MockAssetLocator, 'getCurrentPageUrl', $currentUrl );
         $result = $AuthenticateShortcode->getOutput();
 
         $this->assertEquals( 2, substr_count( $result, $currentUrl ) );
@@ -583,15 +585,15 @@ class TestAuthenticateShortcode extends HfTestCase {
 
     public function testAuthenticateShortcodeRegistrationAdvisesUserOnUsernameChoice() {
         $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
-        $haystack = $AuthenticateShortcode->getOutput();
-        $needle = '<p class="info"><strong>Important:</strong> HabitFree is a support community. For this reason, please choose a non-personally-identifiable username.</p>';
+        $haystack              = $AuthenticateShortcode->getOutput();
+        $needle                = '<p class="info"><strong>Important:</strong> HabitFree is a support community. For this reason, please choose a non-personally-identifiable username.</p>';
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }
 
     public function testAuthenticateShortcodeLoginDisplaysRedirectMessage() {
         $_POST             = array();
-        $_GET = array();
+        $_GET              = array();
         $_POST['login']    = '';
         $_POST['username'] = 'Joe';
         $_POST['password'] = 'bo';
@@ -607,10 +609,10 @@ class TestAuthenticateShortcode extends HfTestCase {
 
         $haystack = $AuthenticateShortcode->getOutput();
 
-        $openingTagPosition = stripos($haystack, '[su_tab title="Log In"]');
-        $closingTagPosition = stripos($haystack, '[/su_tab]');
+        $openingTagPosition = stripos( $haystack, '[su_tab title="Log In"]' );
+        $closingTagPosition = stripos( $haystack, '[/su_tab]' );
 
-        $substring = substr($haystack, $openingTagPosition, $closingTagPosition);
+        $substring = substr( $haystack, $openingTagPosition, $closingTagPosition );
 
         $needle = '<p class="info">Redirecting...';
 
@@ -621,5 +623,43 @@ class TestAuthenticateShortcode extends HfTestCase {
         $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
 
         $this->assertTrue( is_a( $AuthenticateShortcode, 'HfAuthenticateShortcode' ) );
+    }
+
+    public function testAuthenticationShortcodeDoesntDisplayAuthenticiationFormWhenLoggedIn() {
+        $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
+        $this->expectNever( $this->MockMarkupGenerator, 'generateTabs' );
+
+        $this->AuthenticateShortcodeWithMockedDependencies->getOutput();
+    }
+
+    public function testAuthenticationShortcodeCreatesWhenUserLoggedInAndInvited() {
+        $_GET['n'] = 555;
+        $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
+        $this->setReturnValue( $this->MockAssetLocator, 'getCurrentPageUrl', 'here.there' );
+
+        $needle   = '<form action="here.there" method="post">';
+        $haystack = $this->AuthenticateShortcodeWithMockedDependencies->getOutput();
+
+        $this->assertContains( $needle, $haystack );
+    }
+
+    public function testAuthenticationShortcodeDoesntMentionRegisteringWhenUserLoggedInAndInvited() {
+        $_GET['n'] = 555;
+        $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
+        $this->setReturnValue( $this->MockAssetLocator, 'getCurrentPageUrl', 'here.there' );
+
+        $AuthenticateShortcode = new HfAuthenticateShortcode(
+            $this->Factory->makeMarkupGenerator(),
+            $this->MockAssetLocator,
+            $this->MockCms,
+            $this->MockUserManager
+        );
+
+        $needle   = 'register';
+        $haystack = $AuthenticateShortcode->getOutput();
+
+        var_dump($haystack);
+
+        $this->assertFalse($this->haystackContainsNeedle( $haystack, $needle ));
     }
 }
