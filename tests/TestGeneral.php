@@ -26,4 +26,8 @@ class TestGeneral extends \PHPUnit_Framework_TestCase {
         $mysqlTime = $wpdb->get_results( "SELECT NOW()", ARRAY_A );
         $this->assertEquals( $phpTime, $mysqlTime[0]['NOW()'] );
     }
+
+    public function testQuotationPostTypeExists() {
+        $this->assertTrue(post_type_exists( 'hf_quotation' ));
+    }
 }

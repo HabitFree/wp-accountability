@@ -170,34 +170,6 @@ class TestDatabase extends HfTestCase {
         $this->assertTableImplementsSchema( $expectedSchema, 'hf_report_request' );
     }
 
-    public function testQuotationTableSchema() {
-        $expectedSchema = array(
-            'quotationID' => $this->createColumnSchemaObject( 'quotationID', 'int(11)', 'NO', 'PRI', null, 'auto_increment' ),
-            'quotation'   => $this->createColumnSchemaObject( 'quotation', 'text', 'NO', '', null, '' ),
-            'reference'   => $this->createColumnSchemaObject( 'reference', 'varchar(500)', 'NO', '', null, '' )
-        );
-
-        $this->assertTableImplementsSchema( $expectedSchema, 'hf_quotation' );
-    }
-
-    public function testContextTableSchema() {
-        $expectedSchema = array(
-            'contextID' => $this->createColumnSchemaObject( 'contextID', 'int(11)', 'NO', 'PRI', null, 'auto_increment' ),
-            'title'     => $this->createColumnSchemaObject( 'title', 'varchar(500)', 'NO', '', null, '' )
-        );
-
-        $this->assertTableImplementsSchema( $expectedSchema, 'hf_context' );
-    }
-
-    public function testQuotationContextTableSchema() {
-        $expectedSchema = array(
-            'quotationID' => $this->createColumnSchemaObject( 'quotationID', 'int(11)', 'NO', 'PRI', null, '' ),
-            'contextID'   => $this->createColumnSchemaObject( 'contextID', 'int(11)', 'NO', 'PRI', null, '' )
-        );
-
-        $this->assertTableImplementsSchema( $expectedSchema, 'hf_quotation_context' );
-    }
-
     public function testDaysSinceLastEmail() {
         $this->setReturnValue( $this->MockCms, 'getVar', '2014-05-27 16:04:29' );
         $this->setReturnValue( $this->MockCodeLibrary, 'convertStringToTime', 1401224669.0 );
@@ -317,47 +289,62 @@ class TestDatabase extends HfTestCase {
         $this->assertEquals( $this->DatabaseWithMockedDependencies->getAllReportRequests(), 'duck' );
     }
 
-    public function testDefaultContextsExistence() {
-        $Database = $this->Factory->makeDatabase();
-        $actual = $Database->getRows('hf_context', null);
-
-        $forSetbackArray = array(
-            'contextID'     => 1,
-            'title'      => 'For Setback'
-        );
-
-        $forSuccessArray = array(
-            'contextID'     => 2,
-            'title'      => 'For Success'
-        );
-
-        $forMentorArray = array(
-            'contextID'     => 3,
-            'title'      => 'For Mentor'
-        );
-
-        $forSetback = (object) $forSetbackArray;
-        $forSuccess = (object) $forSuccessArray;
-        $forMentor = (object) $forMentorArray;
-
-        $expected = array($forSetback, $forSuccess, $forMentor);
-
-        $this->assertEquals($actual, $expected);
-    }
-
     public function testGetQuotationsGetsQuotations() {
-        $expectedQuery = 'SELECT quotation.* FROM wp_hf_quotation AS quotation LEFT JOIN wp_hf_quotation_context AS quotation_context ON quotation.quotationID = quotation_context.quotationID WHERE quotation_context.contextID = 1';
+        $expectedQuery = "SELECT * FROM wptest_posts INNER JOIN wptest_term_relationships WHERE post_type =  'hf_quotation' AND post_status =  'publish' AND object_id = id AND term_taxonomy_id = 1";
         $this->expectOnce($this->MockCms, 'getResults', array($expectedQuery));
-        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wp_');
-        $this->DatabaseWithMockedDependencies->getQuotations(1);
+        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptest_');
+        $this->setReturnValue($this->MockCms, 'getVar', 1);
+        $this->DatabaseWithMockedDependencies->getQuotations('For Setback');
     }
 
-    public function testGetQuotationReturnsQuotations() {
+    public function testGetQuotationsReturnsQuotations() {
         $this->setReturnValue($this->MockCms, 'getResults', 'duck');
 
-        $actual = $this->DatabaseWithMockedDependencies->getQuotations(1);
+        $actual = $this->DatabaseWithMockedDependencies->getQuotations('For Setback');
         $expected = 'duck';
 
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetQuotationsLooksUpTermId() {
+        $expectedQuery = "SELECT term_id FROM wptest_terms WHERE name = 'For Setback'";
+        $this->expectOnce($this->MockCms, 'getVar', array($expectedQuery));
+        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptest_');
+
+        $this->DatabaseWithMockedDependencies->getQuotations('For Setback');
+    }
+
+    public function testGetQuotationsLooksUpPassedTermName() {
+        $expectedQuery = "SELECT term_id FROM wptest_terms WHERE name = 'For Success'";
+        $this->expectOnce($this->MockCms, 'getVar', array($expectedQuery));
+        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptest_');
+
+        $this->DatabaseWithMockedDependencies->getQuotations('For Success');
+    }
+
+    public function testDeleteRelationshipDeletesRelationship() {
+        $table = 'wptest_hf_relationship';
+        $where = array(
+            'userID1' => 4,
+            'userID2' => 5
+        );
+
+        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptest_');
+        $this->expectOnce($this->MockCms, 'deleteRows', array($table, $where));
+
+        $this->DatabaseWithMockedDependencies->deleteRelationship(4, 5);
+    }
+
+    public function testDeleteRelationshipSortsIds() {
+        $table = 'wptest_hf_relationship';
+        $where = array(
+            'userID1' => 4,
+            'userID2' => 5
+        );
+
+        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptest_');
+        $this->expectOnce($this->MockCms, 'deleteRows', array($table, $where));
+
+        $this->DatabaseWithMockedDependencies->deleteRelationship(5, 4);
     }
 }

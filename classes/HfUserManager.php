@@ -94,4 +94,8 @@ class HfUserManager implements Hf_iUserManager {
     public function getPartners( $userId ) {
         return $this->Database->getPartners( $userId );
     }
+
+    public function deleteRelationship($userId1, $userId2) {
+        $this->Database->deleteRelationship($userId1, $userId2);
+    }
 }

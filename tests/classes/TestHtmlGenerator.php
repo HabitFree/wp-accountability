@@ -74,11 +74,35 @@ class TestHtmlGenerator extends HfTestCase {
         $HtmlGenerator = $this->Factory->makeMarkupGenerator();
 
         $MockQuotation = new stdClass();
-        $MockQuotation->quotation = 'hello';
-        $MockQuotation->reference = 'Nathan';
+        $MockQuotation->post_content = 'hello';
+        $MockQuotation->post_title = 'Nathan';
 
         $result = $HtmlGenerator->makeQuoteMessage($MockQuotation);
 
         $this->assertEquals('<p class="quote">"hello" — Nathan</p>', $result);
+    }
+
+    public function testMakeForm() {
+        $HtmlGenerator = $this->Factory->makeMarkupGenerator();
+        $expected = '<form action="pond.net" method="post" name="waterform">duck</form>';
+        $actual = $HtmlGenerator->makeForm('pond.net', 'duck', 'waterform');
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testMakeButton() {
+        $HtmlGenerator = $this->Factory->makeMarkupGenerator();
+        $name = 'DUCK';
+        $label = 'duck';
+        $onclick = 'quack';
+        $expected = '<input type="button" name="'.$name.'" value="'.$label.'" onclick="'.$onclick.'" />';
+        $actual = $HtmlGenerator->makeButton($name, $label, $onclick);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testMakeHiddenField() {
+        $HtmlGenerator = $this->Factory->makeMarkupGenerator();
+        $actual = $HtmlGenerator->makeHiddenField('ghost');
+        $expected = '<input type="hidden" name="ghost" />';
+        $this->assertEquals($expected, $actual);
     }
 }

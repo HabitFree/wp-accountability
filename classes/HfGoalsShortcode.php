@@ -91,7 +91,7 @@ class HfGoalsShortcode implements Hf_iShortcode {
     private function makeQuotationMessage() {
         $quotation = $this->selectQuotation();
 
-        return $this->MarkupGenerator->makeQuoteMessage( $quotation );
+        return $quotation ? $this->MarkupGenerator->makeQuoteMessage( $quotation ) : null;
     }
 
     private function buildForm( $userID ) {
@@ -125,7 +125,7 @@ class HfGoalsShortcode implements Hf_iShortcode {
         $quotations = $this->Database->getQuotations( $context );
         $key        = $this->CodeLibrary->randomKeyFromArray( $quotations );
 
-        return $quotations[$key];
+        return $quotations ? $quotations[$key] : null;
     }
 
     private function notifyPartner( $Partner, $userId ) {
@@ -137,7 +137,7 @@ class HfGoalsShortcode implements Hf_iShortcode {
     }
 
     private function determineQuotationContext() {
-        return ( $this->didReportSetback() ) ? 1 : 2;
+        return ( $this->didReportSetback() ) ? 'For Setback' : 'For Success';
     }
 
     private function generatePartnerReportBody( $Partner, $reporterUsername ) {

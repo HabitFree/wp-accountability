@@ -62,6 +62,7 @@ require_once( dirname( __FILE__ ) . '/classes/HfAccountabilityForm.php' );
 require_once( dirname( __FILE__ ) . '/classes/HfAuthenticateShortcode.php' );
 require_once( dirname( __FILE__ ) . '/classes/HfUserButtonsShortcode.php' );
 require_once( dirname( __FILE__ ) . '/classes/HfInvitePartnerShortcode.php' );
+require_once( dirname( __FILE__ ) . '/classes/HfPartnerListShortcode.php' );
 
 date_default_timezone_set( 'America/Chicago' );
 
@@ -75,18 +76,85 @@ add_action( 'user_register', array($HfUserManager, 'processNewUser') );
 add_action( 'admin_menu', array($HfAdminPanel, 'registerAdminPanel') );
 add_action( 'admin_head', array($HfAdminPanel, 'addToAdminHead') );
 add_action( 'init', 'hfRegisterShortcodes' );
+add_action('init', 'hfAddPostTypes');
+
+add_filter('user_can_richedit', 'hfDisableWysiwygForQuotes');
+add_filter( 'enter_title_here', 'hfChangeEditTitleLabelForQuotations' );
 
 function hfRegisterShortcodes() {
-    $Factory               = new HfFactory();
-    $SettingsShortcode     = $Factory->makeSettingsShortcode();
-    $GoalsShortcode        = $Factory->makeGoalsShortcode();
-    $AuthenticateShortcode = $Factory->makeAuthenticateShortcode();
-    $UserButtonsShortcode  = $Factory->makeUserButtonsShortcode();
+    $Factory                = new HfFactory();
+    $SettingsShortcode      = $Factory->makeSettingsShortcode();
+    $GoalsShortcode         = $Factory->makeGoalsShortcode();
+    $AuthenticateShortcode  = $Factory->makeAuthenticateShortcode();
+    $UserButtonsShortcode   = $Factory->makeUserButtonsShortcode();
     $InvitePartnerShortcode = $Factory->makeInvitePartnerShortcode();
+    $PartnerListShortcode   = $Factory->makePartnerListShortcode();
 
     add_shortcode( 'hfSettings', array($SettingsShortcode, 'getOutput') );
     add_shortcode( 'hfGoals', array($GoalsShortcode, 'getOutput') );
     add_shortcode( 'hfUserButtons', array($UserButtonsShortcode, 'getOutput') );
     add_shortcode( 'hfAuthenticate', array($AuthenticateShortcode, 'getOutput') );
     add_shortcode( 'hfInvitePartner', array($InvitePartnerShortcode, 'getOutput') );
+    add_shortcode( 'hfPartnerList', array($PartnerListShortcode, 'getOutput') );
 }
+
+function hfAddPostTypes() {
+    register_post_type( 'hf_quotation',
+        array(
+            'labels' => array(
+                'name' => __( 'Quotations' ),
+                'singular_name' => __( 'Quotation' ),
+                'menu_name'           => __( 'Quotations', 'text_domain' ),
+                'parent_item_colon'   => __( 'Parent Quotation:', 'text_domain' ),
+                'all_items'           => __( 'All Quotations', 'text_domain' ),
+                'view_item'           => __( 'View Quotation', 'text_domain' ),
+                'add_new_item'        => __( 'Add New Quotation', 'text_domain' ),
+                'edit_item'           => __( 'Edit Quotation', 'text_domain' ),
+                'update_item'         => __( 'Update Quotation', 'text_domain' ),
+                'search_items'        => __( 'Search Quotation', 'text_domain' )
+            ),
+            'public' => true,
+            'has_archive' => true,
+        )
+    );
+
+    register_taxonomy(
+        'hfContext',
+        'hf_quotation',
+        array(
+            'label' => __( 'Context' ),
+            'rewrite' => array( 'slug' => 'context' ),
+            'hierarchical' => true,
+            'capabilities' => array(
+                'manage_terms'=> 'noone',
+                'edit_terms'=> 'noone',
+                'delete_terms'=> 'noone',
+                'assign_terms' => 'edit_posts'
+            )
+        )
+    );
+
+    $taxonomy = 'hfContext';
+
+    wp_insert_term( 'For Success', $taxonomy, $args = array() );
+    wp_insert_term( 'For Setback', $taxonomy, $args = array() );
+    wp_insert_term( 'For Mentor', $taxonomy, $args = array() );
+}
+
+function hfDisableWysiwygForQuotes($default) {
+    global $post;
+    if ('hf_quotation' == get_post_type($post))
+        return false;
+    return $default;
+}
+
+function hfChangeEditTitleLabelForQuotations( $title ){
+    $screen = get_current_screen();
+
+    if  ( 'hf_quotation' == $screen->post_type ) {
+        $title = 'Enter source / reference here';
+    }
+
+    return $title;
+}
+

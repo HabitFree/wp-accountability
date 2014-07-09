@@ -28,7 +28,6 @@ class TestGoalsShortcode extends HfTestCase {
         $this->setDefaultIterables();
         $_POST['submit'] = '';
         $_POST[1]        = '1';
-        $this->setDefaultQuotationValues();
     }
 
     private function setDefaultQuotationValues() {
@@ -39,8 +38,8 @@ class TestGoalsShortcode extends HfTestCase {
 
     private function makeMockQuotation() {
         $MockQuotation            = new stdClass();
-        $MockQuotation->quotation = 'hello';
-        $MockQuotation->reference = 'Nathan';
+        $MockQuotation->post_content = 'hello';
+        $MockQuotation->post_title = 'Nathan';
 
         return $MockQuotation;
     }
@@ -225,6 +224,7 @@ class TestGoalsShortcode extends HfTestCase {
     public function testGoalsShortcodeUsesReportRequestToGetUsernameWhenUserNotLoggedIn() {
         $this->setValidReportRequest555();
         $this->setReportSuccess();
+        $this->setDefaultQuotationValues();
 
         $this->setReturnValue( $this->MockMessenger, 'getReportRequestUserId', 9 );
         $this->setReturnValue( $this->MockMessenger, 'isReportRequestValid', true );
@@ -243,16 +243,18 @@ class TestGoalsShortcode extends HfTestCase {
 
     public function testGoalsShortcodeAsksForQuotationForSuccess() {
         $this->setReportSuccess();
+        $this->setDefaultQuotationValues();
 
         $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
 
-        $this->expectOnce( $this->MockDatabase, 'getQuotations', array(2) );
+        $this->expectOnce( $this->MockDatabase, 'getQuotations', array('For Success') );
 
         $this->GoalsShortcodeWithMockDependencies->getOutput();
     }
 
     public function testGoalsShortcodeSelectsRandomQuotation() {
         $this->setReportSuccess();
+        $this->setDefaultQuotationValues();
 
         $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
         $this->setReturnValue($this->MockDatabase, 'getQuotations', array($this->setDefaultQuotationValues()));
@@ -264,6 +266,7 @@ class TestGoalsShortcode extends HfTestCase {
 
     public function testGoalsShortcodeUsesMarkupGeneratorToCreateSuccessMessage() {
         $this->setReportSuccess();
+        $this->setDefaultQuotationValues();
 
         $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
 
@@ -274,6 +277,7 @@ class TestGoalsShortcode extends HfTestCase {
 
     public function testGoalsShortcodeMakesQuoteMessage() {
         $this->setReportSuccess();
+        $this->setDefaultQuotationValues();
 
         $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
         $this->setReturnValue($this->MockDatabase, 'getQuotations', 'duck');
@@ -285,6 +289,7 @@ class TestGoalsShortcode extends HfTestCase {
 
     public function testGoalsShortcodeUsesRandomQuotationToMakeQuoteMessage() {
         $this->setReportSuccess();
+        $this->setDefaultQuotationValues();
 
         $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
         $this->setReturnValue($this->MockDatabase, 'getQuotations', array($this->makeMockQuotation()));
@@ -307,6 +312,7 @@ class TestGoalsShortcode extends HfTestCase {
         );
 
         $this->setReportSuccess();
+        $this->setDefaultQuotationValues();
 
         $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
         $this->setReturnValue($this->MockDatabase, 'getQuotations', array($this->makeMockQuotation()));
@@ -324,7 +330,18 @@ class TestGoalsShortcode extends HfTestCase {
         $this->setDefaultQuotationValues();
         $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
 
-        $this->expectOnce($this->MockDatabase, 'getQuotations', array(1));
+        $this->expectOnce($this->MockDatabase, 'getQuotations', array('For Setback'));
+
+        $this->GoalsShortcodeWithMockDependencies->getOutput();
+    }
+
+    public function testGoalsShortcodeDoesntDisplayEmptyQuotation() {
+        $this->setReportSuccess();
+
+        $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
+        $this->setReturnValue($this->MockDatabase, 'getQuotations', array());
+
+        $this->expectNever($this->MockMarkupGenerator, 'makeQuoteMessage');
 
         $this->GoalsShortcodeWithMockDependencies->getOutput();
     }

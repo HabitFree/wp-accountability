@@ -24,7 +24,8 @@ class HfWordPress implements Hf_iContentManagementSystem {
     }
 
     public function currentUser() {
-        return wp_get_current_user();
+        $CurrentUser = wp_get_current_user();
+        return $CurrentUser;
     }
 
     public function getVar( $query ) {
