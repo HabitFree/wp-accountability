@@ -1,6 +1,6 @@
 <?php
 
-class HfWordPress implements Hf_iContentManagementSystem {
+class HfWordPress implements Hf_iCms {
     private $wpdb;
 
     function __construct() {
@@ -134,6 +134,6 @@ class HfWordPress implements Hf_iContentManagementSystem {
     }
 
     public function getHomeUrl() {
-        return home_url();
+        return get_home_url();
     }
 } 

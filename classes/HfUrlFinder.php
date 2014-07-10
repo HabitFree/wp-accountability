@@ -3,7 +3,7 @@
 class HfUrlFinder implements Hf_iAssetLocator {
     private $Cms;
 
-    function __construct( Hf_iContentManagementSystem $ContentManagementSystem ) {
+    function __construct( Hf_iCms $ContentManagementSystem ) {
         $this->Cms = $ContentManagementSystem;
     }
 
@@ -13,21 +13,6 @@ class HfUrlFinder implements Hf_iAssetLocator {
             $pageURL .= $_SERVER["SERVER_NAME"] . ":" . $_SERVER["SERVER_PORT"] . $_SERVER["REQUEST_URI"];
         } else {
             $pageURL .= $_SERVER["SERVER_NAME"] . $_SERVER["REQUEST_URI"];
-        }
-
-        return $pageURL;
-    }
-
-    public function getPluginAssetUrl( $fileName ) {
-        return $this->Cms->getPluginAssetUrl( $fileName );
-    }
-
-    public function getHomePageUrl() {
-        $pageURL = $this->getHttpOrHttps();
-        if ( $_SERVER["SERVER_PORT"] != "80" ) {
-            $pageURL .= $_SERVER["SERVER_NAME"] . ":" . $_SERVER["SERVER_PORT"];
-        } else {
-            $pageURL .= $_SERVER["SERVER_NAME"];
         }
 
         return $pageURL;
@@ -45,16 +30,24 @@ class HfUrlFinder implements Hf_iAssetLocator {
         return $prefix;
     }
 
-    public function getLogoutUrl($redirect) {
-        return $this->Cms->getLogoutUrl($redirect);
+    public function getPluginAssetUrl( $fileName ) {
+        return $this->Cms->getPluginAssetUrl( $fileName );
+    }
+
+    public function getHomePageUrl() {
+        return $this->Cms->getHomeUrl();
+    }
+
+    public function getLogoutUrl( $redirect ) {
+        return $this->Cms->getLogoutUrl( $redirect );
     }
 
     public function getLoginUrl() {
-        return $this->getPageUrlByTitle('Authenticate');
+        return $this->getPageUrlByTitle( 'Authenticate' );
     }
 
     public function getPageUrlByTitle( $title ) {
-        $page = $this->Cms->getPageByTitle($title);
+        $page = $this->Cms->getPageByTitle( $title );
 
         return $this->Cms->getPermalink( $page->ID );
     }

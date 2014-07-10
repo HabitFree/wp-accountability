@@ -3,7 +3,7 @@
 class HfHtmlGenerator implements Hf_iMarkupGenerator {
     private $Cms;
 
-    function __construct( Hf_iContentManagementSystem $ContentManagementSystem ) {
+    function __construct( Hf_iCms $ContentManagementSystem ) {
         $this->Cms = $ContentManagementSystem;
     }
 

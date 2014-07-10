@@ -19,7 +19,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     function __construct(
         Hf_iMarkupGenerator $MarkupGenerator,
         Hf_iAssetLocator $AssetLocator,
-        Hf_iContentManagementSystem $ContentManagementSystem,
+        Hf_iCms $ContentManagementSystem,
         Hf_iUserManager $UserManager
     ) {
         $this->MarkupGenerator = $MarkupGenerator;
