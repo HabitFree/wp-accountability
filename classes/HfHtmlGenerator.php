@@ -3,7 +3,7 @@
 class HfHtmlGenerator implements Hf_iMarkupGenerator {
     private $Cms;
 
-    function __construct( Hf_iContentManagementSystem $ContentManagementSystem ) {
+    function __construct( Hf_iCms $ContentManagementSystem ) {
         $this->Cms = $ContentManagementSystem;
     }
 
@@ -41,7 +41,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         return '<ul>' . $html . '</ul>';
     }
 
-    public function makeError( $content ) {
+    public function makeErrorMessage( $content ) {
         return '<p class="error">' . $content . '</p>';
     }
 
@@ -51,6 +51,10 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
 
     public function makeQuoteMessage( $quotation ) {
         return '<p class="quote">"' . $quotation->post_content . '" — ' . $quotation->post_title . '</p>';
+    }
+
+    public function makeInfoMessage( $content ) {
+        return '<p class="info">' . $content . '</p>';
     }
 
     public function makeForm( $url, $content, $name ) {

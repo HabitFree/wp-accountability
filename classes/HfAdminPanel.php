@@ -8,7 +8,7 @@ class HfAdminPanel {
     private $UserManager;
     private $Cms;
 
-    function HfAdminPanel( Hf_iMessenger $Messenger, Hf_iAssetLocator $PageLocator, Hf_iDatabase $Database, Hf_iUserManager $UserManager, Hf_iContentManagementSystem $ContentManagementSystem ) {
+    function HfAdminPanel( Hf_iMessenger $Messenger, Hf_iAssetLocator $PageLocator, Hf_iDatabase $Database, Hf_iUserManager $UserManager, Hf_iCms $ContentManagementSystem ) {
         $this->Cms         = $ContentManagementSystem;
         $this->Database    = $Database;
         $this->PageLocator = $PageLocator;

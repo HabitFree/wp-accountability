@@ -1,6 +1,6 @@
 <?php
 
-interface Hf_iContentManagementSystem {
+interface Hf_iCms {
     public function getUserEmail( $userID );
 
     public function sendWpEmail( $to, $subject, $message );
@@ -54,4 +54,6 @@ interface Hf_iContentManagementSystem {
     public function getPageByTitle($title);
 
     public function getPermalink($pageId);
+
+    public function getHomeUrl();
 }

@@ -6,7 +6,7 @@ class HfGoals implements Hf_iGoals {
     private $ContentManagementSystem;
     private $Messenger;
 
-    function __construct( Hf_iMessenger $Messenger, Hf_iContentManagementSystem $ContentManagementSystem, Hf_iMarkupGenerator $View, Hf_iDatabase $Database ) {
+    function __construct( Hf_iMessenger $Messenger, Hf_iCms $ContentManagementSystem, Hf_iMarkupGenerator $View, Hf_iDatabase $Database ) {
         $this->Messenger               = $Messenger;
         $this->ContentManagementSystem = $ContentManagementSystem;
         $this->View                    = $View;

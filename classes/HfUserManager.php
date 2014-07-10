@@ -7,7 +7,7 @@ class HfUserManager implements Hf_iUserManager {
     private $Cms;
     private $CodeLibrary;
 
-    function HfUserManager( Hf_iDatabase $Database, Hf_iMessenger $Messenger, Hf_iAssetLocator $PageLocator, Hf_iContentManagementSystem $ContentManagementSystem, Hf_iCodeLibrary $CodeLibrary ) {
+    function HfUserManager( Hf_iDatabase $Database, Hf_iMessenger $Messenger, Hf_iAssetLocator $PageLocator, Hf_iCms $ContentManagementSystem, Hf_iCodeLibrary $CodeLibrary ) {
         $this->Database     = $Database;
         $this->Messenger    = $Messenger;
         $this->AssetLocator = $PageLocator;

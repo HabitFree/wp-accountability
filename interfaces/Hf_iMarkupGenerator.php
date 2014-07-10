@@ -11,7 +11,7 @@ interface Hf_iMarkupGenerator {
 
     public function makeList( $items );
 
-    public function makeError( $content );
+    public function makeErrorMessage( $content );
 
     public function makeSuccessMessage( $content );
 
@@ -22,4 +22,6 @@ interface Hf_iMarkupGenerator {
     public function makeButton( $name, $label, $onclick );
 
     public function makeHiddenField( $name );
+
+    public function makeInfoMessage($content);
 }

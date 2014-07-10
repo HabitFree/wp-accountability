@@ -31,7 +31,7 @@ function hfDeactivate() {
 }
 
 require_once( dirname( __FILE__ ) . '/interfaces/Hf_iMarkupGenerator.php' );
-require_once( dirname( __FILE__ ) . '/interfaces/Hf_iContentManagementSystem.php' );
+require_once( dirname( __FILE__ ) . '/interfaces/Hf_iCms.php' );
 require_once( dirname( __FILE__ ) . '/interfaces/Hf_iCodeLibrary.php' );
 require_once( dirname( __FILE__ ) . '/interfaces/Hf_iView.php' );
 require_once( dirname( __FILE__ ) . '/interfaces/Hf_iShortcode.php' );

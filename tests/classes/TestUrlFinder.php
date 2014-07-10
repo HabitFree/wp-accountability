@@ -19,9 +19,10 @@ class TestUrlFinder extends HfTestCase {
     // Tests
     
     public function testGetHomePageUrl() {
-        $homeUrl = get_home_url();
+        $this->setReturnValue($this->MockCms, 'getHomeUrl', 'thePond');
+        $actual = $this->AssetLocatorWithMockedDependencies->getHomePageUrl();
 
-        $this->assertEquals($homeUrl, $this->AssetLocatorWithMockedDependencies->getHomePageUrl());
+        $this->assertEquals('thePond', $actual);
     }
 
     public function testGetPageUrlByTitleUsesCms() {

@@ -35,7 +35,7 @@ class HfInvitePartnerShortcode implements Hf_iShortcode {
 
     private function validateForm() {
         if ( $this->isFormSubmitted() and $this->isEmailInvalid() ) {
-            $this->messages .= $this->MarkupGenerator->makeError( 'Please enter a valid email address.' );
+            $this->messages .= $this->MarkupGenerator->makeErrorMessage( 'Please enter a valid email address.' );
         }
     }
 
