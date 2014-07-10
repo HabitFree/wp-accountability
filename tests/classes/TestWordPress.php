@@ -15,7 +15,8 @@ class TestWordPress extends HfTestCase {
             'deleteRows',
             'isEmailTaken',
             'getPageByTitle',
-            'getPermalink'
+            'getPermalink',
+            'getHomeUrl'
         );
 
         foreach($methodNames as $methodName) {

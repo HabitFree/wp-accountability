@@ -54,4 +54,6 @@ interface Hf_iContentManagementSystem {
     public function getPageByTitle($title);
 
     public function getPermalink($pageId);
+
+    public function getHomeUrl();
 }

@@ -32,12 +32,11 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         $this->recallPostData();
         $this->validateForms();
         $this->processSubmissions();
+
         $this->makeAuthenticationForm();
         $this->makeInviteResponseForm();
 
-        if ($this->isLoginSuccessful or $this->isRegistrationSuccessful) {
-            $this->output = $this->loginMessages . $this->registrationMessages . $this->output;
-        }
+        $this->displayLoginAndRegistrationSuccessMessages();
 
         return $this->output;
     }
@@ -87,6 +86,12 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
             $Form->addSubmitButton( 'ignore', 'Ignore invitation' );
 
             $this->output .= $Form->getHtml();
+        }
+    }
+
+    private function displayLoginAndRegistrationSuccessMessages() {
+        if ( $this->isLoginSuccessful or $this->isRegistrationSuccessful ) {
+            $this->output = $this->loginMessages . $this->registrationMessages . $this->output;
         }
     }
 
@@ -260,7 +265,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     private function redirectUser() {
-        $url             = $this->AssetLocator->getHomePageUrl();
+        $url = $this->AssetLocator->getHomePageUrl();
         $this->output .= $this->makeRedirectMessage( $url );
         $this->output .= '<script>setTimeout(function(){window.location.replace("' . $url . '")},5000);</script>';
     }

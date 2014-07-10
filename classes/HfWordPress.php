@@ -132,4 +132,8 @@ class HfWordPress implements Hf_iContentManagementSystem {
     public function getPermalink($pageId) {
         return get_permalink( $pageId );
     }
+
+    public function getHomeUrl() {
+        return home_url();
+    }
 } 
