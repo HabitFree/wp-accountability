@@ -584,14 +584,9 @@ class TestAuthenticateShortcode extends HfTestCase {
 
         $haystack = $AuthenticateShortcode->getOutput();
 
-        $openingTagPosition = stripos( $haystack, '[su_tab title="Log In"]' );
-        $closingTagPosition = stripos( $haystack, '[/su_tab]' );
-
-        $substring = substr( $haystack, $openingTagPosition, $closingTagPosition );
-
         $needle = '<p class="info">Redirecting...';
 
-        $this->assertTrue( $this->haystackContainsNeedle( $substring, $needle ) );
+        $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }
 
     public function testMakeAuthenticateShortcode() {
@@ -745,5 +740,40 @@ class TestAuthenticateShortcode extends HfTestCase {
         $haystack = $AuthenticateShortcode->getOutput();
 
         $this->assertContains( $needle, $haystack );
+    }
+
+    public function testAuthenticateShortcodeDoesntDisplayLoginFormOnSuccessfulLogin() {
+        $_POST['login']    = '';
+        $_POST['username'] = 'Joe';
+        $_POST['password'] = 'bo';
+
+        $this->setReturnValue( $this->MockCms, 'authenticateUser', true );
+
+        $AuthenticateShortcode = $this->makeExpressiveAuthenticateShortcode();
+
+        $haystack = $AuthenticateShortcode->getOutput();
+        $needle = '<form';
+
+        $this->assertDoesntContain($needle, $haystack);
+    }
+
+    public function testAuthenticateShortcodeLoginDisplaysOnlyOneRedirectMessage() {
+        $_POST['login']    = '';
+        $_POST['username'] = 'Joe';
+        $_POST['password'] = 'bo';
+
+        $this->setReturnValue( $this->MockCms, 'authenticateUser', true );
+
+        $AuthenticateShortcode = new HfAuthenticateShortcode(
+            $this->Factory->makeMarkupGenerator(),
+            $this->Factory->makeAssetLocator(),
+            $this->MockCms,
+            $this->Factory->makeUserManager()
+        );
+
+        $haystack = $AuthenticateShortcode->getOutput();
+        $needle = '<p class="info">Redirecting...';
+
+        $this->assertEquals( 1, substr_count($haystack, $needle) );
     }
 }

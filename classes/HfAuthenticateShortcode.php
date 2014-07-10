@@ -35,6 +35,10 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         $this->makeAuthenticationForm();
         $this->makeInviteResponseForm();
 
+        if ($this->isLoginSuccessful or $this->isRegistrationSuccessful) {
+            $this->output = $this->loginMessages . $this->registrationMessages . $this->output;
+        }
+
         return $this->output;
     }
 
@@ -60,7 +64,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     private function makeAuthenticationForm() {
-        if ( !$this->UserManager->isUserLoggedIn() ) {
+        if ( !$this->UserManager->isUserLoggedIn() and !$this->isLoginSuccessful and !$this->isRegistrationSuccessful ) {
             $this->informInvitedUser();
             $activeTabNumber = $this->determineActiveTab();
 
@@ -257,11 +261,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     private function redirectUser() {
         $url             = $this->AssetLocator->getHomePageUrl();
-        $redirectMessage = $this->makeRedirectMessage( $url );
-
-        $this->registrationMessages .= $redirectMessage;
-        $this->loginMessages .= $redirectMessage;
-
+        $this->output .= $this->makeRedirectMessage( $url );
         $this->output .= '<script>setTimeout(function(){window.location.replace("' . $url . '")},5000);</script>';
     }
 
