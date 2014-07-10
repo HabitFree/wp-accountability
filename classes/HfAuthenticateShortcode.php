@@ -56,6 +56,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private function processSubmissions() {
         $this->processLoginRequest();
         $this->processRegistrationRequest();
+        $this->processInviteFormSubmission();
     }
 
     private function makeAuthenticationForm() {
@@ -73,11 +74,14 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     private function makeInviteResponseForm() {
-        if ( $this->isInvite() and $this->UserManager->isUserLoggedIn() ) {
+        if ( $this->isInvite() and $this->UserManager->isUserLoggedIn() and !$this->isInviteFormSubmitted() ) {
             $currentUrl = $this->AssetLocator->getCurrentPageUrl();
-            $Form       = new HfGenericForm( $currentUrl );
+
+            $Form = new HfGenericForm( $currentUrl );
+            $Form->addInfoMessage( "Looks like you're responding to an invite. What would you like to do?" );
             $Form->addSubmitButton( 'accept', 'Accept invitation' );
-            $Form->addSubmitButton( 'delete', 'Delete invitation' );
+            $Form->addSubmitButton( 'ignore', 'Ignore invitation' );
+
             $this->output .= $Form->getHtml();
         }
     }
@@ -140,6 +144,15 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         }
     }
 
+    private function processInviteFormSubmission() {
+        if ( $this->isInvite() and $this->isInviteAccepted() ) {
+            $this->processInvite();
+            $this->output .= $this->MarkupGenerator->makeSuccessMessage( 'Invitation processed successfully.' );
+        } elseif ( $this->isInviteIgnored() ) {
+            $this->output .= $this->MarkupGenerator->makeSuccessMessage( 'Invitation ignored successfully.' );
+        }
+    }
+
     private function informInvitedUser() {
         if ( $this->isInvite() ) {
             $infoMessageText = "Looks like you're responding to an invitation. Feel free to either register or log into an existing account—either way we'll automatically set up accountability between you and the user who invited you.";
@@ -189,34 +202,38 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         return !empty( $_GET['n'] );
     }
 
+    private function isInviteFormSubmitted() {
+        return $this->isInviteAccepted() or $this->isInviteIgnored();
+    }
+
     private function missingUsernameError() {
-        if ( empty( $_POST['username'] ) ) {
-            return $this->MarkupGenerator->makeErrorMessage( 'Please enter your username.' );
-        }
+        $errorMessage = $this->MarkupGenerator->makeErrorMessage( 'Please enter your username.' );
+
+        return ( $this->isUsernameMissing() ) ? $errorMessage : '';
     }
 
     private function missingPasswordError() {
-        if ( empty( $_POST['password'] ) ) {
-            return $this->MarkupGenerator->makeErrorMessage( 'Please enter your password.' );
-        }
+        $errorMessage = $this->MarkupGenerator->makeErrorMessage( 'Please enter your password.' );
+
+        return ( $this->isPasswordMissing() ) ? $errorMessage : '';
     }
 
     private function invalidEmailError() {
-        if ( !filter_var( $_POST['email'], FILTER_VALIDATE_EMAIL ) ) {
-            return $this->MarkupGenerator->makeErrorMessage( 'Please enter a valid email address.' );
-        }
+        $errorMessage = $this->MarkupGenerator->makeErrorMessage( 'Please enter a valid email address.' );
+
+        return ( $this->isEmailMalformed() ) ? $errorMessage : '';
     }
 
     private function emailTakenError() {
-        if ( $this->Cms->isEmailTaken( $_POST['email'] ) ) {
-            return $this->MarkupGenerator->makeErrorMessage( 'That email is already taken. Did you mean to log in?' );
-        }
+        $errorMessage = $this->MarkupGenerator->makeErrorMessage( 'That email is already taken. Did you mean to log in?' );
+
+        return ( $this->isEmailTaken() ) ? $errorMessage : '';
     }
 
     private function passwordMatchError() {
-        if ( $_POST['password'] !== $_POST['passwordConfirmation'] ) {
-            return $this->MarkupGenerator->makeErrorMessage( 'Please make sure your passwords match.' );
-        }
+        $errorMessage = $this->MarkupGenerator->makeErrorMessage( 'Please make sure your passwords match.' );
+
+        return ( $this->isPasswordMismatch() ) ? $errorMessage : '';
     }
 
     private function isLoginFormValid() {
@@ -257,6 +274,34 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         if ( $success ) {
             $this->isRegistrationSuccessful = true;
         }
+    }
+
+    private function isInviteAccepted() {
+        return isset( $_POST['accept'] );
+    }
+
+    private function isInviteIgnored() {
+        return isset( $_POST['ignore'] );
+    }
+
+    private function isUsernameMissing() {
+        return empty( $_POST['username'] );
+    }
+
+    private function isPasswordMissing() {
+        return empty( $_POST['password'] );
+    }
+
+    private function isEmailMalformed() {
+        return !filter_var( $_POST['email'], FILTER_VALIDATE_EMAIL );
+    }
+
+    private function isEmailTaken() {
+        return $this->Cms->isEmailTaken( $_POST['email'] );
+    }
+
+    private function isPasswordMismatch() {
+        return $_POST['password'] !== $_POST['passwordConfirmation'];
     }
 
     private function makeRedirectMessage( $url ) {

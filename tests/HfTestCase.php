@@ -193,4 +193,8 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     protected function haystackContainsNeedle( $haystack, $needle ) {
         return strstr( $haystack, $needle ) != false;
     }
+
+    protected function assertDoesntContain($needle, $haystack) {
+        $this->assertFalse($this->haystackContainsNeedle($haystack, $needle));
+    }
 } 
