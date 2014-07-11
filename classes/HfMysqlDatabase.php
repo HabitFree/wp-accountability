@@ -259,16 +259,6 @@ class HfMysqlDatabase implements Hf_iDatabase {
         return $data;
     }
 
-    function insertMultipleRows( $table, $rows ) {
-        global $wpdb;
-        $prefix    = $wpdb->prefix;
-        $tableName = $prefix . $table;
-        foreach ( $rows as $row => $values ) {
-            $data = $this->removeNullValuePairs( $values );
-            $wpdb->insert( $tableName, $data );
-        }
-    }
-
     function generateEmailId() {
         $table     = 'hf_email';
         $tableName = $this->Cms->getDbPrefix() . $table;
@@ -283,30 +273,6 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $tableName = $prefix . $table;
 
         return $wpdb->update( $tableName, $data, $where );
-    }
-
-    function deleteRow( $table, $where ) {
-        global $wpdb;
-        $tableName = $this->getFullTableName( $table );
-
-        return $wpdb->query( 'DELETE FROM ' . $tableName . ' WHERE ' . $where );
-    }
-
-    function getFullTableName( $table ) {
-        global $wpdb;
-        $prefix = $wpdb->prefix;
-
-        return $prefix . $table;
-    }
-
-    function countRowsInTable( $table ) {
-        $rows = $this->getTable( $table );
-
-        return count( $rows );
-    }
-
-    function getTable( $table ) {
-        return $this->getRows( $table, null, ARRAY_A );
     }
 
     function getRows( $table, $where, $outputType = OBJECT ) {

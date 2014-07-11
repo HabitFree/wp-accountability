@@ -3,15 +3,11 @@
 interface Hf_iDatabase {
     public function recordEmail( $userID, $subject, $message, $emailID = null, $emailAddress = null );
 
-    public function insertMultipleRows( $table, $rows );
-
     public function generateEmailId();
 
     public function daysSinceLastEmail( $userID );
 
     public function timeOfLastSuccess( $goalID, $userID );
-
-    public function getFullTableName( $table );
 
     public function idOfLastEmail();
 
@@ -41,19 +37,13 @@ interface Hf_iDatabase {
 
     public function timeOfLastFail( $goalID, $userID );
 
-    public function deleteRow( $table, $where );
-
     public function level( $daysOfSuccess );
-
-    public function countRowsInTable( $table );
 
     public function recordAccountabilityReport( $userID, $goalID, $isSuccessful, $emailID = null );
 
     public function updateRows( $table, $data, $where );
 
     public function daysSinceAnyReport( $userID );
-
-    public function getTable( $table );
 
     public function deleteInvite( $inviteID );
 
