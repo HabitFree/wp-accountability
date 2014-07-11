@@ -347,4 +347,21 @@ class TestDatabase extends HfTestCase {
 
         $this->DatabaseWithMockedDependencies->deleteRelationship(5, 4);
     }
+
+    public function testGenerateEmailId() {
+        $this->expectOnce($this->MockCms, 'getVar', array("SELECT max(emailID) FROM 'wptest_hf_email'"));
+        $this->setReturnValue($this->MockCms, 'prepareQuery', "SELECT max(emailID) FROM 'wptest_hf_email'");
+        $this->DatabaseWithMockedDependencies->generateEmailId();
+    }
+
+    public function testGenerateEmailIdPreparesQuery() {
+        $this->expectOnce($this->MockCms, 'prepareQuery');
+        $this->DatabaseWithMockedDependencies->generateEmailId();
+    }
+
+    public function testGenerateEmailIdPreparesQueryProperly() {
+        $this->expectOnce($this->MockCms, 'prepareQuery', array("SELECT max(emailID) FROM %s", array('wptest_hf_email')));
+        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptest_');
+        $this->DatabaseWithMockedDependencies->generateEmailId();
+    }
 }

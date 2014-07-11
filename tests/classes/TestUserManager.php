@@ -22,7 +22,7 @@ class TestUserManager extends HfTestCase {
 
         $this->setReturnValue( $this->MockDatabase, 'idOfLastEmail', 5 );
         $this->setReturnValue( $this->MockDatabase, 'generateEmailID', 5 );
-        $this->setReturnValue( $this->MockCms, 'sendWpEmail', true );
+        $this->setReturnValue( $this->MockCms, 'sendEmail', true );
         $this->setReturnValue( $this->MockSecurity, 'createRandomString', 555 );
         $this->setReturnValue( $this->MockCodeLibrary, 'convertStringToTime', $expirationTime );
 

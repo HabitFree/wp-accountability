@@ -3,7 +3,7 @@
 interface Hf_iCms {
     public function getUserEmail( $userID );
 
-    public function sendWpEmail( $to, $subject, $message );
+    public function sendEmail( $to, $subject, $message );
 
     public function getSubscribedUsers();
 
@@ -56,4 +56,6 @@ interface Hf_iCms {
     public function getPermalink($pageId);
 
     public function getHomeUrl();
+
+    public function prepareQuery($query, $valueParameters);
 }

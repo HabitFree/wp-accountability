@@ -17,14 +17,14 @@ class HfMailer implements Hf_iMessenger {
 
     function sendEmailToUser( $userID, $subject, $body ) {
         $to = $this->ContentManagementSystem->getUserEmail( $userID );
-        $this->ContentManagementSystem->sendWpEmail( $to, $subject, $body );
+        $this->ContentManagementSystem->sendEmail( $to, $subject, $body );
         $emailID = intval( $this->ContentManagementSystem->getVar( 'hf_email', 'max(emailID)' ) );
 
         $this->Database->recordEmail( $userID, $subject, $body, $emailID, $to );
     }
 
     function sendEmailToAddress( $address, $subject, $body ) {
-        $success = $this->ContentManagementSystem->sendWpEmail( $address, $subject, $body );
+        $success = $this->ContentManagementSystem->sendEmail( $address, $subject, $body );
         $emailID = $this->Database->idOfLastEmail();
 
         if ( $success ) {
@@ -63,7 +63,7 @@ class HfMailer implements Hf_iMessenger {
     function sendEmailToUserAndSpecifyEmailID( $userID, $subject, $body, $emailID ) {
         $to = $this->ContentManagementSystem->getUserEmail( $userID );
 
-        $this->ContentManagementSystem->sendWpEmail( $to, $subject, $body );
+        $this->ContentManagementSystem->sendEmail( $to, $subject, $body );
         $this->Database->recordEmail( $userID, $subject, $body, $emailID, $to );
     }
 

@@ -272,7 +272,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
     function generateEmailId() {
         $table     = 'hf_email';
         $tableName = $this->Cms->getDbPrefix() . $table;
-        $query     = 'SELECT max(emailID) FROM ' . $tableName;
+        $query     = $this->Cms->prepareQuery( 'SELECT max(emailID) FROM %s', array($tableName) );
 
         return $this->Cms->getVar( $query ) + 1;
     }
@@ -618,10 +618,10 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function deleteRelationship( $userId1, $userId2 ) {
-        $userId1 = intval($userId1);
-        $userId2 = intval($userId2);
-        $table = $this->Cms->getDbPrefix() . 'hf_relationship';
-        $where = $this->createDeleteRelationshipWhereCriteria( $userId1, $userId2 );
+        $userId1 = intval( $userId1 );
+        $userId2 = intval( $userId2 );
+        $table   = $this->Cms->getDbPrefix() . 'hf_relationship';
+        $where   = $this->createDeleteRelationshipWhereCriteria( $userId1, $userId2 );
         $this->Cms->deleteRows( $table, $where );
     }
 

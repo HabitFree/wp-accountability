@@ -12,7 +12,7 @@ class HfWordPress implements Hf_iCms {
         return get_userdata( $userID )->user_email;
     }
 
-    public function sendWpEmail( $to, $subject, $message ) {
+    public function sendEmail( $to, $subject, $message ) {
         return wp_mail( $to, $subject, $message );
     }
 
@@ -135,5 +135,12 @@ class HfWordPress implements Hf_iCms {
 
     public function getHomeUrl() {
         return get_home_url();
+    }
+
+    public function prepareQuery($query, $valueParameters) {
+        $parameters = array_merge(array($query), $valueParameters);
+        $callable = array($this->wpdb, 'prepare');
+
+        return call_user_func_array( $callable, $parameters);
     }
 } 
