@@ -267,16 +267,6 @@ class HfMysqlDatabase implements Hf_iDatabase {
         return $this->Cms->getVar( $query ) + 1;
     }
 
-    function getRows( $table, $where, $outputType = OBJECT ) {
-        global $wpdb;
-        $prefix = $wpdb->prefix;
-        if ( $where === null ) {
-            return $wpdb->get_results( "SELECT * FROM " . $prefix . $table, $outputType );
-        } else {
-            return $wpdb->get_results( "SELECT * FROM " . $prefix . $table . " WHERE " . $where, $outputType );
-        }
-    }
-
     function daysSinceLastEmail( $userID ) {
         $table         = 'hf_email';
         $fullTableName = $this->Cms->getDbPrefix() . $table;

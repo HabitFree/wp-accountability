@@ -101,7 +101,7 @@ class HfGoals implements Hf_iGoals {
     }
 
     private function isAnyGoalDue( $userId ) {
-        $goalSubs = $this->Database->getRows( 'hf_user_goal', 'userID = ' . $userId );
+        $goalSubs = $this->getGoalSubscriptions($userId);
         foreach ( $goalSubs as $goalSub ) {
             if ( $this->isGoalDue( $goalSub->goalID, $userId ) ) {
                 return true;

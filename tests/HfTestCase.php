@@ -24,6 +24,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     protected $AssetLocatorWithMockedDependencies;
     protected $PartnerListShortcodeWithMockedDependencies;
     protected $AuthenticateShortcodeWithMockedDependencies;
+    protected $GoalsWithMockedDependencies;
 
     function __construct() {
         $this->Factory = new HfFactory();
@@ -59,6 +60,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->resetInvitePartnerShortcodeWithMockedDependencies();
         $this->resetPartnerListShortcodeWithMockedDependencies();
         $this->resetAuthenticateShortcodeWithMockedDependencies();
+        $this->resetGoalsWithMockedDependencies();
     }
 
     protected function makeMock( $className ) {
@@ -196,5 +198,14 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
 
     protected function assertDoesntContain($needle, $haystack) {
         $this->assertFalse($this->haystackContainsNeedle($haystack, $needle));
+    }
+
+    private function resetGoalsWithMockedDependencies() {
+        $this->GoalsWithMockedDependencies = new HfGoals(
+            $this->MockMessenger,
+            $this->MockCms,
+            $this->MockMarkupGenerator,
+            $this->MockDatabase
+        );
     }
 } 

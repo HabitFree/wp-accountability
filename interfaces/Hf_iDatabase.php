@@ -17,8 +17,6 @@ interface Hf_iDatabase {
 
     public function daysSinceLastReport( $goalID, $userID );
 
-    public function getRows( $table, $where, $outputType = OBJECT );
-
     public function insertUpdateIntoDb( $table, $data );
 
     public function removeNullValuePairs( $array );
