@@ -11,7 +11,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
 
     function installDb() {
         $currentDbVersion  = "4.7";
-        $previousDbVersion = get_option( "hfDbVersion" );
+        $previousDbVersion = $this->Cms->getOption( "hfDbVersion" );
 
         if ( $previousDbVersion != $currentDbVersion ) {
             $this->updateDatabaseSchema();
@@ -200,14 +200,22 @@ class HfMysqlDatabase implements Hf_iDatabase {
             'target'        => 0
         );
 
-        $this->insertUpdateIntoDb( 'hf_level', $defaultLevel0 );
-        $this->insertUpdateIntoDb( 'hf_level', $defaultLevel1 );
-        $this->insertUpdateIntoDb( 'hf_level', $defaultLevel2 );
-        $this->insertUpdateIntoDb( 'hf_level', $defaultLevel3 );
-        $this->insertUpdateIntoDb( 'hf_level', $defaultLevel4 );
-        $this->insertUpdateIntoDb( 'hf_level', $defaultLevel5 );
-        $this->insertUpdateIntoDb( 'hf_level', $defaultLevel6 );
-        $this->insertUpdateIntoDb( 'hf_level', $defaultLevel7 );
+        $levelFormat = array(
+            '%d',
+            '%s',
+            '%d',
+            '%d',
+            '%d',
+        );
+
+        $this->Cms->replaceRow('wptest_hf_level', $defaultLevel0, $levelFormat );
+        $this->Cms->replaceRow('wptest_hf_level', $defaultLevel1, $levelFormat );
+        $this->Cms->replaceRow('wptest_hf_level', $defaultLevel2, $levelFormat );
+        $this->Cms->replaceRow('wptest_hf_level', $defaultLevel3, $levelFormat );
+        $this->Cms->replaceRow('wptest_hf_level', $defaultLevel4, $levelFormat );
+        $this->Cms->replaceRow('wptest_hf_level', $defaultLevel5, $levelFormat );
+        $this->Cms->replaceRow('wptest_hf_level', $defaultLevel6, $levelFormat );
+        $this->Cms->replaceRow('wptest_hf_level', $defaultLevel7, $levelFormat );
     }
 
     function insertUpdateIntoDb( $table, $data ) {
@@ -285,13 +293,12 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $timeNow = $this->CodeLibrary->getCurrentTime();
         $table   = $this->Cms->getDbPrefix() . 'hf_email';
 
-        $query     = $this->Cms->prepareQuery(
+        $query = $this->Cms->prepareQuery(
             'SELECT sendTime FROM (SELECT * FROM %s WHERE userID = %d ORDER BY emailID DESC LIMIT 2) AS T ORDER BY emailID LIMIT 1',
             array($table, $userId)
         );
 
-        $timeString = $this->Cms->getVar($query);
-
+        $timeString              = $this->Cms->getVar( $query );
         $timeOfSecondToLastEmail = strtotime( $timeString );
         $secondsInADay           = 86400;
 

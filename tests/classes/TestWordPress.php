@@ -17,7 +17,9 @@ class TestWordPress extends HfTestCase {
             'getPageByTitle',
             'getPermalink',
             'getHomeUrl',
-            'prepareQuery'
+            'prepareQuery',
+            'replaceRow',
+            'getOption'
         );
 
         foreach($methodNames as $methodName) {

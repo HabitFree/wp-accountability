@@ -58,4 +58,8 @@ interface Hf_iCms {
     public function getHomeUrl();
 
     public function prepareQuery($query, $valueParameters);
+
+    public function replaceRow($table, $data, $format);
+
+    public function getOption($option);
 }

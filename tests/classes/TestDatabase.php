@@ -383,4 +383,105 @@ class TestDatabase extends HfTestCase {
 
         $this->DatabaseWithMockedDependencies->daysSinceSecondToLastEmail( 1 );
     }
+
+    public function testDatabaseUsesCmsToGetOptionWhenInstallingDatabase() {
+        $this->expectOnce($this->MockCms, 'getOption', array('hfDbVersion'));
+
+        $this->DatabaseWithMockedDependencies->installDb();
+    }
+
+    public function testDatabaseUsesCmsReplaceRowWhenInstallingDatabase() {
+        $defaultLevel0 = array(
+            'levelID'       => 0,
+            'title'         => 'Hibernation',
+            'size'          => 0,
+            'emailInterval' => 0,
+            'target'        => 0
+        );
+
+        $defaultLevel1 = array(
+            'levelID'       => 1,
+            'title'         => 'Dawn',
+            'size'          => 2,
+            'emailInterval' => 1,
+            'target'        => 14
+        );
+
+        $defaultLevel2 = array(
+            'levelID'       => 2,
+            'title'         => 'Breach',
+            'size'          => 5,
+            'emailInterval' => 7,
+            'target'        => 30
+        );
+
+        $defaultLevel3 = array(
+            'levelID'       => 3,
+            'title'         => 'Progress',
+            'size'          => 10,
+            'emailInterval' => 14,
+            'target'        => 90
+        );
+
+        $defaultLevel4 = array(
+            'levelID'       => 4,
+            'title'         => 'Conquest',
+            'size'          => 15,
+            'emailInterval' => 30,
+            'target'        => 365
+        );
+
+        $defaultLevel5 = array(
+            'levelID'       => 5,
+            'title'         => 'Conquering',
+            'size'          => 30,
+            'emailInterval' => 90,
+            'target'        => 1095 // 3 years
+        );
+
+        $defaultLevel6 = array(
+            'levelID'       => 6,
+            'title'         => 'Triumph',
+            'size'          => 60,
+            'emailInterval' => 365,
+            'target'        => 1095 // 3 years
+        );
+
+        $defaultLevel7 = array(
+            'levelID'       => 7,
+            'title'         => 'Vigilance',
+            'size'          => 0,
+            'emailInterval' => 365,
+            'target'        => 0
+        );
+
+        $levels = array(
+            $defaultLevel0,
+            $defaultLevel1,
+            $defaultLevel2,
+            $defaultLevel3,
+            $defaultLevel4,
+            $defaultLevel5,
+            $defaultLevel6,
+            $defaultLevel7,
+        );
+
+        $levelFormat = array(
+            '%d',
+            '%s',
+            '%d',
+            '%d',
+            '%d'
+        );
+
+        foreach($levels as $index=>$level) {
+            $this->expectAt($this->MockCms, 'replaceRow', $index + 1, array(
+                'wptest_hf_level',
+                $level,
+                $levelFormat
+            ));
+        }
+
+        $this->DatabaseWithMockedDependencies->installDb();
+    }
 }
