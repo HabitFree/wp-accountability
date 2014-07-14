@@ -474,8 +474,10 @@ class TestDatabase extends HfTestCase {
             '%d'
         );
 
+        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptest_');
+
         foreach($levels as $index=>$level) {
-            $this->expectAt($this->MockCms, 'replaceRow', $index + 1, array(
+            $this->expectAt($this->MockCms, 'replaceRow', $index + 2, array(
                 'wptest_hf_level',
                 $level,
                 $levelFormat

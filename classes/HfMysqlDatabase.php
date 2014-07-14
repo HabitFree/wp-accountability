@@ -208,14 +208,16 @@ class HfMysqlDatabase implements Hf_iDatabase {
             '%d',
         );
 
-        $this->Cms->replaceRow('wptest_hf_level', $defaultLevel0, $levelFormat );
-        $this->Cms->replaceRow('wptest_hf_level', $defaultLevel1, $levelFormat );
-        $this->Cms->replaceRow('wptest_hf_level', $defaultLevel2, $levelFormat );
-        $this->Cms->replaceRow('wptest_hf_level', $defaultLevel3, $levelFormat );
-        $this->Cms->replaceRow('wptest_hf_level', $defaultLevel4, $levelFormat );
-        $this->Cms->replaceRow('wptest_hf_level', $defaultLevel5, $levelFormat );
-        $this->Cms->replaceRow('wptest_hf_level', $defaultLevel6, $levelFormat );
-        $this->Cms->replaceRow('wptest_hf_level', $defaultLevel7, $levelFormat );
+        $table = $this->Cms->getDbPrefix() . 'hf_level';
+
+        $this->Cms->replaceRow($table, $defaultLevel0, $levelFormat );
+        $this->Cms->replaceRow($table, $defaultLevel1, $levelFormat );
+        $this->Cms->replaceRow($table, $defaultLevel2, $levelFormat );
+        $this->Cms->replaceRow($table, $defaultLevel3, $levelFormat );
+        $this->Cms->replaceRow($table, $defaultLevel4, $levelFormat );
+        $this->Cms->replaceRow($table, $defaultLevel5, $levelFormat );
+        $this->Cms->replaceRow($table, $defaultLevel6, $levelFormat );
+        $this->Cms->replaceRow($table, $defaultLevel7, $levelFormat );
     }
 
     function insertUpdateIntoDb( $table, $data ) {
