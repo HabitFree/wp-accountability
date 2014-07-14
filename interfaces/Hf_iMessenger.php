@@ -11,8 +11,6 @@ interface Hf_iMessenger {
 
     public function sendReportRequestEmail( $userId );
 
-    public function markAsDelivered( $emailID );
-
     public function generateReportURL( $reportRequestId );
 
     public function sendEmailToUser( $userID, $subject, $body );

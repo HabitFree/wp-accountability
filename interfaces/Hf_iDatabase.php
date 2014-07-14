@@ -41,8 +41,6 @@ interface Hf_iDatabase {
 
     public function recordAccountabilityReport( $userID, $goalID, $isSuccessful, $emailID = null );
 
-    public function updateRows( $table, $data, $where );
-
     public function daysSinceAnyReport( $userID );
 
     public function deleteInvite( $inviteID );

@@ -74,13 +74,6 @@ class HfMailer implements Hf_iMessenger {
         return date( 'Y-m-d H:i:s', $timePlusOneWeek );
     }
 
-    function markAsDelivered( $emailID ) {
-        $table = 'hf_email';
-        $data  = array('deliveryStatus' => 1);
-        $where = array('emailID' => $emailID);
-        $this->Database->updateRows( $table, $data, $where );
-    }
-
     function recordInvite( $inviteID, $inviterID, $inviteeEmail, $emailID, $expirationDate ) {
         $table = "hf_invite";
         $data  = array(

@@ -267,14 +267,6 @@ class HfMysqlDatabase implements Hf_iDatabase {
         return $this->Cms->getVar( $query ) + 1;
     }
 
-    function updateRows( $table, $data, $where ) {
-        global $wpdb;
-        $prefix    = $wpdb->prefix;
-        $tableName = $prefix . $table;
-
-        return $wpdb->update( $tableName, $data, $where );
-    }
-
     function getRows( $table, $where, $outputType = OBJECT ) {
         global $wpdb;
         $prefix = $wpdb->prefix;
