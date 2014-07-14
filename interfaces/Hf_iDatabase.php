@@ -13,7 +13,7 @@ interface Hf_iDatabase {
 
     public function insertIgnoreIntoDb( $table, $data );
 
-    public function daysSinceSecondToLastEmail( $userID );
+    public function daysSinceSecondToLastEmail( $userId );
 
     public function daysSinceLastReport( $goalID, $userID );
 

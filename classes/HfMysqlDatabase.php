@@ -281,20 +281,16 @@ class HfMysqlDatabase implements Hf_iDatabase {
         return ( $timeNow - $timeOfLastEmail ) / $secondsInADay;
     }
 
-    public function daysSinceSecondToLastEmail( $userID ) {
-        $userID        = strval( $userID );
-        $escapedUserID = $this->escapeData( array($userID) )[0];
-        $timeNow       = $this->CodeLibrary->getCurrentTime();
+    public function daysSinceSecondToLastEmail( $userId ) {
+        $timeNow = $this->CodeLibrary->getCurrentTime();
+        $table   = $this->Cms->getDbPrefix() . 'hf_email';
 
-        $table         = 'hf_email';
-        $fullTableName = $this->Cms->getDbPrefix() . $table;
+        $query     = $this->Cms->prepareQuery(
+            'SELECT sendTime FROM (SELECT * FROM %s WHERE userID = %d ORDER BY emailID DESC LIMIT 2) AS T ORDER BY emailID LIMIT 1',
+            array($table, $userId)
+        );
 
-        $timeString =
-            $this->Cms->getVar(
-                'SELECT sendTime FROM
-                (SELECT * FROM ' . $fullTableName . ' WHERE userID = ' . $escapedUserID . ' ORDER BY emailID DESC LIMIT 2)
-                    AS T ORDER BY emailID LIMIT 1'
-            );
+        $timeString = $this->Cms->getVar($query);
 
         $timeOfSecondToLastEmail = strtotime( $timeString );
         $secondsInADay           = 86400;
