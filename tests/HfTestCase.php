@@ -214,17 +214,18 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $inquisitiveMethod,
         $InitiatingObject,
         $initiatingMethod,
-        $expectedArgs = array()
+        $expectedArgSets
     ) {
-        $success = false;
+        $successes = array_pad(array(), count($expectedArgSets), false);
 
-        $argsChecker = function () use ( &$success, $expectedArgs ) {
+        $argsChecker = function () use ( &$successes, $expectedArgSets ) {
             $actualArgs = func_get_args();
-            if (
-                count( $expectedArgs ) === count( $actualArgs )
-                && $expectedArgs === $actualArgs
-            ) {
-                $success = true;
+
+            foreach ($expectedArgSets as $index=>$argSet) {
+                if ($argSet === $actualArgs) {
+                    $successes[$index] = true;
+                    break;
+                }
             }
         };
 
@@ -233,6 +234,9 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
             ->will( $this->returnCallback( $argsChecker ) );
 
         $InitiatingObject->$initiatingMethod();
-        $this->assertTrue( $success );
+
+        foreach ($successes as $index=>$success) {
+            $this->assertTrue($success, serialize( $expectedArgSets[$index]));
+        }
     }
 } 

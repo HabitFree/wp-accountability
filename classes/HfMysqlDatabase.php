@@ -132,7 +132,8 @@ class HfMysqlDatabase implements Hf_iDatabase {
             'isPrivate'  => 0
         );
 
-        $this->insertUpdateIntoDb( 'hf_goal', $defaultGoal );
+        $table = $this->Cms->getDbPrefix() . 'hf_goal';
+        $this->Cms->replaceRow($table, $defaultGoal, array('%d', '%s', '%d', '%d'));
     }
 
     private function populateLevelsTable() {
@@ -218,36 +219,6 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $this->Cms->replaceRow($table, $defaultLevel5, $levelFormat );
         $this->Cms->replaceRow($table, $defaultLevel6, $levelFormat );
         $this->Cms->replaceRow($table, $defaultLevel7, $levelFormat );
-    }
-
-    function insertUpdateIntoDb( $table, $data ) {
-        global $wpdb;
-        $prefix = $wpdb->prefix;
-        $data   = $this->removeNullValuePairs( $data );
-        $data   = $this->escapeData( $data );
-        $cols   = '';
-        $vals   = '';
-        $pairs  = '';
-
-        foreach ( $data as $col => $value ) {
-            $cols .= $col . ',';
-            if ( is_int( $value ) ) {
-                $vals .= $value . ',';
-                $pairs .= $col . '=' . $value . ',';
-            } else {
-                $vals .= "'" . $value . "',";
-                $pairs .= $col . "='" . $value . "',";
-            }
-        }
-
-        $cols  = trim( $cols, ',' );
-        $vals  = trim( $vals, ',' );
-        $pairs = trim( $pairs, ',' );
-
-        $wpdb->query( "INSERT INTO " . $prefix . $table .
-            "(" . $cols . ")
-					VALUES (" . $vals . ")
-					ON DUPLICATE KEY UPDATE " . $pairs );
     }
 
     function removeNullValuePairs( $array ) {

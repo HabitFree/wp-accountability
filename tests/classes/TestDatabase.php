@@ -476,18 +476,26 @@ class TestDatabase extends HfTestCase {
 
         $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptest_');
 
-        foreach($levels as $index=>$level) {
-            $this->expectAt($this->MockCms, 'replaceRow', $index + 2, array(
+        $argSets = array();
+
+        foreach ($levels as $index=>$level) {
+            $argSets[$index] = array(
                 'wptest_hf_level',
                 $level,
                 $levelFormat
-            ));
+            );
         }
 
-        $this->DatabaseWithMockedDependencies->installDb();
+        $this->assertMethodCallsMethodWithArgsAtAnyTime(
+            $this->MockCms,
+            'replaceRow',
+            $this->DatabaseWithMockedDependencies,
+            'installDb',
+            $argSets
+        );
     }
 
-    public function testInvocationOrderIndependentArgsAssertion() {
+    public function IGNOREtestInvocationOrderIndependentArgsAssertion() {
         $levelFormat = array(
             '%d',
             '%s',
@@ -514,6 +522,31 @@ class TestDatabase extends HfTestCase {
                 $defaultLevel6,
                 $levelFormat
             )
+        );
+    }
+
+    public function testInstallDbPopulatesGoalTable() {
+        $defaultGoal = array(
+            'goalID'     => 1,
+            'title'      => 'Pornography Abstinence',
+            'isPositive' => 1,
+            'isPrivate'  => 0
+        );
+
+        $levelFormat = array('%d', '%s', '%d', '%d');
+
+        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptest_');
+
+        $this->assertMethodCallsMethodWithArgsAtAnyTime(
+            $this->MockCms,
+            'replaceRow',
+            $this->DatabaseWithMockedDependencies,
+            'installDb',
+            array(array(
+                'wptest_hf_goal',
+                $defaultGoal,
+                $levelFormat
+            ))
         );
     }
 }
