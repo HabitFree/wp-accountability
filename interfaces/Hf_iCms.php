@@ -59,7 +59,7 @@ interface Hf_iCms {
 
     public function prepareQuery($query, $valueParameters);
 
-    public function replaceRow($table, $data, $format);
+    public function insertOrReplaceRow($table, $data, $format);
 
     public function getOption($option);
 }

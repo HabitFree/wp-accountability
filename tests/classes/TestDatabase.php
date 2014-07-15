@@ -385,12 +385,12 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testDatabaseUsesCmsToGetOptionWhenInstallingDatabase() {
-        $this->expectOnce($this->MockCms, 'getOption', array('hfDbVersion'));
+        $this->expectOnce( $this->MockCms, 'getOption', array('hfDbVersion') );
 
         $this->DatabaseWithMockedDependencies->installDb();
     }
 
-    public function testDatabaseUsesCmsReplaceRowWhenInstallingDatabase() {
+    public function testDatabaseUsesCmsinsertOrReplaceRowWhenInstallingDatabase() {
         $defaultLevel0 = array(
             'levelID'       => 0,
             'title'         => 'Hibernation',
@@ -474,11 +474,11 @@ class TestDatabase extends HfTestCase {
             '%d'
         );
 
-        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptest_');
+        $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptest_' );
 
         $argSets = array();
 
-        foreach ($levels as $index=>$level) {
+        foreach ( $levels as $index => $level ) {
             $argSets[$index] = array(
                 'wptest_hf_level',
                 $level,
@@ -488,21 +488,15 @@ class TestDatabase extends HfTestCase {
 
         $this->assertMethodCallsMethodWithArgsAtAnyTime(
             $this->MockCms,
-            'replaceRow',
+            'insertOrReplaceRow',
             $this->DatabaseWithMockedDependencies,
             'installDb',
             $argSets
         );
     }
 
-    public function IGNOREtestInvocationOrderIndependentArgsAssertion() {
-        $levelFormat = array(
-            '%d',
-            '%s',
-            '%d',
-            '%d',
-            '%d'
-        );
+    public function testInvocationOrderIndependentArgsAssertion() {
+        $levelFormat = array('%d', '%s', '%d', '%d', '%d');
 
         $defaultLevel6 = array(
             'levelID'       => 6,
@@ -514,14 +508,14 @@ class TestDatabase extends HfTestCase {
 
         $this->assertMethodCallsMethodWithArgsAtAnyTime(
             $this->MockCms,
-            'replaceRow',
+            'insertOrReplaceRow',
             $this->DatabaseWithMockedDependencies,
             'installDb',
-            array(
+            array(array(
                 'hf_level',
                 $defaultLevel6,
                 $levelFormat
-            )
+            ))
         );
     }
 
@@ -535,11 +529,11 @@ class TestDatabase extends HfTestCase {
 
         $levelFormat = array('%d', '%s', '%d', '%d');
 
-        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptest_');
+        $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptest_' );
 
         $this->assertMethodCallsMethodWithArgsAtAnyTime(
             $this->MockCms,
-            'replaceRow',
+            'insertOrReplaceRow',
             $this->DatabaseWithMockedDependencies,
             'installDb',
             array(array(
@@ -548,5 +542,29 @@ class TestDatabase extends HfTestCase {
                 $levelFormat
             ))
         );
+    }
+
+    public function testCreateRelationshipCreatesRelationship() {
+        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptest_');
+
+        $expectedRow = array(
+            'userID1' => 1,
+            'userID2' => 2
+        );
+
+        $this->expectOnce($this->MockCms, 'insertOrReplaceRow', array('wptest_hf_relationship', $expectedRow, array('%d', '%d')));
+        $this->DatabaseWithMockedDependencies->createRelationship(1, 2);
+    }
+
+    public function testCreateRelationshipGetsPrefix() {
+        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'duck_');
+
+        $expectedRow = array(
+            'userID1' => 1,
+            'userID2' => 2
+        );
+
+        $this->expectOnce($this->MockCms, 'insertOrReplaceRow', array('duck_hf_relationship', $expectedRow, array('%d', '%d')));
+        $this->DatabaseWithMockedDependencies->createRelationship(1, 2);
     }
 }

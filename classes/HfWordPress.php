@@ -144,7 +144,7 @@ class HfWordPress implements Hf_iCms {
         return call_user_func_array( $callable, $parameters);
     }
 
-    public function replaceRow($table, $data, $format) {
+    public function insertOrReplaceRow($table, $data, $format) {
         $this->wpdb->replace($table, $data, $format);
     }
 

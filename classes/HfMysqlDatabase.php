@@ -4,12 +4,12 @@ class HfMysqlDatabase implements Hf_iDatabase {
     private $Cms;
     private $CodeLibrary;
 
-    function HfMysqlDatabase( Hf_iCms $ContentManagementSystem, Hf_iCodeLibrary $CodeLibrary ) { //constructor
+    public function HfMysqlDatabase( Hf_iCms $ContentManagementSystem, Hf_iCodeLibrary $CodeLibrary ) { //constructor
         $this->Cms         = $ContentManagementSystem;
         $this->CodeLibrary = $CodeLibrary;
     }
 
-    function installDb() {
+    public function installDb() {
         $currentDbVersion  = "4.7";
         $previousDbVersion = $this->Cms->getOption( "hfDbVersion" );
 
@@ -133,7 +133,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
         );
 
         $table = $this->Cms->getDbPrefix() . 'hf_goal';
-        $this->Cms->replaceRow($table, $defaultGoal, array('%d', '%s', '%d', '%d'));
+        $this->Cms->insertOrReplaceRow( $table, $defaultGoal, array('%d', '%s', '%d', '%d') );
     }
 
     private function populateLevelsTable() {
@@ -211,36 +211,17 @@ class HfMysqlDatabase implements Hf_iDatabase {
 
         $table = $this->Cms->getDbPrefix() . 'hf_level';
 
-        $this->Cms->replaceRow($table, $defaultLevel0, $levelFormat );
-        $this->Cms->replaceRow($table, $defaultLevel1, $levelFormat );
-        $this->Cms->replaceRow($table, $defaultLevel2, $levelFormat );
-        $this->Cms->replaceRow($table, $defaultLevel3, $levelFormat );
-        $this->Cms->replaceRow($table, $defaultLevel4, $levelFormat );
-        $this->Cms->replaceRow($table, $defaultLevel5, $levelFormat );
-        $this->Cms->replaceRow($table, $defaultLevel6, $levelFormat );
-        $this->Cms->replaceRow($table, $defaultLevel7, $levelFormat );
+        $this->Cms->insertOrReplaceRow( $table, $defaultLevel0, $levelFormat );
+        $this->Cms->insertOrReplaceRow( $table, $defaultLevel1, $levelFormat );
+        $this->Cms->insertOrReplaceRow( $table, $defaultLevel2, $levelFormat );
+        $this->Cms->insertOrReplaceRow( $table, $defaultLevel3, $levelFormat );
+        $this->Cms->insertOrReplaceRow( $table, $defaultLevel4, $levelFormat );
+        $this->Cms->insertOrReplaceRow( $table, $defaultLevel5, $levelFormat );
+        $this->Cms->insertOrReplaceRow( $table, $defaultLevel6, $levelFormat );
+        $this->Cms->insertOrReplaceRow( $table, $defaultLevel7, $levelFormat );
     }
 
-    function removeNullValuePairs( $array ) {
-        foreach ( $array as $key => $value ) {
-            if ( $value === null ) {
-                unset( $array[$key] );
-            }
-        }
-
-        return $array;
-    }
-
-    function escapeData( $data ) {
-        foreach ( $data as $col => $val ) {
-            $col = esc_sql( $col );
-            $val = esc_sql( $val );
-        }
-
-        return $data;
-    }
-
-    function generateEmailId() {
+    public function generateEmailId() {
         $table     = 'hf_email';
         $tableName = $this->Cms->getDbPrefix() . $table;
         $query     = $this->Cms->prepareQuery( 'SELECT max(emailID) FROM %s', array($tableName) );
@@ -248,7 +229,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
         return $this->Cms->getVar( $query ) + 1;
     }
 
-    function daysSinceLastEmail( $userID ) {
+    public function daysSinceLastEmail( $userID ) {
         $table         = 'hf_email';
         $fullTableName = $this->Cms->getDbPrefix() . $table;
 
@@ -278,7 +259,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
         return ( $timeNow - $timeOfSecondToLastEmail ) / $secondsInADay;
     }
 
-    function recordEmail( $userID, $subject, $message, $emailID = null, $emailAddress = null ) {
+    public function recordEmail( $userID, $subject, $message, $emailID = null, $emailAddress = null ) {
         $table = "hf_email";
         $data  = array(
             'subject' => $subject,
@@ -290,7 +271,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $this->insertIntoDb( $table, $data );
     }
 
-    function insertIntoDb( $table, $data ) {
+    public function insertIntoDb( $table, $data ) {
         global $wpdb;
         $prefix    = $wpdb->prefix;
         $tableName = $prefix . $table;
@@ -299,7 +280,17 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $this->Cms->insertIntoDb( $tableName, $data );
     }
 
-    function timeOfFirstSuccess( $goalID, $userID ) {
+    public function removeNullValuePairs( $array ) {
+        foreach ( $array as $key => $value ) {
+            if ( $value === null ) {
+                unset( $array[$key] );
+            }
+        }
+
+        return $array;
+    }
+
+    public function timeOfFirstSuccess( $goalID, $userID ) {
         global $wpdb;
         $prefix     = $wpdb->prefix;
         $table      = 'hf_report';
@@ -312,7 +303,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
         return strtotime( $timeString );
     }
 
-    function timeOfLastSuccess( $goalID, $userID ) {
+    public function timeOfLastSuccess( $goalID, $userID ) {
         global $wpdb;
         $prefix     = $wpdb->prefix;
         $table      = 'hf_report';
@@ -325,7 +316,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
         return strtotime( $timeString );
     }
 
-    function timeOfLastFail( $goalID, $userID ) {
+    public function timeOfLastFail( $goalID, $userID ) {
         global $wpdb;
         $prefix     = $wpdb->prefix;
         $table      = 'hf_report';
@@ -338,20 +329,20 @@ class HfMysqlDatabase implements Hf_iDatabase {
         return strtotime( $timeString );
     }
 
-    function level( $daysOfSuccess ) {
+    public function level( $daysOfSuccess ) {
         $whereLevel = 'target > ' . $daysOfSuccess . ' ORDER BY target ASC';
 
         return $this->getRow( 'hf_level', $whereLevel );
     }
 
-    function getRow( $table, $criterion ) {
+    public function getRow( $table, $criterion ) {
         global $wpdb;
         $prefix = $wpdb->prefix;
 
         return $wpdb->get_row( "SELECT * FROM " . $prefix . $table . " WHERE " . $criterion );
     }
 
-    function daysSinceLastReport( $goalID, $userID ) {
+    public function daysSinceLastReport( $goalID, $userID ) {
         global $wpdb;
         $prefix                    = $wpdb->prefix;
         $table                     = 'hf_report';
@@ -407,10 +398,11 @@ class HfMysqlDatabase implements Hf_iDatabase {
             );
         }
 
-        $this->insertIgnoreIntoDb( 'hf_relationship', $row );
+        $table = $this->Cms->getDbPrefix() . 'hf_relationship';
+        $this->Cms->insertOrReplaceRow( $table, $row, array('%d', '%d') );
     }
 
-    function insertIgnoreIntoDb( $table, $data ) {
+    public function insertIgnoreIntoDb( $table, $data ) {
         global $wpdb;
         $prefix    = $wpdb->prefix;
         $tableName = $prefix . $table;
@@ -431,6 +423,15 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $query = "INSERT IGNORE INTO `" . $tableName . "` SET " . $setValues . ";";
 
         $wpdb->query( $query );
+    }
+
+    public function escapeData( $data ) {
+        foreach ( $data as $col => $val ) {
+            $col = esc_sql( $col );
+            $val = esc_sql( $val );
+        }
+
+        return $data;
     }
 
     public function recordAccountabilityReport( $userID, $goalID, $isSuccessful, $emailID = null ) {

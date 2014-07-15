@@ -18,7 +18,7 @@ class TestWordPress extends HfTestCase {
             'getPermalink',
             'getHomeUrl',
             'prepareQuery',
-            'replaceRow',
+            'insertOrReplaceRow',
             'getOption'
         );
 
