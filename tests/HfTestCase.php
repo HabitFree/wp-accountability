@@ -136,6 +136,15 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         );
     }
 
+    private function resetGoalsWithMockedDependencies() {
+        $this->GoalsWithMockedDependencies = new HfGoals(
+            $this->MockMessenger,
+            $this->MockCms,
+            $this->MockMarkupGenerator,
+            $this->MockDatabase
+        );
+    }
+
     protected function setReturnValue( $Mock, $method, $value ) {
         return $Mock->expects( $this->any() )->method( $method )->will( $this->returnValue( $value ) );
     }
@@ -192,20 +201,38 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         return in_array( $interface, $interfacesImplemented );
     }
 
+    protected function assertDoesntContain( $needle, $haystack ) {
+        $this->assertFalse( $this->haystackContainsNeedle( $haystack, $needle ) );
+    }
+
     protected function haystackContainsNeedle( $haystack, $needle ) {
         return strstr( $haystack, $needle ) != false;
     }
 
-    protected function assertDoesntContain($needle, $haystack) {
-        $this->assertFalse($this->haystackContainsNeedle($haystack, $needle));
-    }
+    protected function assertMethodCallsMethodWithArgsAtAnyTime(
+        $InquisitiveMock,
+        $inquisitiveMethod,
+        $InitiatingObject,
+        $initiatingMethod,
+        $expectedArgs = array()
+    ) {
+        $success = false;
 
-    private function resetGoalsWithMockedDependencies() {
-        $this->GoalsWithMockedDependencies = new HfGoals(
-            $this->MockMessenger,
-            $this->MockCms,
-            $this->MockMarkupGenerator,
-            $this->MockDatabase
-        );
+        $argsChecker = function () use ( &$success, $expectedArgs ) {
+            $actualArgs = func_get_args();
+            if (
+                count( $expectedArgs ) === count( $actualArgs )
+                && $expectedArgs === $actualArgs
+            ) {
+                $success = true;
+            }
+        };
+
+        $InquisitiveMock->expects( $this->any() )
+            ->method( $inquisitiveMethod )
+            ->will( $this->returnCallback( $argsChecker ) );
+
+        $InitiatingObject->$initiatingMethod();
+        $this->assertTrue( $success );
     }
 } 

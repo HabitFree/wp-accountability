@@ -486,4 +486,34 @@ class TestDatabase extends HfTestCase {
 
         $this->DatabaseWithMockedDependencies->installDb();
     }
+
+    public function testInvocationOrderIndependentArgsAssertion() {
+        $levelFormat = array(
+            '%d',
+            '%s',
+            '%d',
+            '%d',
+            '%d'
+        );
+
+        $defaultLevel6 = array(
+            'levelID'       => 6,
+            'title'         => 'Triumph',
+            'size'          => 60,
+            'emailInterval' => 365,
+            'target'        => 1095 // 3 years
+        );
+
+        $this->assertMethodCallsMethodWithArgsAtAnyTime(
+            $this->MockCms,
+            'replaceRow',
+            $this->DatabaseWithMockedDependencies,
+            'installDb',
+            array(
+                'hf_level',
+                $defaultLevel6,
+                $levelFormat
+            )
+        );
+    }
 }
