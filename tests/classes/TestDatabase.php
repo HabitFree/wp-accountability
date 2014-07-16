@@ -583,4 +583,19 @@ class TestDatabase extends HfTestCase {
         $this->expectOnce( $this->MockCms, 'insertOrReplaceRow', array('wptest_hf_user_goal', $expectedData, array('%d', '%d')) );
         $this->DatabaseWithMockedDependencies->setDefaultGoalSubscription(7);
     }
+
+    public function testRecordInviteRecordsInvite() {
+        $expectedRow = array(
+            'inviteID'       => 1,
+            'inviterID'      => 2,
+            'inviteeEmail'   => 3,
+            'emailID'        => 4,
+            'expirationDate' => 5
+        );
+
+        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptests_');
+        $this->expectOnce($this->MockCms, 'insertIntoDb', array('wptests_hf_invite', $expectedRow));
+
+        $this->DatabaseWithMockedDependencies->recordInvite(1,2,3,4,5);
+    }
 }

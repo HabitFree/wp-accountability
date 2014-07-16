@@ -529,7 +529,6 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function recordInvite( $inviteID, $inviterID, $inviteeEmail, $emailID, $expirationDate ) {
-        $table = "hf_invite";
         $data  = array(
             'inviteID'       => $inviteID,
             'inviterID'      => $inviterID,
@@ -538,6 +537,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
             'expirationDate' => $expirationDate
         );
 
-        $this->insertIntoDb( $table, $data );
+        $table = $this->Cms->getDbPrefix() . "hf_invite";
+        $this->Cms->insertIntoDb( $table, $data );
     }
 }
