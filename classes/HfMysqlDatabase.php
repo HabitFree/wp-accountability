@@ -332,7 +332,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
     public function getLevel( $daysOfSuccess ) {
         $whereLevel = 'target > ' . $daysOfSuccess . ' ORDER BY target ASC';
 
-        return $this->getRow( 'hf_level', $whereLevel );
+        return $this->Cms->getRow( 'hf_level', $whereLevel );
     }
 
     public function getRow( $table, $criterion ) {
@@ -380,7 +380,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
 
     public function getInviterID( $nonce ) {
         $whereInvite = "inviteID = '" . $nonce . "'";
-        $invite      = $this->getRow( 'hf_invite', $whereInvite );
+        $invite      = $this->Cms->getRow( 'hf_invite', $whereInvite );
 
         return intval( $invite->inviterID );
     }
@@ -412,7 +412,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function isEmailValid( $userID, $emailID ) {
-        $email = $this->getRow( 'hf_email',
+        $email = $this->Cms->getRow( 'hf_email',
             'userID = ' . $userID .
             ' AND emailID = ' . $emailID );
 
