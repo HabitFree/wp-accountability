@@ -19,8 +19,6 @@ interface Hf_iDatabase {
 
     public function installDb();
 
-    public function insertIntoDb( $table, $data );
-
     public function createRelationship( $userOneID, $userTwoID );
 
     public function timeOfFirstSuccess( $goalID, $userID );

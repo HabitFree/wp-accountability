@@ -194,11 +194,6 @@ class TestDatabase extends HfTestCase {
         $this->DatabaseWithMockedDependencies->getGoalSubscriptions( 1 );
     }
 
-    public function testInsertIntoDbCallsCmsInsert() {
-        $this->expectOnce( $this->MockCms, 'insertIntoDb', array('wptests_duck', array('bill')) );
-        $this->DatabaseWithMockedDependencies->insertIntoDb( 'duck', array('bill') );
-    }
-
     public function testRecordReportRequest() {
         $table          = "hf_report_request";
         $requestId      = 555;

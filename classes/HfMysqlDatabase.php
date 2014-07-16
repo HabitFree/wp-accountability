@@ -445,21 +445,10 @@ class HfMysqlDatabase implements Hf_iDatabase {
             'expirationDate' => $expirationDate
         );
 
-        global $wpdb;
-        $prefix    = $this->Cms->getDbPrefix();
-        $tableName = $prefix . 'hf_report_request';
-        $data      = $this->removeNullValuePairs( $data );
+        $table = $this->Cms->getDbPrefix() . 'hf_report_request';
+        $data  = $this->removeNullValuePairs( $data );
 
-        $this->Cms->insertIntoDb( $tableName, $data );
-    }
-
-    public function insertIntoDb( $table, $data ) {
-        global $wpdb;
-        $prefix    = $wpdb->prefix;
-        $tableName = $prefix . $table;
-        $data      = $this->removeNullValuePairs( $data );
-
-        $this->Cms->insertIntoDb( $tableName, $data );
+        $this->Cms->insertIntoDb( $table, $data );
     }
 
     public function isReportRequestValid( $requestId ) {
