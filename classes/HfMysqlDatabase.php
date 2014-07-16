@@ -453,7 +453,11 @@ class HfMysqlDatabase implements Hf_iDatabase {
 
     public function isReportRequestValid( $requestId ) {
         $table = $this->Cms->getDbPrefix() . 'hf_report_request';
-        $query = "SELECT * FROM " . $table . " WHERE requestID = '" . $requestId . "'";
+
+        $query = $this->Cms->prepareQuery(
+            "SELECT * FROM %s WHERE requestID = %d",
+            array($table, $requestId)
+        );
 
         return $this->Cms->getResults( $query ) != null;
     }
@@ -466,7 +470,9 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function getReportRequestUserId( $requestId ) {
-        return $this->Cms->getRow( 'hf_report_request', "requestID = '" . $requestId . "'" )->userID;
+        $ReportRequest = $this->Cms->getRow( 'hf_report_request', "requestID = '" . $requestId . "'" );
+
+        return $ReportRequest->userID;
     }
 
     public function updateReportRequestExpirationDate( $requestId, $expirationTime ) {
@@ -494,7 +500,14 @@ class HfMysqlDatabase implements Hf_iDatabase {
     public function getQuotations( $context ) {
         $prefix    = $this->Cms->getDbPrefix();
         $contextId = $this->getContextId( $context );
-        $query     = "SELECT * FROM " . $prefix . "posts INNER JOIN " . $prefix . "term_relationships WHERE post_type =  'hf_quotation' AND post_status =  'publish' AND object_id = id AND term_taxonomy_id = " . $contextId;
+
+        $postsTable = $prefix . 'posts';
+        $termsTable = $prefix . 'term_relationships';
+
+        $query = $this->Cms->prepareQuery(
+            "SELECT * FROM %s INNER JOIN %s WHERE post_type =  'hf_quotation' AND post_status =  'publish' AND object_id = id AND term_taxonomy_id = %d",
+            array($postsTable, $termsTable, $contextId)
+        );
 
         return $this->Cms->getResults( $query );
     }

@@ -286,9 +286,9 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testGetQuotationsGetsQuotations() {
-        $expectedQuery = "SELECT * FROM wptests_posts INNER JOIN wptests_term_relationships WHERE post_type =  'hf_quotation' AND post_status =  'publish' AND object_id = id AND term_taxonomy_id = 1";
-        $this->expectOnce( $this->MockCms, 'getResults', array($expectedQuery) );
+        $this->expectOnce( $this->MockCms, 'getResults', array('query') );
         $this->setReturnValue( $this->MockCms, 'getVar', 1 );
+        $this->setReturnValue($this->MockCms, 'prepareQuery', 'query');
         $this->DatabaseWithMockedDependencies->getQuotations( 'For Setback' );
     }
 
@@ -621,5 +621,25 @@ class TestDatabase extends HfTestCase {
         $this->expectOnce($this->MockCms, 'insertIntoDb', array('wptests_hf_report_request', $expectedRow));
 
         $this->DatabaseWithMockedDependencies->recordReportRequest(1,2,3,4);
+    }
+
+    public function testIsReportRequestValidPreparesQuery() {
+        $this->expectOnce( $this->MockCms, 'prepareQuery', array(
+            "SELECT * FROM %s WHERE requestID = %d",
+            array('wptests_hf_report_request', 7)
+        ) );
+
+        $this->DatabaseWithMockedDependencies->isReportRequestValid( 7 );
+    }
+
+    public function testGetQuotationsPreparesQuery() {
+        $this->expectOnce( $this->MockCms, 'prepareQuery', array(
+            "SELECT * FROM %s INNER JOIN %s WHERE post_type =  'hf_quotation' AND post_status =  'publish' AND object_id = id AND term_taxonomy_id = %d",
+            array('wptests_posts', 'wptests_term_relationships', 2)
+        ) );
+
+        $this->setReturnValue($this->MockCms, 'getVar', 2);
+
+        $this->DatabaseWithMockedDependencies->getQuotations( 'context' );
     }
 }
