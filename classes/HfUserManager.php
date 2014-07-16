@@ -51,7 +51,7 @@ class HfUserManager implements Hf_iUserManager {
         $expirationDate = $this->generateExpirationDate( 7 );
 
         if ( $emailId !== false ) {
-            $this->Messenger->recordInvite( $inviteId, $inviterId, $address, $emailId, $expirationDate );
+            $this->Database->recordInvite( $inviteId, $inviterId, $address, $emailId, $expirationDate );
         }
 
         return $inviteId;

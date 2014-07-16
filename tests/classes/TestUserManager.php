@@ -16,37 +16,6 @@ class TestUserManager extends HfTestCase {
         $this->assertEquals( $result, 555 );
     }
 
-    public function testInviteStorageInInviteTableUsingMocks() {
-        $expirationTime = strtotime( '+' . 3 . ' days' );
-        $expirationDate = date( 'Y-m-d H:i:s', $expirationTime );
-
-        $this->setReturnValue( $this->MockDatabase, 'idOfLastEmail', 5 );
-        $this->setReturnValue( $this->MockDatabase, 'generateEmailID', 5 );
-        $this->setReturnValue( $this->MockCms, 'sendEmail', true );
-        $this->setReturnValue( $this->MockSecurity, 'createRandomString', 555 );
-        $this->setReturnValue( $this->MockCodeLibrary, 'convertStringToTime', $expirationTime );
-
-        $expectedRecord = array(
-            'inviteID'       => 555,
-            'inviterID'      => 1,
-            'inviteeEmail'   => 'me@test.com',
-            'emailID'        => 5,
-            'expirationDate' => $expirationDate
-        );
-
-        $this->expectAtLeastOnce( $this->MockDatabase, 'insertIntoDb', array('hf_invite', $expectedRecord) );
-
-        $UserManager = new HfUserManager(
-            $this->MockDatabase,
-            $this->MailerWithMockedDependencies,
-            $this->MockAssetLocator,
-            $this->MockCms,
-            $this->MockCodeLibrary
-        );
-
-        $UserManager->sendInvitation( 1, 'me@test.com', 3 );
-    }
-
     public function testGettingCurrentUserLogin() {
         $UserManager = $this->Factory->makeUserManager();
         $user        = wp_get_current_user();
@@ -97,5 +66,10 @@ class TestUserManager extends HfTestCase {
     public function testUserManagerAddsDefaultSubWhenProcessingNewUser() {
         $this->expectOnce($this->MockDatabase, 'setDefaultGoalSubscription', array(9));
         $this->UserManagerWithMockedDependencies->processNewUser(9);
+    }
+
+    public function testUserManagerUsesDatabaseToRecordInvite() {
+        $this->expectOnce($this->MockDatabase, 'recordInvite');
+        $this->UserManagerWithMockedDependencies->sendInvitation(1, 'test@test.com');
     }
 }

@@ -527,4 +527,17 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $table = $this->Cms->getDbPrefix() . 'hf_user_goal';
         $this->Cms->insertOrReplaceRow($table, $sub, array('%d', '%d'));
     }
+
+    public function recordInvite( $inviteID, $inviterID, $inviteeEmail, $emailID, $expirationDate ) {
+        $table = "hf_invite";
+        $data  = array(
+            'inviteID'       => $inviteID,
+            'inviterID'      => $inviterID,
+            'inviteeEmail'   => $inviteeEmail,
+            'emailID'        => $emailID,
+            'expirationDate' => $expirationDate
+        );
+
+        $this->insertIntoDb( $table, $data );
+    }
 }
