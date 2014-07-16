@@ -21,9 +21,9 @@ class HfGoals implements Hf_iGoals {
     function generateGoalCard( $sub ) {
         $goalID        = intval( $sub->goalID );
         $userID        = intval( $sub->userID );
-        $goal          = $this->Database->getRow( 'hf_goal', 'goalID = ' . $goalID );
+        $goal          = $this->Database->getGoal( $goalID, 2 );
         $daysOfSuccess = $this->daysOfSuccess( $goalID, $userID );
-        $level         = $this->Database->level( $daysOfSuccess );
+        $level         = $this->Database->getLevel( $daysOfSuccess );
         $wrapperOpen   = '<div class="report-card">';
         $info          = '<div class="about"><h2>' . $goal->title . '</h2>';
         if ( $goal->description != '' ) {
@@ -90,7 +90,7 @@ class HfGoals implements Hf_iGoals {
     }
 
     function currentLevelTarget( $daysOfSuccess ) {
-        $level = $this->Database->level( $daysOfSuccess );
+        $level = $this->Database->getLevel( $daysOfSuccess );
 
         return $level->target;
     }
@@ -122,7 +122,7 @@ class HfGoals implements Hf_iGoals {
 
     private function isGoalDue( $goalId, $userId ) {
         $daysOfSuccess       = $this->daysOfSuccess( $goalId, $userId );
-        $level               = $this->Database->level( $goalId, $userId, $daysOfSuccess );
+        $level               = $this->Database->getLevel( $goalId, $userId, $daysOfSuccess );
         $emailInterval       = $level->emailInterval;
         $daysSinceLastReport = $this->Database->daysSinceLastReport( $goalId, $userId );
 

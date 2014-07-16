@@ -31,7 +31,7 @@ interface Hf_iDatabase {
 
     public function timeOfLastFail( $goalID, $userID );
 
-    public function level( $daysOfSuccess );
+    public function getLevel( $daysOfSuccess );
 
     public function recordAccountabilityReport( $userID, $goalID, $isSuccessful, $emailID = null );
 

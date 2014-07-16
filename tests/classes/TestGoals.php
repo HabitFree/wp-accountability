@@ -21,7 +21,7 @@ class TestGoals extends HfTestCase {
         $this->setReturnValue( $this->MockDatabase, 'getGoalSubscriptions', $mockGoalSubs );
 
         $mockLevel = $this->makeMockLevel();
-        $this->setReturnValue( $this->MockDatabase, 'level', $mockLevel );
+        $this->setReturnValue( $this->MockDatabase, 'getLevel', $mockLevel );
     }
 
     private function makeMockUsers() {
@@ -33,19 +33,28 @@ class TestGoals extends HfTestCase {
     }
 
     private function makeMockGoalSubs() {
-        $mockGoalSub         = new stdClass();
-        $mockGoalSub->goalID = 1;
-        $mockGoalSubs        = array($mockGoalSub);
+        $mockGoalSub  = $this->makeMockGoalSub();
+        $mockGoalSubs = array($mockGoalSub);
 
         return $mockGoalSubs;
     }
 
     private function makeMockLevel() {
         $mockLevel                = new stdClass();
+        $mockLevel->levelID       = 2;
+        $mockLevel->title         = 'Title';
         $mockLevel->target        = 14;
         $mockLevel->emailInterval = 1;
 
         return $mockLevel;
+    }
+
+    private function makeMockGoalSub() {
+        $mockGoalSub         = new stdClass();
+        $mockGoalSub->goalID = 1;
+        $mockGoalSub->userID = 7;
+
+        return $mockGoalSub;
     }
 
     public function testSendReportRequestEmailsSendsEmailWhenReportDue() {
@@ -85,7 +94,7 @@ class TestGoals extends HfTestCase {
 
     public function testCurrentLevelTarget() {
         $mockLevel = $this->makeMockLevel();
-        $this->setReturnValue( $this->MockDatabase, 'level', $mockLevel );
+        $this->setReturnValue( $this->MockDatabase, 'getLevel', $mockLevel );
 
         $target = $this->GoalsWithMockedDependencies->currentLevelTarget( 5 );
 
@@ -130,5 +139,20 @@ class TestGoals extends HfTestCase {
         $this->expectOnce( $this->MockDatabase, 'getGoalSubscriptions', array(1) );
 
         $this->GoalsWithMockedDependencies->sendReportRequestEmails();
+    }
+
+    public function testGenerateGoalCardUsesDatabaseGetGoalMethod() {
+        $MockGoal              = new stdClass();
+        $MockGoal->title       = 'Title';
+        $MockGoal->description = 'Description';
+        $this->setReturnValue( $this->MockDatabase, 'getGoal', $MockGoal);
+
+        $MockLevel = $this->makeMockLevel();
+        $this->setReturnValue( $this->MockDatabase, 'getLevel', $MockLevel );
+
+        $this->expectOnce( $this->MockDatabase, 'getGoal', array(1) );
+
+        $MockSub = $this->makeMockGoalSub();
+        $this->GoalsWithMockedDependencies->generateGoalCard( $MockSub );
     }
 } 

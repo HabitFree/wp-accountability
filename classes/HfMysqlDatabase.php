@@ -329,7 +329,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
         return strtotime( $timeString );
     }
 
-    public function level( $daysOfSuccess ) {
+    public function getLevel( $daysOfSuccess ) {
         $whereLevel = 'target > ' . $daysOfSuccess . ' ORDER BY target ASC';
 
         return $this->getRow( 'hf_level', $whereLevel );
