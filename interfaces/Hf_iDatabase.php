@@ -41,8 +41,6 @@ interface Hf_iDatabase {
 
     public function getGoalSubscriptions( $userID );
 
-    public function escapeData( $data );
-
     public function getInviterID( $nonce );
 
     public function getPartners( $userId );

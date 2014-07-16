@@ -402,15 +402,6 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $this->Cms->insertOrReplaceRow( $table, $row, array('%d', '%d') );
     }
 
-    public function escapeData( $data ) {
-        foreach ( $data as $col => $val ) {
-            $col = esc_sql( $col );
-            $val = esc_sql( $val );
-        }
-
-        return $data;
-    }
-
     public function recordAccountabilityReport( $userID, $goalID, $isSuccessful, $emailID = null ) {
         $data = array(
             'userID'           => $userID,
