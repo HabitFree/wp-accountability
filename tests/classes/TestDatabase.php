@@ -212,6 +212,7 @@ class TestDatabase extends HfTestCase {
             'expirationDate' => $expirationDate
         );
 
+        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptests_');
         $this->expectOnce( $this->MockCms, 'insertIntoDb', array('wptests_' . $table, $data) );
 
         $this->DatabaseWithMockedDependencies->recordReportRequest( $requestId, $userId, $emailId, $expirationDate );
@@ -290,9 +291,8 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testGetQuotationsGetsQuotations() {
-        $expectedQuery = "SELECT * FROM wptest_posts INNER JOIN wptest_term_relationships WHERE post_type =  'hf_quotation' AND post_status =  'publish' AND object_id = id AND term_taxonomy_id = 1";
+        $expectedQuery = "SELECT * FROM wptests_posts INNER JOIN wptests_term_relationships WHERE post_type =  'hf_quotation' AND post_status =  'publish' AND object_id = id AND term_taxonomy_id = 1";
         $this->expectOnce( $this->MockCms, 'getResults', array($expectedQuery) );
-        $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptest_' );
         $this->setReturnValue( $this->MockCms, 'getVar', 1 );
         $this->DatabaseWithMockedDependencies->getQuotations( 'For Setback' );
     }
@@ -307,42 +307,38 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testGetQuotationsLooksUpTermId() {
-        $expectedQuery = "SELECT term_id FROM wptest_terms WHERE name = 'For Setback'";
+        $expectedQuery = "SELECT term_id FROM wptests_terms WHERE name = 'For Setback'";
         $this->expectOnce( $this->MockCms, 'getVar', array($expectedQuery) );
-        $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptest_' );
 
         $this->DatabaseWithMockedDependencies->getQuotations( 'For Setback' );
     }
 
     public function testGetQuotationsLooksUpPassedTermName() {
-        $expectedQuery = "SELECT term_id FROM wptest_terms WHERE name = 'For Success'";
+        $expectedQuery = "SELECT term_id FROM wptests_terms WHERE name = 'For Success'";
         $this->expectOnce( $this->MockCms, 'getVar', array($expectedQuery) );
-        $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptest_' );
 
         $this->DatabaseWithMockedDependencies->getQuotations( 'For Success' );
     }
 
     public function testDeleteRelationshipDeletesRelationship() {
-        $table = 'wptest_hf_relationship';
+        $table = 'wptests_hf_relationship';
         $where = array(
             'userID1' => 4,
             'userID2' => 5
         );
 
-        $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptest_' );
         $this->expectOnce( $this->MockCms, 'deleteRows', array($table, $where) );
 
         $this->DatabaseWithMockedDependencies->deleteRelationship( 4, 5 );
     }
 
     public function testDeleteRelationshipSortsIds() {
-        $table = 'wptest_hf_relationship';
+        $table = 'wptests_hf_relationship';
         $where = array(
             'userID1' => 4,
             'userID2' => 5
         );
 
-        $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptest_' );
         $this->expectOnce( $this->MockCms, 'deleteRows', array($table, $where) );
 
         $this->DatabaseWithMockedDependencies->deleteRelationship( 5, 4 );
@@ -360,17 +356,14 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testGenerateEmailIdPreparesQueryProperly() {
-        $this->expectOnce( $this->MockCms, 'prepareQuery', array("SELECT max(emailID) FROM %s", array('wptest_hf_email')) );
-        $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptest_' );
+        $this->expectOnce( $this->MockCms, 'prepareQuery', array("SELECT max(emailID) FROM %s", array('wptests_hf_email')) );
         $this->DatabaseWithMockedDependencies->generateEmailId();
     }
 
     public function testDaysSinceSecondToLastEmailPreparesQuery() {
-        $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptest_' );
-
         $this->expectOnce( $this->MockCms, 'prepareQuery', array(
             'SELECT sendTime FROM (SELECT * FROM %s WHERE userID = %d ORDER BY emailID DESC LIMIT 2) AS T ORDER BY emailID LIMIT 1',
-            array('wptest_hf_email', 1)
+            array('wptests_hf_email', 1)
         ) );
 
         $this->DatabaseWithMockedDependencies->daysSinceSecondToLastEmail( 1 );
@@ -474,13 +467,11 @@ class TestDatabase extends HfTestCase {
             '%d'
         );
 
-        $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptest_' );
-
         $argSets = array();
 
         foreach ( $levels as $index => $level ) {
             $argSets[$index] = array(
-                'wptest_hf_level',
+                'wptests_hf_level',
                 $level,
                 $levelFormat
             );
@@ -512,7 +503,7 @@ class TestDatabase extends HfTestCase {
             $this->DatabaseWithMockedDependencies,
             'installDb',
             array(array(
-                'hf_level',
+                'wptests_hf_level',
                 $defaultLevel6,
                 $levelFormat
             ))
@@ -529,15 +520,13 @@ class TestDatabase extends HfTestCase {
 
         $levelFormat = array('%d', '%s', '%d', '%d');
 
-        $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptest_' );
-
         $this->assertMethodCallsMethodWithArgsAtAnyTime(
             $this->MockCms,
             'insertOrReplaceRow',
             $this->DatabaseWithMockedDependencies,
             'installDb',
             array(array(
-                'wptest_hf_goal',
+                'wptests_hf_goal',
                 $defaultGoal,
                 $levelFormat
             ))
@@ -545,42 +534,26 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testCreateRelationshipCreatesRelationship() {
-        $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptest_' );
-
         $expectedRow = array(
             'userID1' => 1,
             'userID2' => 2
         );
 
         $this->expectOnce( $this->MockCms, 'insertOrReplaceRow', array(
-            'wptest_hf_relationship',
+            'wptests_hf_relationship',
             $expectedRow,
             array('%d', '%d')
         ) );
         $this->DatabaseWithMockedDependencies->createRelationship( 1, 2 );
     }
 
-    public function testCreateRelationshipGetsPrefix() {
-        $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'duck_' );
-
-        $expectedRow = array(
-            'userID1' => 1,
-            'userID2' => 2
-        );
-
-        $this->expectOnce( $this->MockCms, 'insertOrReplaceRow', array('duck_hf_relationship', $expectedRow, array('%d', '%d')) );
-        $this->DatabaseWithMockedDependencies->createRelationship( 1, 2 );
-    }
-
     public function testSetDefaultGoalSubscriptionAddsDefaultGoalSubscription() {
-        $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptest_' );
-
         $expectedData = array(
             'userID' => 7,
             'goalID' => 1
         );
 
-        $this->expectOnce( $this->MockCms, 'insertOrReplaceRow', array('wptest_hf_user_goal', $expectedData, array('%d', '%d')) );
+        $this->expectOnce( $this->MockCms, 'insertOrReplaceRow', array('wptests_hf_user_goal', $expectedData, array('%d', '%d')) );
         $this->DatabaseWithMockedDependencies->setDefaultGoalSubscription(7);
     }
 
@@ -624,5 +597,34 @@ class TestDatabase extends HfTestCase {
         $this->expectOnce($this->MockCms, 'insertIntoDb', array('wptests_hf_report', $expectedRow));
 
         $this->DatabaseWithMockedDependencies->recordAccountabilityReport(1,2,3);
+    }
+
+    public function testRecordEmailRecordsEmail() {
+        $expectedRow = array(
+            'subject' => 2,
+            'body'    => 3,
+            'userID'  => 1,
+            'emailID' => 4,
+            'address' => 5
+        );
+
+        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptests_');
+        $this->expectOnce($this->MockCms, 'insertIntoDb', array('wptests_hf_email', $expectedRow));
+
+        $this->DatabaseWithMockedDependencies->recordEmail(1,2,3,4,5);
+    }
+
+    public function testRecordReportRequestRecordsReportRequest() {
+        $expectedRow = array(
+            'requestID'      => 1,
+            'userID'         => 2,
+            'emailID'        => 3,
+            'expirationDate' => 4
+        );
+
+        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptests_');
+        $this->expectOnce($this->MockCms, 'insertIntoDb', array('wptests_hf_report_request', $expectedRow));
+
+        $this->DatabaseWithMockedDependencies->recordReportRequest(1,2,3,4);
     }
 }

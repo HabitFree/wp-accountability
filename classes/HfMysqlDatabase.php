@@ -260,24 +260,18 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function recordEmail( $userID, $subject, $message, $emailID = null, $emailAddress = null ) {
-        $table = "hf_email";
-        $data  = array(
+        $data = array(
             'subject' => $subject,
             'body'    => $message,
             'userID'  => $userID,
             'emailID' => $emailID,
             'address' => $emailAddress
         );
-        $this->insertIntoDb( $table, $data );
-    }
 
-    public function insertIntoDb( $table, $data ) {
-        global $wpdb;
-        $prefix    = $wpdb->prefix;
-        $tableName = $prefix . $table;
-        $data      = $this->removeNullValuePairs( $data );
+        $table = $this->Cms->getDbPrefix() . "hf_email";
+        $data  = $this->removeNullValuePairs( $data );
 
-        $this->Cms->insertIntoDb( $tableName, $data );
+        $this->Cms->insertIntoDb( $table, $data );
     }
 
     public function removeNullValuePairs( $array ) {
@@ -451,7 +445,21 @@ class HfMysqlDatabase implements Hf_iDatabase {
             'expirationDate' => $expirationDate
         );
 
-        $this->insertIntoDb( 'hf_report_request', $data );
+        global $wpdb;
+        $prefix    = $this->Cms->getDbPrefix();
+        $tableName = $prefix . 'hf_report_request';
+        $data      = $this->removeNullValuePairs( $data );
+
+        $this->Cms->insertIntoDb( $tableName, $data );
+    }
+
+    public function insertIntoDb( $table, $data ) {
+        global $wpdb;
+        $prefix    = $wpdb->prefix;
+        $tableName = $prefix . $table;
+        $data      = $this->removeNullValuePairs( $data );
+
+        $this->Cms->insertIntoDb( $tableName, $data );
     }
 
     public function isReportRequestValid( $requestId ) {

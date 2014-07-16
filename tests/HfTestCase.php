@@ -49,6 +49,8 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->MockPageLocator     = $this->makeMock( 'HfUrlFinder' );
         $this->MockGoals           = $this->makeMock( 'HfGoals' );
         $this->MockMarkupGenerator = $this->makeMock( 'HfHtmlGenerator' );
+
+        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptests_');
     }
 
     private function resetObjectsWithMockDependencies() {
