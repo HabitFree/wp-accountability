@@ -598,4 +598,31 @@ class TestDatabase extends HfTestCase {
 
         $this->DatabaseWithMockedDependencies->recordInvite(1,2,3,4,5);
     }
+
+    public function testRecordAccountabilityReportRecordsAccountabilityReport() {
+        $expectedRow = array(
+            'userID'           => 1,
+            'goalID'           => 2,
+            'isSuccessful'     => 3,
+            'referringEmailID' => 4
+        );
+
+        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptests_');
+        $this->expectOnce($this->MockCms, 'insertIntoDb', array('wptests_hf_report', $expectedRow));
+
+        $this->DatabaseWithMockedDependencies->recordAccountabilityReport(1,2,3,4);
+    }
+
+    public function testRecordAccountabilityReportDoesntIncludeReferringEmailIdWhenNotGiven() {
+        $expectedRow = array(
+            'userID'           => 1,
+            'goalID'           => 2,
+            'isSuccessful'     => 3
+        );
+
+        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptests_');
+        $this->expectOnce($this->MockCms, 'insertIntoDb', array('wptests_hf_report', $expectedRow));
+
+        $this->DatabaseWithMockedDependencies->recordAccountabilityReport(1,2,3);
+    }
 }

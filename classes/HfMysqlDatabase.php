@@ -400,8 +400,13 @@ class HfMysqlDatabase implements Hf_iDatabase {
             'userID'           => $userID,
             'goalID'           => $goalID,
             'isSuccessful'     => $isSuccessful,
-            'referringEmailID' => $emailID);
-        $this->insertIntoDb( 'hf_report', $data );
+            'referringEmailID' => $emailID
+        );
+
+        $table = $this->Cms->getDbPrefix() . 'hf_report';
+        $data  = $this->removeNullValuePairs( $data );
+
+        $this->Cms->insertIntoDb( $table, $data );
     }
 
     public function isEmailValid( $userID, $emailID ) {
@@ -520,16 +525,16 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function setDefaultGoalSubscription( $userId ) {
-        $sub = array(
+        $sub   = array(
             'userID' => $userId,
             'goalID' => 1
         );
         $table = $this->Cms->getDbPrefix() . 'hf_user_goal';
-        $this->Cms->insertOrReplaceRow($table, $sub, array('%d', '%d'));
+        $this->Cms->insertOrReplaceRow( $table, $sub, array('%d', '%d') );
     }
 
     public function recordInvite( $inviteID, $inviterID, $inviteeEmail, $emailID, $expirationDate ) {
-        $data  = array(
+        $data = array(
             'inviteID'       => $inviteID,
             'inviterID'      => $inviterID,
             'inviteeEmail'   => $inviteeEmail,
