@@ -335,13 +335,6 @@ class HfMysqlDatabase implements Hf_iDatabase {
         return $this->Cms->getRow( 'hf_level', $whereLevel );
     }
 
-    public function getRow( $table, $criterion ) {
-        global $wpdb;
-        $prefix = $wpdb->prefix;
-
-        return $wpdb->get_row( "SELECT * FROM " . $prefix . $table . " WHERE " . $criterion );
-    }
-
     public function daysSinceLastReport( $goalID, $userID ) {
         global $wpdb;
         $prefix                    = $wpdb->prefix;

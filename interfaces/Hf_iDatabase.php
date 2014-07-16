@@ -27,8 +27,6 @@ interface Hf_iDatabase {
 
     public function isEmailValid( $userID, $emailID );
 
-    public function getRow( $table, $criterion );
-
     public function timeOfLastFail( $goalID, $userID );
 
     public function getLevel( $daysOfSuccess );
