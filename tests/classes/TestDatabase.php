@@ -642,4 +642,15 @@ class TestDatabase extends HfTestCase {
 
         $this->DatabaseWithMockedDependencies->getQuotations( 'context' );
     }
+
+    public function testGetPartnersPreparesQuery() {
+        $this->expectOnce( $this->MockCms, 'prepareQuery', array(
+            'SELECT * FROM %s INNER JOIN %s
+            WHERE (userID1 = ID OR userID2 = ID)
+            AND (userID1 = %d OR userID2 = %d) AND ID != $d',
+            array('wptests_users', 'wptests_hf_relationship', 2, 2, 2)
+        ) );
+
+        $this->DatabaseWithMockedDependencies->getPartners( 2 );
+    }
 }

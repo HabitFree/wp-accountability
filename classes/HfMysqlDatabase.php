@@ -423,10 +423,15 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function getPartners( $userId ) {
-        $query = 'SELECT * FROM `wp_users`
-            INNER JOIN `wp_hf_relationship`
+        $usersTable = $this->Cms->getDbPrefix() . 'users';
+        $relationshipsTable = $this->Cms->getDbPrefix() . 'hf_relationship';
+
+        $query = $this->Cms->prepareQuery(
+            'SELECT * FROM %s INNER JOIN %s
             WHERE (userID1 = ID OR userID2 = ID)
-            AND (userID1 = ' . $userId . ' OR userID2 = ' . $userId . ') AND ID != ' . $userId;
+            AND (userID1 = %d OR userID2 = %d) AND ID != $d',
+            array($usersTable, $relationshipsTable, $userId, $userId, $userId)
+        );
 
         return $this->Cms->getResults( $query );
     }
@@ -498,9 +503,9 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function getQuotations( $context ) {
-        $prefix    = $this->Cms->getDbPrefix();
         $contextId = $this->getContextId( $context );
 
+        $prefix     = $this->Cms->getDbPrefix();
         $postsTable = $prefix . 'posts';
         $termsTable = $prefix . 'term_relationships';
 
