@@ -23,12 +23,7 @@ class HfUserManager implements Hf_iUserManager {
     }
 
     function processNewUser( $userId ) {
-        $table = "hf_user_goal";
-        $data  = array(
-            'userID' => $userId,
-            'goalID' => 1
-        );
-        $this->Database->insertIgnoreIntoDb( $table, $data );
+        $this->Database->setDefaultGoalSubscription($userId);
         $settingsPageURL = $this->AssetLocator->getPageUrlByTitle( 'Settings' );
         $message         = "<p>Welcome to HabitFree!
 				You've been subscribed to periodic accountability emails. 

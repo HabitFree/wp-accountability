@@ -93,4 +93,9 @@ class TestUserManager extends HfTestCase {
         $this->expectOnce($this->MockDatabase, 'deleteRelationship', array('dog', 'cat'));
         $this->UserManagerWithMockedDependencies->deleteRelationship('dog', 'cat');
     }
+
+    public function testUserManagerAddsDefaultSubWhenProcessingNewUser() {
+        $this->expectOnce($this->MockDatabase, 'setDefaultGoalSubscription', array(9));
+        $this->UserManagerWithMockedDependencies->processNewUser(9);
+    }
 }

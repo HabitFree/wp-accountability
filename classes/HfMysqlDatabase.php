@@ -402,29 +402,6 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $this->Cms->insertOrReplaceRow( $table, $row, array('%d', '%d') );
     }
 
-    public function insertIgnoreIntoDb( $table, $data ) {
-        global $wpdb;
-        $prefix    = $wpdb->prefix;
-        $tableName = $prefix . $table;
-        $data      = $this->escapeData( $data );
-        $setValues = '';
-        foreach ( $data as $col => $val ) {
-            if ( $setValues !== '' ) {
-                $setValues .= ", ";
-            }
-            $setValues .= "`" . $col . "` = ";
-            if ( is_int( $val ) ) {
-                $setValues .= $val;
-            } else {
-                $setValues .= "`" . $val . "`";
-            }
-        }
-
-        $query = "INSERT IGNORE INTO `" . $tableName . "` SET " . $setValues . ";";
-
-        $wpdb->query( $query );
-    }
-
     public function escapeData( $data ) {
         foreach ( $data as $col => $val ) {
             $col = esc_sql( $col );
@@ -556,5 +533,14 @@ class HfMysqlDatabase implements Hf_iDatabase {
         } else {
             return array('userID1' => $userId2, 'userID2' => $userId1);
         }
+    }
+
+    public function setDefaultGoalSubscription( $userId ) {
+        $sub = array(
+            'userID' => $userId,
+            'goalID' => 1
+        );
+        $table = $this->Cms->getDbPrefix() . 'hf_user_goal';
+        $this->Cms->insertOrReplaceRow($table, $sub, array('%d', '%d'));
     }
 }

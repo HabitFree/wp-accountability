@@ -11,8 +11,6 @@ interface Hf_iDatabase {
 
     public function idOfLastEmail();
 
-    public function insertIgnoreIntoDb( $table, $data );
-
     public function daysSinceSecondToLastEmail( $userId );
 
     public function daysSinceLastReport( $goalID, $userID );
@@ -67,5 +65,7 @@ interface Hf_iDatabase {
 
     public function getQuotations( $context );
 
-    public function deleteRelationship($userId1, $userId2);
+    public function deleteRelationship( $userId1, $userId2 );
+
+    public function setDefaultGoalSubscription( $userId );
 }

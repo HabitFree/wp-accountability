@@ -545,26 +545,42 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testCreateRelationshipCreatesRelationship() {
-        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptest_');
+        $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptest_' );
 
         $expectedRow = array(
             'userID1' => 1,
             'userID2' => 2
         );
 
-        $this->expectOnce($this->MockCms, 'insertOrReplaceRow', array('wptest_hf_relationship', $expectedRow, array('%d', '%d')));
-        $this->DatabaseWithMockedDependencies->createRelationship(1, 2);
+        $this->expectOnce( $this->MockCms, 'insertOrReplaceRow', array(
+            'wptest_hf_relationship',
+            $expectedRow,
+            array('%d', '%d')
+        ) );
+        $this->DatabaseWithMockedDependencies->createRelationship( 1, 2 );
     }
 
     public function testCreateRelationshipGetsPrefix() {
-        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'duck_');
+        $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'duck_' );
 
         $expectedRow = array(
             'userID1' => 1,
             'userID2' => 2
         );
 
-        $this->expectOnce($this->MockCms, 'insertOrReplaceRow', array('duck_hf_relationship', $expectedRow, array('%d', '%d')));
-        $this->DatabaseWithMockedDependencies->createRelationship(1, 2);
+        $this->expectOnce( $this->MockCms, 'insertOrReplaceRow', array('duck_hf_relationship', $expectedRow, array('%d', '%d')) );
+        $this->DatabaseWithMockedDependencies->createRelationship( 1, 2 );
+    }
+
+    public function testSetDefaultGoalSubscriptionAddsDefaultGoalSubscription() {
+        $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptest_' );
+
+        $expectedData = array(
+            'userID' => 7,
+            'goalID' => 1
+        );
+
+        $this->expectOnce( $this->MockCms, 'insertOrReplaceRow', array('wptest_hf_user_goal', $expectedData, array('%d', '%d')) );
+        $this->DatabaseWithMockedDependencies->setDefaultGoalSubscription(7);
     }
 }
