@@ -383,7 +383,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
         return intval( $this->Cms->getVar( $query ) );
     }
 
-    public function getInviterID( $nonce ) {
+    public function getInviterId( $nonce ) {
         $where = $this->Cms->prepareQuery(
             "inviteID = %s",
             array( $nonce )
@@ -425,10 +425,13 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $this->Cms->insertIntoDb( $table, $data, array( '%d', '%d', '%d', '%d' ) );
     }
 
-    public function isEmailValid( $userID, $emailID ) {
-        $email = $this->Cms->getRow( 'hf_email',
-            'userID = ' . $userID .
-            ' AND emailID = ' . $emailID );
+    public function isEmailValid( $userId, $emailId ) {
+        $query = $this->Cms->prepareQuery(
+            'userID = %d AND emailID = %d',
+            array($userId, $emailId)
+        );
+        
+        $email = $this->Cms->getRow( 'hf_email', $query );
 
         return $email != null;
     }

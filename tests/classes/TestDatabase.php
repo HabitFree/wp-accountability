@@ -759,4 +759,13 @@ class TestDatabase extends HfTestCase {
 
         $this->DatabaseWithMockedDependencies->getInviterID(343);
     }
+
+    public function testIsEmailValidPreparesQuery() {
+        $this->expectOnce($this->MockCms, 'prepareQuery', array(
+            'userID = %d AND emailID = %d',
+            array(1, 3)
+        ));
+
+        $this->DatabaseWithMockedDependencies->isEmailValid(1, 3);
+    }
 }

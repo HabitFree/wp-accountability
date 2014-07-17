@@ -23,7 +23,7 @@ interface Hf_iDatabase {
 
     public function timeOfFirstSuccess( $goalId, $userId );
 
-    public function isEmailValid( $userID, $emailID );
+    public function isEmailValid( $userId, $emailId );
 
     public function timeOfLastFail( $goalId, $userId );
 
@@ -37,7 +37,7 @@ interface Hf_iDatabase {
 
     public function getGoalSubscriptions( $userID );
 
-    public function getInviterID( $nonce );
+    public function getInviterId( $nonce );
 
     public function getPartners( $userId );
 
