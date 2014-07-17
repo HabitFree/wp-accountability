@@ -133,7 +133,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
         );
 
         $table = $this->Cms->getDbPrefix() . 'hf_goal';
-        $this->Cms->insertOrReplaceRow( $table, $defaultGoal, array('%d', '%s', '%d', '%d') );
+        $this->Cms->insertOrReplaceRow( $table, $defaultGoal, array( '%d', '%s', '%d', '%d' ) );
     }
 
     private function populateLevelsTable() {
@@ -224,7 +224,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
     public function generateEmailId() {
         $table     = 'hf_email';
         $tableName = $this->Cms->getDbPrefix() . $table;
-        $query     = $this->Cms->prepareQuery( 'SELECT max(emailID) FROM %s', array($tableName) );
+        $query     = $this->Cms->prepareQuery( 'SELECT max(emailID) FROM %s', array( $tableName ) );
 
         return $this->Cms->getVar( $query ) + 1;
     }
@@ -232,7 +232,10 @@ class HfMysqlDatabase implements Hf_iDatabase {
     public function daysSinceLastEmail( $userID ) {
         $table = $this->Cms->getDbPrefix() . 'hf_email';
 
-        $query = 'SELECT sendTime FROM ' . $table . ' WHERE userID = ' . $userID . ' ORDER BY emailID DESC LIMIT 1';
+        $query = $this->Cms->prepareQuery(
+            'SELECT sendTime FROM %s WHERE userID = %d ORDER BY emailID DESC LIMIT 1',
+            array( $table, $userID )
+        );
 
         $dateOfLastEmail = $this->Cms->getVar( $query );
         $timeOfLastEmail = strtotime( $dateOfLastEmail );
@@ -248,7 +251,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
 
         $query = $this->Cms->prepareQuery(
             'SELECT sendTime FROM (SELECT * FROM %s WHERE userID = %d ORDER BY emailID DESC LIMIT 2) AS T ORDER BY emailID LIMIT 1',
-            array($table, $userId)
+            array( $table, $userId )
         );
 
         $timeString              = $this->Cms->getVar( $query );
@@ -385,7 +388,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
         }
 
         $table = $this->Cms->getDbPrefix() . 'hf_relationship';
-        $this->Cms->insertOrReplaceRow( $table, $row, array('%d', '%d') );
+        $this->Cms->insertOrReplaceRow( $table, $row, array( '%d', '%d' ) );
     }
 
     public function recordAccountabilityReport( $userID, $goalID, $isSuccessful, $emailID = null ) {
@@ -416,7 +419,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
 
     public function deleteInvite( $inviteID ) {
         $table = $this->Cms->getDbPrefix() . 'hf_invite';
-        $where = array('inviteID' => $inviteID);
+        $where = array( 'inviteID' => $inviteID );
 
         $this->Cms->deleteRows( $table, $where );
     }
@@ -429,7 +432,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
             'SELECT * FROM %s INNER JOIN %s
             WHERE (userID1 = ID OR userID2 = ID)
             AND (userID1 = %d OR userID2 = %d) AND ID != $d',
-            array($usersTable, $relationshipsTable, $userId, $userId, $userId)
+            array( $usersTable, $relationshipsTable, $userId, $userId, $userId )
         );
 
         return $this->Cms->getResults( $query );
@@ -460,7 +463,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
 
         $query = $this->Cms->prepareQuery(
             "SELECT * FROM %s WHERE requestID = %d",
-            array($table, $requestId)
+            array( $table, $requestId )
         );
 
         return $this->Cms->getResults( $query ) != null;
@@ -468,7 +471,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
 
     public function deleteReportRequest( $requestId ) {
         $table = $this->Cms->getDbPrefix() . 'hf_report_request';
-        $where = array('requestID' => $requestId);
+        $where = array( 'requestID' => $requestId );
 
         $this->Cms->deleteRows( $table, $where );
     }
@@ -515,7 +518,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
 
         $query = $this->Cms->prepareQuery(
             "SELECT * FROM %s INNER JOIN %s WHERE post_type =  'hf_quotation' AND post_status =  'publish' AND object_id = id AND term_taxonomy_id = %d",
-            array($postsTable, $termsTable, $contextId)
+            array( $postsTable, $termsTable, $contextId )
         );
 
         return $this->Cms->getResults( $query );
@@ -526,7 +529,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
 
         $query = $this->Cms->prepareQuery(
             "SELECT term_id FROM %s WHERE name = %s",
-            array($prefix . 'terms', $context)
+            array( $prefix . 'terms', $context )
         );
 
         return $this->Cms->getVar( $query );
@@ -542,9 +545,9 @@ class HfMysqlDatabase implements Hf_iDatabase {
 
     private function createDeleteRelationshipWhereCriteria( $userId1, $userId2 ) {
         if ( $userId1 < $userId2 ) {
-            return array('userID1' => $userId1, 'userID2' => $userId2);
+            return array( 'userID1' => $userId1, 'userID2' => $userId2 );
         } else {
-            return array('userID1' => $userId2, 'userID2' => $userId1);
+            return array( 'userID1' => $userId2, 'userID2' => $userId1 );
         }
     }
 
@@ -554,7 +557,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
             'goalID' => 1
         );
         $table = $this->Cms->getDbPrefix() . 'hf_user_goal';
-        $this->Cms->insertOrReplaceRow( $table, $sub, array('%d', '%d') );
+        $this->Cms->insertOrReplaceRow( $table, $sub, array( '%d', '%d' ) );
     }
 
     public function recordInvite( $inviteID, $inviterID, $inviteeEmail, $emailID, $expirationDate ) {

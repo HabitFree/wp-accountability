@@ -663,4 +663,13 @@ class TestDatabase extends HfTestCase {
 
         $this->DatabaseWithMockedDependencies->getQuotations('anotherContext');
     }
+
+    public function testDaysSinceLastEmailPreparesQuery() {
+        $this->expectOnce($this->MockCms, 'prepareQuery', array(
+            'SELECT sendTime FROM %s WHERE userID = %d ORDER BY emailID DESC LIMIT 1',
+            array('wptests_hf_email', 7)
+        ));
+
+        $this->DatabaseWithMockedDependencies->daysSinceLastEmail(7);
+    }
 }
