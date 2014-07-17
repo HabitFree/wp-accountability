@@ -683,4 +683,15 @@ class TestDatabase extends HfTestCase {
 
         $this->DatabaseWithMockedDependencies->timeOfFirstSuccess(1, 7);
     }
+
+    public function testTimeOfLastSuccessPreparesQuery() {
+        $this->expectOnce($this->MockCms, 'prepareQuery', array(
+            'SELECT date FROM %s
+            WHERE goalID = %d AND userID = %d
+            AND reportID=( SELECT max(reportID) FROM %s WHERE isSuccessful = 1)',
+            array('wptests_hf_report', 1, 7, 'wptests_hf_report')
+        ));
+
+        $this->DatabaseWithMockedDependencies->timeOfLastSuccess(1, 7);
+    }
 }

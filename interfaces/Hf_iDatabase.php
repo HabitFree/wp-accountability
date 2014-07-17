@@ -7,7 +7,7 @@ interface Hf_iDatabase {
 
     public function daysSinceLastEmail( $userID );
 
-    public function timeOfLastSuccess( $goalID, $userID );
+    public function timeOfLastSuccess( $goalId, $userId );
 
     public function idOfLastEmail();
 
@@ -21,7 +21,7 @@ interface Hf_iDatabase {
 
     public function createRelationship( $userOneID, $userTwoID );
 
-    public function timeOfFirstSuccess( $goalID, $userID );
+    public function timeOfFirstSuccess( $goalId, $userId );
 
     public function isEmailValid( $userID, $emailID );
 

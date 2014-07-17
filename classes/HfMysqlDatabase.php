@@ -286,14 +286,14 @@ class HfMysqlDatabase implements Hf_iDatabase {
         return $array;
     }
 
-    public function timeOfFirstSuccess( $goalID, $userID ) {
-        $tableName = $this->Cms->getDbPrefix() . 'hf_report';
+    public function timeOfFirstSuccess( $goalId, $userId ) {
+        $table = $this->Cms->getDbPrefix() . 'hf_report';
 
         $query = $this->Cms->prepareQuery(
             'SELECT date FROM %s
             WHERE goalID = %d AND userID = %d
             AND reportID=( SELECT min(reportID) FROM %s WHERE isSuccessful = 1)',
-            array( $tableName, $goalID, $userID, $tableName )
+            array( $table, $goalId, $userId, $table )
         );
 
         $timeString = $this->Cms->getVar( $query );
@@ -301,14 +301,16 @@ class HfMysqlDatabase implements Hf_iDatabase {
         return strtotime( $timeString );
     }
 
-    public function timeOfLastSuccess( $goalID, $userID ) {
-        global $wpdb;
-        $prefix     = $wpdb->prefix;
-        $table      = 'hf_report';
-        $tableName  = $prefix . $table;
-        $query      = 'SELECT date FROM ' . $tableName . '
-                WHERE goalID = ' . $goalID . ' AND userID = ' . $userID . '
-                AND reportID=( SELECT max(reportID) FROM ' . $tableName . ' WHERE isSuccessful = 1)';
+    public function timeOfLastSuccess( $goalId, $userId ) {
+        $table = $this->Cms->getDbPrefix() . 'hf_report';
+
+        $query = $this->Cms->prepareQuery(
+            'SELECT date FROM %s
+            WHERE goalID = %d AND userID = %d
+            AND reportID=( SELECT max(reportID) FROM %s WHERE isSuccessful = 1)',
+            array( $table, $goalId, $userId, $table )
+        );
+
         $timeString = $this->Cms->getVar( $query );
 
         return strtotime( $timeString );
