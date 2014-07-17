@@ -334,34 +334,38 @@ class HfMysqlDatabase implements Hf_iDatabase {
     public function getLevel( $daysOfSuccess ) {
         $where = $this->Cms->prepareQuery(
             'target > %d ORDER BY target ASC',
-            array($daysOfSuccess)
+            array( $daysOfSuccess )
         );
 
         return $this->Cms->getRow( 'hf_level', $where );
     }
 
-    public function daysSinceLastReport( $goalID, $userID ) {
-        global $wpdb;
-        $prefix                    = $wpdb->prefix;
-        $table                     = 'hf_report';
-        $tableName                 = $prefix . $table;
-        $query                     = 'SELECT date FROM ' . $tableName . '
-                WHERE goalID = ' . $goalID . ' AND userID = ' . $userID . '
-                AND reportID=( SELECT max(reportID) FROM ' . $tableName . ')';
+    public function daysSinceLastReport( $goalId, $userId ) {
+        $table = $this->Cms->getDbPrefix() . 'hf_report';
+
+        $query = $this->Cms->prepareQuery(
+            'SELECT date FROM %s
+            WHERE goalID = %d AND userID = %d
+            AND reportID=( SELECT max(reportID) FROM %s )',
+            array( $table, $goalId, $userId, $table )
+        );
+
         $dateInSecondsOfLastReport = strtotime( $this->Cms->getVar( $query ) );
         $secondsInADay             = 86400;
 
         return ( time() - $dateInSecondsOfLastReport ) / $secondsInADay;
     }
 
-    public function daysSinceAnyReport( $userID ) {
-        global $wpdb;
-        $prefix                    = $wpdb->prefix;
-        $table                     = 'hf_report';
-        $tableName                 = $prefix . $table;
-        $query                     = 'SELECT date FROM ' . $tableName . '
-                WHERE userID = ' . $userID . '
-                AND reportID=( SELECT max(reportID) FROM ' . $tableName . ')';
+    public function daysSinceAnyReport( $userId ) {
+        $table = $this->Cms->getDbPrefix() . 'hf_report';
+
+        $query = $this->Cms->prepareQuery(
+            'SELECT date FROM %s
+            WHERE userID = %d
+            AND reportID=( SELECT max(reportID) FROM %s )',
+            array( $table, $userId, $table )
+        );
+
         $dateInSecondsOfLastReport = strtotime( $this->Cms->getVar( $query ) );
         $secondsInADay             = 86400;
 

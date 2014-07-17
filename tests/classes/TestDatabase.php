@@ -714,4 +714,26 @@ class TestDatabase extends HfTestCase {
 
         $this->DatabaseWithMockedDependencies->getLevel(13);
     }
+
+    public function testDaysSinceLastReportPreparesQuery() {
+        $this->expectOnce($this->MockCms, 'prepareQuery', array(
+            'SELECT date FROM %s
+            WHERE goalID = %d AND userID = %d
+            AND reportID=( SELECT max(reportID) FROM %s )',
+            array('wptests_hf_report', 3, 7, 'wptests_hf_report')
+        ));
+
+        $this->DatabaseWithMockedDependencies->daysSinceLastReport(3, 7);
+    }
+
+    public function testDaysSinceAnyReportPreparesQuery() {
+        $this->expectOnce($this->MockCms, 'prepareQuery', array(
+            'SELECT date FROM %s
+            WHERE userID = %d
+            AND reportID=( SELECT max(reportID) FROM %s )',
+            array('wptests_hf_report', 7, 'wptests_hf_report')
+        ));
+
+        $this->DatabaseWithMockedDependencies->daysSinceAnyReport(7);
+    }
 }

@@ -13,7 +13,7 @@ interface Hf_iDatabase {
 
     public function daysSinceSecondToLastEmail( $userId );
 
-    public function daysSinceLastReport( $goalID, $userID );
+    public function daysSinceLastReport( $goalId, $userId );
 
     public function removeNullValuePairs( $array );
 
@@ -31,7 +31,7 @@ interface Hf_iDatabase {
 
     public function recordAccountabilityReport( $userID, $goalID, $isSuccessful, $emailID = null );
 
-    public function daysSinceAnyReport( $userID );
+    public function daysSinceAnyReport( $userId );
 
     public function deleteInvite( $inviteID );
 
