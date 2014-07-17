@@ -316,23 +316,28 @@ class HfMysqlDatabase implements Hf_iDatabase {
         return strtotime( $timeString );
     }
 
-    public function timeOfLastFail( $goalID, $userID ) {
-        global $wpdb;
-        $prefix     = $wpdb->prefix;
-        $table      = 'hf_report';
-        $tableName  = $prefix . $table;
-        $query      = 'SELECT date FROM ' . $tableName . '
-                WHERE goalID = ' . $goalID . ' AND userID = ' . $userID . '
-                AND reportID=( SELECT max(reportID) FROM ' . $tableName . ' WHERE NOT isSuccessful = 1)';
+    public function timeOfLastFail( $goalId, $userId ) {
+        $table = $this->Cms->getDbPrefix() . 'hf_report';
+
+        $query = $this->Cms->prepareQuery(
+            'SELECT date FROM %s
+            WHERE goalID = %d AND userID = %d
+            AND reportID=( SELECT max(reportID) FROM %s WHERE NOT isSuccessful = 1)',
+            array( $table, $goalId, $userId, $table )
+        );
+
         $timeString = $this->Cms->getVar( $query );
 
         return strtotime( $timeString );
     }
 
     public function getLevel( $daysOfSuccess ) {
-        $whereLevel = 'target > ' . $daysOfSuccess . ' ORDER BY target ASC';
+        $where = $this->Cms->prepareQuery(
+            'target > %d ORDER BY target ASC',
+            array($daysOfSuccess)
+        );
 
-        return $this->Cms->getRow( 'hf_level', $whereLevel );
+        return $this->Cms->getRow( 'hf_level', $where );
     }
 
     public function daysSinceLastReport( $goalID, $userID ) {
