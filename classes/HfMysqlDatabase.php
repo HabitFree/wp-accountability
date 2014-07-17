@@ -426,18 +426,23 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function isEmailValid( $userId, $emailId ) {
-        $query = $this->Cms->prepareQuery(
+        $where = $this->Cms->prepareQuery(
             'userID = %d AND emailID = %d',
             array($userId, $emailId)
         );
-        
-        $email = $this->Cms->getRow( 'hf_email', $query );
+
+        $email = $this->Cms->getRow( 'hf_email', $where );
 
         return $email != null;
     }
 
-    public function getGoalSubscriptions( $userID ) {
-        return $this->Cms->getRows( 'hf_user_goal', 'userID = ' . $userID );
+    public function getGoalSubscriptions( $userId ) {
+        $where = $this->Cms->prepareQuery(
+            'userID = %d',
+            array($userId)
+        );
+
+        return $this->Cms->getRows( 'hf_user_goal', $where );
     }
 
     public function deleteInvite( $inviteID ) {
@@ -462,7 +467,10 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function getGoal( $goalId ) {
-        $where = 'goalID = ' . $goalId;
+        $where = $this->Cms->prepareQuery(
+            'goalID = %d',
+            array($goalId)
+        );
 
         return $this->Cms->getRow( 'hf_goal', $where );
     }

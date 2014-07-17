@@ -768,4 +768,22 @@ class TestDatabase extends HfTestCase {
 
         $this->DatabaseWithMockedDependencies->isEmailValid(1, 3);
     }
+
+    public function testGetGoalSubscriptionsPreparesQuery() {
+        $this->expectOnce($this->MockCms, 'prepareQuery', array(
+            'userID = %d',
+            array(1)
+        ));
+
+        $this->DatabaseWithMockedDependencies->getGoalSubscriptions(1);
+    }
+
+    public function testGetGoalPreparesQuery() {
+        $this->expectOnce($this->MockCms, 'prepareQuery', array(
+            'goalID = %d',
+            array(3)
+        ));
+
+        $this->DatabaseWithMockedDependencies->getGoal(3);
+    }
 }

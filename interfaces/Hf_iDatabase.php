@@ -35,7 +35,7 @@ interface Hf_iDatabase {
 
     public function deleteInvite( $inviteID );
 
-    public function getGoalSubscriptions( $userID );
+    public function getGoalSubscriptions( $userId );
 
     public function getInviterId( $nonce );
 
