@@ -117,8 +117,8 @@ class HfWordPress implements Hf_iCms {
         return $this->wpdb->get_results($query);
     }
 
-    public function insertIntoDb($table, $data) {
-        $this->wpdb->insert($table, $data);
+    public function insertIntoDb($table, $data, $format) {
+        $this->wpdb->insert($table, $data, $format);
     }
 
     public function updateRowsSafe($table, $data, $where) {

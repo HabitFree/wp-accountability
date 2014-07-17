@@ -47,7 +47,7 @@ interface Hf_iCms {
 
     public function getResults($query);
 
-    public function insertIntoDb($table, $data);
+    public function insertIntoDb($table, $data, $format);
 
     public function updateRowsSafe($table, $data, $where);
 

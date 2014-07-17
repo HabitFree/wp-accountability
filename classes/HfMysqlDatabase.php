@@ -273,7 +273,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $table = $this->Cms->getDbPrefix() . "hf_email";
         $data  = $this->removeNullValuePairs( $data );
 
-        $this->Cms->insertIntoDb( $table, $data );
+        $this->Cms->insertIntoDb( $table, $data, array( '%s', '%s', '%d', '%d', '%s' ) );
     }
 
     public function removeNullValuePairs( $array ) {
@@ -402,7 +402,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $table = $this->Cms->getDbPrefix() . 'hf_report';
         $data  = $this->removeNullValuePairs( $data );
 
-        $this->Cms->insertIntoDb( $table, $data );
+        $this->Cms->insertIntoDb( $table, $data, array( '%d', '%d', '%d', '%d' ) );
     }
 
     public function isEmailValid( $userID, $emailID ) {
@@ -455,7 +455,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $table = $this->Cms->getDbPrefix() . 'hf_report_request';
         $data  = $this->removeNullValuePairs( $data );
 
-        $this->Cms->insertIntoDb( $table, $data );
+        $this->Cms->insertIntoDb( $table, $data, array( '%d', '%d', '%d', '%s' ) );
     }
 
     public function isReportRequestValid( $requestId ) {
@@ -570,6 +570,6 @@ class HfMysqlDatabase implements Hf_iDatabase {
         );
 
         $table = $this->Cms->getDbPrefix() . "hf_invite";
-        $this->Cms->insertIntoDb( $table, $data );
+        $this->Cms->insertIntoDb( $table, $data, array( '%d', '%d', '%s', '%d', '%s' ) );
     }
 }
