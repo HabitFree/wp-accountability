@@ -633,14 +633,24 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testGetQuotationsPreparesQuery() {
-        $this->expectOnce( $this->MockCms, 'prepareQuery', array(
+/*        $this->assertMethodCallsMethodWithArgsAtAnyTime(
+            $this->MockCms,
+            'prepareQuery',
+            $this->DatabaseWithMockedDependencies,
+            'getQuotations',
+            array(
+                "SELECT * FROM %s INNER JOIN %s WHERE post_type =  'hf_quotation' AND post_status =  'publish' AND object_id = id AND term_taxonomy_id = %d",
+                array('wptests_posts', 'wptests_term_relationships', 2)
+            )
+        );*/
+
+        $this->expectAt( $this->MockCms, 'prepareQuery', 4, array(
             "SELECT * FROM %s INNER JOIN %s WHERE post_type =  'hf_quotation' AND post_status =  'publish' AND object_id = id AND term_taxonomy_id = %d",
             array('wptests_posts', 'wptests_term_relationships', 2)
         ) );
 
         $this->setReturnValue($this->MockCms, 'getVar', 2);
-
-        $this->DatabaseWithMockedDependencies->getQuotations( 'context' );
+        $this->DatabaseWithMockedDependencies->getQuotations( 'Big-C-Context' );
     }
 
     public function testGetPartnersPreparesQuery() {
@@ -652,5 +662,14 @@ class TestDatabase extends HfTestCase {
         ) );
 
         $this->DatabaseWithMockedDependencies->getPartners( 2 );
+    }
+
+    public function testGetContextIdPreparesQuery() {
+        $this->expectAt($this->MockCms, 'prepareQuery', 1, array(
+            "SELECT term_id FROM %s WHERE name = %s",
+            array('wptests_tersm', 'context')
+        ));
+
+        $this->DatabaseWithMockedDependencies->getQuotations('context');
     }
 }

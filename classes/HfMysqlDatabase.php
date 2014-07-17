@@ -509,6 +509,11 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $postsTable = $prefix . 'posts';
         $termsTable = $prefix . 'term_relationships';
 
+        var_dump($context);
+        var_dump($postsTable);
+        var_dump($termsTable);
+        var_dump($contextId);
+
         $query = $this->Cms->prepareQuery(
             "SELECT * FROM %s INNER JOIN %s WHERE post_type =  'hf_quotation' AND post_status =  'publish' AND object_id = id AND term_taxonomy_id = %d",
             array($postsTable, $termsTable, $contextId)
@@ -519,6 +524,11 @@ class HfMysqlDatabase implements Hf_iDatabase {
 
     private function getContextId( $context ) {
         $prefix = $this->Cms->getDbPrefix();
+
+        $query = $this->Cms->prepareQuery(
+            "SELECT term_id FROM %s WHERE name = %s",
+            array('wptests_tersm', 'context')
+        );
 
         return $this->Cms->getVar( "SELECT term_id FROM " . $prefix . "terms WHERE name = '" . $context . "'" );
     }

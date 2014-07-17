@@ -180,6 +180,9 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         // Any failure of at() expectations returns "Mocked method does not exist"
         // See http://stackoverflow.com/questions/3367513/phpunit-mocked-method-does-not-exist-when-using-mock-expectsthis-at
 
+        // $at refers to the call number among all calls to any method of the specified mock,
+        // NOT to the specified method of the specified mock
+
         $ExpectantMock = $Mock->expects( $this->at( $at ) )->method( $method );
 
         $this->addWithArgsExpectation( $args, $ExpectantMock );
