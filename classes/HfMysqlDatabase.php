@@ -428,7 +428,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
     public function isEmailValid( $userId, $emailId ) {
         $where = $this->Cms->prepareQuery(
             'userID = %d AND emailID = %d',
-            array($userId, $emailId)
+            array( $userId, $emailId )
         );
 
         $email = $this->Cms->getRow( 'hf_email', $where );
@@ -439,7 +439,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
     public function getGoalSubscriptions( $userId ) {
         $where = $this->Cms->prepareQuery(
             'userID = %d',
-            array($userId)
+            array( $userId )
         );
 
         return $this->Cms->getRows( 'hf_user_goal', $where );
@@ -469,7 +469,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
     public function getGoal( $goalId ) {
         $where = $this->Cms->prepareQuery(
             'goalID = %d',
-            array($goalId)
+            array( $goalId )
         );
 
         return $this->Cms->getRow( 'hf_goal', $where );
@@ -508,7 +508,12 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function getReportRequestUserId( $requestId ) {
-        $ReportRequest = $this->Cms->getRow( 'hf_report_request', "requestID = '" . $requestId . "'" );
+        $where = $this->Cms->prepareQuery(
+            'requestID = %s',
+            array( $requestId )
+        );
+        
+        $ReportRequest = $this->Cms->getRow( 'hf_report_request', $where );
 
         return $ReportRequest->userID;
     }
