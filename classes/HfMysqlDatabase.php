@@ -287,13 +287,15 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function timeOfFirstSuccess( $goalID, $userID ) {
-        global $wpdb;
-        $prefix     = $wpdb->prefix;
-        $table      = 'hf_report';
-        $tableName  = $prefix . $table;
-        $query      = 'SELECT date FROM ' . $tableName . '
-                WHERE goalID = ' . $goalID . ' AND userID = ' . $userID . '
-                AND reportID=( SELECT min(reportID) FROM ' . $tableName . ' WHERE isSuccessful = 1)';
+        $tableName = $this->Cms->getDbPrefix() . 'hf_report';
+
+        $query = $this->Cms->prepareQuery(
+            'SELECT date FROM %s
+            WHERE goalID = %d AND userID = %d
+            AND reportID=( SELECT min(reportID) FROM %s WHERE isSuccessful = 1)',
+            array( $tableName, $goalID, $userID, $tableName )
+        );
+
         $timeString = $this->Cms->getVar( $query );
 
         return strtotime( $timeString );
