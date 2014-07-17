@@ -230,10 +230,9 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function daysSinceLastEmail( $userID ) {
-        $table         = 'hf_email';
-        $fullTableName = $this->Cms->getDbPrefix() . $table;
+        $table = $this->Cms->getDbPrefix() . 'hf_email';
 
-        $query = 'SELECT sendTime FROM ' . $fullTableName . ' WHERE userID = ' . $userID . ' ORDER BY emailID DESC LIMIT 1';
+        $query = 'SELECT sendTime FROM ' . $table . ' WHERE userID = ' . $userID . ' ORDER BY emailID DESC LIMIT 1';
 
         $dateOfLastEmail = $this->Cms->getVar( $query );
         $timeOfLastEmail = strtotime( $dateOfLastEmail );
@@ -423,7 +422,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function getPartners( $userId ) {
-        $usersTable = $this->Cms->getDbPrefix() . 'users';
+        $usersTable         = $this->Cms->getDbPrefix() . 'users';
         $relationshipsTable = $this->Cms->getDbPrefix() . 'hf_relationship';
 
         $query = $this->Cms->prepareQuery(
@@ -509,10 +508,10 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $postsTable = $prefix . 'posts';
         $termsTable = $prefix . 'term_relationships';
 
-        var_dump($context);
-        var_dump($postsTable);
-        var_dump($termsTable);
-        var_dump($contextId);
+        var_dump( $context );
+        var_dump( $postsTable );
+        var_dump( $termsTable );
+        var_dump( $contextId );
 
         $query = $this->Cms->prepareQuery(
             "SELECT * FROM %s INNER JOIN %s WHERE post_type =  'hf_quotation' AND post_status =  'publish' AND object_id = id AND term_taxonomy_id = %d",
@@ -527,10 +526,10 @@ class HfMysqlDatabase implements Hf_iDatabase {
 
         $query = $this->Cms->prepareQuery(
             "SELECT term_id FROM %s WHERE name = %s",
-            array('wptests_tersm', 'context')
+            array($prefix . 'terms', $context)
         );
 
-        return $this->Cms->getVar( "SELECT term_id FROM " . $prefix . "terms WHERE name = '" . $context . "'" );
+        return $this->Cms->getVar( $query );
     }
 
     public function deleteRelationship( $userId1, $userId2 ) {

@@ -301,20 +301,6 @@ class TestDatabase extends HfTestCase {
         $this->assertEquals( $expected, $actual );
     }
 
-    public function testGetQuotationsLooksUpTermId() {
-        $expectedQuery = "SELECT term_id FROM wptests_terms WHERE name = 'For Setback'";
-        $this->expectOnce( $this->MockCms, 'getVar', array($expectedQuery) );
-
-        $this->DatabaseWithMockedDependencies->getQuotations( 'For Setback' );
-    }
-
-    public function testGetQuotationsLooksUpPassedTermName() {
-        $expectedQuery = "SELECT term_id FROM wptests_terms WHERE name = 'For Success'";
-        $this->expectOnce( $this->MockCms, 'getVar', array($expectedQuery) );
-
-        $this->DatabaseWithMockedDependencies->getQuotations( 'For Success' );
-    }
-
     public function testDeleteRelationshipDeletesRelationship() {
         $table = 'wptests_hf_relationship';
         $where = array(
@@ -633,17 +619,6 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testGetQuotationsPreparesQuery() {
-/*        $this->assertMethodCallsMethodWithArgsAtAnyTime(
-            $this->MockCms,
-            'prepareQuery',
-            $this->DatabaseWithMockedDependencies,
-            'getQuotations',
-            array(
-                "SELECT * FROM %s INNER JOIN %s WHERE post_type =  'hf_quotation' AND post_status =  'publish' AND object_id = id AND term_taxonomy_id = %d",
-                array('wptests_posts', 'wptests_term_relationships', 2)
-            )
-        );*/
-
         $this->expectAt( $this->MockCms, 'prepareQuery', 4, array(
             "SELECT * FROM %s INNER JOIN %s WHERE post_type =  'hf_quotation' AND post_status =  'publish' AND object_id = id AND term_taxonomy_id = %d",
             array('wptests_posts', 'wptests_term_relationships', 2)
@@ -667,9 +642,25 @@ class TestDatabase extends HfTestCase {
     public function testGetContextIdPreparesQuery() {
         $this->expectAt($this->MockCms, 'prepareQuery', 1, array(
             "SELECT term_id FROM %s WHERE name = %s",
-            array('wptests_tersm', 'context')
+            array('wptests_terms', 'context')
         ));
 
         $this->DatabaseWithMockedDependencies->getQuotations('context');
+    }
+
+    public function testGetContextIdUsesPreparedQuery() {
+        $this->setReturnValue($this->MockCms, 'prepareQuery', 'duckVal');
+        $this->expectOnce($this->MockCms, 'getVar', array('duckVal'));
+
+        $this->DatabaseWithMockedDependencies->getQuotations('context');
+    }
+
+    public function testGetContextIdLooksUpPassedContext() {
+        $this->expectAt($this->MockCms, 'prepareQuery', 1, array(
+            "SELECT term_id FROM %s WHERE name = %s",
+            array('wptests_terms', 'anotherContext')
+        ));
+
+        $this->DatabaseWithMockedDependencies->getQuotations('anotherContext');
     }
 }
