@@ -373,16 +373,23 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function idOfLastEmail() {
-        global $wpdb;
-        $tableName = $wpdb->prefix . 'hf_email';
-        $query     = 'SELECT max(emailID) FROM ' . $tableName;
+        $table = $this->Cms->getDbPrefix() . 'hf_email';
+
+        $query = $this->Cms->prepareQuery(
+            'SELECT max(emailID) FROM %s',
+            array( $table )
+        );
 
         return intval( $this->Cms->getVar( $query ) );
     }
 
     public function getInviterID( $nonce ) {
-        $whereInvite = "inviteID = '" . $nonce . "'";
-        $invite      = $this->Cms->getRow( 'hf_invite', $whereInvite );
+        $where = $this->Cms->prepareQuery(
+            "inviteID = %s",
+            array( $nonce )
+        );
+
+        $invite = $this->Cms->getRow( 'hf_invite', $where );
 
         return intval( $invite->inviterID );
     }

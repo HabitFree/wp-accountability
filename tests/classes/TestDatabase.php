@@ -736,4 +736,27 @@ class TestDatabase extends HfTestCase {
 
         $this->DatabaseWithMockedDependencies->daysSinceAnyReport(7);
     }
+
+    public function testIdOfLastEmailPreparesQuery() {
+        $this->expectOnce($this->MockCms, 'prepareQuery', array(
+            'SELECT max(emailID) FROM %s',
+            array('wptests_hf_email')
+        ));
+
+        $this->DatabaseWithMockedDependencies->idOfLastEmail();
+    }
+
+    public function testGetInviterIdPreparesQuery() {
+        $MockInvite = new stdClass();
+        $MockInvite->inviterID = 2;
+
+        $this->setReturnValue($this->MockCms, 'getRow', $MockInvite);
+
+        $this->expectOnce($this->MockCms, 'prepareQuery', array(
+            "inviteID = %s",
+            array(343)
+        ));
+
+        $this->DatabaseWithMockedDependencies->getInviterID(343);
+    }
 }
