@@ -316,25 +316,14 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testGenerateEmailId() {
-        $this->expectOnce( $this->MockCms, 'getVar', array( "SELECT max(emailID) FROM 'wptest_hf_email'" ) );
-        $this->setReturnValue( $this->MockCms, 'prepareQuery', "SELECT max(emailID) FROM 'wptest_hf_email'" );
-        $this->DatabaseWithMockedDependencies->generateEmailId();
-    }
-
-    public function testGenerateEmailIdPreparesQuery() {
-        $this->expectOnce( $this->MockCms, 'prepareQuery' );
-        $this->DatabaseWithMockedDependencies->generateEmailId();
-    }
-
-    public function testGenerateEmailIdPreparesQueryProperly() {
-        $this->expectOnce( $this->MockCms, 'prepareQuery', array( "SELECT max(emailID) FROM %s", array( 'wptests_hf_email' ) ) );
+        $this->expectOnce( $this->MockCms, 'getVar', array( "SELECT max(emailID) FROM wptests_hf_email" ) );
         $this->DatabaseWithMockedDependencies->generateEmailId();
     }
 
     public function testDaysSinceSecondToLastEmailPreparesQuery() {
         $this->expectOnce( $this->MockCms, 'prepareQuery', array(
-            'SELECT sendTime FROM (SELECT * FROM %s WHERE userID = %d ORDER BY emailID DESC LIMIT 2) AS T ORDER BY emailID LIMIT 1',
-            array( 'wptests_hf_email', 1 )
+            'SELECT sendTime FROM (SELECT * FROM wptests_hf_email WHERE userID = %d ORDER BY emailID DESC LIMIT 2) AS T ORDER BY emailID LIMIT 1',
+            array( 1 )
         ) );
 
         $this->DatabaseWithMockedDependencies->daysSinceSecondToLastEmail( 1 );
@@ -354,7 +343,7 @@ class TestDatabase extends HfTestCase {
         $this->DatabaseWithMockedDependencies->installDb();
     }
 
-    public function testDatabaseUsesCmsinsertOrReplaceRowWhenInstallingDatabase() {
+    public function testDatabaseUsesCmsInsertOrReplaceRowWhenInstallingDatabase() {
         $defaultLevel0 = array(
             'levelID'       => 0,
             'title'         => 'Hibernation',
@@ -601,8 +590,8 @@ class TestDatabase extends HfTestCase {
 
     public function testIsReportRequestValidPreparesQuery() {
         $this->expectOnce( $this->MockCms, 'prepareQuery', array(
-            "SELECT * FROM %s WHERE requestID = %d",
-            array( 'wptests_hf_report_request', 7 )
+            "SELECT * FROM wptests_hf_report_request WHERE requestID = %d",
+            array( 7 )
         ) );
 
         $this->DatabaseWithMockedDependencies->isReportRequestValid( 7 );
@@ -610,8 +599,8 @@ class TestDatabase extends HfTestCase {
 
     public function testGetQuotationsPreparesQuery() {
         $this->expectAt( $this->MockCms, 'prepareQuery', 4, array(
-            "SELECT * FROM %s INNER JOIN %s WHERE post_type =  'hf_quotation' AND post_status =  'publish' AND object_id = id AND term_taxonomy_id = %d",
-            array( 'wptests_posts', 'wptests_term_relationships', 2 )
+            "SELECT * FROM wptests_posts INNER JOIN wptests_term_relationships WHERE post_type =  'hf_quotation' AND post_status =  'publish' AND object_id = id AND term_taxonomy_id = %d",
+            array( 2 )
         ) );
 
         $this->setReturnValue( $this->MockCms, 'getVar', 2 );
@@ -620,10 +609,10 @@ class TestDatabase extends HfTestCase {
 
     public function testGetPartnersPreparesQuery() {
         $this->expectOnce( $this->MockCms, 'prepareQuery', array(
-            'SELECT * FROM %s INNER JOIN %s
+            'SELECT * FROM wptests_users INNER JOIN wptests_hf_relationship
             WHERE (userID1 = ID OR userID2 = ID)
             AND (userID1 = %d OR userID2 = %d) AND ID != $d',
-            array( 'wptests_users', 'wptests_hf_relationship', 2, 2, 2 )
+            array( 2, 2, 2 )
         ) );
 
         $this->DatabaseWithMockedDependencies->getPartners( 2 );
@@ -631,8 +620,8 @@ class TestDatabase extends HfTestCase {
 
     public function testGetContextIdPreparesQuery() {
         $this->expectAt( $this->MockCms, 'prepareQuery', 1, array(
-            "SELECT term_id FROM %s WHERE name = %s",
-            array( 'wptests_terms', 'context' )
+            "SELECT term_id FROM wptests_terms WHERE name = %s",
+            array( 'context' )
         ) );
 
         $this->DatabaseWithMockedDependencies->getQuotations( 'context' );
@@ -647,8 +636,8 @@ class TestDatabase extends HfTestCase {
 
     public function testGetContextIdLooksUpPassedContext() {
         $this->expectAt( $this->MockCms, 'prepareQuery', 1, array(
-            "SELECT term_id FROM %s WHERE name = %s",
-            array( 'wptests_terms', 'anotherContext' )
+            "SELECT term_id FROM wptests_terms WHERE name = %s",
+            array( 'anotherContext' )
         ) );
 
         $this->DatabaseWithMockedDependencies->getQuotations( 'anotherContext' );
@@ -656,8 +645,8 @@ class TestDatabase extends HfTestCase {
 
     public function testDaysSinceLastEmailPreparesQuery() {
         $this->expectOnce( $this->MockCms, 'prepareQuery', array(
-            'SELECT sendTime FROM %s WHERE userID = %d ORDER BY emailID DESC LIMIT 1',
-            array( 'wptests_hf_email', 7 )
+            'SELECT sendTime FROM wptests_hf_email WHERE userID = %d ORDER BY emailID DESC LIMIT 1',
+            array( 7 )
         ) );
 
         $this->DatabaseWithMockedDependencies->daysSinceLastEmail( 7 );
@@ -665,10 +654,10 @@ class TestDatabase extends HfTestCase {
 
     public function testTimeOfFirstSuccessPreparesQuery() {
         $this->expectOnce( $this->MockCms, 'prepareQuery', array(
-            'SELECT date FROM %s
+            'SELECT date FROM wptests_hf_report
             WHERE goalID = %d AND userID = %d
-            AND reportID=( SELECT min(reportID) FROM %s WHERE isSuccessful = 1)',
-            array( 'wptests_hf_report', 1, 7, 'wptests_hf_report' )
+            AND reportID=( SELECT min(reportID) FROM wptests_hf_report WHERE isSuccessful = 1)',
+            array( 1, 7 )
         ) );
 
         $this->DatabaseWithMockedDependencies->timeOfFirstSuccess( 1, 7 );
@@ -676,10 +665,10 @@ class TestDatabase extends HfTestCase {
 
     public function testTimeOfLastSuccessPreparesQuery() {
         $this->expectOnce( $this->MockCms, 'prepareQuery', array(
-            'SELECT date FROM %s
+            'SELECT date FROM wptests_hf_report
             WHERE goalID = %d AND userID = %d
-            AND reportID=( SELECT max(reportID) FROM %s WHERE isSuccessful = 1)',
-            array( 'wptests_hf_report', 1, 7, 'wptests_hf_report' )
+            AND reportID=( SELECT max(reportID) FROM wptests_hf_report WHERE isSuccessful = 1)',
+            array( 1, 7 )
         ) );
 
         $this->DatabaseWithMockedDependencies->timeOfLastSuccess( 1, 7 );
@@ -687,10 +676,10 @@ class TestDatabase extends HfTestCase {
 
     public function testTimeOfLastFailPreparesQuery() {
         $this->expectOnce( $this->MockCms, 'prepareQuery', array(
-            'SELECT date FROM %s
+            'SELECT date FROM wptests_hf_report
             WHERE goalID = %d AND userID = %d
-            AND reportID=( SELECT max(reportID) FROM %s WHERE NOT isSuccessful = 1)',
-            array( 'wptests_hf_report', 1, 7, 'wptests_hf_report' )
+            AND reportID=( SELECT max(reportID) FROM wptests_hf_report WHERE NOT isSuccessful = 1)',
+            array( 1, 7 )
         ) );
 
         $this->DatabaseWithMockedDependencies->timeOfLastFail( 1, 7 );
@@ -707,10 +696,10 @@ class TestDatabase extends HfTestCase {
 
     public function testDaysSinceLastReportPreparesQuery() {
         $this->expectOnce( $this->MockCms, 'prepareQuery', array(
-            'SELECT date FROM %s
+            'SELECT date FROM wptests_hf_report
             WHERE goalID = %d AND userID = %d
-            AND reportID=( SELECT max(reportID) FROM %s )',
-            array( 'wptests_hf_report', 3, 7, 'wptests_hf_report' )
+            AND reportID=( SELECT max(reportID) FROM wptests_hf_report )',
+            array( 3, 7 )
         ) );
 
         $this->DatabaseWithMockedDependencies->daysSinceLastReport( 3, 7 );
@@ -718,20 +707,18 @@ class TestDatabase extends HfTestCase {
 
     public function testDaysSinceAnyReportPreparesQuery() {
         $this->expectOnce( $this->MockCms, 'prepareQuery', array(
-            'SELECT date FROM %s
+            'SELECT date FROM wptests_hf_report
             WHERE userID = %d
-            AND reportID=( SELECT max(reportID) FROM %s )',
-            array( 'wptests_hf_report', 7, 'wptests_hf_report' )
+            AND reportID=( SELECT max(reportID) FROM wptests_hf_report )',
+            array( 7 )
         ) );
 
         $this->DatabaseWithMockedDependencies->daysSinceAnyReport( 7 );
     }
 
-    public function testIdOfLastEmailPreparesQuery() {
-        $this->expectOnce( $this->MockCms, 'prepareQuery', array(
-            'SELECT max(emailID) FROM %s',
-            array( 'wptests_hf_email' )
-        ) );
+    public function testIdOfLastEmailQuery() {
+        $this->expectOnce( $this->MockCms, 'getVar', array(
+            'SELECT max(emailID) FROM wptests_hf_email' ) );
 
         $this->DatabaseWithMockedDependencies->idOfLastEmail();
     }

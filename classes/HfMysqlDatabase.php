@@ -222,9 +222,8 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function generateEmailId() {
-        $table     = 'hf_email';
-        $tableName = $this->Cms->getDbPrefix() . $table;
-        $query     = $this->Cms->prepareQuery( 'SELECT max(emailID) FROM %s', array( $tableName ) );
+        $table = $this->Cms->getDbPrefix() . 'hf_email';
+        $query = 'SELECT max(emailID) FROM ' . $table;
 
         return $this->Cms->getVar( $query ) + 1;
     }
@@ -232,10 +231,8 @@ class HfMysqlDatabase implements Hf_iDatabase {
     public function daysSinceLastEmail( $userID ) {
         $table = $this->Cms->getDbPrefix() . 'hf_email';
 
-        $query = $this->Cms->prepareQuery(
-            'SELECT sendTime FROM %s WHERE userID = %d ORDER BY emailID DESC LIMIT 1',
-            array( $table, $userID )
-        );
+        $format = 'SELECT sendTime FROM ' . $table . ' WHERE userID = %d ORDER BY emailID DESC LIMIT 1';
+        $query  = $this->Cms->prepareQuery( $format, array( $userID ) );
 
         $dateOfLastEmail = $this->Cms->getVar( $query );
         $timeOfLastEmail = strtotime( $dateOfLastEmail );
@@ -249,10 +246,8 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $timeNow = $this->CodeLibrary->getCurrentTime();
         $table   = $this->Cms->getDbPrefix() . 'hf_email';
 
-        $query = $this->Cms->prepareQuery(
-            'SELECT sendTime FROM (SELECT * FROM %s WHERE userID = %d ORDER BY emailID DESC LIMIT 2) AS T ORDER BY emailID LIMIT 1',
-            array( $table, $userId )
-        );
+        $format = 'SELECT sendTime FROM (SELECT * FROM ' . $table . ' WHERE userID = %d ORDER BY emailID DESC LIMIT 2) AS T ORDER BY emailID LIMIT 1';
+        $query  = $this->Cms->prepareQuery( $format, array( $userId ) );
 
         $timeString              = $this->Cms->getVar( $query );
         $timeOfSecondToLastEmail = strtotime( $timeString );
@@ -289,12 +284,10 @@ class HfMysqlDatabase implements Hf_iDatabase {
     public function timeOfFirstSuccess( $goalId, $userId ) {
         $table = $this->Cms->getDbPrefix() . 'hf_report';
 
-        $query = $this->Cms->prepareQuery(
-            'SELECT date FROM %s
+        $format = 'SELECT date FROM ' . $table . '
             WHERE goalID = %d AND userID = %d
-            AND reportID=( SELECT min(reportID) FROM %s WHERE isSuccessful = 1)',
-            array( $table, $goalId, $userId, $table )
-        );
+            AND reportID=( SELECT min(reportID) FROM ' . $table . ' WHERE isSuccessful = 1)';
+        $query  = $this->Cms->prepareQuery( $format, array( $goalId, $userId ) );
 
         $timeString = $this->Cms->getVar( $query );
 
@@ -304,12 +297,10 @@ class HfMysqlDatabase implements Hf_iDatabase {
     public function timeOfLastSuccess( $goalId, $userId ) {
         $table = $this->Cms->getDbPrefix() . 'hf_report';
 
-        $query = $this->Cms->prepareQuery(
-            'SELECT date FROM %s
+        $format = 'SELECT date FROM ' . $table . '
             WHERE goalID = %d AND userID = %d
-            AND reportID=( SELECT max(reportID) FROM %s WHERE isSuccessful = 1)',
-            array( $table, $goalId, $userId, $table )
-        );
+            AND reportID=( SELECT max(reportID) FROM ' . $table . ' WHERE isSuccessful = 1)';
+        $query  = $this->Cms->prepareQuery( $format, array( $goalId, $userId ) );
 
         $timeString = $this->Cms->getVar( $query );
 
@@ -319,12 +310,10 @@ class HfMysqlDatabase implements Hf_iDatabase {
     public function timeOfLastFail( $goalId, $userId ) {
         $table = $this->Cms->getDbPrefix() . 'hf_report';
 
-        $query = $this->Cms->prepareQuery(
-            'SELECT date FROM %s
+        $format = 'SELECT date FROM ' . $table . '
             WHERE goalID = %d AND userID = %d
-            AND reportID=( SELECT max(reportID) FROM %s WHERE NOT isSuccessful = 1)',
-            array( $table, $goalId, $userId, $table )
-        );
+            AND reportID=( SELECT max(reportID) FROM ' . $table . ' WHERE NOT isSuccessful = 1)';
+        $query  = $this->Cms->prepareQuery( $format, array( $goalId, $userId ) );
 
         $timeString = $this->Cms->getVar( $query );
 
@@ -343,12 +332,10 @@ class HfMysqlDatabase implements Hf_iDatabase {
     public function daysSinceLastReport( $goalId, $userId ) {
         $table = $this->Cms->getDbPrefix() . 'hf_report';
 
-        $query = $this->Cms->prepareQuery(
-            'SELECT date FROM %s
+        $format = 'SELECT date FROM ' . $table . '
             WHERE goalID = %d AND userID = %d
-            AND reportID=( SELECT max(reportID) FROM %s )',
-            array( $table, $goalId, $userId, $table )
-        );
+            AND reportID=( SELECT max(reportID) FROM ' . $table . ' )';
+        $query  = $this->Cms->prepareQuery( $format, array( $goalId, $userId ) );
 
         $dateInSecondsOfLastReport = strtotime( $this->Cms->getVar( $query ) );
         $secondsInADay             = 86400;
@@ -359,12 +346,10 @@ class HfMysqlDatabase implements Hf_iDatabase {
     public function daysSinceAnyReport( $userId ) {
         $table = $this->Cms->getDbPrefix() . 'hf_report';
 
-        $query = $this->Cms->prepareQuery(
-            'SELECT date FROM %s
+        $format = 'SELECT date FROM ' . $table . '
             WHERE userID = %d
-            AND reportID=( SELECT max(reportID) FROM %s )',
-            array( $table, $userId, $table )
-        );
+            AND reportID=( SELECT max(reportID) FROM ' . $table . ' )';
+        $query  = $this->Cms->prepareQuery( $format, array( $userId ) );
 
         $dateInSecondsOfLastReport = strtotime( $this->Cms->getVar( $query ) );
         $secondsInADay             = 86400;
@@ -374,11 +359,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
 
     public function idOfLastEmail() {
         $table = $this->Cms->getDbPrefix() . 'hf_email';
-
-        $query = $this->Cms->prepareQuery(
-            'SELECT max(emailID) FROM %s',
-            array( $table )
-        );
+        $query = 'SELECT max(emailID) FROM ' . $table;
 
         return intval( $this->Cms->getVar( $query ) );
     }
@@ -456,12 +437,10 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $usersTable         = $this->Cms->getDbPrefix() . 'users';
         $relationshipsTable = $this->Cms->getDbPrefix() . 'hf_relationship';
 
-        $query = $this->Cms->prepareQuery(
-            'SELECT * FROM %s INNER JOIN %s
+        $format = 'SELECT * FROM ' . $usersTable . ' INNER JOIN ' . $relationshipsTable . '
             WHERE (userID1 = ID OR userID2 = ID)
-            AND (userID1 = %d OR userID2 = %d) AND ID != $d',
-            array( $usersTable, $relationshipsTable, $userId, $userId, $userId )
-        );
+            AND (userID1 = %d OR userID2 = %d) AND ID != $d';
+        $query  = $this->Cms->prepareQuery( $format, array( $userId, $userId, $userId ) );
 
         return $this->Cms->getResults( $query );
     }
@@ -492,10 +471,8 @@ class HfMysqlDatabase implements Hf_iDatabase {
     public function isReportRequestValid( $requestId ) {
         $table = $this->Cms->getDbPrefix() . 'hf_report_request';
 
-        $query = $this->Cms->prepareQuery(
-            "SELECT * FROM %s WHERE requestID = %d",
-            array( $table, $requestId )
-        );
+        $format = 'SELECT * FROM ' . $table . ' WHERE requestID = %d';
+        $query  = $this->Cms->prepareQuery( $format, array( $requestId ) );
 
         return $this->Cms->getResults( $query ) != null;
     }
@@ -512,7 +489,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
             'requestID = %s',
             array( $requestId )
         );
-        
+
         $ReportRequest = $this->Cms->getRow( 'hf_report_request', $where );
 
         return $ReportRequest->userID;
@@ -547,26 +524,17 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $postsTable = $prefix . 'posts';
         $termsTable = $prefix . 'term_relationships';
 
-        var_dump( $context );
-        var_dump( $postsTable );
-        var_dump( $termsTable );
-        var_dump( $contextId );
-
-        $query = $this->Cms->prepareQuery(
-            "SELECT * FROM %s INNER JOIN %s WHERE post_type =  'hf_quotation' AND post_status =  'publish' AND object_id = id AND term_taxonomy_id = %d",
-            array( $postsTable, $termsTable, $contextId )
-        );
+        $format = "SELECT * FROM " . $postsTable . " INNER JOIN " . $termsTable . " WHERE post_type =  'hf_quotation' AND post_status =  'publish' AND object_id = id AND term_taxonomy_id = %d";
+        $query  = $this->Cms->prepareQuery( $format, array( $contextId ) );
 
         return $this->Cms->getResults( $query );
     }
 
     private function getContextId( $context ) {
-        $prefix = $this->Cms->getDbPrefix();
+        $table = $this->Cms->getDbPrefix() . 'terms';
 
-        $query = $this->Cms->prepareQuery(
-            "SELECT term_id FROM %s WHERE name = %s",
-            array( $prefix . 'terms', $context )
-        );
+        $format = "SELECT term_id FROM " . $table . " WHERE name = %s";
+        $query  = $this->Cms->prepareQuery( $format, array( $context ) );
 
         return $this->Cms->getVar( $query );
     }
