@@ -1,5 +1,6 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit;
 //require_once( dirname( dirname( __FILE__ ) ) . '/hf-accountability.php' );
 
 abstract class HfTestCase extends \PHPUnit_Framework_TestCase {

@@ -1,5 +1,5 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) exit;
 class HfWordPress implements Hf_iCms {
     private $wpdb;
 

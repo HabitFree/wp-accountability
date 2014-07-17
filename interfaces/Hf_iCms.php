@@ -1,5 +1,5 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) exit;
 interface Hf_iCms {
     public function getUserEmail( $userID );
 

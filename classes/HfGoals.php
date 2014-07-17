@@ -1,5 +1,5 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) exit;
 class HfGoals implements Hf_iGoals {
     private $Database;
     private $MarkupGenerator;

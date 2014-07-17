@@ -6,6 +6,7 @@ Author: Nathan Arthur
 Version: 1.0
 Author URI: http://NathanArthur.com/
 */
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 register_activation_hook( __FILE__, "hfActivate" );
 register_deactivation_hook( __FILE__, "hfDeactivate" );

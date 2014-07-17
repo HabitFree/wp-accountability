@@ -1,5 +1,5 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) exit;
 class HfAuthenticateShortcode implements Hf_iShortcode {
     private $MarkupGenerator;
     private $AssetLocator;

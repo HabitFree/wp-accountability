@@ -1,5 +1,5 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) exit;
 interface Hf_iSecurity {
     public function createRandomString( $length );
 

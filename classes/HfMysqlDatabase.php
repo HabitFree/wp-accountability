@@ -1,5 +1,5 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) exit;
 class HfMysqlDatabase implements Hf_iDatabase {
     private $Cms;
     private $CodeLibrary;

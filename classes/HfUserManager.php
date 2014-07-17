@@ -1,5 +1,5 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) exit;
 class HfUserManager implements Hf_iUserManager {
     private $Database;
     private $Messenger;

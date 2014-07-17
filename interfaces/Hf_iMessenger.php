@@ -1,5 +1,5 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) exit;
 interface Hf_iMessenger {
     public function sendEmailToAddress( $address, $subject, $body );
 

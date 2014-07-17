@@ -1,5 +1,5 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) exit;
 class HfMailer implements Hf_iMessenger {
     private $Security;
     private $Database;

@@ -1,5 +1,5 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) exit;
 interface Hf_iDatabase {
     public function recordEmail( $userID, $subject, $message, $emailID = null, $emailAddress = null );
 
