@@ -1,6 +1,8 @@
 <?php
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( !defined( 'ABSPATH' ) ) {
+    exit;
+}
 require_once( dirname( dirname( __FILE__ ) ) . '/HfTestCase.php' );
 
 class TestDatabase extends HfTestCase {
@@ -599,8 +601,10 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testGetQuotationsPreparesQuery() {
+        $format = "SELECT * FROM wptests_posts INNER JOIN wptests_term_relationships
+            WHERE post_type = 'hf_quotation' AND post_status = 'publish' AND object_id = id AND term_taxonomy_id = %d";
         $this->expectAt( $this->MockCms, 'prepareQuery', 4, array(
-            "SELECT * FROM wptests_posts INNER JOIN wptests_term_relationships WHERE post_type =  'hf_quotation' AND post_status =  'publish' AND object_id = id AND term_taxonomy_id = %d",
+            $format,
             array( 2 )
         ) );
 
