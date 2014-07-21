@@ -192,11 +192,6 @@ class TestDatabase extends HfTestCase {
         $this->DatabaseWithMockedDependencies->deleteInvite( 777 );
     }
 
-    public function testGetGoalSubscriptions() {
-        $this->expectOnce( $this->MockCms, 'getRows' );
-        $this->DatabaseWithMockedDependencies->getGoalSubscriptions( 1 );
-    }
-
     public function testRecordReportRequest() {
         $table          = "hf_report_request";
         $requestId      = 555;
@@ -741,15 +736,6 @@ class TestDatabase extends HfTestCase {
         $this->DatabaseWithMockedDependencies->isEmailValid( 1, 3 );
     }
 
-    public function testGetGoalSubscriptionsPreparesQuery() {
-        $this->expectOnce( $this->MockCms, 'prepareQuery', array(
-            'userID = %d',
-            array( 1 )
-        ) );
-
-        $this->DatabaseWithMockedDependencies->getGoalSubscriptions( 1 );
-    }
-
     public function testGetGoalPreparesQuery() {
         $this->expectOnce( $this->MockCms, 'prepareQuery', array(
             'goalID = %d',
@@ -782,5 +768,29 @@ class TestDatabase extends HfTestCase {
         $expected = 'SELECT * FROM wptests_hf_report_request';
         $this->expectOnce($this->MockCms, 'getResults', array($expected));
         $this->DatabaseWithMockedDependencies->getAllReportRequests();
+    }
+
+    public function testGetGoalSubscriptionsPreparesNewQuery() {
+        $this->expectOnce( $this->MockCms, 'prepareQuery', array(
+            'SELECT * FROM wptests_hf_user_goal WHERE userID = %d',
+            array( 7 )
+        ) );
+
+        $this->DatabaseWithMockedDependencies->getGoalSubscriptions(7);
+    }
+
+    public function testGetGoalSubscriptionsUsesPreparedQuery() {
+        $this->setReturnValue($this->MockCms, 'prepareQuery', 'duck');
+        $this->expectOnce($this->MockCms, 'getResults', array('duck'));
+        $this->DatabaseWithMockedDependencies->getGoalSubscriptions(7);
+    }
+
+    public function testGetGoalSubscriptionsUsesPassedValue() {
+        $this->expectOnce( $this->MockCms, 'prepareQuery', array(
+            'SELECT * FROM wptests_hf_user_goal WHERE userID = %d',
+            array( 3 )
+        ) );
+
+        $this->DatabaseWithMockedDependencies->getGoalSubscriptions(3);
     }
 }

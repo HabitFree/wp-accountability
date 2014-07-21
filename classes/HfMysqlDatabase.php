@@ -421,12 +421,14 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function getGoalSubscriptions( $userId ) {
-        $where = $this->Cms->prepareQuery(
-            'userID = %d',
+        $table = $this->Cms->getDbPrefix() . 'hf_user_goal';
+
+        $query = $this->Cms->prepareQuery(
+            "SELECT * FROM $table WHERE userID = %d",
             array( $userId )
         );
 
-        return $this->Cms->getRows( 'hf_user_goal', $where );
+        return $this->Cms->getResults( $query );
     }
 
     public function deleteInvite( $inviteID ) {

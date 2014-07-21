@@ -48,16 +48,6 @@ class HfWordPress implements Hf_iCms {
         return is_user_logged_in();
     }
 
-    public function getRows( $table, $where, $outputType = OBJECT ) {
-        global $wpdb;
-        $prefix = $wpdb->prefix;
-        if ( $where === null ) {
-            return $wpdb->get_results( "SELECT * FROM " . $prefix . $table, $outputType );
-        } else {
-            return $wpdb->get_results( "SELECT * FROM " . $prefix . $table . " WHERE " . $where, $outputType );
-        }
-    }
-
     function getRow( $table, $criterion ) {
         $prefix = $this->getDbPrefix();
         $query = "SELECT * FROM " . $prefix . $table . " WHERE " . $criterion;

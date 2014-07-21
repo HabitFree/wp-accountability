@@ -19,8 +19,6 @@ interface Hf_iCms {
 
     public function isUserLoggedIn();
 
-    public function getRows( $table, $where, $outputType = OBJECT );
-
     public function getRow( $table, $criterion );
 
     public function deleteRows( $table, $where );
