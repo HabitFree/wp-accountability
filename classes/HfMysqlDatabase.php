@@ -414,12 +414,14 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function isEmailValid( $userId, $emailId ) {
-        $where = $this->Cms->prepareQuery(
-            'userID = %d AND emailID = %d',
+        $t = $this->Cms->getDbPrefix() . 'hf_email';
+
+        $query = $this->Cms->prepareQuery(
+            "SELECT * FROM $t WHERE userID = %d AND emailID = %d",
             array( $userId, $emailId )
         );
 
-        $email = $this->Cms->getRow( 'hf_email', $where );
+        $email = $this->Cms->getRow( $query );
 
         return $email != null;
     }

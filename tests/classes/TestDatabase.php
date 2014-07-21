@@ -745,12 +745,21 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testIsEmailValidPreparesQuery() {
+        //$prefix = $this->getDbPrefix();
+        //$query = "SELECT * FROM " . $prefix . $table . " WHERE " . $criterion;
+
         $this->expectOnce( $this->MockCms, 'prepareQuery', array(
-            'userID = %d AND emailID = %d',
+            'SELECT * FROM wptests_hf_email WHERE userID = %d AND emailID = %d',
             array( 1, 3 )
         ) );
 
         $this->DatabaseWithMockedDependencies->isEmailValid( 1, 3 );
+    }
+
+    public function testIsEmailValidUsesOnlyPreparedQuery() {
+        $this->setReturnValue($this->MockCms, 'prepareQuery', 'duck');
+        $this->expectOnce($this->MockCms, 'getRow', array('duck'));
+        $this->DatabaseWithMockedDependencies->isEmailValid(1,3);
     }
 
     public function testGetGoalPreparesQuery() {
