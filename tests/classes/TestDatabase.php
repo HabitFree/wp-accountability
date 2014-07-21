@@ -714,17 +714,25 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testGetInviterIdPreparesQuery() {
-        $MockInvite            = new stdClass();
-        $MockInvite->inviterID = 2;
+        //$prefix = $this->getDbPrefix();
+        //$query = "SELECT * FROM " . $prefix . $table . " WHERE " . $criterion;
 
-        $this->setReturnValue( $this->MockCms, 'getRow', $MockInvite );
+        $this->setMockInviteReturnValue();
 
         $this->expectOnce( $this->MockCms, 'prepareQuery', array(
-            "inviteID = %s",
+            "SELECT * FROM wptests_hf_invite WHERE inviteID = %s",
             array( 343 )
         ) );
 
-        $this->DatabaseWithMockedDependencies->getInviterID( 343 );
+        $this->DatabaseWithMockedDependencies->getInviterId( 343 );
+    }
+
+    public function testGetInviterIdUsesPreparedQueryOnly() {
+        $this->setMockInviteReturnValue();
+        $this->setReturnValue($this->MockCms, 'prepareQuery', 'duck');
+        $this->expectOnce($this->MockCms, 'getRow', array('duck'));
+
+        $this->DatabaseWithMockedDependencies->getInviterId(343);
     }
 
     public function testIsEmailValidPreparesQuery() {
@@ -801,5 +809,12 @@ class TestDatabase extends HfTestCase {
         ) );
 
         $this->DatabaseWithMockedDependencies->getGoalSubscriptions(3);
+    }
+
+    private function setMockInviteReturnValue() {
+        $MockInvite            = new stdClass();
+        $MockInvite->inviterID = 2;
+
+        $this->setReturnValue( $this->MockCms, 'getRow', $MockInvite );
     }
 }

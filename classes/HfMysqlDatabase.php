@@ -368,12 +368,14 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function getInviterId( $nonce ) {
-        $where = $this->Cms->prepareQuery(
-            "inviteID = %s",
+        $t = $this->Cms->getDbPrefix() . 'hf_invite';
+
+        $query = $this->Cms->prepareQuery(
+            "SELECT * FROM $t WHERE inviteID = %s",
             array( $nonce )
         );
 
-        $invite = $this->Cms->getRow( 'hf_invite', $where );
+        $invite = $this->Cms->getRow( $query );
 
         return intval( $invite->inviterID );
     }
