@@ -6,8 +6,6 @@ if ( !defined( 'ABSPATH' ) ) {
 require_once( dirname( dirname( __FILE__ ) ) . '/HfTestCase.php' );
 
 class TestDatabase extends HfTestCase {
-    // Helper Functions
-
     public function testDbDataNullRemoval() {
         $Database = $this->Factory->makeDatabase();
 
@@ -58,8 +56,6 @@ class TestDatabase extends HfTestCase {
 
         return $column;
     }
-
-    // Tests
 
     public function testEmailTableSchema() {
         $expectedSchema = array(
@@ -676,9 +672,6 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testGetLevelPreparesQuery() {
-        //$prefix = $this->getDbPrefix();
-        //$query = "SELECT * FROM " . $prefix . $table . " WHERE " . $criterion;
-
         $this->expectOnce( $this->MockCms, 'prepareQuery', array(
             'SELECT * FROM wptests_hf_level WHERE target > %d ORDER BY target ASC',
             array( 13 )
@@ -688,9 +681,9 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testGetLevelUsesOnlyPreparedQuery() {
-        $this->setReturnValue($this->MockCms, 'prepareQuery', 'duck');
-        $this->expectOnce($this->MockCms, 'getRow', array('duck'));
-        $this->DatabaseWithMockedDependencies->getLevel(13);
+        $this->setReturnValue( $this->MockCms, 'prepareQuery', 'duck' );
+        $this->expectOnce( $this->MockCms, 'getRow', array( 'duck' ) );
+        $this->DatabaseWithMockedDependencies->getLevel( 13 );
     }
 
     public function testDaysSinceLastReportPreparesQuery() {
@@ -723,9 +716,6 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testGetInviterIdPreparesQuery() {
-        //$prefix = $this->getDbPrefix();
-        //$query = "SELECT * FROM " . $prefix . $table . " WHERE " . $criterion;
-
         $this->setMockInviteReturnValue();
 
         $this->expectOnce( $this->MockCms, 'prepareQuery', array(
@@ -736,18 +726,22 @@ class TestDatabase extends HfTestCase {
         $this->DatabaseWithMockedDependencies->getInviterId( 343 );
     }
 
+    private function setMockInviteReturnValue() {
+        $MockInvite            = new stdClass();
+        $MockInvite->inviterID = 2;
+
+        $this->setReturnValue( $this->MockCms, 'getRow', $MockInvite );
+    }
+
     public function testGetInviterIdUsesPreparedQueryOnly() {
         $this->setMockInviteReturnValue();
-        $this->setReturnValue($this->MockCms, 'prepareQuery', 'duck');
-        $this->expectOnce($this->MockCms, 'getRow', array('duck'));
+        $this->setReturnValue( $this->MockCms, 'prepareQuery', 'duck' );
+        $this->expectOnce( $this->MockCms, 'getRow', array( 'duck' ) );
 
-        $this->DatabaseWithMockedDependencies->getInviterId(343);
+        $this->DatabaseWithMockedDependencies->getInviterId( 343 );
     }
 
     public function testIsEmailValidPreparesQuery() {
-        //$prefix = $this->getDbPrefix();
-        //$query = "SELECT * FROM " . $prefix . $table . " WHERE " . $criterion;
-
         $this->expectOnce( $this->MockCms, 'prepareQuery', array(
             'SELECT * FROM wptests_hf_email WHERE userID = %d AND emailID = %d',
             array( 1, 3 )
@@ -757,15 +751,12 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testIsEmailValidUsesOnlyPreparedQuery() {
-        $this->setReturnValue($this->MockCms, 'prepareQuery', 'duck');
-        $this->expectOnce($this->MockCms, 'getRow', array('duck'));
-        $this->DatabaseWithMockedDependencies->isEmailValid(1,3);
+        $this->setReturnValue( $this->MockCms, 'prepareQuery', 'duck' );
+        $this->expectOnce( $this->MockCms, 'getRow', array( 'duck' ) );
+        $this->DatabaseWithMockedDependencies->isEmailValid( 1, 3 );
     }
 
     public function testGetGoalPreparesQuery() {
-        //$prefix = $this->getDbPrefix();
-        //$query = "SELECT * FROM " . $prefix . $table . " WHERE " . $criterion;
-
         $this->expectOnce( $this->MockCms, 'prepareQuery', array(
             'SELECT * FROM wptests_hf_goal WHERE goalID = %d',
             array( 3 )
@@ -775,15 +766,12 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testGetGoalUsesOnlyPreparedQuery() {
-        $this->setReturnValue($this->MockCms, 'prepareQuery', 'duck');
-        $this->expectOnce($this->MockCms, 'getRow', array('duck'));
+        $this->setReturnValue( $this->MockCms, 'prepareQuery', 'duck' );
+        $this->expectOnce( $this->MockCms, 'getRow', array( 'duck' ) );
         $this->DatabaseWithMockedDependencies->getGoal( 3 );
     }
 
     public function testGetReportRequestUserIdPreparesQuery() {
-        //$prefix = $this->getDbPrefix();
-        //$query = "SELECT * FROM " . $prefix . $table . " WHERE " . $criterion;
-
         $this->setMockRequestReturnValue();
 
         $this->expectOnce( $this->MockCms, 'prepareQuery', array(
@@ -794,23 +782,29 @@ class TestDatabase extends HfTestCase {
         $this->DatabaseWithMockedDependencies->getReportRequestUserId( 9 );
     }
 
+    private function setMockRequestReturnValue() {
+        $MockRequest         = new stdClass();
+        $MockRequest->userID = 5;
+        $this->setReturnValue( $this->MockCms, 'getRow', $MockRequest );
+    }
+
     public function testGetReportRequestIdUsesOnlyPreparedQuery() {
         $this->setMockRequestReturnValue();
 
-        $this->setReturnValue($this->MockCms, 'prepareQuery', 'duck');
-        $this->expectOnce($this->MockCms, 'getRow', array('duck'));
-        $this->DatabaseWithMockedDependencies->getReportRequestUserId(9);
+        $this->setReturnValue( $this->MockCms, 'prepareQuery', 'duck' );
+        $this->expectOnce( $this->MockCms, 'getRow', array( 'duck' ) );
+        $this->DatabaseWithMockedDependencies->getReportRequestUserId( 9 );
     }
 
     public function testGetAllInvitesUsesGetResults() {
         $expected = 'SELECT * FROM wptests_hf_invite';
-        $this->expectOnce($this->MockCms, 'getResults', array($expected));
+        $this->expectOnce( $this->MockCms, 'getResults', array( $expected ) );
         $this->DatabaseWithMockedDependencies->getAllInvites();
     }
 
     public function testGetAllReportRequestsUsesGetResults() {
         $expected = 'SELECT * FROM wptests_hf_report_request';
-        $this->expectOnce($this->MockCms, 'getResults', array($expected));
+        $this->expectOnce( $this->MockCms, 'getResults', array( $expected ) );
         $this->DatabaseWithMockedDependencies->getAllReportRequests();
     }
 
@@ -820,13 +814,13 @@ class TestDatabase extends HfTestCase {
             array( 7 )
         ) );
 
-        $this->DatabaseWithMockedDependencies->getGoalSubscriptions(7);
+        $this->DatabaseWithMockedDependencies->getGoalSubscriptions( 7 );
     }
 
     public function testGetGoalSubscriptionsUsesPreparedQuery() {
-        $this->setReturnValue($this->MockCms, 'prepareQuery', 'duck');
-        $this->expectOnce($this->MockCms, 'getResults', array('duck'));
-        $this->DatabaseWithMockedDependencies->getGoalSubscriptions(7);
+        $this->setReturnValue( $this->MockCms, 'prepareQuery', 'duck' );
+        $this->expectOnce( $this->MockCms, 'getResults', array( 'duck' ) );
+        $this->DatabaseWithMockedDependencies->getGoalSubscriptions( 7 );
     }
 
     public function testGetGoalSubscriptionsUsesPassedValue() {
@@ -835,19 +829,6 @@ class TestDatabase extends HfTestCase {
             array( 3 )
         ) );
 
-        $this->DatabaseWithMockedDependencies->getGoalSubscriptions(3);
-    }
-
-    private function setMockInviteReturnValue() {
-        $MockInvite            = new stdClass();
-        $MockInvite->inviterID = 2;
-
-        $this->setReturnValue( $this->MockCms, 'getRow', $MockInvite );
-    }
-
-    private function setMockRequestReturnValue() {
-        $MockRequest         = new stdClass();
-        $MockRequest->userID = 5;
-        $this->setReturnValue( $this->MockCms, 'getRow', $MockRequest );
+        $this->DatabaseWithMockedDependencies->getGoalSubscriptions( 3 );
     }
 }
