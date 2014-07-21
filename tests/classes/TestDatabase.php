@@ -737,11 +737,20 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testGetGoalPreparesQuery() {
+        //$prefix = $this->getDbPrefix();
+        //$query = "SELECT * FROM " . $prefix . $table . " WHERE " . $criterion;
+
         $this->expectOnce( $this->MockCms, 'prepareQuery', array(
-            'goalID = %d',
+            'SELECT * FROM wptests_hf_goal WHERE goalID = %d',
             array( 3 )
         ) );
 
+        $this->DatabaseWithMockedDependencies->getGoal( 3 );
+    }
+
+    public function testGetGoalUsesOnlyPreparedQuery() {
+        $this->setReturnValue($this->MockCms, 'prepareQuery', 'duck');
+        $this->expectOnce($this->MockCms, 'getRow', array('duck'));
         $this->DatabaseWithMockedDependencies->getGoal( 3 );
     }
 

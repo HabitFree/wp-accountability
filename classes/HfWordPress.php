@@ -48,9 +48,9 @@ class HfWordPress implements Hf_iCms {
         return is_user_logged_in();
     }
 
-    function getRow( $table, $criterion ) {
-        $prefix = $this->getDbPrefix();
-        $query = "SELECT * FROM " . $prefix . $table . " WHERE " . $criterion;
+    function getRow( $query ) {
+        //$prefix = $this->getDbPrefix();
+        //$query = "SELECT * FROM " . $prefix . $table . " WHERE " . $criterion;
 
         return $this->wpdb->get_row( $query );
     }

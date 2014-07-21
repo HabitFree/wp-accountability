@@ -451,12 +451,14 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function getGoal( $goalId ) {
-        $where = $this->Cms->prepareQuery(
-            'goalID = %d',
+        $t = $this->Cms->getDbPrefix() . 'hf_goal';
+
+        $query = $this->Cms->prepareQuery(
+            "SELECT * FROM $t WHERE goalID = %d",
             array( $goalId )
         );
 
-        return $this->Cms->getRow( 'hf_goal', $where );
+        return $this->Cms->getRow( $query );
     }
 
     public function recordReportRequest( $requestId, $userId, $emailId, $expirationDate ) {
