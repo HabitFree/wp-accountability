@@ -676,12 +676,21 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testGetLevelPreparesQuery() {
+        //$prefix = $this->getDbPrefix();
+        //$query = "SELECT * FROM " . $prefix . $table . " WHERE " . $criterion;
+
         $this->expectOnce( $this->MockCms, 'prepareQuery', array(
-            'target > %d ORDER BY target ASC',
+            'SELECT * FROM wptests_hf_level WHERE target > %d ORDER BY target ASC',
             array( 13 )
         ) );
 
         $this->DatabaseWithMockedDependencies->getLevel( 13 );
+    }
+
+    public function testGetLevelUsesOnlyPreparedQuery() {
+        $this->setReturnValue($this->MockCms, 'prepareQuery', 'duck');
+        $this->expectOnce($this->MockCms, 'getRow', array('duck'));
+        $this->DatabaseWithMockedDependencies->getLevel(13);
     }
 
     public function testDaysSinceLastReportPreparesQuery() {

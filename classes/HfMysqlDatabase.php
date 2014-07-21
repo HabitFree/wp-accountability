@@ -324,12 +324,14 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function getLevel( $daysOfSuccess ) {
-        $where = $this->Cms->prepareQuery(
-            'target > %d ORDER BY target ASC',
+        $t = $this->Cms->getDbPrefix() . 'hf_level';
+
+        $query = $this->Cms->prepareQuery(
+            "SELECT * FROM $t WHERE target > %d ORDER BY target ASC",
             array( $daysOfSuccess )
         );
 
-        return $this->Cms->getRow( 'hf_level', $where );
+        return $this->Cms->getRow( $query );
     }
 
     public function daysSinceLastReport( $goalId, $userId ) {
