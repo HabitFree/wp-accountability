@@ -258,23 +258,13 @@ class TestDatabase extends HfTestCase {
         $this->DatabaseWithMockedDependencies->updateReportRequestExpirationDate( 555, 1403211517 );
     }
 
-    public function testGetAllInvitesGetsInvites() {
-        $this->expectOnce( $this->MockCms, 'getRows', array( 'hf_invite', null ) );
-        $this->DatabaseWithMockedDependencies->getAllInvites();
-    }
-
     public function testGetAllInvitesReturnsInvites() {
-        $this->setReturnValue( $this->MockCms, 'getRows', 'duck' );
+        $this->setReturnValue( $this->MockCms, 'getResults', 'duck' );
         $this->assertEquals( $this->DatabaseWithMockedDependencies->getAllInvites(), 'duck' );
     }
 
-    public function testGetAllReportRequestsGetsReportRequests() {
-        $this->expectOnce( $this->MockCms, 'getRows', array( 'hf_report_request', null ) );
-        $this->DatabaseWithMockedDependencies->getAllReportRequests();
-    }
-
     public function testGetAllReportRequestsReturnsReportRequests() {
-        $this->setReturnValue( $this->MockCms, 'getRows', 'duck' );
+        $this->setReturnValue( $this->MockCms, 'getResults', 'duck' );
         $this->assertEquals( $this->DatabaseWithMockedDependencies->getAllReportRequests(), 'duck' );
     }
 
@@ -780,5 +770,17 @@ class TestDatabase extends HfTestCase {
         ) );
 
         $this->DatabaseWithMockedDependencies->getReportRequestUserId( 9 );
+    }
+
+    public function testGetAllInvitesUsesGetResults() {
+        $expected = 'SELECT * FROM wptests_hf_invite';
+        $this->expectOnce($this->MockCms, 'getResults', array($expected));
+        $this->DatabaseWithMockedDependencies->getAllInvites();
+    }
+
+    public function testGetAllReportRequestsUsesGetResults() {
+        $expected = 'SELECT * FROM wptests_hf_report_request';
+        $this->expectOnce($this->MockCms, 'getResults', array($expected));
+        $this->DatabaseWithMockedDependencies->getAllReportRequests();
     }
 }

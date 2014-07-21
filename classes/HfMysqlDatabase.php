@@ -225,7 +225,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function generateEmailId() {
-        $t = $this->Cms->getDbPrefix() . 'hf_email';
+        $t     = $this->Cms->getDbPrefix() . 'hf_email';
         $query = "SELECT max(emailID) FROM $t";
 
         return $this->Cms->getVar( $query ) + 1;
@@ -247,7 +247,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
 
     public function daysSinceSecondToLastEmail( $userId ) {
         $timeNow = $this->CodeLibrary->getCurrentTime();
-        $t   = $this->Cms->getDbPrefix() . 'hf_email';
+        $t       = $this->Cms->getDbPrefix() . 'hf_email';
 
         $format = "SELECT sendTime FROM (SELECT * FROM $t WHERE userID = %d ORDER BY emailID DESC LIMIT 2) AS T ORDER BY emailID LIMIT 1";
         $query  = $this->Cms->prepareQuery( $format, array( $userId ) );
@@ -513,11 +513,14 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function getAllInvites() {
-        return $this->Cms->getRows( 'hf_invite', null );
+        $table = $this->Cms->getDbPrefix() . 'hf_invite';
+
+        return $this->Cms->getResults( "SELECT * FROM $table" );
     }
 
     public function getAllReportRequests() {
-        return $this->Cms->getRows( 'hf_report_request', null );
+        $table = $this->Cms->getDbPrefix() . 'hf_report_request';
+        return $this->Cms->getResults( "SELECT * FROM $table" );
     }
 
     public function getQuotations( $context ) {
