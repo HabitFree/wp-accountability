@@ -496,12 +496,14 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function getReportRequestUserId( $requestId ) {
-        $where = $this->Cms->prepareQuery(
-            'requestID = %s',
+        $t = $this->Cms->getDbPrefix() . 'hf_report_request';
+
+        $query = $this->Cms->prepareQuery(
+            "SELECT * FROM $t WHERE requestID = %s",
             array( $requestId )
         );
 
-        $ReportRequest = $this->Cms->getRow( 'hf_report_request', $where );
+        $ReportRequest = $this->Cms->getRow( $query );
 
         return $ReportRequest->userID;
     }
