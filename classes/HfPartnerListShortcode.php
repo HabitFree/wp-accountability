@@ -1,5 +1,5 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) exit;
 class HfPartnerListShortcode implements Hf_iShortcode {
     private $UserManager;
     private $MarkupGenerator;

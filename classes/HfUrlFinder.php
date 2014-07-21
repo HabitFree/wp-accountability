@@ -1,5 +1,5 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) exit;
 class HfUrlFinder implements Hf_iAssetLocator {
     private $Cms;
 

@@ -1,5 +1,5 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) exit;
 interface Hf_iView {
     public function displayContent($string);
     public function displayErrorMessage($string);

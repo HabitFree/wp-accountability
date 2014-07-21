@@ -1,5 +1,5 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) exit;
 class HfHtmlGenerator implements Hf_iMarkupGenerator {
     private $Cms;
 

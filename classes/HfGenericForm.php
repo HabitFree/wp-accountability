@@ -1,5 +1,5 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) exit;
 class HfGenericForm extends HfForm {
     public function addTextBox($name, $label, $defaultValue, $isRequired) {
         if ($isRequired) {

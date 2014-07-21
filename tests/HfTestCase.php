@@ -1,5 +1,6 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit;
 //require_once( dirname( dirname( __FILE__ ) ) . '/hf-accountability.php' );
 
 abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
@@ -24,6 +25,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     protected $AssetLocatorWithMockedDependencies;
     protected $PartnerListShortcodeWithMockedDependencies;
     protected $AuthenticateShortcodeWithMockedDependencies;
+    protected $GoalsWithMockedDependencies;
 
     function __construct() {
         $this->Factory = new HfFactory();
@@ -48,6 +50,8 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->MockPageLocator     = $this->makeMock( 'HfUrlFinder' );
         $this->MockGoals           = $this->makeMock( 'HfGoals' );
         $this->MockMarkupGenerator = $this->makeMock( 'HfHtmlGenerator' );
+
+        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptests_');
     }
 
     private function resetObjectsWithMockDependencies() {
@@ -59,6 +63,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->resetInvitePartnerShortcodeWithMockedDependencies();
         $this->resetPartnerListShortcodeWithMockedDependencies();
         $this->resetAuthenticateShortcodeWithMockedDependencies();
+        $this->resetGoalsWithMockedDependencies();
     }
 
     protected function makeMock( $className ) {
@@ -134,6 +139,15 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         );
     }
 
+    private function resetGoalsWithMockedDependencies() {
+        $this->GoalsWithMockedDependencies = new HfGoals(
+            $this->MockMessenger,
+            $this->MockCms,
+            $this->MockMarkupGenerator,
+            $this->MockDatabase
+        );
+    }
+
     protected function setReturnValue( $Mock, $method, $value ) {
         return $Mock->expects( $this->any() )->method( $method )->will( $this->returnValue( $value ) );
     }
@@ -167,6 +181,9 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         // Any failure of at() expectations returns "Mocked method does not exist"
         // See http://stackoverflow.com/questions/3367513/phpunit-mocked-method-does-not-exist-when-using-mock-expectsthis-at
 
+        // $at refers to the call number among all calls to any method of the specified mock,
+        // NOT to the specified method of the specified mock
+
         $ExpectantMock = $Mock->expects( $this->at( $at ) )->method( $method );
 
         $this->addWithArgsExpectation( $args, $ExpectantMock );
@@ -190,11 +207,42 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         return in_array( $interface, $interfacesImplemented );
     }
 
+    protected function assertDoesntContain( $needle, $haystack ) {
+        $this->assertFalse( $this->haystackContainsNeedle( $haystack, $needle ) );
+    }
+
     protected function haystackContainsNeedle( $haystack, $needle ) {
         return strstr( $haystack, $needle ) != false;
     }
 
-    protected function assertDoesntContain($needle, $haystack) {
-        $this->assertFalse($this->haystackContainsNeedle($haystack, $needle));
+    protected function assertMethodCallsMethodWithArgsAtAnyTime(
+        $InquisitiveMock,
+        $inquisitiveMethod,
+        $InitiatingObject,
+        $initiatingMethod,
+        $expectedArgSets
+    ) {
+        $successes = array_pad(array(), count($expectedArgSets), false);
+
+        $argsChecker = function () use ( &$successes, $expectedArgSets ) {
+            $actualArgs = func_get_args();
+
+            foreach ($expectedArgSets as $index=>$argSet) {
+                if ($argSet === $actualArgs) {
+                    $successes[$index] = true;
+                    break;
+                }
+            }
+        };
+
+        $InquisitiveMock->expects( $this->any() )
+            ->method( $inquisitiveMethod )
+            ->will( $this->returnCallback( $argsChecker ) );
+
+        $InitiatingObject->$initiatingMethod();
+
+        foreach ($successes as $index=>$success) {
+            $this->assertTrue($success, serialize( $expectedArgSets[$index]));
+        }
     }
 } 

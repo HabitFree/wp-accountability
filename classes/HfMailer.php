@@ -1,5 +1,5 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) exit;
 class HfMailer implements Hf_iMessenger {
     private $Security;
     private $Database;
@@ -17,14 +17,14 @@ class HfMailer implements Hf_iMessenger {
 
     function sendEmailToUser( $userID, $subject, $body ) {
         $to = $this->ContentManagementSystem->getUserEmail( $userID );
-        $this->ContentManagementSystem->sendWpEmail( $to, $subject, $body );
+        $this->ContentManagementSystem->sendEmail( $to, $subject, $body );
         $emailID = intval( $this->ContentManagementSystem->getVar( 'hf_email', 'max(emailID)' ) );
 
         $this->Database->recordEmail( $userID, $subject, $body, $emailID, $to );
     }
 
     function sendEmailToAddress( $address, $subject, $body ) {
-        $success = $this->ContentManagementSystem->sendWpEmail( $address, $subject, $body );
+        $success = $this->ContentManagementSystem->sendEmail( $address, $subject, $body );
         $emailID = $this->Database->idOfLastEmail();
 
         if ( $success ) {
@@ -63,7 +63,7 @@ class HfMailer implements Hf_iMessenger {
     function sendEmailToUserAndSpecifyEmailID( $userID, $subject, $body, $emailID ) {
         $to = $this->ContentManagementSystem->getUserEmail( $userID );
 
-        $this->ContentManagementSystem->sendWpEmail( $to, $subject, $body );
+        $this->ContentManagementSystem->sendEmail( $to, $subject, $body );
         $this->Database->recordEmail( $userID, $subject, $body, $emailID, $to );
     }
 
@@ -72,26 +72,6 @@ class HfMailer implements Hf_iMessenger {
         $timePlusOneWeek = $this->CodeLibrary->getCurrentTime() + $oneWeek;
 
         return date( 'Y-m-d H:i:s', $timePlusOneWeek );
-    }
-
-    function markAsDelivered( $emailID ) {
-        $table = 'hf_email';
-        $data  = array('deliveryStatus' => 1);
-        $where = array('emailID' => $emailID);
-        $this->Database->updateRows( $table, $data, $where );
-    }
-
-    function recordInvite( $inviteID, $inviterID, $inviteeEmail, $emailID, $expirationDate ) {
-        $table = "hf_invite";
-        $data  = array(
-            'inviteID'       => $inviteID,
-            'inviterID'      => $inviterID,
-            'inviteeEmail'   => $inviteeEmail,
-            'emailID'        => $emailID,
-            'expirationDate' => $expirationDate
-        );
-
-        $this->Database->insertIntoDb( $table, $data );
     }
 
     function generateSecureEmailId() {

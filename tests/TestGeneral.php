@@ -1,5 +1,6 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit;
 class TestGeneral extends \PHPUnit_Framework_TestCase {
     protected $backupGlobals = false;
     private $Factory;

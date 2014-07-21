@@ -1,5 +1,5 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) exit;
 class HfGoalsShortcode implements Hf_iShortcode {
     private $UserManager;
     private $Messenger;

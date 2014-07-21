@@ -1,5 +1,7 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 class HfAccountabilityForm extends HfForm {
     protected $elements;
     private $Goals;

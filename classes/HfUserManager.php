@@ -1,5 +1,5 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) exit;
 class HfUserManager implements Hf_iUserManager {
     private $Database;
     private $Messenger;
@@ -23,12 +23,7 @@ class HfUserManager implements Hf_iUserManager {
     }
 
     function processNewUser( $userId ) {
-        $table = "hf_user_goal";
-        $data  = array(
-            'userID' => $userId,
-            'goalID' => 1
-        );
-        $this->Database->insertIgnoreIntoDb( $table, $data );
+        $this->Database->setDefaultGoalSubscription($userId);
         $settingsPageURL = $this->AssetLocator->getPageUrlByTitle( 'Settings' );
         $message         = "<p>Welcome to HabitFree!
 				You've been subscribed to periodic accountability emails. 
@@ -56,7 +51,7 @@ class HfUserManager implements Hf_iUserManager {
         $expirationDate = $this->generateExpirationDate( 7 );
 
         if ( $emailId !== false ) {
-            $this->Messenger->recordInvite( $inviteId, $inviterId, $address, $emailId, $expirationDate );
+            $this->Database->recordInvite( $inviteId, $inviterId, $address, $emailId, $expirationDate );
         }
 
         return $inviteId;
@@ -81,7 +76,7 @@ class HfUserManager implements Hf_iUserManager {
         $this->Messenger->deleteExpiredInvites();
 
         $inviteeID = $this->Cms->getUserIdByEmail( $inviteeEmail );
-        $inviterID = $this->Database->getInviterID( $nonce );
+        $inviterID = $this->Database->getInviterId( $nonce );
 
         $this->Database->createRelationship( $inviteeID, $inviterID );
         $this->Database->deleteInvite( $nonce );

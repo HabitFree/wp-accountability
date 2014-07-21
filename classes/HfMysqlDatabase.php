@@ -1,17 +1,20 @@
 <?php
+if ( !defined( 'ABSPATH' ) ) {
+    exit;
+}
 
 class HfMysqlDatabase implements Hf_iDatabase {
     private $Cms;
     private $CodeLibrary;
 
-    function HfMysqlDatabase( Hf_iCms $ContentManagementSystem, Hf_iCodeLibrary $CodeLibrary ) { //constructor
+    public function HfMysqlDatabase( Hf_iCms $ContentManagementSystem, Hf_iCodeLibrary $CodeLibrary ) { //constructor
         $this->Cms         = $ContentManagementSystem;
         $this->CodeLibrary = $CodeLibrary;
     }
 
-    function installDb() {
+    public function installDb() {
         $currentDbVersion  = "4.7";
-        $previousDbVersion = get_option( "hfDbVersion" );
+        $previousDbVersion = $this->Cms->getOption( "hfDbVersion" );
 
         if ( $previousDbVersion != $currentDbVersion ) {
             $this->updateDatabaseSchema();
@@ -132,7 +135,8 @@ class HfMysqlDatabase implements Hf_iDatabase {
             'isPrivate'  => 0
         );
 
-        $this->insertUpdateIntoDb( 'hf_goal', $defaultGoal );
+        $table = $this->Cms->getDbPrefix() . 'hf_goal';
+        $this->Cms->insertOrReplaceRow( $table, $defaultGoal, array( '%d', '%s', '%d', '%d' ) );
     }
 
     private function populateLevelsTable() {
@@ -200,130 +204,38 @@ class HfMysqlDatabase implements Hf_iDatabase {
             'target'        => 0
         );
 
-        $this->insertUpdateIntoDb( 'hf_level', $defaultLevel0 );
-        $this->insertUpdateIntoDb( 'hf_level', $defaultLevel1 );
-        $this->insertUpdateIntoDb( 'hf_level', $defaultLevel2 );
-        $this->insertUpdateIntoDb( 'hf_level', $defaultLevel3 );
-        $this->insertUpdateIntoDb( 'hf_level', $defaultLevel4 );
-        $this->insertUpdateIntoDb( 'hf_level', $defaultLevel5 );
-        $this->insertUpdateIntoDb( 'hf_level', $defaultLevel6 );
-        $this->insertUpdateIntoDb( 'hf_level', $defaultLevel7 );
+        $levelFormat = array(
+            '%d',
+            '%s',
+            '%d',
+            '%d',
+            '%d',
+        );
+
+        $table = $this->Cms->getDbPrefix() . 'hf_level';
+
+        $this->Cms->insertOrReplaceRow( $table, $defaultLevel0, $levelFormat );
+        $this->Cms->insertOrReplaceRow( $table, $defaultLevel1, $levelFormat );
+        $this->Cms->insertOrReplaceRow( $table, $defaultLevel2, $levelFormat );
+        $this->Cms->insertOrReplaceRow( $table, $defaultLevel3, $levelFormat );
+        $this->Cms->insertOrReplaceRow( $table, $defaultLevel4, $levelFormat );
+        $this->Cms->insertOrReplaceRow( $table, $defaultLevel5, $levelFormat );
+        $this->Cms->insertOrReplaceRow( $table, $defaultLevel6, $levelFormat );
+        $this->Cms->insertOrReplaceRow( $table, $defaultLevel7, $levelFormat );
     }
 
-    function insertUpdateIntoDb( $table, $data ) {
-        global $wpdb;
-        $prefix = $wpdb->prefix;
-        $data   = $this->removeNullValuePairs( $data );
-        $data   = $this->escapeData( $data );
-        $cols   = '';
-        $vals   = '';
-        $pairs  = '';
-
-        foreach ( $data as $col => $value ) {
-            $cols .= $col . ',';
-            if ( is_int( $value ) ) {
-                $vals .= $value . ',';
-                $pairs .= $col . '=' . $value . ',';
-            } else {
-                $vals .= "'" . $value . "',";
-                $pairs .= $col . "='" . $value . "',";
-            }
-        }
-
-        $cols  = trim( $cols, ',' );
-        $vals  = trim( $vals, ',' );
-        $pairs = trim( $pairs, ',' );
-
-        $wpdb->query( "INSERT INTO " . $prefix . $table .
-            "(" . $cols . ")
-					VALUES (" . $vals . ")
-					ON DUPLICATE KEY UPDATE " . $pairs );
-    }
-
-    function removeNullValuePairs( $array ) {
-        foreach ( $array as $key => $value ) {
-            if ( $value === null ) {
-                unset( $array[$key] );
-            }
-        }
-
-        return $array;
-    }
-
-    function escapeData( $data ) {
-        foreach ( $data as $col => $val ) {
-            $col = esc_sql( $col );
-            $val = esc_sql( $val );
-        }
-
-        return $data;
-    }
-
-    function insertMultipleRows( $table, $rows ) {
-        global $wpdb;
-        $prefix    = $wpdb->prefix;
-        $tableName = $prefix . $table;
-        foreach ( $rows as $row => $values ) {
-            $data = $this->removeNullValuePairs( $values );
-            $wpdb->insert( $tableName, $data );
-        }
-    }
-
-    function generateEmailId() {
-        $table     = 'hf_email';
-        $tableName = $this->Cms->getDbPrefix() . $table;
-        $query     = 'SELECT max(emailID) FROM ' . $tableName;
+    public function generateEmailId() {
+        $t     = $this->Cms->getDbPrefix() . 'hf_email';
+        $query = "SELECT max(emailID) FROM $t";
 
         return $this->Cms->getVar( $query ) + 1;
     }
 
-    function updateRows( $table, $data, $where ) {
-        global $wpdb;
-        $prefix    = $wpdb->prefix;
-        $tableName = $prefix . $table;
+    public function daysSinceLastEmail( $userID ) {
+        $t = $this->Cms->getDbPrefix() . 'hf_email';
 
-        return $wpdb->update( $tableName, $data, $where );
-    }
-
-    function deleteRow( $table, $where ) {
-        global $wpdb;
-        $tableName = $this->getFullTableName( $table );
-
-        return $wpdb->query( 'DELETE FROM ' . $tableName . ' WHERE ' . $where );
-    }
-
-    function getFullTableName( $table ) {
-        global $wpdb;
-        $prefix = $wpdb->prefix;
-
-        return $prefix . $table;
-    }
-
-    function countRowsInTable( $table ) {
-        $rows = $this->getTable( $table );
-
-        return count( $rows );
-    }
-
-    function getTable( $table ) {
-        return $this->getRows( $table, null, ARRAY_A );
-    }
-
-    function getRows( $table, $where, $outputType = OBJECT ) {
-        global $wpdb;
-        $prefix = $wpdb->prefix;
-        if ( $where === null ) {
-            return $wpdb->get_results( "SELECT * FROM " . $prefix . $table, $outputType );
-        } else {
-            return $wpdb->get_results( "SELECT * FROM " . $prefix . $table . " WHERE " . $where, $outputType );
-        }
-    }
-
-    function daysSinceLastEmail( $userID ) {
-        $table         = 'hf_email';
-        $fullTableName = $this->Cms->getDbPrefix() . $table;
-
-        $query = 'SELECT sendTime FROM ' . $fullTableName . ' WHERE userID = ' . $userID . ' ORDER BY emailID DESC LIMIT 1';
+        $format = "SELECT sendTime FROM $t WHERE userID = %d ORDER BY emailID DESC LIMIT 1";
+        $query  = $this->Cms->prepareQuery( $format, array( $userID ) );
 
         $dateOfLastEmail = $this->Cms->getVar( $query );
         $timeOfLastEmail = strtotime( $dateOfLastEmail );
@@ -333,122 +245,117 @@ class HfMysqlDatabase implements Hf_iDatabase {
         return ( $timeNow - $timeOfLastEmail ) / $secondsInADay;
     }
 
-    public function daysSinceSecondToLastEmail( $userID ) {
-        $userID        = strval( $userID );
-        $escapedUserID = $this->escapeData( array($userID) )[0];
-        $timeNow       = $this->CodeLibrary->getCurrentTime();
+    public function daysSinceSecondToLastEmail( $userId ) {
+        $timeNow = $this->CodeLibrary->getCurrentTime();
+        $t       = $this->Cms->getDbPrefix() . 'hf_email';
 
-        $table         = 'hf_email';
-        $fullTableName = $this->Cms->getDbPrefix() . $table;
+        $format = "SELECT sendTime FROM (SELECT * FROM $t WHERE userID = %d ORDER BY emailID DESC LIMIT 2) AS T ORDER BY emailID LIMIT 1";
+        $query  = $this->Cms->prepareQuery( $format, array( $userId ) );
 
-        $timeString =
-            $this->Cms->getVar(
-                'SELECT sendTime FROM
-                (SELECT * FROM ' . $fullTableName . ' WHERE userID = ' . $escapedUserID . ' ORDER BY emailID DESC LIMIT 2)
-                    AS T ORDER BY emailID LIMIT 1'
-            );
-
+        $timeString              = $this->Cms->getVar( $query );
         $timeOfSecondToLastEmail = strtotime( $timeString );
         $secondsInADay           = 86400;
 
         return ( $timeNow - $timeOfSecondToLastEmail ) / $secondsInADay;
     }
 
-    function recordEmail( $userID, $subject, $message, $emailID = null, $emailAddress = null ) {
-        $table = "hf_email";
-        $data  = array(
+    public function recordEmail( $userID, $subject, $message, $emailID = null, $emailAddress = null ) {
+        $data = array(
             'subject' => $subject,
             'body'    => $message,
             'userID'  => $userID,
             'emailID' => $emailID,
             'address' => $emailAddress
         );
-        $this->insertIntoDb( $table, $data );
+
+        $table = $this->Cms->getDbPrefix() . "hf_email";
+        $data  = $this->removeNullValuePairs( $data );
+
+        $this->Cms->insertIntoDb( $table, $data, array( '%s', '%s', '%d', '%d', '%s' ) );
     }
 
-    function insertIntoDb( $table, $data ) {
-        global $wpdb;
-        $prefix    = $wpdb->prefix;
-        $tableName = $prefix . $table;
-        $data      = $this->removeNullValuePairs( $data );
+    public function removeNullValuePairs( $array ) {
+        foreach ( $array as $key => $value ) {
+            if ( $value === null ) {
+                unset( $array[$key] );
+            }
+        }
 
-        $this->Cms->insertIntoDb( $tableName, $data );
+        return $array;
     }
 
-    function timeOfFirstSuccess( $goalID, $userID ) {
-        global $wpdb;
-        $prefix     = $wpdb->prefix;
-        $table      = 'hf_report';
-        $tableName  = $prefix . $table;
-        $query      = 'SELECT date FROM ' . $tableName . '
-                WHERE goalID = ' . $goalID . ' AND userID = ' . $userID . '
-                AND reportID=( SELECT min(reportID) FROM ' . $tableName . ' WHERE isSuccessful = 1)';
+    public function timeOfFirstSuccess( $goalId, $userId ) {
+        $t = $this->Cms->getDbPrefix() . 'hf_report';
+
+        $format = "SELECT date FROM $t
+            WHERE goalID = %d AND userID = %d
+            AND reportID=( SELECT min(reportID) FROM $t WHERE isSuccessful = 1)";
+        $query  = $this->Cms->prepareQuery( $format, array( $goalId, $userId ) );
+
         $timeString = $this->Cms->getVar( $query );
 
         return strtotime( $timeString );
     }
 
-    function timeOfLastSuccess( $goalID, $userID ) {
-        global $wpdb;
-        $prefix     = $wpdb->prefix;
-        $table      = 'hf_report';
-        $tableName  = $prefix . $table;
-        $query      = 'SELECT date FROM ' . $tableName . '
-                WHERE goalID = ' . $goalID . ' AND userID = ' . $userID . '
-                AND reportID=( SELECT max(reportID) FROM ' . $tableName . ' WHERE isSuccessful = 1)';
+    public function timeOfLastSuccess( $goalId, $userId ) {
+        $t = $this->Cms->getDbPrefix() . 'hf_report';
+
+        $format = "SELECT date FROM $t
+            WHERE goalID = %d AND userID = %d
+            AND reportID=( SELECT max(reportID) FROM $t WHERE isSuccessful = 1)";
+        $query  = $this->Cms->prepareQuery( $format, array( $goalId, $userId ) );
+
         $timeString = $this->Cms->getVar( $query );
 
         return strtotime( $timeString );
     }
 
-    function timeOfLastFail( $goalID, $userID ) {
-        global $wpdb;
-        $prefix     = $wpdb->prefix;
-        $table      = 'hf_report';
-        $tableName  = $prefix . $table;
-        $query      = 'SELECT date FROM ' . $tableName . '
-                WHERE goalID = ' . $goalID . ' AND userID = ' . $userID . '
-                AND reportID=( SELECT max(reportID) FROM ' . $tableName . ' WHERE NOT isSuccessful = 1)';
+    public function timeOfLastFail( $goalId, $userId ) {
+        $t = $this->Cms->getDbPrefix() . 'hf_report';
+
+        $format = "SELECT date FROM $t
+            WHERE goalID = %d AND userID = %d
+            AND reportID=( SELECT max(reportID) FROM $t WHERE NOT isSuccessful = 1)";
+        $query  = $this->Cms->prepareQuery( $format, array( $goalId, $userId ) );
+
         $timeString = $this->Cms->getVar( $query );
 
         return strtotime( $timeString );
     }
 
-    function level( $daysOfSuccess ) {
-        $whereLevel = 'target > ' . $daysOfSuccess . ' ORDER BY target ASC';
+    public function getLevel( $daysOfSuccess ) {
+        $t = $this->Cms->getDbPrefix() . 'hf_level';
 
-        return $this->getRow( 'hf_level', $whereLevel );
+        $query = $this->Cms->prepareQuery(
+            "SELECT * FROM $t WHERE target > %d ORDER BY target ASC",
+            array( $daysOfSuccess )
+        );
+
+        return $this->Cms->getRow( $query );
     }
 
-    function getRow( $table, $criterion ) {
-        global $wpdb;
-        $prefix = $wpdb->prefix;
+    public function daysSinceLastReport( $goalId, $userId ) {
+        $t = $this->Cms->getDbPrefix() . 'hf_report';
 
-        return $wpdb->get_row( "SELECT * FROM " . $prefix . $table . " WHERE " . $criterion );
-    }
+        $format = "SELECT date FROM $t
+            WHERE goalID = %d AND userID = %d
+            AND reportID=( SELECT max(reportID) FROM $t )";
+        $query  = $this->Cms->prepareQuery( $format, array( $goalId, $userId ) );
 
-    function daysSinceLastReport( $goalID, $userID ) {
-        global $wpdb;
-        $prefix                    = $wpdb->prefix;
-        $table                     = 'hf_report';
-        $tableName                 = $prefix . $table;
-        $query                     = 'SELECT date FROM ' . $tableName . '
-                WHERE goalID = ' . $goalID . ' AND userID = ' . $userID . '
-                AND reportID=( SELECT max(reportID) FROM ' . $tableName . ')';
         $dateInSecondsOfLastReport = strtotime( $this->Cms->getVar( $query ) );
         $secondsInADay             = 86400;
 
         return ( time() - $dateInSecondsOfLastReport ) / $secondsInADay;
     }
 
-    public function daysSinceAnyReport( $userID ) {
-        global $wpdb;
-        $prefix                    = $wpdb->prefix;
-        $table                     = 'hf_report';
-        $tableName                 = $prefix . $table;
-        $query                     = 'SELECT date FROM ' . $tableName . '
-                WHERE userID = ' . $userID . '
-                AND reportID=( SELECT max(reportID) FROM ' . $tableName . ')';
+    public function daysSinceAnyReport( $userId ) {
+        $t = $this->Cms->getDbPrefix() . 'hf_report';
+
+        $format = "SELECT date FROM $t
+            WHERE userID = %d
+            AND reportID=( SELECT max(reportID) FROM $t )";
+        $query  = $this->Cms->prepareQuery( $format, array( $userId ) );
+
         $dateInSecondsOfLastReport = strtotime( $this->Cms->getVar( $query ) );
         $secondsInADay             = 86400;
 
@@ -456,16 +363,21 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function idOfLastEmail() {
-        global $wpdb;
-        $tableName = $wpdb->prefix . 'hf_email';
-        $query     = 'SELECT max(emailID) FROM ' . $tableName;
+        $t     = $this->Cms->getDbPrefix() . 'hf_email';
+        $query = "SELECT max(emailID) FROM $t";
 
         return intval( $this->Cms->getVar( $query ) );
     }
 
-    public function getInviterID( $nonce ) {
-        $whereInvite = "inviteID = '" . $nonce . "'";
-        $invite      = $this->getRow( 'hf_invite', $whereInvite );
+    public function getInviterId( $nonce ) {
+        $t = $this->Cms->getDbPrefix() . 'hf_invite';
+
+        $query = $this->Cms->prepareQuery(
+            "SELECT * FROM $t WHERE inviteID = %s",
+            array( $nonce )
+        );
+
+        $invite = $this->Cms->getRow( $query );
 
         return intval( $invite->inviterID );
     }
@@ -483,30 +395,8 @@ class HfMysqlDatabase implements Hf_iDatabase {
             );
         }
 
-        $this->insertIgnoreIntoDb( 'hf_relationship', $row );
-    }
-
-    function insertIgnoreIntoDb( $table, $data ) {
-        global $wpdb;
-        $prefix    = $wpdb->prefix;
-        $tableName = $prefix . $table;
-        $data      = $this->escapeData( $data );
-        $setValues = '';
-        foreach ( $data as $col => $val ) {
-            if ( $setValues !== '' ) {
-                $setValues .= ", ";
-            }
-            $setValues .= "`" . $col . "` = ";
-            if ( is_int( $val ) ) {
-                $setValues .= $val;
-            } else {
-                $setValues .= "`" . $val . "`";
-            }
-        }
-
-        $query = "INSERT IGNORE INTO `" . $tableName . "` SET " . $setValues . ";";
-
-        $wpdb->query( $query );
+        $table = $this->Cms->getDbPrefix() . 'hf_relationship';
+        $this->Cms->insertOrReplaceRow( $table, $row, array( '%d', '%d' ) );
     }
 
     public function recordAccountabilityReport( $userID, $goalID, $isSuccessful, $emailID = null ) {
@@ -514,42 +404,67 @@ class HfMysqlDatabase implements Hf_iDatabase {
             'userID'           => $userID,
             'goalID'           => $goalID,
             'isSuccessful'     => $isSuccessful,
-            'referringEmailID' => $emailID);
-        $this->insertIntoDb( 'hf_report', $data );
+            'referringEmailID' => $emailID
+        );
+
+        $table = $this->Cms->getDbPrefix() . 'hf_report';
+        $data  = $this->removeNullValuePairs( $data );
+
+        $this->Cms->insertIntoDb( $table, $data, array( '%d', '%d', '%d', '%d' ) );
     }
 
-    public function isEmailValid( $userID, $emailID ) {
-        $email = $this->getRow( 'hf_email',
-            'userID = ' . $userID .
-            ' AND emailID = ' . $emailID );
+    public function isEmailValid( $userId, $emailId ) {
+        $t = $this->Cms->getDbPrefix() . 'hf_email';
+
+        $query = $this->Cms->prepareQuery(
+            "SELECT * FROM $t WHERE userID = %d AND emailID = %d",
+            array( $userId, $emailId )
+        );
+
+        $email = $this->Cms->getRow( $query );
 
         return $email != null;
     }
 
-    public function getGoalSubscriptions( $userID ) {
-        return $this->Cms->getRows( 'hf_user_goal', 'userID = ' . $userID );
+    public function getGoalSubscriptions( $userId ) {
+        $table = $this->Cms->getDbPrefix() . 'hf_user_goal';
+
+        $query = $this->Cms->prepareQuery(
+            "SELECT * FROM $table WHERE userID = %d",
+            array( $userId )
+        );
+
+        return $this->Cms->getResults( $query );
     }
 
     public function deleteInvite( $inviteID ) {
         $table = $this->Cms->getDbPrefix() . 'hf_invite';
-        $where = array('inviteID' => $inviteID);
+        $where = array( 'inviteID' => $inviteID );
 
         $this->Cms->deleteRows( $table, $where );
     }
 
     public function getPartners( $userId ) {
-        $query = 'SELECT * FROM `wp_users`
-            INNER JOIN `wp_hf_relationship`
+        $usersTable         = $this->Cms->getDbPrefix() . 'users';
+        $relationshipsTable = $this->Cms->getDbPrefix() . 'hf_relationship';
+
+        $format = 'SELECT * FROM ' . $usersTable . ' INNER JOIN ' . $relationshipsTable . '
             WHERE (userID1 = ID OR userID2 = ID)
-            AND (userID1 = ' . $userId . ' OR userID2 = ' . $userId . ') AND ID != ' . $userId;
+            AND (userID1 = %d OR userID2 = %d) AND ID != $d';
+        $query  = $this->Cms->prepareQuery( $format, array( $userId, $userId, $userId ) );
 
         return $this->Cms->getResults( $query );
     }
 
     public function getGoal( $goalId ) {
-        $where = 'goalID = ' . $goalId;
+        $t = $this->Cms->getDbPrefix() . 'hf_goal';
 
-        return $this->Cms->getRow( 'hf_goal', $where );
+        $query = $this->Cms->prepareQuery(
+            "SELECT * FROM $t WHERE goalID = %d",
+            array( $goalId )
+        );
+
+        return $this->Cms->getRow( $query );
     }
 
     public function recordReportRequest( $requestId, $userId, $emailId, $expirationDate ) {
@@ -560,25 +475,39 @@ class HfMysqlDatabase implements Hf_iDatabase {
             'expirationDate' => $expirationDate
         );
 
-        $this->insertIntoDb( 'hf_report_request', $data );
+        $table = $this->Cms->getDbPrefix() . 'hf_report_request';
+        $data  = $this->removeNullValuePairs( $data );
+
+        $this->Cms->insertIntoDb( $table, $data, array( '%d', '%d', '%d', '%s' ) );
     }
 
     public function isReportRequestValid( $requestId ) {
         $table = $this->Cms->getDbPrefix() . 'hf_report_request';
-        $query = "SELECT * FROM " . $table . " WHERE requestID = '" . $requestId . "'";
+
+        $format = 'SELECT * FROM ' . $table . ' WHERE requestID = %d';
+        $query  = $this->Cms->prepareQuery( $format, array( $requestId ) );
 
         return $this->Cms->getResults( $query ) != null;
     }
 
     public function deleteReportRequest( $requestId ) {
         $table = $this->Cms->getDbPrefix() . 'hf_report_request';
-        $where = array('requestID' => $requestId);
+        $where = array( 'requestID' => $requestId );
 
         $this->Cms->deleteRows( $table, $where );
     }
 
     public function getReportRequestUserId( $requestId ) {
-        return $this->Cms->getRow( 'hf_report_request', "requestID = '" . $requestId . "'" )->userID;
+        $t = $this->Cms->getDbPrefix() . 'hf_report_request';
+
+        $query = $this->Cms->prepareQuery(
+            "SELECT * FROM $t WHERE requestID = %s",
+            array( $requestId )
+        );
+
+        $ReportRequest = $this->Cms->getRow( $query );
+
+        return $ReportRequest->userID;
     }
 
     public function updateReportRequestExpirationDate( $requestId, $expirationTime ) {
@@ -596,40 +525,74 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function getAllInvites() {
-        return $this->Cms->getRows( 'hf_invite', null );
+        $table = $this->Cms->getDbPrefix() . 'hf_invite';
+
+        return $this->Cms->getResults( "SELECT * FROM $table" );
     }
 
     public function getAllReportRequests() {
-        return $this->Cms->getRows( 'hf_report_request', null );
+        $table = $this->Cms->getDbPrefix() . 'hf_report_request';
+        return $this->Cms->getResults( "SELECT * FROM $table" );
     }
 
     public function getQuotations( $context ) {
-        $prefix    = $this->Cms->getDbPrefix();
         $contextId = $this->getContextId( $context );
-        $query     = "SELECT * FROM " . $prefix . "posts INNER JOIN " . $prefix . "term_relationships WHERE post_type =  'hf_quotation' AND post_status =  'publish' AND object_id = id AND term_taxonomy_id = " . $contextId;
+
+        $prefix     = $this->Cms->getDbPrefix();
+        $postsTable = $prefix . 'posts';
+        $termsTable = $prefix . 'term_relationships';
+
+        $format = "SELECT * FROM $postsTable INNER JOIN $termsTable
+            WHERE post_type = 'hf_quotation' AND post_status = 'publish' AND object_id = id AND term_taxonomy_id = %d";
+        $query  = $this->Cms->prepareQuery( $format, array( $contextId ) );
 
         return $this->Cms->getResults( $query );
     }
 
     private function getContextId( $context ) {
-        $prefix = $this->Cms->getDbPrefix();
+        $t = $this->Cms->getDbPrefix() . 'terms';
 
-        return $this->Cms->getVar( "SELECT term_id FROM " . $prefix . "terms WHERE name = '" . $context . "'" );
+        $format = "SELECT term_id FROM $t WHERE name = %s";
+        $query  = $this->Cms->prepareQuery( $format, array( $context ) );
+
+        return $this->Cms->getVar( $query );
     }
 
     public function deleteRelationship( $userId1, $userId2 ) {
-        $userId1 = intval($userId1);
-        $userId2 = intval($userId2);
-        $table = $this->Cms->getDbPrefix() . 'hf_relationship';
-        $where = $this->createDeleteRelationshipWhereCriteria( $userId1, $userId2 );
+        $userId1 = intval( $userId1 );
+        $userId2 = intval( $userId2 );
+        $table   = $this->Cms->getDbPrefix() . 'hf_relationship';
+        $where   = $this->createDeleteRelationshipWhereCriteria( $userId1, $userId2 );
         $this->Cms->deleteRows( $table, $where );
     }
 
     private function createDeleteRelationshipWhereCriteria( $userId1, $userId2 ) {
         if ( $userId1 < $userId2 ) {
-            return array('userID1' => $userId1, 'userID2' => $userId2);
+            return array( 'userID1' => $userId1, 'userID2' => $userId2 );
         } else {
-            return array('userID1' => $userId2, 'userID2' => $userId1);
+            return array( 'userID1' => $userId2, 'userID2' => $userId1 );
         }
+    }
+
+    public function setDefaultGoalSubscription( $userId ) {
+        $sub   = array(
+            'userID' => $userId,
+            'goalID' => 1
+        );
+        $table = $this->Cms->getDbPrefix() . 'hf_user_goal';
+        $this->Cms->insertOrReplaceRow( $table, $sub, array( '%d', '%d' ) );
+    }
+
+    public function recordInvite( $inviteID, $inviterID, $inviteeEmail, $emailID, $expirationDate ) {
+        $data = array(
+            'inviteID'       => $inviteID,
+            'inviterID'      => $inviterID,
+            'inviteeEmail'   => $inviteeEmail,
+            'emailID'        => $emailID,
+            'expirationDate' => $expirationDate
+        );
+
+        $table = $this->Cms->getDbPrefix() . "hf_invite";
+        $this->Cms->insertIntoDb( $table, $data, array( '%d', '%d', '%s', '%d', '%s' ) );
     }
 }

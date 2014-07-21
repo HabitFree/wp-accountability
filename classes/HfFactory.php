@@ -1,5 +1,5 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) exit;
 class HfFactory {
     public function makePartnerListShortcode() {
         $UserManager     = $this->makeUserManager();

@@ -1,9 +1,9 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) exit;
 interface Hf_iCms {
     public function getUserEmail( $userID );
 
-    public function sendWpEmail( $to, $subject, $message );
+    public function sendEmail( $to, $subject, $message );
 
     public function getSubscribedUsers();
 
@@ -19,9 +19,7 @@ interface Hf_iCms {
 
     public function isUserLoggedIn();
 
-    public function getRows( $table, $where, $outputType = OBJECT );
-
-    public function getRow( $table, $criterion );
+    public function getRow( $query );
 
     public function deleteRows( $table, $where );
 
@@ -47,7 +45,7 @@ interface Hf_iCms {
 
     public function getResults($query);
 
-    public function insertIntoDb($table, $data);
+    public function insertIntoDb($table, $data, $format);
 
     public function updateRowsSafe($table, $data, $where);
 
@@ -56,4 +54,10 @@ interface Hf_iCms {
     public function getPermalink($pageId);
 
     public function getHomeUrl();
+
+    public function prepareQuery($query, $valueParameters);
+
+    public function insertOrReplaceRow($table, $data, $format);
+
+    public function getOption($option);
 }

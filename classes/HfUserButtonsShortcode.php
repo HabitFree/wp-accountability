@@ -1,5 +1,5 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) exit;
 class HfUserButtonsShortcode implements Hf_iShortcode {
     private $UserManager;
     private $AssetLocator;

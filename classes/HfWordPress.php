@@ -1,5 +1,5 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) exit;
 class HfWordPress implements Hf_iCms {
     private $wpdb;
 
@@ -12,7 +12,7 @@ class HfWordPress implements Hf_iCms {
         return get_userdata( $userID )->user_email;
     }
 
-    public function sendWpEmail( $to, $subject, $message ) {
+    public function sendEmail( $to, $subject, $message ) {
         return wp_mail( $to, $subject, $message );
     }
 
@@ -48,20 +48,7 @@ class HfWordPress implements Hf_iCms {
         return is_user_logged_in();
     }
 
-    public function getRows( $table, $where, $outputType = OBJECT ) {
-        global $wpdb;
-        $prefix = $wpdb->prefix;
-        if ( $where === null ) {
-            return $wpdb->get_results( "SELECT * FROM " . $prefix . $table, $outputType );
-        } else {
-            return $wpdb->get_results( "SELECT * FROM " . $prefix . $table . " WHERE " . $where, $outputType );
-        }
-    }
-
-    function getRow( $table, $criterion ) {
-        $prefix = $this->getDbPrefix();
-        $query = "SELECT * FROM " . $prefix . $table . " WHERE " . $criterion;
-
+    function getRow( $query ) {
         return $this->wpdb->get_row( $query );
     }
 
@@ -117,8 +104,8 @@ class HfWordPress implements Hf_iCms {
         return $this->wpdb->get_results($query);
     }
 
-    public function insertIntoDb($table, $data) {
-        $this->wpdb->insert($table, $data);
+    public function insertIntoDb($table, $data, $format) {
+        $this->wpdb->insert($table, $data, $format);
     }
 
     public function updateRowsSafe($table, $data, $where) {
@@ -135,5 +122,20 @@ class HfWordPress implements Hf_iCms {
 
     public function getHomeUrl() {
         return get_home_url();
+    }
+
+    public function prepareQuery($query, $valueParameters) {
+        $parameters = array_merge(array($query), $valueParameters);
+        $callable = array($this->wpdb, 'prepare');
+
+        return call_user_func_array( $callable, $parameters);
+    }
+
+    public function insertOrReplaceRow($table, $data, $format) {
+        $this->wpdb->replace($table, $data, $format);
+    }
+
+    public function getOption($option) {
+        return get_option($option);
     }
 } 

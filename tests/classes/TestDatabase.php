@@ -1,37 +1,11 @@
 <?php
 
+if ( !defined( 'ABSPATH' ) ) {
+    exit;
+}
 require_once( dirname( dirname( __FILE__ ) ) . '/HfTestCase.php' );
 
 class TestDatabase extends HfTestCase {
-    // Helper Functions
-
-    private function getTableSchema( $table ) {
-        global $wpdb;
-        $prefix    = $wpdb->prefix;
-        $tableName = $prefix . $table;
-
-        return $wpdb->get_results( 'SHOW COLUMNS FROM ' . $tableName, OBJECT_K );
-    }
-
-    private function createColumnSchemaObject( $field, $type, $null, $key, $default, $extra ) {
-        $column          = new StdClass;
-        $column->Field   = $field;
-        $column->Type    = $type;
-        $column->Null    = $null;
-        $column->Key     = $key;
-        $column->Default = $default;
-        $column->Extra   = $extra;
-
-        return $column;
-    }
-
-    private function assertTableImplementsSchema( $expectedSchema, $table ) {
-        $currentSchema = $this->getTableSchema( $table );
-        $this->assertEquals( $expectedSchema, $currentSchema );
-    }
-
-    // Tests
-
     public function testDbDataNullRemoval() {
         $Database = $this->Factory->makeDatabase();
 
@@ -71,6 +45,18 @@ class TestDatabase extends HfTestCase {
         $this->assertEquals( $columnObject, $expected );
     }
 
+    private function createColumnSchemaObject( $field, $type, $null, $key, $default, $extra ) {
+        $column          = new StdClass;
+        $column->Field   = $field;
+        $column->Type    = $type;
+        $column->Null    = $null;
+        $column->Key     = $key;
+        $column->Default = $default;
+        $column->Extra   = $extra;
+
+        return $column;
+    }
+
     public function testEmailTableSchema() {
         $expectedSchema = array(
             'emailID'        => $this->createColumnSchemaObject( 'emailID', 'int(11)', 'NO', 'PRI', null, 'auto_increment' ),
@@ -84,6 +70,19 @@ class TestDatabase extends HfTestCase {
         );
 
         $this->assertTableImplementsSchema( $expectedSchema, 'hf_email' );
+    }
+
+    private function assertTableImplementsSchema( $expectedSchema, $table ) {
+        $currentSchema = $this->getTableSchema( $table );
+        $this->assertEquals( $expectedSchema, $currentSchema );
+    }
+
+    private function getTableSchema( $table ) {
+        global $wpdb;
+        $prefix    = $wpdb->prefix;
+        $tableName = $prefix . $table;
+
+        return $wpdb->get_results( 'SHOW COLUMNS FROM ' . $tableName, OBJECT_K );
     }
 
     public function testGoalTableSchema() {
@@ -189,16 +188,6 @@ class TestDatabase extends HfTestCase {
         $this->DatabaseWithMockedDependencies->deleteInvite( 777 );
     }
 
-    public function testGetGoalSubscriptions() {
-        $this->expectOnce( $this->MockCms, 'getRows' );
-        $this->DatabaseWithMockedDependencies->getGoalSubscriptions( 1 );
-    }
-
-    public function testInsertIntoDbCallsCmsInsert() {
-        $this->expectOnce( $this->MockCms, 'insertIntoDb', array('wptests_duck', array('bill')) );
-        $this->DatabaseWithMockedDependencies->insertIntoDb( 'duck', array('bill') );
-    }
-
     public function testRecordReportRequest() {
         $table          = "hf_report_request";
         $requestId      = 555;
@@ -212,13 +201,14 @@ class TestDatabase extends HfTestCase {
             'expirationDate' => $expirationDate
         );
 
-        $this->expectOnce( $this->MockCms, 'insertIntoDb', array('wptests_' . $table, $data) );
+        $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptests_' );
+        $this->expectOnce( $this->MockCms, 'insertIntoDb', array( 'wptests_' . $table, $data ) );
 
         $this->DatabaseWithMockedDependencies->recordReportRequest( $requestId, $userId, $emailId, $expirationDate );
     }
 
     public function testIsReportRequestValid() {
-        $this->setReturnValue( $this->MockCms, 'getResults', array(new stdClass()) );
+        $this->setReturnValue( $this->MockCms, 'getResults', array( new stdClass() ) );
 
         $this->assertTrue( $this->DatabaseWithMockedDependencies->isReportRequestValid( 555 ) );
     }
@@ -229,7 +219,7 @@ class TestDatabase extends HfTestCase {
 
     public function testDeleteReportRequest() {
         $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptests_' );
-        $this->expectOnce( $this->MockCms, 'deleteRows', array('wptests_hf_report_request', array('requestID' => 555)) );
+        $this->expectOnce( $this->MockCms, 'deleteRows', array( 'wptests_hf_report_request', array( 'requestID' => 555 ) ) );
         $this->DatabaseWithMockedDependencies->deleteReportRequest( 555 );
     }
 
@@ -244,16 +234,6 @@ class TestDatabase extends HfTestCase {
         $this->assertEquals( 5, $actual );
     }
 
-    public function testGetReportRequestIdQueryFormat() {
-        $mockReportRequest         = new stdClass();
-        $mockReportRequest->userID = 5;
-
-        $this->setReturnValue( $this->MockCms, 'getRow', $mockReportRequest );
-        $this->expectOnce( $this->MockCms, 'getRow', array('hf_report_request', "requestID = '555'") );
-
-        $this->DatabaseWithMockedDependencies->getReportRequestUserId( 555 );
-    }
-
     public function testUpdateExpirationDate() {
         $data = array(
             'expirationDate' => '2014-06-19 15:58:37'
@@ -264,87 +244,591 @@ class TestDatabase extends HfTestCase {
         );
 
         $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptests_' );
-        $this->expectOnce( $this->MockCms, 'updateRowsSafe', array('wptests_hf_report_request', $data, $where) );
+        $this->expectOnce( $this->MockCms, 'updateRowsSafe', array( 'wptests_hf_report_request', $data, $where ) );
 
         $this->DatabaseWithMockedDependencies->updateReportRequestExpirationDate( 555, 1403211517 );
     }
 
-    public function testGetAllInvitesGetsInvites() {
-        $this->expectOnce( $this->MockCms, 'getRows', array('hf_invite', null) );
-        $this->DatabaseWithMockedDependencies->getAllInvites();
-    }
-
     public function testGetAllInvitesReturnsInvites() {
-        $this->setReturnValue( $this->MockCms, 'getRows', 'duck' );
+        $this->setReturnValue( $this->MockCms, 'getResults', 'duck' );
         $this->assertEquals( $this->DatabaseWithMockedDependencies->getAllInvites(), 'duck' );
     }
 
-    public function testGetAllReportRequestsGetsReportRequests() {
-        $this->expectOnce( $this->MockCms, 'getRows', array('hf_report_request', null) );
-        $this->DatabaseWithMockedDependencies->getAllReportRequests();
-    }
-
     public function testGetAllReportRequestsReturnsReportRequests() {
-        $this->setReturnValue( $this->MockCms, 'getRows', 'duck' );
+        $this->setReturnValue( $this->MockCms, 'getResults', 'duck' );
         $this->assertEquals( $this->DatabaseWithMockedDependencies->getAllReportRequests(), 'duck' );
     }
 
     public function testGetQuotationsGetsQuotations() {
-        $expectedQuery = "SELECT * FROM wptest_posts INNER JOIN wptest_term_relationships WHERE post_type =  'hf_quotation' AND post_status =  'publish' AND object_id = id AND term_taxonomy_id = 1";
-        $this->expectOnce($this->MockCms, 'getResults', array($expectedQuery));
-        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptest_');
-        $this->setReturnValue($this->MockCms, 'getVar', 1);
-        $this->DatabaseWithMockedDependencies->getQuotations('For Setback');
+        $this->expectOnce( $this->MockCms, 'getResults', array( 'query' ) );
+        $this->setReturnValue( $this->MockCms, 'getVar', 1 );
+        $this->setReturnValue( $this->MockCms, 'prepareQuery', 'query' );
+        $this->DatabaseWithMockedDependencies->getQuotations( 'For Setback' );
     }
 
     public function testGetQuotationsReturnsQuotations() {
-        $this->setReturnValue($this->MockCms, 'getResults', 'duck');
+        $this->setReturnValue( $this->MockCms, 'getResults', 'duck' );
 
-        $actual = $this->DatabaseWithMockedDependencies->getQuotations('For Setback');
+        $actual   = $this->DatabaseWithMockedDependencies->getQuotations( 'For Setback' );
         $expected = 'duck';
 
-        $this->assertEquals($expected, $actual);
-    }
-
-    public function testGetQuotationsLooksUpTermId() {
-        $expectedQuery = "SELECT term_id FROM wptest_terms WHERE name = 'For Setback'";
-        $this->expectOnce($this->MockCms, 'getVar', array($expectedQuery));
-        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptest_');
-
-        $this->DatabaseWithMockedDependencies->getQuotations('For Setback');
-    }
-
-    public function testGetQuotationsLooksUpPassedTermName() {
-        $expectedQuery = "SELECT term_id FROM wptest_terms WHERE name = 'For Success'";
-        $this->expectOnce($this->MockCms, 'getVar', array($expectedQuery));
-        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptest_');
-
-        $this->DatabaseWithMockedDependencies->getQuotations('For Success');
+        $this->assertEquals( $expected, $actual );
     }
 
     public function testDeleteRelationshipDeletesRelationship() {
-        $table = 'wptest_hf_relationship';
+        $table = 'wptests_hf_relationship';
         $where = array(
             'userID1' => 4,
             'userID2' => 5
         );
 
-        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptest_');
-        $this->expectOnce($this->MockCms, 'deleteRows', array($table, $where));
+        $this->expectOnce( $this->MockCms, 'deleteRows', array( $table, $where ) );
 
-        $this->DatabaseWithMockedDependencies->deleteRelationship(4, 5);
+        $this->DatabaseWithMockedDependencies->deleteRelationship( 4, 5 );
     }
 
     public function testDeleteRelationshipSortsIds() {
-        $table = 'wptest_hf_relationship';
+        $table = 'wptests_hf_relationship';
         $where = array(
             'userID1' => 4,
             'userID2' => 5
         );
 
-        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptest_');
-        $this->expectOnce($this->MockCms, 'deleteRows', array($table, $where));
+        $this->expectOnce( $this->MockCms, 'deleteRows', array( $table, $where ) );
 
-        $this->DatabaseWithMockedDependencies->deleteRelationship(5, 4);
+        $this->DatabaseWithMockedDependencies->deleteRelationship( 5, 4 );
+    }
+
+    public function testGenerateEmailId() {
+        $this->expectOnce( $this->MockCms, 'getVar', array( "SELECT max(emailID) FROM wptests_hf_email" ) );
+        $this->DatabaseWithMockedDependencies->generateEmailId();
+    }
+
+    public function testDaysSinceSecondToLastEmailPreparesQuery() {
+        $this->expectOnce( $this->MockCms, 'prepareQuery', array(
+            'SELECT sendTime FROM (SELECT * FROM wptests_hf_email WHERE userID = %d ORDER BY emailID DESC LIMIT 2) AS T ORDER BY emailID LIMIT 1',
+            array( 1 )
+        ) );
+
+        $this->DatabaseWithMockedDependencies->daysSinceSecondToLastEmail( 1 );
+    }
+
+    public function testDaysSinceSecondToLastEmailUsesPreparedQuery() {
+        $this->setReturnValue( $this->MockCms, 'prepareQuery', 'duck' );
+
+        $this->expectOnce( $this->MockCms, 'getVar', array( 'duck' ) );
+
+        $this->DatabaseWithMockedDependencies->daysSinceSecondToLastEmail( 1 );
+    }
+
+    public function testDatabaseUsesCmsToGetOptionWhenInstallingDatabase() {
+        $this->expectOnce( $this->MockCms, 'getOption', array( 'hfDbVersion' ) );
+
+        $this->DatabaseWithMockedDependencies->installDb();
+    }
+
+    public function testDatabaseUsesCmsInsertOrReplaceRowWhenInstallingDatabase() {
+        $defaultLevel0 = array(
+            'levelID'       => 0,
+            'title'         => 'Hibernation',
+            'size'          => 0,
+            'emailInterval' => 0,
+            'target'        => 0
+        );
+
+        $defaultLevel1 = array(
+            'levelID'       => 1,
+            'title'         => 'Dawn',
+            'size'          => 2,
+            'emailInterval' => 1,
+            'target'        => 14
+        );
+
+        $defaultLevel2 = array(
+            'levelID'       => 2,
+            'title'         => 'Breach',
+            'size'          => 5,
+            'emailInterval' => 7,
+            'target'        => 30
+        );
+
+        $defaultLevel3 = array(
+            'levelID'       => 3,
+            'title'         => 'Progress',
+            'size'          => 10,
+            'emailInterval' => 14,
+            'target'        => 90
+        );
+
+        $defaultLevel4 = array(
+            'levelID'       => 4,
+            'title'         => 'Conquest',
+            'size'          => 15,
+            'emailInterval' => 30,
+            'target'        => 365
+        );
+
+        $defaultLevel5 = array(
+            'levelID'       => 5,
+            'title'         => 'Conquering',
+            'size'          => 30,
+            'emailInterval' => 90,
+            'target'        => 1095 // 3 years
+        );
+
+        $defaultLevel6 = array(
+            'levelID'       => 6,
+            'title'         => 'Triumph',
+            'size'          => 60,
+            'emailInterval' => 365,
+            'target'        => 1095 // 3 years
+        );
+
+        $defaultLevel7 = array(
+            'levelID'       => 7,
+            'title'         => 'Vigilance',
+            'size'          => 0,
+            'emailInterval' => 365,
+            'target'        => 0
+        );
+
+        $levels = array(
+            $defaultLevel0,
+            $defaultLevel1,
+            $defaultLevel2,
+            $defaultLevel3,
+            $defaultLevel4,
+            $defaultLevel5,
+            $defaultLevel6,
+            $defaultLevel7,
+        );
+
+        $levelFormat = array(
+            '%d',
+            '%s',
+            '%d',
+            '%d',
+            '%d'
+        );
+
+        $argSets = array();
+
+        foreach ( $levels as $index => $level ) {
+            $argSets[$index] = array(
+                'wptests_hf_level',
+                $level,
+                $levelFormat
+            );
+        }
+
+        $this->assertMethodCallsMethodWithArgsAtAnyTime(
+            $this->MockCms,
+            'insertOrReplaceRow',
+            $this->DatabaseWithMockedDependencies,
+            'installDb',
+            $argSets
+        );
+    }
+
+    public function testInvocationOrderIndependentArgsAssertion() {
+        $levelFormat = array( '%d', '%s', '%d', '%d', '%d' );
+
+        $defaultLevel6 = array(
+            'levelID'       => 6,
+            'title'         => 'Triumph',
+            'size'          => 60,
+            'emailInterval' => 365,
+            'target'        => 1095 // 3 years
+        );
+
+        $this->assertMethodCallsMethodWithArgsAtAnyTime(
+            $this->MockCms,
+            'insertOrReplaceRow',
+            $this->DatabaseWithMockedDependencies,
+            'installDb',
+            array( array(
+                'wptests_hf_level',
+                $defaultLevel6,
+                $levelFormat
+            ) )
+        );
+    }
+
+    public function testInstallDbPopulatesGoalTable() {
+        $defaultGoal = array(
+            'goalID'     => 1,
+            'title'      => 'Pornography Abstinence',
+            'isPositive' => 1,
+            'isPrivate'  => 0
+        );
+
+        $levelFormat = array( '%d', '%s', '%d', '%d' );
+
+        $this->assertMethodCallsMethodWithArgsAtAnyTime(
+            $this->MockCms,
+            'insertOrReplaceRow',
+            $this->DatabaseWithMockedDependencies,
+            'installDb',
+            array( array(
+                'wptests_hf_goal',
+                $defaultGoal,
+                $levelFormat
+            ) )
+        );
+    }
+
+    public function testCreateRelationshipCreatesRelationship() {
+        $expectedRow = array(
+            'userID1' => 1,
+            'userID2' => 2
+        );
+
+        $this->expectOnce( $this->MockCms, 'insertOrReplaceRow', array(
+            'wptests_hf_relationship',
+            $expectedRow,
+            array( '%d', '%d' )
+        ) );
+        $this->DatabaseWithMockedDependencies->createRelationship( 1, 2 );
+    }
+
+    public function testSetDefaultGoalSubscriptionAddsDefaultGoalSubscription() {
+        $expectedData = array(
+            'userID' => 7,
+            'goalID' => 1
+        );
+
+        $this->expectOnce( $this->MockCms, 'insertOrReplaceRow', array( 'wptests_hf_user_goal', $expectedData, array( '%d', '%d' ) ) );
+        $this->DatabaseWithMockedDependencies->setDefaultGoalSubscription( 7 );
+    }
+
+    public function testRecordInviteRecordsInvite() {
+        $expectedRow = array(
+            'inviteID'       => 1,
+            'inviterID'      => 2,
+            'inviteeEmail'   => 3,
+            'emailID'        => 4,
+            'expirationDate' => 5
+        );
+
+        $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptests_' );
+        $this->expectOnce( $this->MockCms, 'insertIntoDb', array( 'wptests_hf_invite', $expectedRow ) );
+
+        $this->DatabaseWithMockedDependencies->recordInvite( 1, 2, 3, 4, 5 );
+    }
+
+    public function testRecordAccountabilityReportRecordsAccountabilityReport() {
+        $expectedRow = array(
+            'userID'           => 1,
+            'goalID'           => 2,
+            'isSuccessful'     => 3,
+            'referringEmailID' => 4
+        );
+
+        $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptests_' );
+        $this->expectOnce( $this->MockCms, 'insertIntoDb', array( 'wptests_hf_report', $expectedRow ) );
+
+        $this->DatabaseWithMockedDependencies->recordAccountabilityReport( 1, 2, 3, 4 );
+    }
+
+    public function testRecordAccountabilityReportDoesntIncludeReferringEmailIdWhenNotGiven() {
+        $expectedRow = array(
+            'userID'       => 1,
+            'goalID'       => 2,
+            'isSuccessful' => 3
+        );
+
+        $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptests_' );
+        $this->expectOnce( $this->MockCms, 'insertIntoDb', array( 'wptests_hf_report', $expectedRow ) );
+
+        $this->DatabaseWithMockedDependencies->recordAccountabilityReport( 1, 2, 3 );
+    }
+
+    public function testRecordEmailRecordsEmail() {
+        $expectedRow = array(
+            'subject' => 2,
+            'body'    => 3,
+            'userID'  => 1,
+            'emailID' => 4,
+            'address' => 5
+        );
+
+        $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptests_' );
+        $this->expectOnce( $this->MockCms, 'insertIntoDb', array( 'wptests_hf_email', $expectedRow ) );
+
+        $this->DatabaseWithMockedDependencies->recordEmail( 1, 2, 3, 4, 5 );
+    }
+
+    public function testRecordReportRequestRecordsReportRequest() {
+        $expectedRow = array(
+            'requestID'      => 1,
+            'userID'         => 2,
+            'emailID'        => 3,
+            'expirationDate' => 4
+        );
+
+        $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptests_' );
+        $this->expectOnce( $this->MockCms, 'insertIntoDb', array( 'wptests_hf_report_request', $expectedRow ) );
+
+        $this->DatabaseWithMockedDependencies->recordReportRequest( 1, 2, 3, 4 );
+    }
+
+    public function testIsReportRequestValidPreparesQuery() {
+        $this->expectOnce( $this->MockCms, 'prepareQuery', array(
+            "SELECT * FROM wptests_hf_report_request WHERE requestID = %d",
+            array( 7 )
+        ) );
+
+        $this->DatabaseWithMockedDependencies->isReportRequestValid( 7 );
+    }
+
+    public function testGetQuotationsPreparesQuery() {
+        $format = "SELECT * FROM wptests_posts INNER JOIN wptests_term_relationships
+            WHERE post_type = 'hf_quotation' AND post_status = 'publish' AND object_id = id AND term_taxonomy_id = %d";
+        $this->expectAt( $this->MockCms, 'prepareQuery', 4, array(
+            $format,
+            array( 2 )
+        ) );
+
+        $this->setReturnValue( $this->MockCms, 'getVar', 2 );
+        $this->DatabaseWithMockedDependencies->getQuotations( 'Big-C-Context' );
+    }
+
+    public function testGetPartnersPreparesQuery() {
+        $this->expectOnce( $this->MockCms, 'prepareQuery', array(
+            'SELECT * FROM wptests_users INNER JOIN wptests_hf_relationship
+            WHERE (userID1 = ID OR userID2 = ID)
+            AND (userID1 = %d OR userID2 = %d) AND ID != $d',
+            array( 2, 2, 2 )
+        ) );
+
+        $this->DatabaseWithMockedDependencies->getPartners( 2 );
+    }
+
+    public function testGetContextIdPreparesQuery() {
+        $this->expectAt( $this->MockCms, 'prepareQuery', 1, array(
+            "SELECT term_id FROM wptests_terms WHERE name = %s",
+            array( 'context' )
+        ) );
+
+        $this->DatabaseWithMockedDependencies->getQuotations( 'context' );
+    }
+
+    public function testGetContextIdUsesPreparedQuery() {
+        $this->setReturnValue( $this->MockCms, 'prepareQuery', 'duckVal' );
+        $this->expectOnce( $this->MockCms, 'getVar', array( 'duckVal' ) );
+
+        $this->DatabaseWithMockedDependencies->getQuotations( 'context' );
+    }
+
+    public function testGetContextIdLooksUpPassedContext() {
+        $this->expectAt( $this->MockCms, 'prepareQuery', 1, array(
+            "SELECT term_id FROM wptests_terms WHERE name = %s",
+            array( 'anotherContext' )
+        ) );
+
+        $this->DatabaseWithMockedDependencies->getQuotations( 'anotherContext' );
+    }
+
+    public function testDaysSinceLastEmailPreparesQuery() {
+        $this->expectOnce( $this->MockCms, 'prepareQuery', array(
+            'SELECT sendTime FROM wptests_hf_email WHERE userID = %d ORDER BY emailID DESC LIMIT 1',
+            array( 7 )
+        ) );
+
+        $this->DatabaseWithMockedDependencies->daysSinceLastEmail( 7 );
+    }
+
+    public function testTimeOfFirstSuccessPreparesQuery() {
+        $this->expectOnce( $this->MockCms, 'prepareQuery', array(
+            'SELECT date FROM wptests_hf_report
+            WHERE goalID = %d AND userID = %d
+            AND reportID=( SELECT min(reportID) FROM wptests_hf_report WHERE isSuccessful = 1)',
+            array( 1, 7 )
+        ) );
+
+        $this->DatabaseWithMockedDependencies->timeOfFirstSuccess( 1, 7 );
+    }
+
+    public function testTimeOfLastSuccessPreparesQuery() {
+        $this->expectOnce( $this->MockCms, 'prepareQuery', array(
+            'SELECT date FROM wptests_hf_report
+            WHERE goalID = %d AND userID = %d
+            AND reportID=( SELECT max(reportID) FROM wptests_hf_report WHERE isSuccessful = 1)',
+            array( 1, 7 )
+        ) );
+
+        $this->DatabaseWithMockedDependencies->timeOfLastSuccess( 1, 7 );
+    }
+
+    public function testTimeOfLastFailPreparesQuery() {
+        $this->expectOnce( $this->MockCms, 'prepareQuery', array(
+            'SELECT date FROM wptests_hf_report
+            WHERE goalID = %d AND userID = %d
+            AND reportID=( SELECT max(reportID) FROM wptests_hf_report WHERE NOT isSuccessful = 1)',
+            array( 1, 7 )
+        ) );
+
+        $this->DatabaseWithMockedDependencies->timeOfLastFail( 1, 7 );
+    }
+
+    public function testGetLevelPreparesQuery() {
+        $this->expectOnce( $this->MockCms, 'prepareQuery', array(
+            'SELECT * FROM wptests_hf_level WHERE target > %d ORDER BY target ASC',
+            array( 13 )
+        ) );
+
+        $this->DatabaseWithMockedDependencies->getLevel( 13 );
+    }
+
+    public function testGetLevelUsesOnlyPreparedQuery() {
+        $this->setReturnValue( $this->MockCms, 'prepareQuery', 'duck' );
+        $this->expectOnce( $this->MockCms, 'getRow', array( 'duck' ) );
+        $this->DatabaseWithMockedDependencies->getLevel( 13 );
+    }
+
+    public function testDaysSinceLastReportPreparesQuery() {
+        $this->expectOnce( $this->MockCms, 'prepareQuery', array(
+            'SELECT date FROM wptests_hf_report
+            WHERE goalID = %d AND userID = %d
+            AND reportID=( SELECT max(reportID) FROM wptests_hf_report )',
+            array( 3, 7 )
+        ) );
+
+        $this->DatabaseWithMockedDependencies->daysSinceLastReport( 3, 7 );
+    }
+
+    public function testDaysSinceAnyReportPreparesQuery() {
+        $this->expectOnce( $this->MockCms, 'prepareQuery', array(
+            'SELECT date FROM wptests_hf_report
+            WHERE userID = %d
+            AND reportID=( SELECT max(reportID) FROM wptests_hf_report )',
+            array( 7 )
+        ) );
+
+        $this->DatabaseWithMockedDependencies->daysSinceAnyReport( 7 );
+    }
+
+    public function testIdOfLastEmailQuery() {
+        $this->expectOnce( $this->MockCms, 'getVar', array(
+            'SELECT max(emailID) FROM wptests_hf_email' ) );
+
+        $this->DatabaseWithMockedDependencies->idOfLastEmail();
+    }
+
+    public function testGetInviterIdPreparesQuery() {
+        $this->setMockInviteReturnValue();
+
+        $this->expectOnce( $this->MockCms, 'prepareQuery', array(
+            "SELECT * FROM wptests_hf_invite WHERE inviteID = %s",
+            array( 343 )
+        ) );
+
+        $this->DatabaseWithMockedDependencies->getInviterId( 343 );
+    }
+
+    private function setMockInviteReturnValue() {
+        $MockInvite            = new stdClass();
+        $MockInvite->inviterID = 2;
+
+        $this->setReturnValue( $this->MockCms, 'getRow', $MockInvite );
+    }
+
+    public function testGetInviterIdUsesPreparedQueryOnly() {
+        $this->setMockInviteReturnValue();
+        $this->setReturnValue( $this->MockCms, 'prepareQuery', 'duck' );
+        $this->expectOnce( $this->MockCms, 'getRow', array( 'duck' ) );
+
+        $this->DatabaseWithMockedDependencies->getInviterId( 343 );
+    }
+
+    public function testIsEmailValidPreparesQuery() {
+        $this->expectOnce( $this->MockCms, 'prepareQuery', array(
+            'SELECT * FROM wptests_hf_email WHERE userID = %d AND emailID = %d',
+            array( 1, 3 )
+        ) );
+
+        $this->DatabaseWithMockedDependencies->isEmailValid( 1, 3 );
+    }
+
+    public function testIsEmailValidUsesOnlyPreparedQuery() {
+        $this->setReturnValue( $this->MockCms, 'prepareQuery', 'duck' );
+        $this->expectOnce( $this->MockCms, 'getRow', array( 'duck' ) );
+        $this->DatabaseWithMockedDependencies->isEmailValid( 1, 3 );
+    }
+
+    public function testGetGoalPreparesQuery() {
+        $this->expectOnce( $this->MockCms, 'prepareQuery', array(
+            'SELECT * FROM wptests_hf_goal WHERE goalID = %d',
+            array( 3 )
+        ) );
+
+        $this->DatabaseWithMockedDependencies->getGoal( 3 );
+    }
+
+    public function testGetGoalUsesOnlyPreparedQuery() {
+        $this->setReturnValue( $this->MockCms, 'prepareQuery', 'duck' );
+        $this->expectOnce( $this->MockCms, 'getRow', array( 'duck' ) );
+        $this->DatabaseWithMockedDependencies->getGoal( 3 );
+    }
+
+    public function testGetReportRequestUserIdPreparesQuery() {
+        $this->setMockRequestReturnValue();
+
+        $this->expectOnce( $this->MockCms, 'prepareQuery', array(
+            'SELECT * FROM wptests_hf_report_request WHERE requestID = %s',
+            array( 9 )
+        ) );
+
+        $this->DatabaseWithMockedDependencies->getReportRequestUserId( 9 );
+    }
+
+    private function setMockRequestReturnValue() {
+        $MockRequest         = new stdClass();
+        $MockRequest->userID = 5;
+        $this->setReturnValue( $this->MockCms, 'getRow', $MockRequest );
+    }
+
+    public function testGetReportRequestIdUsesOnlyPreparedQuery() {
+        $this->setMockRequestReturnValue();
+
+        $this->setReturnValue( $this->MockCms, 'prepareQuery', 'duck' );
+        $this->expectOnce( $this->MockCms, 'getRow', array( 'duck' ) );
+        $this->DatabaseWithMockedDependencies->getReportRequestUserId( 9 );
+    }
+
+    public function testGetAllInvitesUsesGetResults() {
+        $expected = 'SELECT * FROM wptests_hf_invite';
+        $this->expectOnce( $this->MockCms, 'getResults', array( $expected ) );
+        $this->DatabaseWithMockedDependencies->getAllInvites();
+    }
+
+    public function testGetAllReportRequestsUsesGetResults() {
+        $expected = 'SELECT * FROM wptests_hf_report_request';
+        $this->expectOnce( $this->MockCms, 'getResults', array( $expected ) );
+        $this->DatabaseWithMockedDependencies->getAllReportRequests();
+    }
+
+    public function testGetGoalSubscriptionsPreparesNewQuery() {
+        $this->expectOnce( $this->MockCms, 'prepareQuery', array(
+            'SELECT * FROM wptests_hf_user_goal WHERE userID = %d',
+            array( 7 )
+        ) );
+
+        $this->DatabaseWithMockedDependencies->getGoalSubscriptions( 7 );
+    }
+
+    public function testGetGoalSubscriptionsUsesPreparedQuery() {
+        $this->setReturnValue( $this->MockCms, 'prepareQuery', 'duck' );
+        $this->expectOnce( $this->MockCms, 'getResults', array( 'duck' ) );
+        $this->DatabaseWithMockedDependencies->getGoalSubscriptions( 7 );
+    }
+
+    public function testGetGoalSubscriptionsUsesPassedValue() {
+        $this->expectOnce( $this->MockCms, 'prepareQuery', array(
+            'SELECT * FROM wptests_hf_user_goal WHERE userID = %d',
+            array( 3 )
+        ) );
+
+        $this->DatabaseWithMockedDependencies->getGoalSubscriptions( 3 );
     }
 }
