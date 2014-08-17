@@ -450,7 +450,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
 
         $format = 'SELECT * FROM ' . $usersTable . ' INNER JOIN ' . $relationshipsTable . '
             WHERE (userID1 = ID OR userID2 = ID)
-            AND (userID1 = %d OR userID2 = %d) AND ID != $d';
+            AND (userID1 = %d OR userID2 = %d) AND ID != %d';
         $query  = $this->Cms->prepareQuery( $format, array( $userId, $userId, $userId ) );
 
         return $this->Cms->getResults( $query );

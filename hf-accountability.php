@@ -31,39 +31,19 @@ function hfDeactivate() {
     wp_clear_scheduled_hook( 'hfEmailCronHook' );
 }
 
-require_once( dirname( __FILE__ ) . '/interfaces/Hf_iMarkupGenerator.php' );
-require_once( dirname( __FILE__ ) . '/interfaces/Hf_iCms.php' );
-require_once( dirname( __FILE__ ) . '/interfaces/Hf_iCodeLibrary.php' );
-require_once( dirname( __FILE__ ) . '/interfaces/Hf_iView.php' );
-require_once( dirname( __FILE__ ) . '/interfaces/Hf_iShortcode.php' );
-require_once( dirname( __FILE__ ) . '/interfaces/Hf_iGoals.php' );
-require_once( dirname( __FILE__ ) . '/interfaces/Hf_iMessenger.php' );
-require_once( dirname( __FILE__ ) . '/interfaces/Hf_iAssetLocator.php' );
-require_once( dirname( __FILE__ ) . '/interfaces/Hf_iDatabase.php' );
-require_once( dirname( __FILE__ ) . '/interfaces/Hf_iUserManager.php' );
-require_once( dirname( __FILE__ ) . '/interfaces/Hf_iSecurity.php' );
 
-require_once( dirname( __FILE__ ) . '/abstractClasses/abstractClass-HfForm.php' );
+function autoload($folder) {
+    foreach ( scandir( dirname( __FILE__ ) . DIRECTORY_SEPARATOR . $folder ) as $filename ) {
+        $path = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . $filename;
+        if ( is_file( $path ) ) {
+            require_once $path;
+        }
+    }
+}
 
-require_once( dirname( __FILE__ ) . '/classes/HfUrlFinder.php' );
-require_once( dirname( __FILE__ ) . '/classes/HfSecurity.php' );
-require_once( dirname( __FILE__ ) . '/classes/HfMailer.php' );
-require_once( dirname( __FILE__ ) . '/classes/HfMysqlDatabase.php' );
-require_once( dirname( __FILE__ ) . '/classes/HfUserManager.php' );
-require_once( dirname( __FILE__ ) . '/classes/HfAdminPanel.php' );
-require_once( dirname( __FILE__ ) . '/classes/HfHtmlGenerator.php' );
-require_once( dirname( __FILE__ ) . '/classes/HfWordPress.php' );
-require_once( dirname( __FILE__ ) . '/classes/HfGoals.php' );
-require_once( dirname( __FILE__ ) . '/classes/HfPhpLibrary.php' );
-require_once( dirname( __FILE__ ) . '/classes/HfGenericForm.php' );
-require_once( dirname( __FILE__ ) . '/classes/HfSettingsShortcode.php' );
-require_once( dirname( __FILE__ ) . '/classes/HfFactory.php' );
-require_once( dirname( __FILE__ ) . '/classes/HfGoalsShortcode.php' );
-require_once( dirname( __FILE__ ) . '/classes/HfAccountabilityForm.php' );
-require_once( dirname( __FILE__ ) . '/classes/HfAuthenticateShortcode.php' );
-require_once( dirname( __FILE__ ) . '/classes/HfUserButtonsShortcode.php' );
-require_once( dirname( __FILE__ ) . '/classes/HfInvitePartnerShortcode.php' );
-require_once( dirname( __FILE__ ) . '/classes/HfPartnerListShortcode.php' );
+autoload('interfaces');
+autoload('abstractClasses');
+autoload('classes');
 
 date_default_timezone_set( 'America/Chicago' );
 

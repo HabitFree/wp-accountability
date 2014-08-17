@@ -597,7 +597,7 @@ class TestDatabase extends HfTestCase {
         $this->expectOnce( $this->MockCms, 'prepareQuery', array(
             'SELECT * FROM wptests_users INNER JOIN wptests_hf_relationship
             WHERE (userID1 = ID OR userID2 = ID)
-            AND (userID1 = %d OR userID2 = %d) AND ID != $d',
+            AND (userID1 = %d OR userID2 = %d) AND ID != %d',
             array( 2, 2, 2 )
         ) );
 
