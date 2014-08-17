@@ -44,4 +44,8 @@ class TestUrlFinder extends HfTestCase {
 
         $this->assertEquals('www.site.com/page', $actual);
     }
+
+    public function testUrlFinderExists() {
+        $this->assertTrue(class_exists('HfUrlFinder'));
+    }
 }
