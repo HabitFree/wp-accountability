@@ -777,4 +777,10 @@ class TestAuthenticateShortcode extends HfTestCase {
 
         $this->assertEquals( 1, substr_count($haystack, $needle) );
     }
+
+    public function testAuthenticateShortcodeUsesHookToLogin() {
+        $Cms = $this->Factory->makeCms();
+        $hookRegistered = has_action( 'after_setup_theme', array($Cms, 'authenticateUser') );
+        $this->assertTrue($hookRegistered !== False);
+    }
 }
