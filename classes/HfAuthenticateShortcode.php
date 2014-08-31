@@ -1,5 +1,8 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( !defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 class HfAuthenticateShortcode implements Hf_iShortcode {
     private $MarkupGenerator;
     private $AssetLocator;
@@ -125,6 +128,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private function processLoginRequest() {
         if ( $this->isLoggingIn() and $this->isLoginFormValid() ) {
             $this->attemptLogin();
+            $this->determineLoginSuccess();
 
             if ( $this->isLoginSuccessful ) {
                 $this->processInvite();
@@ -250,10 +254,8 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     private function attemptLogin() {
-        $success = $this->Cms->authenticateUser( $_POST['username'], $_POST['password'] );
-        if ( $success ) {
-            $this->isLoginSuccessful = true;
-        }
+        add_action( 'after_setup_theme', array( $this->Cms, 'authenticateUser' ), 10, 2 );
+        do_action( 'after_setup_theme', $_POST['username'], $_POST['password'] );
     }
 
     private function processInvite() {
@@ -313,5 +315,12 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         $infoMessageText = 'Redirecting... <a href="' . $url . '">Click here</a> if you are not automatically redirected. <a href="' . $url . '">Onward!</a>';
 
         return $this->MarkupGenerator->makeInfoMessage( $infoMessageText );
+    }
+
+    private function determineLoginSuccess() {
+        $success = ( $this->UserManager->getCurrentUserId() === $_POST['username'] );
+        if ( $success ) {
+            $this->isLoginSuccessful = true;
+        }
     }
 } 
