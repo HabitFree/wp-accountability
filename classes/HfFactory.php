@@ -1,6 +1,11 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
 class HfFactory {
+    public function makeAuthenticateHook() {
+        $Cms = $this->makeCms();
+        return new HfAuthenticateHook($Cms);
+    }
+
     public function makePartnerListShortcode() {
         $UserManager     = $this->makeUserManager();
         $MarkupGenerator = $this->makeMarkupGenerator();

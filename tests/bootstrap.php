@@ -7,12 +7,12 @@
 /**
  * The path to the WordPress tests checkout.
  */
-define( 'WP_TESTS_DIR', '/Applications/wordpress-3.8.3-0/apps/wordpress/htdocs/wp-content/plugins/hf-accountability/tests/wordpress-dev/trunk/tests/phpunit/' );
+define( 'WP_TESTS_DIR', '/Applications/wordpress-3.8.3-0/apps/wordpress/htdocs/wp-content/plugins/wp-hf-accountability/tests/wordpress-dev/trunk/tests/phpunit/' );
 
 /**
  * The path to the main file of the plugin to test.
  */
-define( 'TEST_PLUGIN_FILE', '/Applications/wordpress-3.8.3-0/apps/wordpress/htdocs/wp-content/plugins/hf-accountability/hf-accountability.php' );
+define( 'TEST_PLUGIN_FILE', '/Applications/wordpress-3.8.3-0/apps/wordpress/htdocs/wp-content/plugins/wp-hf-accountability/hf-accountability.php' );
 
 /**
  * The WordPress tests functions.

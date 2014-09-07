@@ -1,8 +1,8 @@
 <?php
 
 if ( ! defined( 'ABSPATH' ) ) exit;
-require_once(dirname(__FILE__) . '/../../../wp-load.php' );
-require_once(dirname(__FILE__) . '/hf-accountability.php');
+require_once(dirname(__FILE__) . '/../../../../wp-load.php' );
+require_once(dirname(__FILE__) . '../hf-accountability.php');
 
 if(isset($_POST['mandrill_events'])) {
 	$Mailer = new HfMailer();

@@ -802,6 +802,5 @@ class TestAuthenticateShortcode extends HfTestCase {
 
         $this->expectOnce($this->MockCms, 'authenticateUser', array('Joe', 'bo'));
         $AuthenticateShortcode->getOutput();
-
     }
 }

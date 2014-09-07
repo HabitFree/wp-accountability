@@ -254,8 +254,28 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     private function attemptLogin() {
-        add_action( 'after_setup_theme', array( $this->Cms, 'authenticateUser' ), 10, 2 );
-        do_action( 'after_setup_theme', $_POST['username'], $_POST['password'] );
+        $credentials = array(
+            'username' => $_POST['username'],
+            'password' => $_POST['password']
+        );
+
+        $url = plugins_url() . '/wp-hf-accountability/hooks/authenticate.php';
+
+        $ch = curl_init($url);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+        curl_setopt($ch, CURLOPT_POSTFIELDS,http_build_query($credentials));
+
+        $response = curl_exec($ch);
+
+        if(!$response) {
+            return false;
+        }
+
+//        add_action( 'after_setup_theme', array( $this->Cms, 'getSubscribedUsers' ) );
+//        add_action( 'after_setup_theme', array( $this->Cms, 'authenticateUser' ), 10, 2 );
+//        do_action( 'after_setup_theme', $_POST['username'], $_POST['password'] );
     }
 
     private function processInvite() {
