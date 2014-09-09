@@ -139,3 +139,19 @@ function hfChangeEditTitleLabelForQuotations( $title ){
     return $title;
 }
 
+// process login requests each time wordpress renders a page.
+function my_custom_login_process() {
+    // check if login credentials are present in the current http request
+    if ( isset( $_POST['username'] ) && isset( $_POST['password'] ) ) {
+        // try login
+        $Factory = new HfFactory();
+        $WordPress = $Factory->makeCms();
+        $user = $WordPress->authenticateUser($_POST['username'], $_POST['password']);
+
+        if ( is_wp_error($user) ) // didn't work. Tell the user.
+            exit('Nope...');
+        else // worked! Get him somewhere.
+            wp_redirect( get_bloginfo('url') );
+    }
+}
+add_action('after_setup_theme','my_custom_login_process');

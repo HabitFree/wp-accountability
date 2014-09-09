@@ -32,6 +32,9 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     public function getOutput() {
+        add_action( 'after_setup_theme', array( $this, 'attemptLogin' ) );
+        print_r('yo');
+
         $this->recallPostData();
         $this->validateForms();
         $this->processSubmissions();
@@ -127,7 +130,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     private function processLoginRequest() {
         if ( $this->isLoggingIn() and $this->isLoginFormValid() ) {
-            $this->attemptLogin();
+            //$this->attemptLogin();
             $this->determineLoginSuccess();
 
             if ( $this->isLoginSuccessful ) {
@@ -253,29 +256,15 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         return empty( $this->loginMessages );
     }
 
-    private function attemptLogin() {
+    public function attemptLogin() {
         $credentials = array(
             'username' => $_POST['username'],
             'password' => $_POST['password']
         );
 
-        $url = plugins_url() . '/wp-hf-accountability/hooks/authenticate.php';
+        print_r('hello!!');
 
-        $ch = curl_init($url);
-
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
-        curl_setopt($ch, CURLOPT_POSTFIELDS,http_build_query($credentials));
-
-        $response = curl_exec($ch);
-
-        if(!$response) {
-            return false;
-        }
-
-//        add_action( 'after_setup_theme', array( $this->Cms, 'getSubscribedUsers' ) );
-//        add_action( 'after_setup_theme', array( $this->Cms, 'authenticateUser' ), 10, 2 );
-//        do_action( 'after_setup_theme', $_POST['username'], $_POST['password'] );
+        $this->Cms->authenticateUser($_POST['username'], $_POST['password']);
     }
 
     private function processInvite() {
