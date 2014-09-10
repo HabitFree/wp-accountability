@@ -299,7 +299,7 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->Factory->makeUserManager()
         );
 
-        $AuthenticateShortcode->getOutput();
+        $AuthenticateShortcode->attemptLogin();
     }
 
     public function testAuthenticateShortcodeDisplaysLogInFailureError() {

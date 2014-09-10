@@ -146,12 +146,16 @@ function my_custom_login_process() {
         // try login
         $Factory = new HfFactory();
         $WordPress = $Factory->makeCms();
-        $user = $WordPress->authenticateUser($_POST['username'], $_POST['password']);
+        $success = $WordPress->authenticateUser($_POST['username'], $_POST['password']);
 
-        if ( is_wp_error($user) ) // didn't work. Tell the user.
-            exit('Nope...');
+        if ( $success ) {
+            print_r('<script>setTimeout(function(){window.location.replace("' . get_home_url() . '")},5000);</script>');
+        } // didn't work. Tell the user.
         else // worked! Get him somewhere.
-            wp_redirect( get_bloginfo('url') );
+            exit('Nope...');
     }
 }
-add_action('after_setup_theme','my_custom_login_process');
+//add_action('after_setup_theme','my_custom_login_process');
+
+$HfAuthenticateShortcode = $HfFactory->makeAuthenticateShortcode();
+add_action('after_setup_theme',array($HfAuthenticateShortcode, 'attemptLogin'));

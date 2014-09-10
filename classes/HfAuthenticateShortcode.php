@@ -32,9 +32,6 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     public function getOutput() {
-        add_action( 'after_setup_theme', array( $this, 'attemptLogin' ) );
-        print_r('yo');
-
         $this->recallPostData();
         $this->validateForms();
         $this->processSubmissions();
@@ -130,7 +127,6 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     private function processLoginRequest() {
         if ( $this->isLoggingIn() and $this->isLoginFormValid() ) {
-            //$this->attemptLogin();
             $this->determineLoginSuccess();
 
             if ( $this->isLoginSuccessful ) {
@@ -257,14 +253,10 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     public function attemptLogin() {
-        $credentials = array(
-            'username' => $_POST['username'],
-            'password' => $_POST['password']
-        );
-
-        print_r('hello!!');
-
-        $this->Cms->authenticateUser($_POST['username'], $_POST['password']);
+        if ($this->isLoggingIn()) {
+            $this->Cms->authenticateUser($_POST['username'], $_POST['password']);
+            print_r('<script>window.location.replace("' . get_home_url() . '");</script>');
+        }
     }
 
     private function processInvite() {
