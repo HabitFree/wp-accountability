@@ -299,7 +299,7 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->Factory->makeUserManager()
         );
 
-        $AuthenticateShortcode->getOutput();
+        $AuthenticateShortcode->attemptLogin();
     }
 
     public function testAuthenticateShortcodeDisplaysLogInFailureError() {
@@ -347,13 +347,13 @@ class TestAuthenticateShortcode extends HfTestCase {
         $_POST['username'] = 'Joe';
         $_POST['password'] = 'bo';
 
-        $this->setReturnValue( $this->MockCms, 'authenticateUser', true );
+        $this->setReturnValue( $this->MockUserManager, 'getCurrentUserId', 'Joe');
 
         $AuthenticateShortcode = new HfAuthenticateShortcode(
             $this->Factory->makeMarkupGenerator(),
             $this->Factory->makeAssetLocator(),
             $this->MockCms,
-            $this->Factory->makeUserManager()
+            $this->MockUserManager
         );
 
         $haystack = $AuthenticateShortcode->getOutput();
@@ -368,7 +368,7 @@ class TestAuthenticateShortcode extends HfTestCase {
         $_POST['password'] = 'bo';
 
         $AssetLocator = $this->Factory->makeAssetLocator();
-        $this->setReturnValue( $this->MockCms, 'authenticateUser', true );
+        $this->setReturnValue( $this->MockUserManager, 'getCurrentUserId', 'Joe');
 
         $homeUrl = $AssetLocator->getHomePageUrl();
 
@@ -376,7 +376,7 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->Factory->makeMarkupGenerator(),
             $this->Factory->makeAssetLocator(),
             $this->MockCms,
-            $this->Factory->makeUserManager()
+            $this->MockUserManager
         );
 
         $haystack = $AuthenticateShortcode->getOutput();
@@ -503,7 +503,7 @@ class TestAuthenticateShortcode extends HfTestCase {
         $mockUser     = new stdClass();
         $mockUser->ID = 7;
 
-        $this->setReturnValue( $this->MockCms, 'authenticateUser', true );
+        $this->setReturnValue( $this->MockUserManager, 'getCurrentUserId', 'Joe');
         $this->setReturnValue( $this->MockCms, 'currentUser', $mockUser );
         $this->setReturnValue( $this->MockCms, 'getUserEmail', 'joe@wallysworld.com' );
         $this->expectOnce( $this->MockUserManager, 'processInvite', array('joe@wallysworld.com', 555) );
@@ -574,13 +574,13 @@ class TestAuthenticateShortcode extends HfTestCase {
         $_POST['username'] = 'Joe';
         $_POST['password'] = 'bo';
 
-        $this->setReturnValue( $this->MockCms, 'authenticateUser', true );
+        $this->setReturnValue( $this->MockUserManager, 'getCurrentUserId', 'Joe');
 
         $AuthenticateShortcode = new HfAuthenticateShortcode(
             $this->Factory->makeMarkupGenerator(),
             $this->Factory->makeAssetLocator(),
             $this->MockCms,
-            $this->Factory->makeUserManager()
+            $this->MockUserManager
         );
 
         $haystack = $AuthenticateShortcode->getOutput();
@@ -748,7 +748,7 @@ class TestAuthenticateShortcode extends HfTestCase {
         $_POST['username'] = 'Joe';
         $_POST['password'] = 'bo';
 
-        $this->setReturnValue( $this->MockCms, 'authenticateUser', true );
+        $this->setReturnValue( $this->MockUserManager, 'getCurrentUserId', 'Joe');
 
         $AuthenticateShortcode = $this->makeExpressiveAuthenticateShortcode();
 
@@ -763,18 +763,42 @@ class TestAuthenticateShortcode extends HfTestCase {
         $_POST['username'] = 'Joe';
         $_POST['password'] = 'bo';
 
-        $this->setReturnValue( $this->MockCms, 'authenticateUser', true );
+        $this->setReturnValue( $this->MockUserManager, 'getCurrentUserId', 'Joe');
 
         $AuthenticateShortcode = new HfAuthenticateShortcode(
             $this->Factory->makeMarkupGenerator(),
             $this->Factory->makeAssetLocator(),
             $this->MockCms,
-            $this->Factory->makeUserManager()
+            $this->MockUserManager
         );
 
         $haystack = $AuthenticateShortcode->getOutput();
         $needle = '<p class="info">Redirecting...';
 
         $this->assertEquals( 1, substr_count($haystack, $needle) );
+    }
+
+    public function testAuthenticateShortcodeUsesMarkupGeneratorToRedirect() {
+        $_POST['login']    = '';
+        $_POST['username'] = 'Joe';
+        $_POST['password'] = 'bo';
+
+        $this->setReturnValue( $this->MockCms, 'authenticateUser', true);
+
+        $this->expectOnce($this->MockMarkupGenerator, 'makeRedirectScript');
+
+        $this->AuthenticateShortcodeWithMockedDependencies->attemptLogin();
+    }
+
+    public function testAuthenticateShortcodeDoesntRedirectOnFailedLogin() {
+        $_POST['login']    = '';
+        $_POST['username'] = 'Joe';
+        $_POST['password'] = 'bo';
+
+        $this->setReturnValue( $this->MockCms, 'authenticateUser', false);
+
+        $this->expectNever($this->MockMarkupGenerator, 'makeRedirectScript');
+
+        $this->AuthenticateShortcodeWithMockedDependencies->attemptLogin();
     }
 }

@@ -112,4 +112,10 @@ class TestHtmlGenerator extends HfTestCase {
         $result = $HtmlGenerator->makeInfoMessage('duck');
         $this->assertEquals('<p class="info">duck</p>', $result);
     }
+
+    public function testMakeRedirectScript() {
+        $HtmlGenerator = $this->Factory->makeMarkupGenerator();
+        $result = $HtmlGenerator->makeRedirectScript('duck');
+        $this->assertEquals('<script>window.location.replace("duck");</script>', $result);
+    }
 }

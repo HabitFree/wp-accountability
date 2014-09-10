@@ -1,7 +1,7 @@
 <?php
 
 if ( ! defined( 'ABSPATH' ) ) exit;
-//require_once( dirname( dirname( __FILE__ ) ) . '/hf-accountability.php' );
+//require_once( dirname( dirname( __FILE__ ) ) . '/wp-hf-accountability.php' );
 
 abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     protected $backupGlobals = false;

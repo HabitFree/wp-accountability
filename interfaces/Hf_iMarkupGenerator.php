@@ -24,4 +24,6 @@ interface Hf_iMarkupGenerator {
     public function makeHiddenField( $name );
 
     public function makeInfoMessage($content);
+
+    public function makeRedirectScript($url);
 }
