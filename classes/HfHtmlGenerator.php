@@ -68,4 +68,8 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     public function makeHiddenField( $name ) {
         return '<input type="hidden" name="' . $name . '" />';
     }
+
+    public function makeRedirectScript($url) {
+        return '<script>window.location.replace("'.$url.'");</script>';
+    }
 }

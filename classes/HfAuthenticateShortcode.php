@@ -254,8 +254,10 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     public function attemptLogin() {
         if ($this->isLoggingIn()) {
-            $this->Cms->authenticateUser($_POST['username'], $_POST['password']);
-            print_r('<script>window.location.replace("' . get_home_url() . '");</script>');
+            $success = $this->Cms->authenticateUser($_POST['username'], $_POST['password']);
+            if ($success) {
+                print_r($this->MarkupGenerator->makeRedirectScript(get_home_url()));
+            }
         }
     }
 

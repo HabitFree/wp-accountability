@@ -778,17 +778,27 @@ class TestAuthenticateShortcode extends HfTestCase {
         $this->assertEquals( 1, substr_count($haystack, $needle) );
     }
 
-    public function testAuthenticateShortcodeUsesHookToLogin() {
+    public function testAuthenticateShortcodeUsesMarkupGeneratorToRedirect() {
         $_POST['login']    = '';
         $_POST['username'] = 'Joe';
         $_POST['password'] = 'bo';
 
-        $this->AuthenticateShortcodeWithMockedDependencies->getOutput();
-        $hookRegistered = has_action( 'after_setup_theme' );
-        $this->assertTrue($hookRegistered !== False);
+        $this->setReturnValue( $this->MockCms, 'authenticateUser', true);
+
+        $this->expectOnce($this->MockMarkupGenerator, 'makeRedirectScript');
+
+        $this->AuthenticateShortcodeWithMockedDependencies->attemptLogin();
     }
 
-    public function dddtestAuthenticateShortcodeAddsAction() {
-        has_action('after_setup_theme');
+    public function testAuthenticateShortcodeDoesntRedirectOnFailedLogin() {
+        $_POST['login']    = '';
+        $_POST['username'] = 'Joe';
+        $_POST['password'] = 'bo';
+
+        $this->setReturnValue( $this->MockCms, 'authenticateUser', false);
+
+        $this->expectNever($this->MockMarkupGenerator, 'makeRedirectScript');
+
+        $this->AuthenticateShortcodeWithMockedDependencies->attemptLogin();
     }
 }
