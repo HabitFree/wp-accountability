@@ -70,11 +70,6 @@ class HfWordPress implements Hf_iCms {
         $success = !$this->isError($result);
 
         return $success;
-//        $result = wp_authenticate( $username, $password );
-//        $success = !$this->isError($result);
-//        print_r($result);
-//        echo $success;
-//        return $success;
     }
 
     public function isError( $thing ) {
