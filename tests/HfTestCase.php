@@ -1,6 +1,9 @@
 <?php
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( !defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 //require_once( dirname( dirname( __FILE__ ) ) . '/wp-hf-accountability.php' );
 
 abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
@@ -52,7 +55,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->MockGoals           = $this->makeMock( 'HfGoals' );
         $this->MockMarkupGenerator = $this->makeMock( 'HfHtmlGenerator' );
 
-        $this->setReturnValue($this->MockCms, 'getDbPrefix', 'wptests_');
+        $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptests_' );
     }
 
     private function resetObjectsWithMockDependencies() {
@@ -65,11 +68,15 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->resetPartnerListShortcodeWithMockedDependencies();
         $this->resetAuthenticateShortcodeWithMockedDependencies();
         $this->resetGoalsWithMockedDependencies();
-        $this->ManagePartnersShortcodeWithMockedDependencies = new HfManagePartnersShortcode($this->MockSecurity);
+        $this->resetManagePartnersShortcodeWithMockedDependencies();
     }
 
     protected function makeMock( $className ) {
         return $this->getMockBuilder( $className )->disableOriginalConstructor()->getMock();
+    }
+
+    protected function setReturnValue( $Mock, $method, $value ) {
+        return $Mock->expects( $this->any() )->method( $method )->will( $this->returnValue( $value ) );
     }
 
     private function resetUserManagerWithMockedDependencies() {
@@ -150,13 +157,9 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         );
     }
 
-    protected function setReturnValue( $Mock, $method, $value ) {
-        return $Mock->expects( $this->any() )->method( $method )->will( $this->returnValue( $value ) );
-    }
-
     protected function setReturnValues( $Mock, $method, $values ) {
         $AdjustedMock     = $Mock->expects( $this->any() )->method( $method );
-        $consecutiveCalls = call_user_func_array( array($this, "onConsecutiveCalls"), $values );
+        $consecutiveCalls = call_user_func_array( array( $this, "onConsecutiveCalls" ), $values );
 
         return $AdjustedMock->will( $consecutiveCalls );
     }
@@ -175,7 +178,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
                 $expectations[] = $this->equalTo( $arg );
             }
 
-            call_user_func_array( array($ExpectantMock, "with"), $expectations );
+            call_user_func_array( array( $ExpectantMock, "with" ), $expectations );
         }
     }
 
@@ -224,13 +227,13 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $initiatingMethod,
         $expectedArgSets
     ) {
-        $successes = array_pad(array(), count($expectedArgSets), false);
+        $successes = array_pad( array(), count( $expectedArgSets ), false );
 
         $argsChecker = function () use ( &$successes, $expectedArgSets ) {
             $actualArgs = func_get_args();
 
-            foreach ($expectedArgSets as $index=>$argSet) {
-                if ($argSet === $actualArgs) {
+            foreach ( $expectedArgSets as $index => $argSet ) {
+                if ( $argSet === $actualArgs ) {
                     $successes[$index] = true;
                     break;
                 }
@@ -243,8 +246,15 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
 
         $InitiatingObject->$initiatingMethod();
 
-        foreach ($successes as $index=>$success) {
-            $this->assertTrue($success, serialize( $expectedArgSets[$index]));
+        foreach ( $successes as $index => $success ) {
+            $this->assertTrue( $success, serialize( $expectedArgSets[$index] ) );
         }
+    }
+
+    private function resetManagePartnersShortcodeWithMockedDependencies() {
+        $this->ManagePartnersShortcodeWithMockedDependencies = new HfManagePartnersShortcode(
+            $this->MockSecurity,
+            $this->MockUserManager
+        );
     }
 } 

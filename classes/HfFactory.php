@@ -6,8 +6,9 @@ if ( !defined( 'ABSPATH' ) ) {
 class HfFactory {
     public function makeManagePartnersShortcode() {
         $Security = $this->makeSecurity();
+        $UserManager = $this->makeUserManager();
 
-        return new HfManagePartnersShortcode( $Security );
+        return new HfManagePartnersShortcode( $Security, $UserManager );
     }
 
     public function makeSecurity() {
