@@ -26,4 +26,6 @@ interface Hf_iMarkupGenerator {
     public function makeInfoMessage($content);
 
     public function makeRedirectScript($url);
+
+    public function makeHeader($content, $level);
 }

@@ -71,9 +71,8 @@ class TestFactory extends HfTestCase {
         $this->assertTrue( is_a( $SettingsShortcode, 'HfSettingsShortcode' ) );
     }
 
-    public function testFactoryMakeAuthenticateHook() {
-        $AuthenticateHook = $this->Factory->makeAuthenticateHook();
-
-        $this->assertTrue( is_a( $AuthenticateHook, 'HfAuthenticateHook' ) );
+    public function testFactoryMakeManagePartnersShortcode() {
+        $ManagePartnersShortcode = $this->Factory->makeManagePartnersShortcode();
+        $this->assertTrue(is_a($ManagePartnersShortcode, 'HfManagePartnersShortcode'));
     }
 }
