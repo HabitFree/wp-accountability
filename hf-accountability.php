@@ -34,7 +34,7 @@ function hfDeactivate() {
 }
 
 
-function autoload( $folder ) {
+function hfAutoload( $folder ) {
     foreach ( scandir( dirname( __FILE__ ) . DIRECTORY_SEPARATOR . $folder ) as $filename ) {
         $path = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . $filename;
         if ( is_file( $path ) ) {
@@ -43,17 +43,19 @@ function autoload( $folder ) {
     }
 }
 
-autoload( 'interfaces' );
-autoload( 'abstractClasses' );
-autoload( 'classes' );
+hfAutoload( 'interfaces' );
+hfAutoload( 'abstractClasses' );
+hfAutoload( 'classes' );
 
 date_default_timezone_set( 'America/Chicago' );
 
-$HfFactory     = new HfFactory();
-$HfGoals       = $HfFactory->makeGoals();
-$HfUserManager = $HfFactory->makeUserManager();
-$HfAdminPanel  = $HfFactory->makeAdminPanel();
+$HfFactory               = new HfFactory();
+$HfGoals                 = $HfFactory->makeGoals();
+$HfUserManager           = $HfFactory->makeUserManager();
+$HfAdminPanel            = $HfFactory->makeAdminPanel();
+$HfAuthenticateShortcode = $HfFactory->makeAuthenticateShortcode();
 
+add_action( 'after_setup_theme', array( $HfAuthenticateShortcode, 'attemptLogin' ) );
 add_action( 'hfEmailCronHook', array( $HfGoals, 'sendReportRequestEmails' ) );
 add_action( 'user_register', array( $HfUserManager, 'processNewUser' ) );
 add_action( 'admin_menu', array( $HfAdminPanel, 'registerAdminPanel' ) );
@@ -144,27 +146,3 @@ function hfChangeEditTitleLabelForQuotations( $title ) {
 
     return $title;
 }
-
-// process login requests each time wordpress renders a page.
-function my_custom_login_process() {
-    // check if login credentials are present in the current http request
-    if ( isset( $_POST['username'] ) && isset( $_POST['password'] ) ) {
-        // try login
-        $Factory   = new HfFactory();
-        $WordPress = $Factory->makeCms();
-        $success   = $WordPress->authenticateUser( $_POST['username'], $_POST['password'] );
-
-        if ( $success ) {
-            print_r( '<script>setTimeout(function(){window.location.replace("' . get_home_url() . '")},5000);</script>' );
-        } // didn't work. Tell the user.
-        else // worked! Get him somewhere.
-        {
-            exit( 'Nope...' );
-        }
-    }
-}
-
-//add_action('after_setup_theme','my_custom_login_process');
-
-$HfAuthenticateShortcode = $HfFactory->makeAuthenticateShortcode();
-add_action( 'after_setup_theme', array( $HfAuthenticateShortcode, 'attemptLogin' ) );

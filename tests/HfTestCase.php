@@ -26,6 +26,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     protected $PartnerListShortcodeWithMockedDependencies;
     protected $AuthenticateShortcodeWithMockedDependencies;
     protected $GoalsWithMockedDependencies;
+    protected $ManagePartnersShortcodeWithMockedDependencies;
 
     function __construct() {
         $this->Factory = new HfFactory();
@@ -64,6 +65,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->resetPartnerListShortcodeWithMockedDependencies();
         $this->resetAuthenticateShortcodeWithMockedDependencies();
         $this->resetGoalsWithMockedDependencies();
+        $this->ManagePartnersShortcodeWithMockedDependencies = new HfManagePartnersShortcode($this->MockSecurity);
     }
 
     protected function makeMock( $className ) {

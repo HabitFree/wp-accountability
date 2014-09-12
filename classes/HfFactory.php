@@ -5,7 +5,13 @@ if ( !defined( 'ABSPATH' ) ) {
 
 class HfFactory {
     public function makeManagePartnersShortcode() {
-        return new HfManagePartnersShortcode();
+        $Security = $this->makeSecurity();
+
+        return new HfManagePartnersShortcode( $Security );
+    }
+
+    public function makeSecurity() {
+        return new HfSecurity();
     }
 
     public function makePartnerListShortcode() {
@@ -61,10 +67,6 @@ class HfFactory {
 
     public function makeCodeLibrary() {
         return new HfPhpLibrary();
-    }
-
-    public function makeSecurity() {
-        return new HfSecurity();
     }
 
     public function makeInvitePartnerShortcode() {
