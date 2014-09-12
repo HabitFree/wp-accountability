@@ -1,6 +1,13 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( !defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 class HfFactory {
+    public function makeManagePartnersShortcode() {
+        return new HfManagePartnersShortcode();
+    }
+
     public function makePartnerListShortcode() {
         $UserManager     = $this->makeUserManager();
         $MarkupGenerator = $this->makeMarkupGenerator();
