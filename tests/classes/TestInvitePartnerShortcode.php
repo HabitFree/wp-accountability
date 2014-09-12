@@ -128,4 +128,16 @@ class TestInvitePartnerShortcode extends HfTestCase {
 
         $InviteShortcode->getOutput();
     }
+
+    public function testInvitePartnerShortcodeIncludesHeader() {
+        $InviteShortcode = new HfInvitePartnerShortcode(
+            $this->MockAssetLocator,
+            $this->Factory->makeMarkupGenerator(),
+            $this->MockUserManager
+        );
+
+        $result = $InviteShortcode->getOutput();
+
+        $this->assertContains('<h2>Invite Partner</h2>', $result);
+    }
 }

@@ -72,4 +72,8 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     public function makeRedirectScript($url) {
         return '<script>window.location.replace("'.$url.'");</script>';
     }
+
+    public function makeHeader($content, $level) {
+        return "<h$level>$content</h$level>";
+    }
 }

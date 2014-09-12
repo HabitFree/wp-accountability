@@ -1,5 +1,8 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( !defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 class HfInvitePartnerShortcode implements Hf_iShortcode {
     private $AssetLocator;
     private $MarkupGenerator;
@@ -17,9 +20,17 @@ class HfInvitePartnerShortcode implements Hf_iShortcode {
 
         $this->processForm();
 
-        $form = $this->generateForm();
+        $header = $this->MarkupGenerator->makeHeader('Invite Partner', 2);
+        $form   = $this->generateForm();
 
-        return $this->messages . $form->getHtml();
+        return $header . $this->messages . $form->getHtml();
+    }
+
+    private function processForm() {
+        if ( $this->isFormSubmitted() ) {
+            $this->validateForm();
+            $this->sendInvitation();
+        }
     }
 
     private function generateForm() {
@@ -33,24 +44,13 @@ class HfInvitePartnerShortcode implements Hf_iShortcode {
         return $form;
     }
 
-    private function validateForm() {
-        if ( $this->isFormSubmitted() and $this->isEmailInvalid() ) {
-            $this->messages .= $this->MarkupGenerator->makeErrorMessage( 'Please enter a valid email address.' );
-        }
-    }
-
     private function isFormSubmitted() {
         return isset( $_POST['submit'] );
     }
 
-    private function isEmailInvalid() {
-        return !filter_var( $_POST['email'], FILTER_VALIDATE_EMAIL );
-    }
-
-    private function processForm() {
-        if ( $this->isFormSubmitted() ) {
-            $this->validateForm();
-            $this->sendInvitation();
+    private function validateForm() {
+        if ( $this->isFormSubmitted() and $this->isEmailInvalid() ) {
+            $this->messages .= $this->MarkupGenerator->makeErrorMessage( 'Please enter a valid email address.' );
         }
     }
 
@@ -60,5 +60,9 @@ class HfInvitePartnerShortcode implements Hf_iShortcode {
             $this->UserManager->sendInvitation( $inviterId, $_POST['email'] );
             $this->messages .= '<p class="success">' . $_POST['email'] . ' has been successfully invited to partner with you.</p>';
         }
+    }
+
+    private function isEmailInvalid() {
+        return !filter_var( $_POST['email'], FILTER_VALIDATE_EMAIL );
     }
 }
