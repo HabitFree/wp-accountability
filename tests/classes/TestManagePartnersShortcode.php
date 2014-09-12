@@ -33,4 +33,30 @@ class TestManagePartnersShortcode extends HfTestCase {
         $result = $this->ManagePartnersShortcodeWithMockedDependencies->getOutput();
         $this->assertEquals('duck', $result);
     }
+
+    public function testShortcodeQueriesPartnerList() {
+        $this->expectOnce($this->MockPartnerListShortcode, 'getOutput');
+        $this->setReturnValue($this->MockUserManager, 'isUserLoggedIn', true);
+        $this->ManagePartnersShortcodeWithMockedDependencies->getOutput();
+    }
+
+    public function testShortcodeQueriesInvitePartnerForm() {
+        $this->expectOnce($this->MockInvitePartnerShortcode, 'getOutput');
+        $this->setReturnValue($this->MockUserManager, 'isUserLoggedIn', true);
+        $this->ManagePartnersShortcodeWithMockedDependencies->getOutput();
+    }
+
+    public function testShortcodeReturnsPartnerList() {
+        $this->setReturnValue($this->MockUserManager, 'isUserLoggedIn', true);
+        $this->setReturnValue($this->MockPartnerListShortcode, 'getOutput', 'duck');
+        $result = $this->ManagePartnersShortcodeWithMockedDependencies->getOutput();
+        $this->assertContains('duck', $result);
+    }
+
+    public function testShortcodeReturnsInviteForm() {
+        $this->setReturnValue($this->MockUserManager, 'isUserLoggedIn', true);
+        $this->setReturnValue($this->MockInvitePartnerShortcode, 'getOutput', 'goose');
+        $result = $this->ManagePartnersShortcodeWithMockedDependencies->getOutput();
+        $this->assertContains('goose', $result);
+    }
 }

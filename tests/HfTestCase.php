@@ -19,6 +19,8 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     protected $MockUserManager;
     protected $MockGoals;
     protected $MockMarkupGenerator;
+    protected $MockPartnerListShortcode;
+    protected $MockInvitePartnerShortcode;
 
     protected $InvitePartnerShortcodeWithMockedDependencies;
     protected $UserManagerWithMockedDependencies;
@@ -44,16 +46,18 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     }
 
     private function resetMocks() {
-        $this->MockDatabase        = $this->makeMock( 'HfMysqlDatabase' );
-        $this->MockMessenger       = $this->makeMock( 'HfMailer' );
-        $this->MockAssetLocator    = $this->makeMock( 'HfUrlFinder' );
-        $this->MockCms             = $this->makeMock( 'HfWordPress' );
-        $this->MockSecurity        = $this->makeMock( 'HfSecurity' );
-        $this->MockCodeLibrary     = $this->makeMock( 'HfPhpLibrary' );
-        $this->MockUserManager     = $this->makeMock( 'HfUserManager' );
-        $this->MockPageLocator     = $this->makeMock( 'HfUrlFinder' );
-        $this->MockGoals           = $this->makeMock( 'HfGoals' );
-        $this->MockMarkupGenerator = $this->makeMock( 'HfHtmlGenerator' );
+        $this->MockDatabase               = $this->makeMock( 'HfMysqlDatabase' );
+        $this->MockMessenger              = $this->makeMock( 'HfMailer' );
+        $this->MockAssetLocator           = $this->makeMock( 'HfUrlFinder' );
+        $this->MockCms                    = $this->makeMock( 'HfWordPress' );
+        $this->MockSecurity               = $this->makeMock( 'HfSecurity' );
+        $this->MockCodeLibrary            = $this->makeMock( 'HfPhpLibrary' );
+        $this->MockUserManager            = $this->makeMock( 'HfUserManager' );
+        $this->MockPageLocator            = $this->makeMock( 'HfUrlFinder' );
+        $this->MockGoals                  = $this->makeMock( 'HfGoals' );
+        $this->MockMarkupGenerator        = $this->makeMock( 'HfHtmlGenerator' );
+        $this->MockPartnerListShortcode   = $this->makeMock( 'HfPartnerListShortcode' );
+        $this->MockInvitePartnerShortcode = $this->makeMock( 'HfInvitePartnerShortcode' );
 
         $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptests_' );
     }
@@ -157,6 +161,15 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         );
     }
 
+    private function resetManagePartnersShortcodeWithMockedDependencies() {
+        $this->ManagePartnersShortcodeWithMockedDependencies = new HfManagePartnersShortcode(
+            $this->MockSecurity,
+            $this->MockUserManager,
+            $this->MockPartnerListShortcode,
+            $this->MockInvitePartnerShortcode
+        );
+    }
+
     protected function setReturnValues( $Mock, $method, $values ) {
         $AdjustedMock     = $Mock->expects( $this->any() )->method( $method );
         $consecutiveCalls = call_user_func_array( array( $this, "onConsecutiveCalls" ), $values );
@@ -249,12 +262,5 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         foreach ( $successes as $index => $success ) {
             $this->assertTrue( $success, serialize( $expectedArgSets[$index] ) );
         }
-    }
-
-    private function resetManagePartnersShortcodeWithMockedDependencies() {
-        $this->ManagePartnersShortcodeWithMockedDependencies = new HfManagePartnersShortcode(
-            $this->MockSecurity,
-            $this->MockUserManager
-        );
     }
 } 
