@@ -27,4 +27,10 @@ class TestManagePartnersShortcode extends HfTestCase {
         $this->expectNever($this->MockSecurity, 'requireLogin');
         $this->ManagePartnersShortcodeWithMockedDependencies->getOutput();
     }
+
+    public function testManagePartnerShortcodeReturnsLoginForm() {
+        $this->setReturnValue($this->MockSecurity, 'requireLogin', 'duck');
+        $result = $this->ManagePartnersShortcodeWithMockedDependencies->getOutput();
+        $this->assertEquals('duck', $result);
+    }
 }
