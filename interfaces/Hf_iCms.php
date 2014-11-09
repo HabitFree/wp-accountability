@@ -60,4 +60,6 @@ interface Hf_iCms {
     public function insertOrReplaceRow($table, $data, $format);
 
     public function getOption($option);
+
+    public function getPluginDirectoryUrl($plugin);
 }

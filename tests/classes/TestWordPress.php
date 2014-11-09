@@ -20,7 +20,8 @@ class TestWordPress extends HfTestCase {
             'getHomeUrl',
             'prepareQuery',
             'insertOrReplaceRow',
-            'getOption'
+            'getOption',
+            'getPluginDirectoryUrl'
         );
 
         foreach($methodNames as $methodName) {

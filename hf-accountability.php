@@ -6,7 +6,9 @@ Author: Nathan Arthur
 Version: 1.0
 Author URI: http://NathanArthur.com/
 */
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( !defined( 'ABSPATH' ) ) {
+    exit;
+}
 
 register_activation_hook( __FILE__, "hfActivate" );
 register_deactivation_hook( __FILE__, "hfDeactivate" );
@@ -22,7 +24,7 @@ function hfActivate() {
 
     $Database->installDb();
 
-    add_action( 'wp_loaded', array($UserManager, 'processAllUsers') );
+    add_action( 'wp_loaded', array( $UserManager, 'processAllUsers' ) );
 
     error_log( "my plugin activated", 0 );
 }
@@ -32,7 +34,7 @@ function hfDeactivate() {
 }
 
 
-function autoload($folder) {
+function hfAutoload( $folder ) {
     foreach ( scandir( dirname( __FILE__ ) . DIRECTORY_SEPARATOR . $folder ) as $filename ) {
         $path = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . $filename;
         if ( is_file( $path ) ) {
@@ -41,60 +43,64 @@ function autoload($folder) {
     }
 }
 
-autoload('interfaces');
-autoload('abstractClasses');
-autoload('classes');
+hfAutoload( 'interfaces' );
+hfAutoload( 'abstractClasses' );
+hfAutoload( 'classes' );
 
 date_default_timezone_set( 'America/Chicago' );
 
-$HfFactory     = new HfFactory();
-$HfGoals       = $HfFactory->makeGoals();
-$HfUserManager = $HfFactory->makeUserManager();
-$HfAdminPanel  = $HfFactory->makeAdminPanel();
+$HfFactory               = new HfFactory();
+$HfGoals                 = $HfFactory->makeGoals();
+$HfUserManager           = $HfFactory->makeUserManager();
+$HfAdminPanel            = $HfFactory->makeAdminPanel();
+$HfAuthenticateShortcode = $HfFactory->makeAuthenticateShortcode();
 
-add_action( 'hfEmailCronHook', array($HfGoals, 'sendReportRequestEmails') );
-add_action( 'user_register', array($HfUserManager, 'processNewUser') );
-add_action( 'admin_menu', array($HfAdminPanel, 'registerAdminPanel') );
-add_action( 'admin_head', array($HfAdminPanel, 'addToAdminHead') );
+add_action( 'after_setup_theme', array( $HfAuthenticateShortcode, 'attemptLogin' ) );
+add_action( 'hfEmailCronHook', array( $HfGoals, 'sendReportRequestEmails' ) );
+add_action( 'user_register', array( $HfUserManager, 'processNewUser' ) );
+add_action( 'admin_menu', array( $HfAdminPanel, 'registerAdminPanel' ) );
+add_action( 'admin_head', array( $HfAdminPanel, 'addToAdminHead' ) );
 add_action( 'init', 'hfRegisterShortcodes' );
-add_action('init', 'hfAddPostTypes');
+add_action( 'init', 'hfAddPostTypes' );
 
-add_filter('user_can_richedit', 'hfDisableWysiwygForQuotes');
+add_filter( 'user_can_richedit', 'hfDisableWysiwygForQuotes' );
 add_filter( 'enter_title_here', 'hfChangeEditTitleLabelForQuotations' );
 
 function hfRegisterShortcodes() {
-    $Factory                = new HfFactory();
-    $SettingsShortcode      = $Factory->makeSettingsShortcode();
-    $GoalsShortcode         = $Factory->makeGoalsShortcode();
-    $AuthenticateShortcode  = $Factory->makeAuthenticateShortcode();
-    $UserButtonsShortcode   = $Factory->makeUserButtonsShortcode();
-    $InvitePartnerShortcode = $Factory->makeInvitePartnerShortcode();
-    $PartnerListShortcode   = $Factory->makePartnerListShortcode();
+    $Factory                 = new HfFactory();
+    $SettingsShortcode       = $Factory->makeSettingsShortcode();
+    $GoalsShortcode          = $Factory->makeGoalsShortcode();
+    $AuthenticateShortcode   = $Factory->makeAuthenticateShortcode();
+    $UserButtonsShortcode    = $Factory->makeUserButtonsShortcode();
+    $InvitePartnerShortcode  = $Factory->makeInvitePartnerShortcode();
+    $PartnerListShortcode    = $Factory->makePartnerListShortcode();
+    $ManagePartnersShortcode = $Factory->makeManagePartnersShortcode();
 
-    add_shortcode( 'hfSettings', array($SettingsShortcode, 'getOutput') );
-    add_shortcode( 'hfGoals', array($GoalsShortcode, 'getOutput') );
-    add_shortcode( 'hfUserButtons', array($UserButtonsShortcode, 'getOutput') );
-    add_shortcode( 'hfAuthenticate', array($AuthenticateShortcode, 'getOutput') );
-    add_shortcode( 'hfInvitePartner', array($InvitePartnerShortcode, 'getOutput') );
-    add_shortcode( 'hfPartnerList', array($PartnerListShortcode, 'getOutput') );
+    add_shortcode( 'hfSettings', array( $SettingsShortcode, 'getOutput' ) );
+    add_shortcode( 'hfGoals', array( $GoalsShortcode, 'getOutput' ) );
+    add_shortcode( 'hfUserButtons', array( $UserButtonsShortcode, 'getOutput' ) );
+    add_shortcode( 'hfAuthenticate', array( $AuthenticateShortcode, 'getOutput' ) );
+    add_shortcode( 'hfInvitePartner', array( $InvitePartnerShortcode, 'getOutput' ) );
+    add_shortcode( 'hfPartnerList', array( $PartnerListShortcode, 'getOutput' ) );
+    add_shortcode( 'hfManagePartners', array( $ManagePartnersShortcode, 'getOutput' ) );
 }
 
 function hfAddPostTypes() {
     register_post_type( 'hf_quotation',
         array(
-            'labels' => array(
-                'name' => __( 'Quotations' ),
-                'singular_name' => __( 'Quotation' ),
-                'menu_name'           => __( 'Quotations', 'text_domain' ),
-                'parent_item_colon'   => __( 'Parent Quotation:', 'text_domain' ),
-                'all_items'           => __( 'All Quotations', 'text_domain' ),
-                'view_item'           => __( 'View Quotation', 'text_domain' ),
-                'add_new_item'        => __( 'Add New Quotation', 'text_domain' ),
-                'edit_item'           => __( 'Edit Quotation', 'text_domain' ),
-                'update_item'         => __( 'Update Quotation', 'text_domain' ),
-                'search_items'        => __( 'Search Quotation', 'text_domain' )
+            'labels'      => array(
+                'name'              => __( 'Quotations' ),
+                'singular_name'     => __( 'Quotation' ),
+                'menu_name'         => __( 'Quotations', 'text_domain' ),
+                'parent_item_colon' => __( 'Parent Quotation:', 'text_domain' ),
+                'all_items'         => __( 'All Quotations', 'text_domain' ),
+                'view_item'         => __( 'View Quotation', 'text_domain' ),
+                'add_new_item'      => __( 'Add New Quotation', 'text_domain' ),
+                'edit_item'         => __( 'Edit Quotation', 'text_domain' ),
+                'update_item'       => __( 'Update Quotation', 'text_domain' ),
+                'search_items'      => __( 'Search Quotation', 'text_domain' )
             ),
-            'public' => true,
+            'public'      => true,
             'has_archive' => true,
         )
     );
@@ -103,13 +109,13 @@ function hfAddPostTypes() {
         'hfContext',
         'hf_quotation',
         array(
-            'label' => __( 'Context' ),
-            'rewrite' => array( 'slug' => 'context' ),
+            'label'        => __( 'Context' ),
+            'rewrite'      => array( 'slug' => 'context' ),
             'hierarchical' => true,
             'capabilities' => array(
-                'manage_terms'=> 'noone',
-                'edit_terms'=> 'noone',
-                'delete_terms'=> 'noone',
+                'manage_terms' => 'noone',
+                'edit_terms'   => 'noone',
+                'delete_terms' => 'noone',
                 'assign_terms' => 'edit_posts'
             )
         )
@@ -122,20 +128,21 @@ function hfAddPostTypes() {
     wp_insert_term( 'For Mentor', $taxonomy, $args = array() );
 }
 
-function hfDisableWysiwygForQuotes($default) {
+function hfDisableWysiwygForQuotes( $default ) {
     global $post;
-    if ('hf_quotation' == get_post_type($post))
+    if ( 'hf_quotation' == get_post_type( $post ) ) {
         return false;
+    }
+
     return $default;
 }
 
-function hfChangeEditTitleLabelForQuotations( $title ){
+function hfChangeEditTitleLabelForQuotations( $title ) {
     $screen = get_current_screen();
 
-    if  ( 'hf_quotation' == $screen->post_type ) {
+    if ( 'hf_quotation' == $screen->post_type ) {
         $title = 'Enter source / reference here';
     }
 
     return $title;
 }
-

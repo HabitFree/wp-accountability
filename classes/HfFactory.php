@@ -1,12 +1,20 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) exit;
-class HfFactory {
-    public function makePartnerListShortcode() {
-        $UserManager     = $this->makeUserManager();
-        $MarkupGenerator = $this->makeMarkupGenerator();
-        $AssetLocator    = $this->makeAssetLocator();
+if ( !defined( 'ABSPATH' ) ) {
+    exit;
+}
 
-        return new HfPartnerListShortcode( $UserManager, $MarkupGenerator, $AssetLocator );
+class HfFactory {
+    public function makeManagePartnersShortcode() {
+        $Security             = $this->makeSecurity();
+        $UserManager          = $this->makeUserManager();
+        $PartnerListShortcode = $this->makePartnerListShortcode();
+        $InvitePartnerShortcode = $this->makeInvitePartnerShortcode();
+
+        return new HfManagePartnersShortcode( $Security, $UserManager, $PartnerListShortcode, $InvitePartnerShortcode );
+    }
+
+    public function makeSecurity() {
+        return new HfSecurity();
     }
 
     public function makeUserManager() {
@@ -19,20 +27,22 @@ class HfFactory {
         return new HfUserManager( $Database, $Mailer, $AssetLocator, $Cms, $CodeLibrary );
     }
 
-    public function makeMarkupGenerator() {
-        $Cms = $this->makeCms();
+    public function makePartnerListShortcode() {
+        $UserManager     = $this->makeUserManager();
+        $MarkupGenerator = $this->makeMarkupGenerator();
+        $AssetLocator    = $this->makeAssetLocator();
 
-        return new HfHtmlGenerator( $Cms );
+        return new HfPartnerListShortcode( $UserManager, $MarkupGenerator, $AssetLocator );
+    }
+
+    public function makeCms() {
+        return new HfWordPress();
     }
 
     public function makeAssetLocator() {
         $Cms = $this->makeCms();
 
         return new HfUrlFinder( $Cms );
-    }
-
-    public function makeCms() {
-        return new HfWordPress();
     }
 
     public function makeMessenger() {
@@ -56,8 +66,10 @@ class HfFactory {
         return new HfPhpLibrary();
     }
 
-    public function makeSecurity() {
-        return new HfSecurity();
+    public function makeMarkupGenerator() {
+        $Cms = $this->makeCms();
+
+        return new HfHtmlGenerator( $Cms );
     }
 
     public function makeInvitePartnerShortcode() {
