@@ -105,6 +105,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
 					requestID varchar(250) NOT NULL,
 					userID int NOT NULL,
 					emailID int NOT NULL,
+                                        expirationDate datetime NOT NULL,
 					KEY requestID (requestID),
 					KEY userID (userID),
 					KEY emailID (emailID),
