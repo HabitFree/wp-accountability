@@ -197,12 +197,18 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private function generateRegistrationForm() {
         $Form = new HfGenericForm( $this->AssetLocator->getCurrentPageUrl() );
 
-        $usernameChoiceMessage =
-            '<strong>Important:</strong> HabitFree is a support community. For this reason, please choose a non-personally-identifiable username.';
-
+        $usernameChoiceMessage = '<strong>Important:</strong> HabitFree is a '
+                . 'support community. For this reason, please choose a '
+                . 'non-personally-identifiable username.';
+        $passwordChoiceMessage = '<strong>Important:</strong> Please '
+                . 'choose a secure password. The most secure passwords are '
+                . 'randomly generated. You can do that '
+                . '<a href="https://lastpass.com/generate">here.</a>';
+        
         $Form->addInfoMessage( $usernameChoiceMessage );
         $Form->addTextBox( 'username', 'Username', $this->username, true );
         $Form->addTextBox( 'email', 'Email', $this->email, true );
+        $Form->addInfoMessage( $passwordChoiceMessage );
         $Form->addPasswordBox( 'password', 'Password', true );
         $Form->addPasswordBox( 'passwordConfirmation', 'Confirm Password', true );
         $Form->addSubmitButton( 'register', 'Register' );

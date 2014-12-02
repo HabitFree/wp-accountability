@@ -59,9 +59,18 @@ class TestAuthenticateShortcode extends HfTestCase {
         $result = $AuthenticateShortcode->getOutput();
         $url    = $AssetLocator->getCurrentPageUrl();
 
-        $expectedHtml = '<form action="' . $url . '" method="post"><p class="info"><strong>Important:</strong> HabitFree is a support community. For this reason, please choose a non-personally-identifiable username.</p><p><label for="username"><span class="required">*</span> Username: <input type="text" name="username" value="" required /></label></p><p><label for="email"><span class="required">*</span> Email: <input type="text" name="email" value="" required /></label></p><p><label for="password"><span class="required">*</span> Password: <input type="password" name="password" required /></label></p><p><label for="passwordConfirmation"><span class="required">*</span> Confirm Password: <input type="password" name="passwordConfirmation" required /></label></p><p><input type="submit" name="register" value="Register" /></p></form>';
-
-        $this->assertTrue( $this->haystackContainsNeedle( $result, $expectedHtml ) );
+        $formOpener = '<form action="' . $url . '" method="post">';
+        $usernameChoiceMessage = '<p class="info"><strong>Important:</strong> '
+                . 'HabitFree is a support community. For this reason, please '
+                . 'choose a non-personally-identifiable username.</p>';
+        $usernameField = '<p><label for="username"><span class="required">*'
+                . '</span> Username: <input type="text" name="username" '
+                . 'value="" required /></label></p>';
+        
+        
+        $this->assertContains($formOpener, $result);
+        $this->assertContains($usernameChoiceMessage, $result);
+        $this->assertContains($usernameField, $result);
     }
 
     public function testAuthenticateShortcodeUsesCurrentUrl() {
@@ -800,5 +809,18 @@ class TestAuthenticateShortcode extends HfTestCase {
         $this->expectNever($this->MockMarkupGenerator, 'makeRedirectScript');
 
         $this->AuthenticateShortcodeWithMockedDependencies->attemptLogin();
+    }
+    
+    public function testAuthenticateShortcodeTellsUserToChooseSecurePassword() {
+        $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
+
+        $result = $AuthenticateShortcode->getOutput();
+
+        $expectedHtml = '<p class="info"><strong>Important:</strong> Please '
+                . 'choose a secure password. The most secure passwords are '
+                . 'randomly generated. You can do that '
+                . '<a href="https://lastpass.com/generate">here.</a></p>';
+
+        $this->assertContains( $expectedHtml, $result );
     }
 }
