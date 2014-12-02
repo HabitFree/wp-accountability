@@ -24,7 +24,7 @@ function hfActivate() {
 
     $Database->installDb();
 
-    add_action( 'wp_loaded', array( $UserManager, 'processAllUsers' ) );
+    add_action( 'shutdown', array( $UserManager, 'processAllUsers' ) );
 
     error_log( "my plugin activated", 0 );
 }
