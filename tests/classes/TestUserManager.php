@@ -73,4 +73,28 @@ class TestUserManager extends HfTestCase {
         $this->expectOnce($this->MockDatabase, 'recordInvite');
         $this->UserManagerWithMockedDependencies->sendInvitation(1, 'test@test.com');
     }
+
+    public function testProcessAllUsersDoesntSendEmails() {
+        $users = $this->makeMockUsers();
+        $this->setReturnValue($this->MockCms, 'getUsers', $users);
+
+        $this->expectNever($this->MockMessenger, 'sendEmailToUser');
+        $this->UserManagerWithMockedDependencies->processAllUsers();
+    }
+
+    public function testProcessAllUsersGetsUsers() {
+        $users = $this->makeMockUsers();
+        $this->setReturnValue($this->MockCms, 'getUsers', $users);
+
+        $this->expectOnce($this->MockCms, 'getUsers');
+        $this->UserManagerWithMockedDependencies->processAllUsers();
+    }
+
+    public function testProcessAllUsersSetsDefaultGoalSubscriptions() {
+        $users = $this->makeMockUsers();
+        $this->setReturnValue($this->MockCms, 'getUsers', $users);
+
+        $this->expectAtLeastOnce($this->MockDatabase, 'setDefaultGoalSubscription', array(7));
+        $this->UserManagerWithMockedDependencies->processAllUsers();
+    }
 }

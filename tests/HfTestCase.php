@@ -263,4 +263,11 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
             $this->assertTrue( $success, serialize( $expectedArgSets[$index] ) );
         }
     }
+
+    protected function makeMockUsers()
+    {
+        $user = new stdClass();
+        $user->ID = 7;
+        return [$user];
+    }
 } 

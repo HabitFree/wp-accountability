@@ -62,4 +62,6 @@ interface Hf_iCms {
     public function getOption($option);
 
     public function getPluginDirectoryUrl($plugin);
+
+    public function getUsers();
 }

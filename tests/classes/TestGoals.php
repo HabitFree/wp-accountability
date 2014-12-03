@@ -25,14 +25,6 @@ class TestGoals extends HfTestCase {
         $this->setReturnValue( $this->MockDatabase, 'getLevel', $mockLevel );
     }
 
-    private function makeMockUsers() {
-        $mockUser     = new stdClass();
-        $mockUser->ID = 1;
-        $mockUsers    = array($mockUser);
-
-        return $mockUsers;
-    }
-
     private function makeMockGoalSubs() {
         $mockGoalSub  = $this->makeMockGoalSub();
         $mockGoalSubs = array($mockGoalSub);
@@ -137,7 +129,7 @@ class TestGoals extends HfTestCase {
     public function testIsAnyGoalDueGetsGoalSubscriptionsFromDatabase() {
         $this->setMockReturns();
 
-        $this->expectOnce( $this->MockDatabase, 'getGoalSubscriptions', array(1) );
+        $this->expectOnce( $this->MockDatabase, 'getGoalSubscriptions', array(7) );
 
         $this->GoalsWithMockedDependencies->sendReportRequestEmails();
     }

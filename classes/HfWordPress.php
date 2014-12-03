@@ -145,4 +145,8 @@ class HfWordPress implements Hf_iCms {
     public function getPluginDirectoryUrl($plugin) {
         return plugin_dir_url($plugin);
     }
+
+    public function getUsers() {
+        return get_users();
+    }
 } 
