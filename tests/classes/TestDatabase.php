@@ -457,7 +457,30 @@ class TestDatabase extends HfTestCase {
     public function testInstallDbPopulatesGoalTable() {
         $defaultGoal = array(
             'goalID'     => 1,
-            'title'      => 'Pornography Abstinence',
+            'title'      => 'Freedom from Pornography',
+            'isPositive' => 1,
+            'isPrivate'  => 0
+        );
+
+        $levelFormat = array( '%d', '%s', '%d', '%d' );
+
+        $this->assertMethodCallsMethodWithArgsAtAnyTime(
+            $this->MockCms,
+            'insertOrReplaceRow',
+            $this->DatabaseWithMockedDependencies,
+            'installDb',
+            array( array(
+                'wptests_hf_goal',
+                $defaultGoal,
+                $levelFormat
+            ) )
+        );
+    }
+
+    public function testInstallDbPopulatesGoalTableWithSelfAbuseGoal() {
+        $defaultGoal = array(
+            'goalID'     => 2,
+            'title'      => 'Freedom from Self-Abuse',
             'isPositive' => 1,
             'isPrivate'  => 0
         );
@@ -492,12 +515,17 @@ class TestDatabase extends HfTestCase {
     }
 
     public function testSetDefaultGoalSubscriptionAddsDefaultGoalSubscription() {
-        $expectedData = array(
+        $subOne = array(
             'userID' => 7,
             'goalID' => 1
         );
+        $subTwo = array(
+            'userID' => 7,
+            'goalID' => 2
+        );
 
-        $this->expectOnce( $this->MockCms, 'insertOrReplaceRow', array( 'wptests_hf_user_goal', $expectedData, array( '%d', '%d' ) ) );
+        $this->expectAt( $this->MockCms, 'insertOrReplaceRow', 1, array( 'wptests_hf_user_goal', $subOne, array( '%d', '%d' ) ) );
+        $this->expectAt( $this->MockCms, 'insertOrReplaceRow', 2, array( 'wptests_hf_user_goal', $subTwo, array( '%d', '%d' ) ) );
         $this->DatabaseWithMockedDependencies->setDefaultGoalSubscription( 7 );
     }
 
