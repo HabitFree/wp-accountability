@@ -129,15 +129,23 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     private function populateGoalTable() {
-        $defaultGoal = array(
+        $pornographyGoal = array(
             'goalID'     => 1,
-            'title'      => 'Pornography Abstinence',
+            'title'      => 'Freedom from Pornography',
+            'isPositive' => 1,
+            'isPrivate'  => 0
+        );
+
+        $selfAbuseGoal = array(
+            'goalID'     => 2,
+            'title'      => 'Freedom from Self-Abuse',
             'isPositive' => 1,
             'isPrivate'  => 0
         );
 
         $table = $this->Cms->getDbPrefix() . 'hf_goal';
-        $this->Cms->insertOrReplaceRow( $table, $defaultGoal, array( '%d', '%s', '%d', '%d' ) );
+        $this->Cms->insertOrReplaceRow( $table, $pornographyGoal, array( '%d', '%s', '%d', '%d' ) );
+        $this->Cms->insertOrReplaceRow( $table, $selfAbuseGoal, array( '%d', '%s', '%d', '%d' ) );
     }
 
     private function populateLevelsTable() {
@@ -576,12 +584,17 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function setDefaultGoalSubscription( $userId ) {
-        $sub   = array(
+        $pornographySub   = array(
             'userID' => $userId,
             'goalID' => 1
         );
+        $selfAbuseSub   = array(
+            'userID' => $userId,
+            'goalID' => 2
+        );
         $table = $this->Cms->getDbPrefix() . 'hf_user_goal';
-        $this->Cms->insertOrReplaceRow( $table, $sub, array( '%d', '%d' ) );
+        $this->Cms->insertOrReplaceRow( $table, $pornographySub, array( '%d', '%d' ) );
+        $this->Cms->insertOrReplaceRow( $table, $selfAbuseSub, array( '%d', '%d' ) );
     }
 
     public function recordInvite( $inviteID, $inviterID, $inviteeEmail, $emailID, $expirationDate ) {
