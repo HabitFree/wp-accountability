@@ -24,11 +24,7 @@ class HfUserManager implements Hf_iUserManager {
 
     function processNewUser( $userId ) {
         $this->Database->setDefaultGoalSubscription($userId);
-        $settingsPageURL = $this->AssetLocator->getPageUrlByTitle( 'Settings' );
-        $message         = "<p>Welcome to HabitFree!
-				You've been subscribed to periodic accountability emails. 
-				You can <a href='" . $settingsPageURL . "'>edit your subscription settings by clicking here</a>.</p>";
-        $this->Messenger->sendEmailToUser( $userId, 'Welcome!', $message );
+        $this->sendWelcomeMessage($userId);
     }
 
     function getCurrentUserLogin() {
@@ -92,5 +88,14 @@ class HfUserManager implements Hf_iUserManager {
 
     public function deleteRelationship($userId1, $userId2) {
         $this->Database->deleteRelationship($userId1, $userId2);
+    }
+
+    private function sendWelcomeMessage($userId)
+    {
+        $settingsPageURL = $this->AssetLocator->getPageUrlByTitle('Settings');
+        $message = "<p>Welcome to HabitFree!
+				You've been subscribed to periodic accountability emails.
+				You can <a href='" . $settingsPageURL . "'>edit your subscription settings by clicking here</a>.</p>";
+        $this->Messenger->sendEmailToUser($userId, 'Welcome!', $message);
     }
 }
