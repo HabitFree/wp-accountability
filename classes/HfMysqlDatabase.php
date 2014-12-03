@@ -13,7 +13,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function installDb() {
-        $currentDbVersion  = "4.7";
+        $currentDbVersion  = "4.8";
         $previousDbVersion = $this->Cms->getOption( "hfDbVersion" );
 
         if ( $previousDbVersion != $currentDbVersion ) {
