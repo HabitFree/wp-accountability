@@ -603,6 +603,6 @@ class HfMysqlDatabase implements Hf_iDatabase {
         );
 
         $table = $this->Cms->getDbPrefix() . "hf_invite";
-        $this->Cms->insertIntoDb( $table, $data, array( '%d', '%d', '%s', '%d', '%s' ) );
+        $this->Cms->insertIntoDb( $table, $data, array( '%s', '%d', '%s', '%d', '%s' ) );
     }
 }

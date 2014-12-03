@@ -539,7 +539,12 @@ class TestDatabase extends HfTestCase {
         );
 
         $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptests_' );
-        $this->expectOnce( $this->MockCms, 'insertIntoDb', array( 'wptests_hf_invite', $expectedRow ) );
+        $this->expectOnce( $this->MockCms, 'insertIntoDb', array(
+                'wptests_hf_invite',
+                $expectedRow,
+                array( '%s', '%d', '%s', '%d', '%s' )
+            )
+        );
 
         $this->DatabaseWithMockedDependencies->recordInvite( 1, 2, 3, 4, 5 );
     }
