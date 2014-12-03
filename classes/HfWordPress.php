@@ -17,7 +17,6 @@ class HfWordPress implements Hf_iCms {
     }
 
     public function getSubscribedUsers() {
-        print_r('Yo');
         return get_users( array(
             'meta_key'   => 'hfSubscribed',
             'meta_value' => true
@@ -145,5 +144,9 @@ class HfWordPress implements Hf_iCms {
 
     public function getPluginDirectoryUrl($plugin) {
         return plugin_dir_url($plugin);
+    }
+
+    public function getUsers() {
+        return get_users();
     }
 } 

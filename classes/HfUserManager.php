@@ -16,9 +16,9 @@ class HfUserManager implements Hf_iUserManager {
     }
 
     function processAllUsers() {
-        $users = get_users();
+        $users = $this->Cms->getUsers();
         foreach ( $users as $user ) {
-            $this->processNewUser( $user->ID );
+            $this->Database->setDefaultGoalSubscription($user->ID);
         }
     }
 
