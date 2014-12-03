@@ -296,9 +296,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
     public function timeOfFirstSuccess( $goalId, $userId ) {
         $t = $this->Cms->getDbPrefix() . 'hf_report';
 
-        $format = "SELECT date FROM $t
-            WHERE goalID = %d AND userID = %d
-            AND reportID=( SELECT min(reportID) FROM $t WHERE isSuccessful = 1)";
+        $format = "SELECT date FROM $t WHERE reportID=( SELECT min(reportID) FROM $t WHERE isSuccessful = 1 AND goalID = %d AND userID = %d)";
         $query  = $this->Cms->prepareQuery( $format, array( $goalId, $userId ) );
 
         $timeString = $this->Cms->getVar( $query );
@@ -309,9 +307,8 @@ class HfMysqlDatabase implements Hf_iDatabase {
     public function timeOfLastSuccess( $goalId, $userId ) {
         $t = $this->Cms->getDbPrefix() . 'hf_report';
 
-        $format = "SELECT date FROM $t
-            WHERE goalID = %d AND userID = %d
-            AND reportID=( SELECT max(reportID) FROM $t WHERE isSuccessful = 1)";
+        $format = "SELECT date FROM $t WHERE reportID=( SELECT max(reportID) FROM $t WHERE isSuccessful = 1 AND " .
+            "goalID = %d AND userID = %d)";
         $query  = $this->Cms->prepareQuery( $format, array( $goalId, $userId ) );
 
         $timeString = $this->Cms->getVar( $query );
@@ -322,9 +319,8 @@ class HfMysqlDatabase implements Hf_iDatabase {
     public function timeOfLastFail( $goalId, $userId ) {
         $t = $this->Cms->getDbPrefix() . 'hf_report';
 
-        $format = "SELECT date FROM $t
-            WHERE goalID = %d AND userID = %d
-            AND reportID=( SELECT max(reportID) FROM $t WHERE NOT isSuccessful = 1)";
+        $format = "SELECT date FROM $t WHERE reportID=( SELECT max(reportID) FROM $t WHERE goalID = %d AND " .
+            "userID = %d AND NOT isSuccessful = 1)";
         $query  = $this->Cms->prepareQuery( $format, array( $goalId, $userId ) );
 
         $timeString = $this->Cms->getVar( $query );

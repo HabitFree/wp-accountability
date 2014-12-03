@@ -668,9 +668,8 @@ class TestDatabase extends HfTestCase {
 
     public function testTimeOfFirstSuccessPreparesQuery() {
         $this->expectOnce( $this->MockCms, 'prepareQuery', array(
-            'SELECT date FROM wptests_hf_report
-            WHERE goalID = %d AND userID = %d
-            AND reportID=( SELECT min(reportID) FROM wptests_hf_report WHERE isSuccessful = 1)',
+            'SELECT date FROM wptests_hf_report WHERE reportID=( SELECT min(reportID) FROM wptests_hf_report WHERE ' .
+            'isSuccessful = 1 AND goalID = %d AND userID = %d)',
             array( 1, 7 )
         ) );
 
@@ -679,9 +678,8 @@ class TestDatabase extends HfTestCase {
 
     public function testTimeOfLastSuccessPreparesQuery() {
         $this->expectOnce( $this->MockCms, 'prepareQuery', array(
-            'SELECT date FROM wptests_hf_report
-            WHERE goalID = %d AND userID = %d
-            AND reportID=( SELECT max(reportID) FROM wptests_hf_report WHERE isSuccessful = 1)',
+            'SELECT date FROM wptests_hf_report WHERE reportID=( SELECT max(reportID) FROM wptests_hf_report WHERE ' .
+            'isSuccessful = 1 AND goalID = %d AND userID = %d)',
             array( 1, 7 )
         ) );
 
@@ -690,9 +688,8 @@ class TestDatabase extends HfTestCase {
 
     public function testTimeOfLastFailPreparesQuery() {
         $this->expectOnce( $this->MockCms, 'prepareQuery', array(
-            'SELECT date FROM wptests_hf_report
-            WHERE goalID = %d AND userID = %d
-            AND reportID=( SELECT max(reportID) FROM wptests_hf_report WHERE NOT isSuccessful = 1)',
+            'SELECT date FROM wptests_hf_report WHERE reportID=( SELECT max(reportID) FROM wptests_hf_report WHERE ' .
+            'goalID = %d AND userID = %d AND NOT isSuccessful = 1)',
             array( 1, 7 )
         ) );
 
