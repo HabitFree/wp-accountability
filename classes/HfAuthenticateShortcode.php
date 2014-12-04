@@ -133,7 +133,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
                 $userId = $this->UserManager->getCurrentUserId();
                 $this->processInvite($userId);
                 $this->loginMessages .= $this->MarkupGenerator->makeSuccessMessage( 'Welcome back!' );
-                $this->redirectUser();
+                $this->redirectUserHome();
             } else {
                 $errorMessageText = 'That username and password combination is incorrect.';
                 $this->loginMessages .= $this->MarkupGenerator->makeErrorMessage( $errorMessageText );
@@ -252,7 +252,11 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     public function attemptLogin() {
         if ($this->isLoggingIn()) {
-            $this->Cms->authenticateUser($_POST['username'], $_POST['password']);
+            $success = $this->Cms->authenticateUser($_POST['username'], $_POST['password']);
+            if ($success) {
+                $url = $this->AssetLocator->getCurrentPageUrl();
+                $this->MarkupGenerator->makeRedirectScript($url);
+            }
         }
     }
 
@@ -263,7 +267,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         }
     }
 
-    private function redirectUser() {
+    private function redirectUserHome() {
         $url = $this->AssetLocator->getHomePageUrl();
         $this->output .= $this->makeRedirectMessage( $url );
         $this->output .= $this->MarkupGenerator->makeRedirectScript($url);
@@ -280,7 +284,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
             $this->attemptLogin();
             $this->processInvite($userIdOrError);
             $this->enqueueRegistrationSuccessMessage();
-            $this->redirectUser();
+            $this->redirectUserHome();
         } else {
             $this->enqueueRegistrationErrorMessage();
         }
@@ -321,7 +325,8 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     private function determineLoginSuccess() {
-        $success = ( $this->UserManager->getCurrentUserId() === $_POST['username'] );
+        $currentUserUsername = $this->UserManager->getCurrentUserLogin();
+        $success = ( $currentUserUsername === $_POST['username'] );
         if ( $success ) {
             $this->isLoginSuccessful = true;
         }
