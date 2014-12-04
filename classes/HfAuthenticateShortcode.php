@@ -281,11 +281,10 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
             $this->isRegistrationSuccessful = true;
             $this->attemptLogin();
             $this->processInvite();
-            $this->registrationMessages .= $this->MarkupGenerator->makeSuccessMessage( 'Welcome to HabitFree!' );
+            $this->enqueueRegistrationSuccessMessage();
             $this->redirectUser();
         } else {
-            $errorMessageText = "We're very sorry, but something seems to have gone wrong with your registration.";
-            $this->registrationMessages .= $this->MarkupGenerator->makeErrorMessage( $errorMessageText );
+            $this->enqueueRegistrationErrorMessage();
         }
     }
 
@@ -328,5 +327,16 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         if ( $success ) {
             $this->isLoginSuccessful = true;
         }
+    }
+
+    private function enqueueRegistrationErrorMessage()
+    {
+        $errorMessageText = "We're very sorry, but something seems to have gone wrong with your registration.";
+        $this->registrationMessages .= $this->MarkupGenerator->makeErrorMessage($errorMessageText);
+    }
+
+    private function enqueueRegistrationSuccessMessage()
+    {
+        $this->registrationMessages .= $this->MarkupGenerator->makeSuccessMessage('Welcome to HabitFree!');
     }
 } 
