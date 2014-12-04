@@ -60,7 +60,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     private function processSubmissions() {
-        $this->processLoginRequest();
+        $this->postProcessLogin();
         $this->processRegistrationRequest();
         $this->processInviteFormSubmission();
     }
@@ -125,7 +125,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         }
     }
 
-    private function processLoginRequest() {
+    private function postProcessLogin() {
         if ( $this->isLoggingIn() and $this->isLoginFormValid() ) {
             $this->determineLoginSuccess();
 
@@ -252,10 +252,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     public function attemptLogin() {
         if ($this->isLoggingIn()) {
-            $success = $this->Cms->authenticateUser($_POST['username'], $_POST['password']);
-//            if ($success) {
-//                print_r($this->MarkupGenerator->makeRedirectScript(get_home_url()));
-//            }
+            $this->Cms->authenticateUser($_POST['username'], $_POST['password']);
         }
     }
 

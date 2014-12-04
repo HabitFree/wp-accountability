@@ -215,11 +215,7 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeRequiresPasswordEntry() {
-        $_POST['register']             = '';
-        $_POST['username']             = '';
-        $_POST['email']                = '';
-        $_POST['password']             = '';
-        $_POST['passwordConfirmation'] = '';
+        $this->setEmptyRegistrationPost();
 
         $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
         $haystack              = $AuthenticateShortcode->getOutput();
@@ -229,11 +225,7 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeSwitchesToRegisterTabForRegisteringUsers() {
-        $_POST['register']             = '';
-        $_POST['username']             = '';
-        $_POST['email']                = '';
-        $_POST['password']             = '';
-        $_POST['passwordConfirmation'] = '';
+        $this->setEmptyRegistrationPost();
 
         $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
         $haystack              = $AuthenticateShortcode->getOutput();
@@ -243,11 +235,7 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodePlacesErrorsWithinRegistrationTab() {
-        $_POST['register']             = '';
-        $_POST['username']             = '';
-        $_POST['email']                = '';
-        $_POST['password']             = '';
-        $_POST['passwordConfirmation'] = '';
+        $this->setEmptyRegistrationPost();
 
         $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
         $haystack              = $AuthenticateShortcode->getOutput();
@@ -271,9 +259,7 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeRequiresLogInUsername() {
-        $_POST['login']    = '';
-        $_POST['username'] = '';
-        $_POST['password'] = '';
+        $this->setEmptyLoginPost();
 
         $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
         $haystack              = $AuthenticateShortcode->getOutput();
@@ -283,9 +269,7 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeRequiresPassword() {
-        $_POST['login']    = '';
-        $_POST['username'] = '';
-        $_POST['password'] = '';
+        $this->setEmptyLoginPost();
 
         $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
         $haystack              = $AuthenticateShortcode->getOutput();
@@ -295,9 +279,7 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeAttemptsLogIn() {
-        $_POST['login']    = '';
-        $_POST['username'] = 'Joe';
-        $_POST['password'] = 'bo';
+        $this->setLoginPost();
 
         $this->expectOnce( $this->MockCms, 'authenticateUser', array('Joe', 'bo') );
 
@@ -312,9 +294,7 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeDisplaysLogInFailureError() {
-        $_POST['login']    = '';
-        $_POST['username'] = 'Joe';
-        $_POST['password'] = 'bo';
+        $this->setLoginPost();
 
         $this->setReturnValue( $this->MockCms, 'authenticateUser', false );
 
@@ -332,9 +312,7 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeDisplaysLogInFailureErrorWithinTab() {
-        $_POST['login']    = '';
-        $_POST['username'] = 'Joe';
-        $_POST['password'] = 'bo';
+        $this->setLoginPost();
 
         $this->setReturnValue( $this->MockCms, 'authenticateUser', false );
 
@@ -352,9 +330,7 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeDisplaysLogInSuccessMessage() {
-        $_POST['login']    = '';
-        $_POST['username'] = 'Joe';
-        $_POST['password'] = 'bo';
+        $this->setLoginPost();
 
         $this->setReturnValue( $this->MockUserManager, 'getCurrentUserId', 'Joe');
 
@@ -372,9 +348,7 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeGeneratesRedirectScript() {
-        $_POST['login']    = '';
-        $_POST['username'] = 'Joe';
-        $_POST['password'] = 'bo';
+        $this->setLoginPost();
 
         $this->setReturnValue( $this->MockUserManager, 'getCurrentUserId', 'Joe');
         $this->expectOnce($this->MockMarkupGenerator, 'makeRedirectScript');
@@ -382,8 +356,7 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeDoesNotAttemptLogInWhenFormFailsToValidate() {
-        $_POST['login']    = '';
-        $_POST['username'] = 'Joe';
+        $this->setLoginPost();
         $_POST['password'] = '';
 
         $this->expectNever( $this->MockCms, 'authenticateUser' );
@@ -811,5 +784,28 @@ class TestAuthenticateShortcode extends HfTestCase {
         $this->setReturnValue($this->MockCms, 'createUser', 999);
         $this->expectOnce($this->MockCms, 'getUserEmail', array(999));
         $this->AuthenticateShortcodeWithMockedDependencies->getOutput();
+    }
+
+    private function setLoginPost()
+    {
+        $_POST['login'] = '';
+        $_POST['username'] = 'Joe';
+        $_POST['password'] = 'bo';
+    }
+
+    private function setEmptyLoginPost()
+    {
+        $_POST['login'] = '';
+        $_POST['username'] = '';
+        $_POST['password'] = '';
+    }
+
+    private function setEmptyRegistrationPost()
+    {
+        $_POST['register'] = '';
+        $_POST['username'] = '';
+        $_POST['email'] = '';
+        $_POST['password'] = '';
+        $_POST['passwordConfirmation'] = '';
     }
 }
