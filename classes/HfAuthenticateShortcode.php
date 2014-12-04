@@ -130,7 +130,8 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
             $this->determineLoginSuccess();
 
             if ( $this->isLoginSuccessful ) {
-                $this->processInvite();
+                $userId = $this->UserManager->getCurrentUserId();
+                $this->processInvite($userId);
                 $this->loginMessages .= $this->MarkupGenerator->makeSuccessMessage( 'Welcome back!' );
                 $this->redirectUser();
             } else {
@@ -148,7 +149,8 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     private function processInviteFormSubmission() {
         if ( $this->isInvite() and $this->isInviteAccepted() ) {
-            $this->processInvite();
+            $userId = $this->UserManager->getCurrentUserId();
+            $this->processInvite($userId);
             $this->output .= $this->MarkupGenerator->makeSuccessMessage( 'Invitation processed successfully.' );
         } elseif ( $this->isInviteIgnored() ) {
             $this->output .= $this->MarkupGenerator->makeSuccessMessage( 'Invitation ignored successfully.' );
@@ -251,16 +253,15 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     public function attemptLogin() {
         if ($this->isLoggingIn()) {
             $success = $this->Cms->authenticateUser($_POST['username'], $_POST['password']);
-            if ($success) {
-                print_r($this->MarkupGenerator->makeRedirectScript(get_home_url()));
-            }
+//            if ($success) {
+//                print_r($this->MarkupGenerator->makeRedirectScript(get_home_url()));
+//            }
         }
     }
 
-    private function processInvite() {
+    private function processInvite($userId) {
         if ( $this->isInvite() ) {
-            $user         = $this->Cms->currentUser();
-            $inviteeEmail = $this->Cms->getUserEmail( $user->ID );
+            $inviteeEmail = $this->Cms->getUserEmail( $userId );
             $this->UserManager->processInvite( $inviteeEmail, $_GET['n'] );
         }
     }
@@ -268,7 +269,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private function redirectUser() {
         $url = $this->AssetLocator->getHomePageUrl();
         $this->output .= $this->makeRedirectMessage( $url );
-        $this->output .= '<script>setTimeout(function(){window.location.replace("' . $url . '")},5000);</script>';
+        $this->output .= $this->MarkupGenerator->makeRedirectScript($url);
     }
 
     private function isRegistrationFormValid() {
@@ -280,7 +281,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         if ( !$this->Cms->isError($userIdOrError) ) {
             $this->isRegistrationSuccessful = true;
             $this->attemptLogin();
-            $this->processInvite();
+            $this->processInvite($userIdOrError);
             $this->enqueueRegistrationSuccessMessage();
             $this->redirectUser();
         } else {
