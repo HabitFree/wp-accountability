@@ -286,8 +286,8 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     private function attemptRegistration() {
-        $success = $this->Cms->createUser( $_POST['username'], $_POST['password'], $_POST['email'] );
-        if ( $success ) {
+        $userIdOrError = $this->Cms->createUser( $_POST['username'], $_POST['password'], $_POST['email'] );
+        if ( !$this->Cms->isError($userIdOrError) ) {
             $this->isRegistrationSuccessful = true;
         }
     }

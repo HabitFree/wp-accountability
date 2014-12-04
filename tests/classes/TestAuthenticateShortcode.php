@@ -412,11 +412,7 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeAttemptsRegistration() {
-        $_POST['register']             = '';
-        $_POST['username']             = 'Joe';
-        $_POST['email']                = 'joe@wallysworld.com';
-        $_POST['password']             = 'bo';
-        $_POST['passwordConfirmation'] = 'bo';
+        $this->setRegistrationPost();
 
         $this->expectOnce( $this->MockCms, 'createUser', array('Joe', 'bo', 'joe@wallysworld.com') );
 
@@ -431,11 +427,7 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeDisplaysRegistrationSuccessMessage() {
-        $_POST['register']             = '';
-        $_POST['username']             = 'Joe';
-        $_POST['email']                = 'joe@wallysworld.com';
-        $_POST['password']             = 'bo';
-        $_POST['passwordConfirmation'] = 'bo';
+        $this->setRegistrationPost();
 
         $this->setReturnValue( $this->MockCms, 'createUser', true );
 
@@ -453,11 +445,7 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeGeneratesRedirectScriptOnRegistration() {
-        $_POST['register']             = '';
-        $_POST['username']             = 'Joe';
-        $_POST['email']                = 'joe@wallysworld.com';
-        $_POST['password']             = 'bo';
-        $_POST['passwordConfirmation'] = 'bo';
+        $this->setRegistrationPost();
 
         $this->setReturnValue( $this->MockCms, 'createUser', true );
 
@@ -478,11 +466,8 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeRegistrationProcessInvite() {
-        $_POST['register']             = '';
-        $_POST['username']             = 'Joe';
-        $_POST['email']                = 'joe@wallysworld.com';
-        $_POST['password']             = 'bo';
-        $_POST['passwordConfirmation'] = 'bo';
+        $this->setRegistrationPost();
+
         $_GET['n']                     = 555;
 
         $mockUser     = new stdClass();
@@ -528,13 +513,9 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeDisplaysRegistrationErrorMessage() {
-        $_POST['register']             = '';
-        $_POST['username']             = 'Joe';
-        $_POST['email']                = 'joe@wallysworld.com';
-        $_POST['password']             = 'bo';
-        $_POST['passwordConfirmation'] = 'bo';
+        $this->setRegistrationPost();
 
-        $this->setReturnValue( $this->MockCms, 'createUser', false );
+        $this->setReturnValue( $this->MockCms, 'isError', True );
 
         $AuthenticateShortcode = new HfAuthenticateShortcode(
             $this->Factory->makeMarkupGenerator(),
@@ -822,5 +803,42 @@ class TestAuthenticateShortcode extends HfTestCase {
                 . '<a href="https://lastpass.com/generate">here.</a></p>';
 
         $this->assertContains( $expectedHtml, $result );
+    }
+
+    public function testRegistrationTestForErrors() {
+        $this->setRegistrationPost();
+
+        $this->expectOnce($this->MockCms, 'isError');
+        $this->AuthenticateShortcodeWithMockedDependencies->getOutput();
+    }
+
+    private function setRegistrationPost()
+    {
+        $_POST['register'] = '';
+        $_POST['username'] = 'Joe';
+        $_POST['email'] = 'joe@wallysworld.com';
+        $_POST['password'] = 'bo';
+        $_POST['passwordConfirmation'] = 'bo';
+    }
+
+    public function testRegistrationChecksCreateUserResponseForErrors() {
+        $this->setRegistrationPost();
+        $this->setReturnValue($this->MockCms, 'createUser', 'duck');
+        $this->expectOnce($this->MockCms, 'isError', array('duck'));
+        $this->AuthenticateShortcodeWithMockedDependencies->getOutput();
+    }
+
+    public function testRegistrationRespectsErrors() {
+        $this->setRegistrationPost();
+        $this->setReturnValue($this->MockCms, 'isError', True);
+        $this->expectNever($this->MockMarkupGenerator, 'makeSuccessMessage');
+        $this->AuthenticateShortcodeWithMockedDependencies->getOutput();
+    }
+
+    public function testRegistrationRespectsSuccess() {
+        $this->setRegistrationPost();
+        $this->setReturnValue($this->MockCms, 'isError', False);
+        $this->expectOnce($this->MockMarkupGenerator, 'makeSuccessMessage');
+        $this->AuthenticateShortcodeWithMockedDependencies->getOutput();
     }
 }

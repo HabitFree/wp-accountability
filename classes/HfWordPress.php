@@ -41,7 +41,8 @@ class HfWordPress implements Hf_iCms {
     }
 
     public function createUser( $username, $password, $email ) {
-        return !$this->isError(wp_create_user( $username, $password, $email ));
+        $userIdOrError = wp_create_user($username, $password, $email);
+        return $userIdOrError;
     }
 
     public function isUserLoggedIn() {
