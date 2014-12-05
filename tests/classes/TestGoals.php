@@ -148,4 +148,31 @@ class TestGoals extends HfTestCase {
         $MockSub = $this->makeMockGoalSub();
         $this->GoalsWithMockedDependencies->generateGoalCard( $MockSub );
     }
+
+    public function testGenerateGoalCardCreatesCorrectHtml() {
+        $MockGoal              = new stdClass();
+        $MockGoal->title       = 'Title';
+        $MockGoal->description = 'Description';
+        $this->setReturnValue( $this->MockDatabase, 'getGoal', $MockGoal);
+
+        $MockLevel = $this->makeMockLevel();
+        $this->setReturnValue( $this->MockDatabase, 'getLevel', $MockLevel );
+
+        $MockSub = $this->makeMockGoalSub();
+
+        $result = $this->GoalsWithMockedDependencies->generateGoalCard($MockSub);
+        $expected = "<div class='report-card'>" .
+            "<div class='main'><div class='about'><h2>Title</h2><p>Description</p></div>" .
+            "<div class='report'>Have you fallen since your last check-in?<div class='controls'>" .
+            "<label class='success'><input type='radio' name='1' value='1'> No</label>" .
+            "<label class='setback'><input type='radio' name='1' value='0'> Yes</label>" .
+            "</div></div></div>" .
+            "<div class='stats'>" .
+            "<p class='stat'>Level <span class='number'>2</span> Title</p>" .
+            "<p class='stat'>Level <span class='number'>0%</span> Complete</p>" .
+            "<p class='stat'>Days to <span class='number'>14</span> Next Level</p>" .
+            "</div></div>";
+
+        $this->assertEquals($result, $expected);
+    }
 } 
