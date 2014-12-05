@@ -809,18 +809,10 @@ class TestAuthenticateShortcode extends HfTestCase {
         $_POST['passwordConfirmation'] = '';
     }
 
-    public function testAttemptLoginGetsCurrentUrl() {
+    public function testAttemptLoginCreatesRefreshScript() {
         $this->setLoginPost();
         $this->setReturnValue($this->MockCms, 'authenticateUser', True);
-        $this->expectOnce($this->MockAssetLocator, 'getCurrentPageUrl');
-        $this->AuthenticateShortcodeWithMockedDependencies->attemptLogin();
-    }
-
-    public function testAttemptLoginCreatesRedirect() {
-        $this->setLoginPost();
-        $this->setReturnValue($this->MockCms, 'authenticateUser', True);
-        $this->setReturnValue($this->MockAssetLocator, 'getCurrentPageUrl', 'authUrl');
-        $this->expectOnce($this->MockMarkupGenerator, 'makeRedirectScript', array('authUrl'));
+        $this->expectOnce($this->MockMarkupGenerator, 'makeRefreshScript');
         $this->AuthenticateShortcodeWithMockedDependencies->attemptLogin();
     }
 }

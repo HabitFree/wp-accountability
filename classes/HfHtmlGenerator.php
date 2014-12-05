@@ -73,6 +73,10 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         return '<script>window.location.replace("'.$url.'");</script>';
     }
 
+    public function makeRefreshScript() {
+        return '<script>window.location.reload();</script>';
+    }
+
     public function makeHeader($content, $level) {
         return "<h$level>$content</h$level>";
     }

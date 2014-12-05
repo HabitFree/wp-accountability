@@ -254,8 +254,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         if ($this->isLoggingIn()) {
             $success = $this->Cms->authenticateUser($_POST['username'], $_POST['password']);
             if ($success) {
-                $url = $this->AssetLocator->getCurrentPageUrl();
-                $this->MarkupGenerator->makeRedirectScript($url);
+                $this->refreshPage();
             }
         }
     }
@@ -341,5 +340,10 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private function enqueueRegistrationSuccessMessage()
     {
         $this->registrationMessages .= $this->MarkupGenerator->makeSuccessMessage('Welcome to HabitFree!');
+    }
+
+    private function refreshPage()
+    {
+        print $this->MarkupGenerator->makeRefreshScript();
     }
 } 
