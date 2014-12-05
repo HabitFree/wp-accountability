@@ -28,7 +28,8 @@ class HfUserManager implements Hf_iUserManager {
     }
 
     function getCurrentUserLogin() {
-        return $this->Cms->currentUser()->user_login;
+        $user = $this->Cms->currentUser();
+        return $user->user_login;
     }
 
     function getCurrentUserId() {
