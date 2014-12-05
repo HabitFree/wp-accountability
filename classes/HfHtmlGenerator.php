@@ -61,7 +61,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         return '<form action="' . $url . '" method="post" name="' . $name . '">' . $content . '</form>';
     }
 
-    public function makeButton( $name, $label, $onclick ) {
+    public function makeButtonInput( $name, $label, $onclick ) {
         return '<input type="button" name="' . $name . '" value="' . $label . '" onclick="' . $onclick . '" />';
     }
 
@@ -79,5 +79,31 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
 
     public function makeHeader($content, $level) {
         return "<h$level>$content</h$level>";
+    }
+
+    public function makeGoalCard(
+        $goalTitle,
+        $goalDescription,
+        $goalId,
+        $levelId,
+        $levelTitle,
+        $levelPercent,
+        $levelDaysToComplete,
+        $levelBar
+    ) {
+        $goalDescription = ($goalDescription === '' ? $goalDescription : $this->makeParagraph($goalDescription));
+
+        return "<div class='report-card'>" .
+        "<div class='main'><div class='about'><h2>$goalTitle</h2>$goalDescription</div>" .
+        "<div class='report'>Have you fallen since your last check-in?<div class='controls'>" .
+        "<label class='success'><input type='radio' name='$goalId' value='1'> No</label>" .
+        "<label class='setback'><input type='radio' name='$goalId' value='0'> Yes</label>" .
+        "</div></div></div>" .
+        "<div class='stats'>" .
+        "<p class='stat'>Level <span class='number'>$levelId</span> $levelTitle</p>" .
+        "<p class='stat'>Level <span class='number'>$levelPercent%</span> Complete</p>" .
+        "<p class='stat'>Days to <span class='number'>$levelDaysToComplete</span> Next Level</p>" .
+        $levelBar .
+        "</div></div>";
     }
 }

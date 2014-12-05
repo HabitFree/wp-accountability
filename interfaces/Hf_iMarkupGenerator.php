@@ -19,7 +19,7 @@ interface Hf_iMarkupGenerator {
 
     public function makeForm( $url, $content, $name );
 
-    public function makeButton( $name, $label, $onclick );
+    public function makeButtonInput( $name, $label, $onclick );
 
     public function makeHiddenField( $name );
 
