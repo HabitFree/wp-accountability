@@ -28,4 +28,15 @@ interface Hf_iMarkupGenerator {
     public function makeRedirectScript($url);
 
     public function makeHeader($content, $level);
+
+    public function makeGoalCard(
+        $goalTitle,
+        $goalDescription,
+        $goalId,
+        $levelId,
+        $levelTitle,
+        $levelPercent,
+        $levelDaysToComplete,
+        $levelBar
+    );
 }

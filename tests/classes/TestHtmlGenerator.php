@@ -58,13 +58,13 @@ class TestHtmlGenerator extends HfTestCase {
     public function testMakeError() {
         $HtmlGenerator = $this->Factory->makeMarkupGenerator();
         $result = $HtmlGenerator->makeErrorMessage('duck');
-        $this->assertEquals('<p class="error">duck</p>', $result);
+        $this->assertEquals("<p class='error'>duck</p>", $result);
     }
 
     public function testMakeSuccessMessage() {
         $HtmlGenerator = $this->Factory->makeMarkupGenerator();
         $result = $HtmlGenerator->makeSuccessMessage('duck');
-        $this->assertEquals('<p class="success">duck</p>', $result);
+        $this->assertEquals("<p class='success'>duck</p>", $result);
     }
 
     public function testMakeQuoteMessage() {
@@ -191,5 +191,11 @@ class TestHtmlGenerator extends HfTestCase {
             "</div></div>";
 
         $this->assertEquals($result, $expected);
+    }
+
+    public function testMakeParagraphWithClass() {
+        $result = $this->MarkupGeneratorWithMockedDependencies->makeParagraph('duck','classy');
+        $expected = "<p class='classy'>duck</p>";
+        $this->assertEquals($expected, $result);
     }
 }

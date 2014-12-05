@@ -24,8 +24,9 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         return $this->Cms->expandShortcodes( $html . '[/su_tabs]' );
     }
 
-    public function makeParagraph( $content ) {
-        return '<p>' . $content . '</p>';
+    public function makeParagraph( $content, $classes = NULL ) {
+        $properties = ($classes === NULL ? '' : " class='$classes'");
+        return "<p$properties>$content</p>";
     }
 
     public function makeLink( $target, $content ) {
@@ -42,11 +43,11 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     }
 
     public function makeErrorMessage( $content ) {
-        return '<p class="error">' . $content . '</p>';
+        return $this->makeParagraph($content, 'error');
     }
 
     public function makeSuccessMessage( $content ) {
-        return '<p class="success">' . $content . '</p>';
+        return $this->makeParagraph($content, 'success');
     }
 
     public function makeQuoteMessage( $quotation ) {
