@@ -152,6 +152,8 @@ class TestGoals extends HfTestCase {
 
         $MockLevel = $this->makeMockLevel();
         $this->setReturnValue($this->MockDatabase, 'getLevel', $MockLevel);
+
+        $this->setReturnValue($this->MockDatabase, 'daysSinceLastReport', 3.1415);
     }
 
     public function testUsesHtmlGeneratorToMakeGoalCard() {
@@ -162,6 +164,7 @@ class TestGoals extends HfTestCase {
             'Title',
             'Description',
             1,
+            3,
             2,
             'Title',
             0,

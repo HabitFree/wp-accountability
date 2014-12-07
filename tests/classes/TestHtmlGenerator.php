@@ -125,6 +125,7 @@ class TestHtmlGenerator extends HfTestCase {
         $goalTitle = 'Title';
         $goalDescription = 'Description';
         $goalId = 1;
+        $daysSinceLastReport = 3;
         $levelId = 2;
         $levelTitle = 'Title';
         $levelPercent = 0;
@@ -135,6 +136,7 @@ class TestHtmlGenerator extends HfTestCase {
             $goalTitle,
             $goalDescription,
             $goalId,
+            $daysSinceLastReport,
             $levelId,
             $levelTitle,
             $levelPercent,
@@ -144,7 +146,7 @@ class TestHtmlGenerator extends HfTestCase {
 
         $expected = "<div class='report-card'>" .
             "<div class='main'><div class='about'><h2>Title</h2><p>Description</p></div>" .
-            "<div class='report'>Have you fallen since your last check-in?<div class='controls'>" .
+            "<div class='report'>Have you fallen since your last check-in 3 days ago?<div class='controls'>" .
             "<label class='success'><input type='radio' name='1' value='1'> No</label>" .
             "<label class='setback'><input type='radio' name='1' value='0'> Yes</label>" .
             "</div></div></div>" .
@@ -161,6 +163,7 @@ class TestHtmlGenerator extends HfTestCase {
         $goalTitle = 'Title';
         $goalDescription = '';
         $goalId = 1;
+        $daysSinceLastReport = 3;
         $levelId = 2;
         $levelTitle = 'Title';
         $levelPercent = 0;
@@ -171,6 +174,7 @@ class TestHtmlGenerator extends HfTestCase {
             $goalTitle,
             $goalDescription,
             $goalId,
+            $daysSinceLastReport,
             $levelId,
             $levelTitle,
             $levelPercent,
@@ -180,7 +184,7 @@ class TestHtmlGenerator extends HfTestCase {
 
         $expected = "<div class='report-card'>" .
             "<div class='main'><div class='about'><h2>Title</h2></div>" .
-            "<div class='report'>Have you fallen since your last check-in?<div class='controls'>" .
+            "<div class='report'>Have you fallen since your last check-in 3 days ago?<div class='controls'>" .
             "<label class='success'><input type='radio' name='1' value='1'> No</label>" .
             "<label class='setback'><input type='radio' name='1' value='0'> Yes</label>" .
             "</div></div></div>" .
@@ -197,5 +201,81 @@ class TestHtmlGenerator extends HfTestCase {
         $result = $this->MarkupGeneratorWithMockedDependencies->makeParagraph('duck','classy');
         $expected = "<p class='classy'>duck</p>";
         $this->assertEquals($expected, $result);
+    }
+
+    public function testMakeGoalCardDoesntSay1Days() {
+        $goalTitle = 'Title';
+        $goalDescription = '';
+        $goalId = 1;
+        $daysSinceLastReport = 1;
+        $levelId = 2;
+        $levelTitle = 'Title';
+        $levelPercent = 0;
+        $levelDaysToComplete = 14;
+        $levelBar = '';
+
+        $result = $this->MarkupGeneratorWithMockedDependencies->makeGoalCard(
+            $goalTitle,
+            $goalDescription,
+            $goalId,
+            $daysSinceLastReport,
+            $levelId,
+            $levelTitle,
+            $levelPercent,
+            $levelDaysToComplete,
+            $levelBar
+        );
+
+        $expected = "<div class='report-card'>" .
+            "<div class='main'><div class='about'><h2>Title</h2></div>" .
+            "<div class='report'>Have you fallen since your last check-in 1 day ago?<div class='controls'>" .
+            "<label class='success'><input type='radio' name='1' value='1'> No</label>" .
+            "<label class='setback'><input type='radio' name='1' value='0'> Yes</label>" .
+            "</div></div></div>" .
+            "<div class='stats'>" .
+            "<p class='stat'>Level <span class='number'>2</span> Title</p>" .
+            "<p class='stat'>Level <span class='number'>0%</span> Complete</p>" .
+            "<p class='stat'>Days to <span class='number'>14</span> Next Level</p>" .
+            "</div></div>";
+
+        $this->assertEquals($result, $expected);
+    }
+
+    public function testMakeGoalCardSaysToday() {
+        $goalTitle = 'Title';
+        $goalDescription = '';
+        $goalId = 1;
+        $daysSinceLastReport = 0;
+        $levelId = 2;
+        $levelTitle = 'Title';
+        $levelPercent = 0;
+        $levelDaysToComplete = 14;
+        $levelBar = '';
+
+        $result = $this->MarkupGeneratorWithMockedDependencies->makeGoalCard(
+            $goalTitle,
+            $goalDescription,
+            $goalId,
+            $daysSinceLastReport,
+            $levelId,
+            $levelTitle,
+            $levelPercent,
+            $levelDaysToComplete,
+            $levelBar
+        );
+
+        $expected = "<div class='report-card'>" .
+            "<div class='main'><div class='about'><h2>Title</h2></div>" .
+            "<div class='report'>Have you fallen since your last check-in less than a day ago?<div class='controls'>" .
+            "<label class='success'><input type='radio' name='1' value='1'> No</label>" .
+            "<label class='setback'><input type='radio' name='1' value='0'> Yes</label>" .
+            "</div></div></div>" .
+            "<div class='stats'>" .
+            "<p class='stat'>Level <span class='number'>2</span> Title</p>" .
+            "<p class='stat'>Level <span class='number'>0%</span> Complete</p>" .
+            "<p class='stat'>Days to <span class='number'>14</span> Next Level</p>" .
+            "</div></div>";
+
+        $this->assertEquals($result, $expected);
     }
 }

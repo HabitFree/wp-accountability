@@ -718,9 +718,8 @@ class TestDatabase extends HfTestCase {
 
     public function testDaysSinceLastReportPreparesQuery() {
         $this->expectOnce( $this->MockCms, 'prepareQuery', array(
-            'SELECT date FROM wptests_hf_report
-            WHERE goalID = %d AND userID = %d
-            AND reportID=( SELECT max(reportID) FROM wptests_hf_report )',
+            'SELECT date FROM wptests_hf_report ' .
+            'WHERE reportID=( SELECT max(reportID) FROM wptests_hf_report WHERE goalID = %d AND userID = %d )',
             array( 3, 7 )
         ) );
 

@@ -24,6 +24,7 @@ class HfGoals implements Hf_iGoals {
         $goalID        = intval( $sub->goalID );
         $goal          = $this->Database->getGoal( $goalID, 2 );
         $daysOfSuccess = $this->daysOfSuccess( $goalID, $userID );
+        $daysSinceLastReport = round($this->Database->daysSinceLastReport($goalID, $userID));
 
         $level         = $this->Database->getLevel( $daysOfSuccess );
         $levelPercentComplete = round($this->levelPercentComplete($goalID, $userID), 1);
@@ -34,6 +35,7 @@ class HfGoals implements Hf_iGoals {
             $goal->title,
             $goal->description,
             $goalID,
+            $daysSinceLastReport,
             $level->levelID,
             $level->title,
             $levelPercentComplete,
@@ -44,7 +46,7 @@ class HfGoals implements Hf_iGoals {
         return $card;
     }
 
-    function daysOfSuccess( $goalId, $userId ) {
+    private function daysOfSuccess( $goalId, $userId ) {
         $dateInSecondsOfFirstSuccess = $this->Database->timeOfFirstSuccess( $goalId, $userId );
         $dateInSecondsOfLastSuccess  = $this->Database->timeOfLastSuccess( $goalId, $userId );
         $dateInSecondsOfLastFail     = $this->Database->timeOfLastFail( $goalId, $userId );

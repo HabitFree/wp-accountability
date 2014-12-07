@@ -33,6 +33,7 @@ interface Hf_iMarkupGenerator {
         $goalTitle,
         $goalDescription,
         $goalId,
+        $daysSinceLastReport,
         $levelId,
         $levelTitle,
         $levelPercent,
