@@ -19,36 +19,34 @@ class HfGoals implements Hf_iGoals {
     }
 
     function generateGoalCard( $sub ) {
-        $goalID        = intval( $sub->goalID );
         $userID        = intval( $sub->userID );
+
+        $goalID        = intval( $sub->goalID );
         $goal          = $this->Database->getGoal( $goalID, 2 );
         $daysOfSuccess = $this->daysOfSuccess( $goalID, $userID );
+        $daysSinceLastReport = round($this->Database->daysSinceLastReport($goalID, $userID));
+
         $level         = $this->Database->getLevel( $daysOfSuccess );
-        $wrapperOpen   = '<div class="report-card">';
-        $info          = '<div class="about"><h2>' . $goal->title . '</h2>';
-        if ( $goal->description != '' ) {
-            $info .= '<p>' . $goal->description . '</p></div>';
-        } else {
-            $info .= '</div>';
-        }
-
-        $controls     = "<div class='controls'>
-					<label class='success'><input type='radio' name='" . $goalID . "' value='1'> No</label>
-                    <label class='setback'><input type='radio' name='" . $goalID . "' value='0'> Yes</label>
-				</div>";
-        $report       = "<div class='report'>Have you fallen since your last check-in?" . $controls . "</div>";
-        $main         = '<div class="main">' . $info . $report . '</div>';
-        $stat1        = '<p class="stat">Level <span class="number">' . $level->levelID . '</span> ' . $level->title . '</p>';
-        $stat2        = '<p class="stat">Level <span class="number">' . round( $this->levelPercentComplete( $goalID, $userID ), 1 ) . '%</span> Complete</p>';
-        $stat3        = '<p class="stat">Days to <span class="number">' . round( $this->daysToNextLevel( $goalID, $userID ) ) . '</span> Next Level</p>';
+        $levelPercentComplete = round($this->levelPercentComplete($goalID, $userID), 1);
+        $levelDaysToComplete = round($this->daysToNextLevel($goalID, $userID));
         $bar          = $this->levelBarForGoal( $goalID, $userID );
-        $stats        = '<div class="stats">' . $stat1 . $stat2 . $stat3 . $bar . '</div>';
-        $wrapperClose = '</div>';
 
-        return $wrapperOpen . $main . $stats . $wrapperClose;
+        $card = $this->MarkupGenerator->makeGoalCard(
+            $goal->title,
+            $goal->description,
+            $goalID,
+            $daysSinceLastReport,
+            $level->levelID,
+            $level->title,
+            $levelPercentComplete,
+            $levelDaysToComplete,
+            $bar
+        );
+
+        return $card;
     }
 
-    function daysOfSuccess( $goalId, $userId ) {
+    private function daysOfSuccess( $goalId, $userId ) {
         $dateInSecondsOfFirstSuccess = $this->Database->timeOfFirstSuccess( $goalId, $userId );
         $dateInSecondsOfLastSuccess  = $this->Database->timeOfLastSuccess( $goalId, $userId );
         $dateInSecondsOfLastFail     = $this->Database->timeOfLastFail( $goalId, $userId );

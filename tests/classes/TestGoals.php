@@ -135,17 +135,53 @@ class TestGoals extends HfTestCase {
     }
 
     public function testGenerateGoalCardUsesDatabaseGetGoalMethod() {
-        $MockGoal              = new stdClass();
-        $MockGoal->title       = 'Title';
-        $MockGoal->description = 'Description';
-        $this->setReturnValue( $this->MockDatabase, 'getGoal', $MockGoal);
-
-        $MockLevel = $this->makeMockLevel();
-        $this->setReturnValue( $this->MockDatabase, 'getLevel', $MockLevel );
+        $this->setReturnValsForGoalCardCreation();
 
         $this->expectOnce( $this->MockDatabase, 'getGoal', array(1) );
 
         $MockSub = $this->makeMockGoalSub();
         $this->GoalsWithMockedDependencies->generateGoalCard( $MockSub );
+    }
+
+    private function setReturnValsForGoalCardCreation()
+    {
+        $MockGoal = new stdClass();
+        $MockGoal->title = 'Title';
+        $MockGoal->description = 'Description';
+        $this->setReturnValue($this->MockDatabase, 'getGoal', $MockGoal);
+
+        $MockLevel = $this->makeMockLevel();
+        $this->setReturnValue($this->MockDatabase, 'getLevel', $MockLevel);
+
+        $this->setReturnValue($this->MockDatabase, 'daysSinceLastReport', 3.1415);
+    }
+
+    public function testUsesHtmlGeneratorToMakeGoalCard() {
+        $this->setReturnValsForGoalCardCreation();
+        $MockSub = $this->makeMockGoalSub();
+
+        $this->expectOnce($this->MockMarkupGenerator, 'makeGoalCard', array(
+            'Title',
+            'Description',
+            1,
+            3,
+            2,
+            'Title',
+            0,
+            14,
+            ''
+        ));
+
+        $this->GoalsWithMockedDependencies->generateGoalCard($MockSub);
+    }
+
+    public function testReturnsHtmlGeneratorMadeGoalCard() {
+        $this->setReturnValsForGoalCardCreation();
+        $MockSub = $this->makeMockGoalSub();
+        $this->setReturnValue($this->MockMarkupGenerator, 'makeGoalCard', 'goose');
+
+        $result = $this->GoalsWithMockedDependencies->generateGoalCard($MockSub);
+
+        $this->assertEquals('goose', $result);
     }
 } 

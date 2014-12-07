@@ -342,9 +342,8 @@ class HfMysqlDatabase implements Hf_iDatabase {
     public function daysSinceLastReport( $goalId, $userId ) {
         $t = $this->Cms->getDbPrefix() . 'hf_report';
 
-        $format = "SELECT date FROM $t
-            WHERE goalID = %d AND userID = %d
-            AND reportID=( SELECT max(reportID) FROM $t )";
+        $format = "SELECT date FROM $t " .
+            "WHERE reportID=( SELECT max(reportID) FROM $t WHERE goalID = %d AND userID = %d )";
         $query  = $this->Cms->prepareQuery( $format, array( $goalId, $userId ) );
 
         $dateInSecondsOfLastReport = strtotime( $this->Cms->getVar( $query ) );

@@ -1,8 +1,6 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
 interface Hf_iGoals {
-    function daysOfSuccess( $goalId, $userId );
-
     function currentLevelTarget( $daysOfSuccess );
 
     function generateGoalCard( $sub );

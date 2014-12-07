@@ -47,7 +47,7 @@ class TestInvitePartnerShortcode extends HfTestCase {
             $this->MockUserManager
         );
         $output = $InviteShortcode->getOutput();
-        $this->assertContains('<p class="error">Please enter a valid email address.</p>', $output);
+        $this->assertContains("<p class='error'>Please enter a valid email address.</p>", $output);
     }
 
     public function testInviteShortcodeDoesNotErrOnValidEmail() {
@@ -59,12 +59,12 @@ class TestInvitePartnerShortcode extends HfTestCase {
             $this->MockUserManager
         );
         $output = $InviteShortcode->getOutput();
-        $this->assertFalse($this->haystackContainsNeedle($output, '<p class="error">Please enter a valid email address.</p>'));
+        $this->assertFalse($this->haystackContainsNeedle($output, "<p class='error'>Please enter a valid email address.</p>"));
     }
 
     public function testInviteShortcodeDoesNotDisplayEmailErrorWhenFormNotSubmitted() {
         $output = $this->Factory->makeInvitePartnerShortcode()->getOutput();
-        $this->assertFalse($this->haystackContainsNeedle($output, '<p class="error">Please enter a valid email address.</p>'));
+        $this->assertFalse($this->haystackContainsNeedle($output, "<p class='error'>Please enter a valid email address.</p>"));
     }
 
     public function testInviteShortcodeErrsOnInvalidEmail() {
@@ -76,7 +76,7 @@ class TestInvitePartnerShortcode extends HfTestCase {
             $this->MockUserManager
         );
         $output = $InviteShortcode->getOutput();
-        $this->assertContains('<p class="error">Please enter a valid email address.</p>', $output);
+        $this->assertContains("<p class='error'>Please enter a valid email address.</p>", $output);
     }
 
     public function testInvitePartnerShortcodeExists() {

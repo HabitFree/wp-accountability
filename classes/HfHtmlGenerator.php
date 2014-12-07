@@ -24,8 +24,9 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         return $this->Cms->expandShortcodes( $html . '[/su_tabs]' );
     }
 
-    public function makeParagraph( $content ) {
-        return '<p>' . $content . '</p>';
+    public function makeParagraph( $content, $classes = NULL ) {
+        $properties = ($classes === NULL ? '' : " class='$classes'");
+        return "<p$properties>$content</p>";
     }
 
     public function makeLink( $target, $content ) {
@@ -42,11 +43,11 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     }
 
     public function makeErrorMessage( $content ) {
-        return '<p class="error">' . $content . '</p>';
+        return $this->makeParagraph($content, 'error');
     }
 
     public function makeSuccessMessage( $content ) {
-        return '<p class="success">' . $content . '</p>';
+        return $this->makeParagraph($content, 'success');
     }
 
     public function makeQuoteMessage( $quotation ) {
@@ -61,7 +62,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         return '<form action="' . $url . '" method="post" name="' . $name . '">' . $content . '</form>';
     }
 
-    public function makeButton( $name, $label, $onclick ) {
+    public function makeButtonInput( $name, $label, $onclick ) {
         return '<input type="button" name="' . $name . '" value="' . $label . '" onclick="' . $onclick . '" />';
     }
 
@@ -79,5 +80,44 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
 
     public function makeHeader($content, $level) {
         return "<h$level>$content</h$level>";
+    }
+
+    public function makeGoalCard(
+        $goalTitle,
+        $goalDescription,
+        $goalId,
+        $daysSinceLastReport,
+        $levelId,
+        $levelTitle,
+        $levelPercent,
+        $levelDaysToComplete,
+        $levelBar
+    ) {
+        $goalDescription = ($goalDescription === '' ? $goalDescription : $this->makeParagraph($goalDescription));
+        $timeElapsed = $this->makeDayPhrase($daysSinceLastReport);
+
+        return "<div class='report-card'>" .
+        "<div class='main'><div class='about'><h2>$goalTitle</h2>$goalDescription</div>" .
+        "<div class='report'>Have you fallen since your last check-in $timeElapsed ago?<div class='controls'>" .
+        "<label class='success'><input type='radio' name='$goalId' value='1'> No</label>" .
+        "<label class='setback'><input type='radio' name='$goalId' value='0'> Yes</label>" .
+        "</div></div></div>" .
+        "<div class='stats'>" .
+        "<p class='stat'>Level <span class='number'>$levelId</span> $levelTitle</p>" .
+        "<p class='stat'>Level <span class='number'>$levelPercent%</span> Complete</p>" .
+        "<p class='stat'>Days to <span class='number'>$levelDaysToComplete</span> Next Level</p>" .
+        $levelBar .
+        "</div></div>";
+    }
+
+    private function makeDayPhrase($daysSinceLastReport)
+    {
+        if ($daysSinceLastReport == 0) {
+            return "less than a day";
+        } else if ($daysSinceLastReport == 1) {
+            return "$daysSinceLastReport day";
+        } else {
+            return "$daysSinceLastReport days";
+        }
     }
 }
