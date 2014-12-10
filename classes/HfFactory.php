@@ -136,4 +136,11 @@ class HfFactory {
 
         return new HfAdminPanel( $Messenger, $AssetLocator, $Database, $UserManager, $Cms );
     }
+
+    public function makeLoginForm($usernameDefault) {
+        $AssetLocator = $this->makeAssetLocator();
+        $actionUrl = $AssetLocator->getCurrentPageUrl();
+
+        return new HfLoginForm($actionUrl, $usernameDefault);
+    }
 } 
