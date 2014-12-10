@@ -9,4 +9,12 @@ class TestSecurity extends HfTestCase {
 
         $this->assertEquals( strlen( $randomString ), 400 );
     }
+
+    public function testMakeNonceFieldMethodExists() {
+        $this->assertMethodExists($this->MockSecurity, 'makeNonceField');
+    }
+
+    public function testCheckNonceMethodExists() {
+        $this->assertMethodExists($this->MockSecurity, 'isNonceValid');
+    }
 }
