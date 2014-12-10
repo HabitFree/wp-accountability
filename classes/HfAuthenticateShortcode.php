@@ -9,6 +9,8 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private $Cms;
     private $UserManager;
 
+    private $LoginForm;
+
     private $username;
     private $email;
 
@@ -23,12 +25,14 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         Hf_iMarkupGenerator $MarkupGenerator,
         Hf_iAssetLocator $AssetLocator,
         Hf_iCms $ContentManagementSystem,
-        Hf_iUserManager $UserManager
+        Hf_iUserManager $UserManager,
+        $LoginForm
     ) {
         $this->MarkupGenerator = $MarkupGenerator;
         $this->AssetLocator    = $AssetLocator;
         $this->Cms             = $ContentManagementSystem;
         $this->UserManager     = $UserManager;
+        $this->LoginForm       = $LoginForm;
     }
 
     public function getOutput() {
@@ -71,7 +75,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
             $activeTabNumber = $this->determineActiveTab();
 
             $tabbedForms = $this->MarkupGenerator->generateTabs( array(
-                'Log In'   => $this->loginMessages . $this->generateLoginForm(),
+                'Log In'   => $this->loginMessages . $this->LoginForm->getHtml(),
                 'Register' => $this->registrationMessages . $this->generateRegistrationForm()
             ), $activeTabNumber );
 
@@ -174,16 +178,6 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         } else {
             return 1;
         }
-    }
-
-    private function generateLoginForm() {
-        $Form = new HfGenericForm( $this->AssetLocator->getCurrentPageUrl() );
-
-        $Form->addTextBox( 'username', 'Username', $this->username, true );
-        $Form->addPasswordBox( 'password', 'Password', true );
-        $Form->addSubmitButton( 'login', 'Log In' );
-
-        return $Form->getHtml();
     }
 
     private function generateRegistrationForm() {

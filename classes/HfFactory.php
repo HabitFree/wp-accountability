@@ -93,8 +93,9 @@ class HfFactory {
         $AssetLocator    = $this->makeAssetLocator();
         $Cms             = $this->makeCms();
         $UserManager     = $this->makeUserManager();
+        $LoginForm       = $this->makeLoginForm('jo');
 
-        return new HfAuthenticateShortcode( $MarkupGenerator, $AssetLocator, $Cms, $UserManager );
+        return new HfAuthenticateShortcode( $MarkupGenerator, $AssetLocator, $Cms, $UserManager, $LoginForm );
     }
 
     public function makeGoalsShortcode() {
