@@ -93,7 +93,7 @@ class HfFactory {
         $AssetLocator    = $this->makeAssetLocator();
         $Cms             = $this->makeCms();
         $UserManager     = $this->makeUserManager();
-        $LoginForm       = $this->makeLoginForm('jo');
+        $LoginForm       = $this->makeLoginForm();
 
         return new HfAuthenticateShortcode( $MarkupGenerator, $AssetLocator, $Cms, $UserManager, $LoginForm );
     }
@@ -138,10 +138,10 @@ class HfFactory {
         return new HfAdminPanel( $Messenger, $AssetLocator, $Database, $UserManager, $Cms );
     }
 
-    public function makeLoginForm($usernameDefault) {
+    public function makeLoginForm() {
         $AssetLocator = $this->makeAssetLocator();
         $actionUrl = $AssetLocator->getCurrentPageUrl();
 
-        return new HfLoginForm($actionUrl, $usernameDefault);
+        return new HfLoginForm($actionUrl);
     }
 } 
