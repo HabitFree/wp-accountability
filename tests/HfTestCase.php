@@ -111,7 +111,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->MockedGoalsShortcode = new HfGoalsShortcode(
             $this->MockUserManager,
             $this->MockMessenger,
-            $this->MockPageLocator,
+            $this->MockAssetLocator,
             $this->MockGoals,
             $this->MockSecurity,
             $this->MockMarkupGenerator,
