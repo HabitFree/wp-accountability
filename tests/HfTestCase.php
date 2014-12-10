@@ -272,4 +272,9 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $user->ID = 7;
         return [$user];
     }
+
+    protected function assertMethodExists($object, $method)
+    {
+        $this->assertTrue(method_exists($object, $method));
+    }
 } 
