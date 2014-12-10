@@ -14,66 +14,66 @@ class TestFactory extends HfTestCase {
     public function testFactoryMakeGoals() {
         $Goals = $this->Factory->makeGoals();
 
-        $this->assertTrue( is_a( $Goals, 'HfGoals' ) );
+        $this->assertInstanceOf('HfGoals', $Goals);
     }
 
     public function testFactoryMakeUserManager() {
         $UserManager = $this->Factory->makeUserManager();
 
-        $this->assertTrue( is_a( $UserManager, 'HfUserManager' ) );
+        $this->assertInstanceOf('HfUserManager', $UserManager);
     }
 
     public function testFactoryMakeMailer() {
         $Mailer = $this->Factory->makeMessenger();
 
-        $this->assertTrue( is_a( $Mailer, 'HfMailer' ) );
+        $this->assertInstanceOf('HfMailer', $Mailer);
     }
 
     public function testFactoryMakeUrlFinder() {
         $UrlFinder = $this->Factory->makeAssetLocator();
 
-        $this->assertTrue( is_a( $UrlFinder, 'HfUrlFinder' ) );
+        $this->assertInstanceOf('HfUrlFinder', $UrlFinder);
     }
 
     public function testFactoryMakeHtmlGenerator() {
         $HtmlGenerator = $this->Factory->makeMarkupGenerator();
 
-        $this->assertTrue( is_a( $HtmlGenerator, 'HfHtmlGenerator' ) );
+        $this->assertInstanceOf('HfHtmlGenerator', $HtmlGenerator);
     }
 
     public function testFactoryMakeDatabase() {
         $Database = $this->Factory->makeDatabase();
 
-        $this->assertTrue( is_a( $Database, 'HfMysqlDatabase' ) );
+        $this->assertInstanceOf('HfMysqlDatabase', $Database);
     }
 
     public function testFactoryMakePhpLibrary() {
         $PhpLibrary = $this->Factory->makeCodeLibrary();
 
-        $this->assertTrue( is_a( $PhpLibrary, 'HfPhpLibrary' ) );
+        $this->assertInstanceOf('HfPhpLibrary', $PhpLibrary);
     }
 
     public function testFactoryMakeWordPressInterface() {
         $WordPressInterface = $this->Factory->makeCms();
 
-        $this->assertTrue( is_a( $WordPressInterface, 'HfWordPress' ) );
+        $this->assertInstanceOf('HfWordPress', $WordPressInterface);
     }
 
     public function testFactoryMakeSecurity() {
         $Security = $this->Factory->makeSecurity();
 
-        $this->assertTrue( is_a( $Security, 'HfSecurity' ) );
+        $this->assertInstanceOf('HfSecurity', $Security);
     }
 
     public function testFactoryMakeSettingsShortcode() {
         $SettingsShortcode = $this->Factory->makeSettingsShortcode();
 
-        $this->assertTrue( is_a( $SettingsShortcode, 'HfSettingsShortcode' ) );
+        $this->assertInstanceOf('HfSettingsShortcode', $SettingsShortcode);
     }
 
     public function testFactoryMakeManagePartnersShortcode() {
         $ManagePartnersShortcode = $this->Factory->makeManagePartnersShortcode();
-        $this->assertTrue(is_a($ManagePartnersShortcode, 'HfManagePartnersShortcode'));
+        $this->assertInstanceOf('HfManagePartnersShortcode', $ManagePartnersShortcode);
     }
 
     public function testMakeLoginForm() {
