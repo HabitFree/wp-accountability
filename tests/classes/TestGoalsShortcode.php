@@ -129,14 +129,14 @@ class TestGoalsShortcode extends HfTestCase {
         $this->expectOnce( $this->MockMessenger, 'isReportRequestValid', array(555) );
         $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', false );
 
-        $this->GoalsShortcodeWithMockDependencies->getOutput();
+        $this->MockedGoalsShortcode->getOutput();
     }
 
     public function testGoalsShortcodeDoesNotAuthenticateUserWhenNoNonce() {
         $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', false );
         $this->expectOnce( $this->MockSecurity, 'requireLogin' );
 
-        $this->GoalsShortcodeWithMockDependencies->getOutput();
+        $this->MockedGoalsShortcode->getOutput();
     }
 
     public function testGoalsShortcodeDoesNotDeleteReportRequest() {
@@ -145,7 +145,7 @@ class TestGoalsShortcode extends HfTestCase {
         $this->expectNever( $this->MockMessenger, 'deleteReportRequest' );
         $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', false );
 
-        $this->GoalsShortcodeWithMockDependencies->getOutput();
+        $this->MockedGoalsShortcode->getOutput();
     }
 
     public function testGoalsShortcodeGetsUserIdFromReportRequest() {
@@ -154,7 +154,7 @@ class TestGoalsShortcode extends HfTestCase {
         $this->expectOnce( $this->MockMessenger, 'getReportRequestUserId', array(555) );
         $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', false );
 
-        $this->GoalsShortcodeWithMockDependencies->getOutput();
+        $this->MockedGoalsShortcode->getOutput();
     }
 
     public function testGoalsShortcodeGetsUserIdFromUserManager() {
@@ -163,7 +163,7 @@ class TestGoalsShortcode extends HfTestCase {
         $this->expectOnce( $this->MockUserManager, 'getCurrentUserId' );
         $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
 
-        $this->GoalsShortcodeWithMockDependencies->getOutput();
+        $this->MockedGoalsShortcode->getOutput();
     }
 
     public function testGoalsShortcodeUpdatesExpirationDate() {
@@ -172,7 +172,7 @@ class TestGoalsShortcode extends HfTestCase {
         $this->expectOnce( $this->MockMessenger, 'updateReportRequestExpirationDate' );
         $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', false );
 
-        $this->GoalsShortcodeWithMockDependencies->getOutput();
+        $this->MockedGoalsShortcode->getOutput();
     }
 
     public function testGoalsShortcodeSetsExpirationDateToOneHourInFuture() {
@@ -182,7 +182,7 @@ class TestGoalsShortcode extends HfTestCase {
         $this->setReturnValue( $this->MockCodeLibrary, 'getCurrentTime', 10 );
         $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', false );
 
-        $this->GoalsShortcodeWithMockDependencies->getOutput();
+        $this->MockedGoalsShortcode->getOutput();
     }
 
     public function testGoalsShortcodeDeletesReportRequestIfReportSubmitted() {
@@ -194,7 +194,7 @@ class TestGoalsShortcode extends HfTestCase {
 
         $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', false );
 
-        $this->GoalsShortcodeWithMockDependencies->getOutput();
+        $this->MockedGoalsShortcode->getOutput();
     }
 
     public function testGoalsShortcodeUpdatsReportRequestWhenUserLoggedIn() {
@@ -202,7 +202,7 @@ class TestGoalsShortcode extends HfTestCase {
         $this->setDefaultIterables();
         $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
         $this->expectOnce( $this->MockMessenger, 'updateReportRequestExpirationDate' );
-        $this->GoalsShortcodeWithMockDependencies->getOutput();
+        $this->MockedGoalsShortcode->getOutput();
     }
 
     public function testGoalsShortcodeDoesNotUpdateReportRequestWhenReportSubmitted() {
@@ -210,7 +210,7 @@ class TestGoalsShortcode extends HfTestCase {
         $this->setDefaultIterables();
         $_POST['submit'] = '';
         $this->expectNever( $this->MockMessenger, 'updateReportRequestExpirationDate' );
-        $this->GoalsShortcodeWithMockDependencies->getOutput();
+        $this->MockedGoalsShortcode->getOutput();
     }
 
     public function testGoalsShortcodeIgnoresInvalidNonces() {
@@ -219,7 +219,7 @@ class TestGoalsShortcode extends HfTestCase {
         $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
         $this->setReturnValue( $this->MockMessenger, 'isReportRequestValid', false );
         $this->expectNever( $this->MockMessenger, 'updateReportRequestExpirationDate' );
-        $this->GoalsShortcodeWithMockDependencies->getOutput();
+        $this->MockedGoalsShortcode->getOutput();
     }
 
     public function testGoalsShortcodeUsesReportRequestToGetUsernameWhenUserNotLoggedIn() {
@@ -233,13 +233,13 @@ class TestGoalsShortcode extends HfTestCase {
         $this->expectOnce( $this->MockMessenger, 'getReportRequestUserId' );
         $this->expectOnce( $this->MockUserManager, 'getUsernameById', array(9) );
 
-        $this->GoalsShortcodeWithMockDependencies->getOutput();
+        $this->MockedGoalsShortcode->getOutput();
     }
 
     public function testGoalsShortcodeDeletesExpiredReportRequests() {
         $this->expectOnce( $this->MockMessenger, 'deleteExpiredReportRequests' );
 
-        $this->GoalsShortcodeWithMockDependencies->getOutput();
+        $this->MockedGoalsShortcode->getOutput();
     }
 
     public function testGoalsShortcodeAsksForQuotationForSuccess() {
@@ -250,7 +250,7 @@ class TestGoalsShortcode extends HfTestCase {
 
         $this->expectOnce( $this->MockDatabase, 'getQuotations', array('For Success') );
 
-        $this->GoalsShortcodeWithMockDependencies->getOutput();
+        $this->MockedGoalsShortcode->getOutput();
     }
 
     public function testGoalsShortcodeSelectsRandomQuotation() {
@@ -262,7 +262,7 @@ class TestGoalsShortcode extends HfTestCase {
 
         $this->expectOnce($this->MockCodeLibrary, 'randomKeyFromArray', array(array($this->makeMockQuotation())));
 
-        $this->GoalsShortcodeWithMockDependencies->getOutput();
+        $this->MockedGoalsShortcode->getOutput();
     }
 
     public function testGoalsShortcodeUsesMarkupGeneratorToCreateSuccessMessage() {
@@ -273,7 +273,7 @@ class TestGoalsShortcode extends HfTestCase {
 
         $this->expectOnce( $this->MockMarkupGenerator, 'makeSuccessMessage', array('Thanks for checking in!') );
 
-        $this->GoalsShortcodeWithMockDependencies->getOutput();
+        $this->MockedGoalsShortcode->getOutput();
     }
 
     public function testGoalsShortcodeMakesQuoteMessage() {
@@ -285,7 +285,7 @@ class TestGoalsShortcode extends HfTestCase {
 
         $this->expectOnce($this->MockMarkupGenerator, 'makeQuoteMessage');
 
-        $this->GoalsShortcodeWithMockDependencies->getOutput();
+        $this->MockedGoalsShortcode->getOutput();
     }
 
     public function testGoalsShortcodeUsesRandomQuotationToMakeQuoteMessage() {
@@ -297,7 +297,7 @@ class TestGoalsShortcode extends HfTestCase {
 
         $this->expectOnce($this->MockMarkupGenerator, 'makeQuoteMessage', array($this->makeMockQuotation()));
 
-        $this->GoalsShortcodeWithMockDependencies->getOutput();
+        $this->MockedGoalsShortcode->getOutput();
     }
 
     public function testGoalsShortcodeDisplaysRandomQuotationOnSuccess() {
@@ -333,7 +333,7 @@ class TestGoalsShortcode extends HfTestCase {
 
         $this->expectOnce($this->MockDatabase, 'getQuotations', array('For Setback'));
 
-        $this->GoalsShortcodeWithMockDependencies->getOutput();
+        $this->MockedGoalsShortcode->getOutput();
     }
 
     public function testGoalsShortcodeDoesntDisplayEmptyQuotation() {
@@ -344,6 +344,6 @@ class TestGoalsShortcode extends HfTestCase {
 
         $this->expectNever($this->MockMarkupGenerator, 'makeQuoteMessage');
 
-        $this->GoalsShortcodeWithMockDependencies->getOutput();
+        $this->MockedGoalsShortcode->getOutput();
     }
 }

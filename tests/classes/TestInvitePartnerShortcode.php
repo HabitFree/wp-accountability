@@ -9,32 +9,32 @@ class TestInvitePartnerShortcode extends HfTestCase {
 
 
     public function testInvitePartnerShortcodeImplementsShortcodeInterface() {
-        $this->assertTrue( $this->classImplementsInterface( $this->InvitePartnerShortcodeWithMockedDependencies, 'Hf_iShortcode' ) );
+        $this->assertTrue( $this->classImplementsInterface( $this->MockedInvitePartnerShortcode, 'Hf_iShortcode' ) );
     }
 
     public function testInvitePartnerShortcodeCreatesForm() {
-        $actual = $this->InvitePartnerShortcodeWithMockedDependencies->getOutput();
+        $actual = $this->MockedInvitePartnerShortcode->getOutput();
         $this->assertContains('<form', $actual);
     }
 
     public function testInvitePartnerShortcodeCallsGetCurrentUrl() {
         $this->expectOnce($this->MockAssetLocator, 'getCurrentPageUrl');
-        $this->InvitePartnerShortcodeWithMockedDependencies->getOutput();
+        $this->MockedInvitePartnerShortcode->getOutput();
     }
 
     public function testInvitePartnerShortcodeUsesCurrentUrlAsFormAction() {
         $this->setReturnValue($this->MockAssetLocator, 'getCurrentPageUrl', 'test.com');
-        $output = $this->InvitePartnerShortcodeWithMockedDependencies->getOutput();
+        $output = $this->MockedInvitePartnerShortcode->getOutput();
         $this->assertContains('<form action="test.com"', $output);
     }
 
     public function testInvitePartnerShortcodeIncludesEmailField() {
-        $output = $this->InvitePartnerShortcodeWithMockedDependencies->getOutput();
+        $output = $this->MockedInvitePartnerShortcode->getOutput();
         $this->assertContains('<label for="email"><span class="required">*</span> Email: <input type="text" name="email" value="" required /></label>', $output);
     }
 
     public function testInvitePartnerShortcodeIncludesSubmitButton() {
-        $output = $this->InvitePartnerShortcodeWithMockedDependencies->getOutput();
+        $output = $this->MockedInvitePartnerShortcode->getOutput();
         $this->assertContains('<input type="submit" name="submit" value="Invite" />', $output);
     }
 
@@ -96,7 +96,7 @@ class TestInvitePartnerShortcode extends HfTestCase {
         $this->expectOnce($this->MockUserManager, 'sendInvitation', array(1, 'test@test.com'));
         $this->setReturnValue($this->MockUserManager, 'getCurrentUserId', 1);
 
-        $this->InvitePartnerShortcodeWithMockedDependencies->getOutput();
+        $this->MockedInvitePartnerShortcode->getOutput();
     }
 
     public function testInvitePartnerShortcodeDisplaysSuccessMessage() {

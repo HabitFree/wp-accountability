@@ -36,7 +36,7 @@ class TestMailer extends HfTestCase {
 
         $this->expectAtLeastOnce( $this->MockDatabase, 'recordEmail', array(1, 'test', 'test', 5, 'me@test.com') );
 
-        $this->MailerWithMockedDependencies->sendEmailToUser( 1, 'test', 'test' );
+        $this->MockedMailer->sendEmailToUser( 1, 'test', 'test' );
     }
 
     public function testSendEmailToUserAndSpecifyEmailID() {
@@ -45,7 +45,7 @@ class TestMailer extends HfTestCase {
 
         $this->expectAtLeastOnce( $this->MockDatabase, 'recordEmail', array(1, 'test subject', 'test body', 123, 'me@test.com') );
 
-        $this->MailerWithMockedDependencies->sendEmailToUserAndSpecifyEmailID( 1, 'test subject', 'test body', 123 );
+        $this->MockedMailer->sendEmailToUserAndSpecifyEmailID( 1, 'test subject', 'test body', 123 );
     }
 
     public function testIsThrottledReturnsFalse() {
@@ -53,7 +53,7 @@ class TestMailer extends HfTestCase {
         $this->setReturnValue( $this->MockDatabase, 'daysSinceLastEmail', 10 );
         $this->setReturnValue( $this->MockDatabase, 'daysSinceSecondToLastEmail', 12 );
 
-        $result = $this->MailerWithMockedDependencies->isThrottled( 1 );
+        $result = $this->MockedMailer->isThrottled( 1 );
 
         $this->assertEquals( $result, false );
     }
@@ -63,7 +63,7 @@ class TestMailer extends HfTestCase {
         $this->setReturnValue( $this->MockDatabase, 'daysSinceLastEmail', 10 );
         $this->setReturnValue( $this->MockDatabase, 'daysSinceSecondToLastEmail', 17 );
 
-        $result = $this->MailerWithMockedDependencies->isThrottled( 1 );
+        $result = $this->MockedMailer->isThrottled( 1 );
 
         $this->assertEquals( $result, true );
     }
@@ -71,7 +71,7 @@ class TestMailer extends HfTestCase {
     public function testMailerPointsInviteUrlToRegistrationTab() {
         $this->setReturnValue( $this->MockAssetLocator, 'getPageUrlByTitle', 'habitfree.org/authenticate' );
 
-        $result   = $this->MailerWithMockedDependencies->generateInviteURL( 777 );
+        $result   = $this->MockedMailer->generateInviteURL( 777 );
         $expected = 'habitfree.org/authenticate?n=777&tab=2';
 
         $this->assertEquals( $expected, $result );
@@ -80,19 +80,19 @@ class TestMailer extends HfTestCase {
     public function testIsEmailValid() {
         $this->setReturnValue( $this->MockDatabase, 'isEmailValid', true );
 
-        $this->assertTrue( $this->MailerWithMockedDependencies->isEmailValid( 1, 1 ) );
+        $this->assertTrue( $this->MockedMailer->isEmailValid( 1, 1 ) );
     }
 
     public function testSendReportRequestEmailGeneratesNonce() {
         $this->expectAtLeastOnce( $this->MockSecurity, 'createRandomString', array(250) );
-        $this->MailerWithMockedDependencies->sendReportRequestEmail( 1 );
+        $this->MockedMailer->sendReportRequestEmail( 1 );
     }
 
     public function testGenerateReportUrlUsesNonce() {
         $baseURL = 'habitfree.org/test';
         $this->setReturnValue( $this->MockAssetLocator, 'getPageUrlByTitle', $baseURL );
 
-        $actual = $this->MailerWithMockedDependencies->generateReportURL( 555 );
+        $actual = $this->MockedMailer->generateReportURL( 555 );
 
         $expected = $baseURL . '?n=555';
 
@@ -113,7 +113,7 @@ class TestMailer extends HfTestCase {
 
         $this->expectOnce( $this->MockDatabase, 'recordEmail', array($userID, $subject, $body, $emailID, $to) );
 
-        $this->MailerWithMockedDependencies->sendReportRequestEmail( $userID );
+        $this->MockedMailer->sendReportRequestEmail( $userID );
     }
 
     public function testSendReportRequestEmailRecordsRequest() {
@@ -125,38 +125,38 @@ class TestMailer extends HfTestCase {
 
         $this->expectOnce( $this->MockDatabase, 'recordReportRequest', array(555, $userId, $emailId) );
 
-        $this->MailerWithMockedDependencies->sendReportRequestEmail( $userId );
+        $this->MockedMailer->sendReportRequestEmail( $userId );
     }
 
     public function testIsReportRequestValid() {
         $this->setReturnValue( $this->MockDatabase, 'isReportrequestValid', true );
-        $this->assertTrue( $this->MailerWithMockedDependencies->isReportRequestValid( 555 ) );
+        $this->assertTrue( $this->MockedMailer->isReportRequestValid( 555 ) );
     }
 
     public function testIsReportRequestValidReturnsFalse() {
         $this->setReturnValue( $this->MockDatabase, 'isReportrequestValid', false );
-        $this->assertFalse( $this->MailerWithMockedDependencies->isReportRequestValid( 555 ) );
+        $this->assertFalse( $this->MockedMailer->isReportRequestValid( 555 ) );
     }
 
     public function testDeleteReportRequest() {
         $this->expectOnce( $this->MockDatabase, 'deleteReportRequest', array(555) );
-        $this->MailerWithMockedDependencies->deleteReportRequest( 555 );
+        $this->MockedMailer->deleteReportRequest( 555 );
     }
 
     public function testGetReportRequestUserId() {
         $this->expectOnce( $this->MockDatabase, 'getReportRequestUserId', array(555) );
-        $this->MailerWithMockedDependencies->getReportRequestUserId( 555 );
+        $this->MockedMailer->getReportRequestUserId( 555 );
     }
 
     public function testGetReportRequestUserIdReturnsValue() {
         $this->setReturnValue( $this->MockDatabase, 'getReportRequestUserId', 5 );
-        $actual = $this->MailerWithMockedDependencies->getReportRequestUserId( 555 );
+        $actual = $this->MockedMailer->getReportRequestUserId( 555 );
         $this->assertEquals( 5, $actual );
     }
 
     public function testUpdateReportRequestExpirationDate() {
         $this->expectOnce( $this->MockDatabase, 'updateReportRequestExpirationDate', array(555, 'abcd') );
-        $this->MailerWithMockedDependencies->updateReportRequestExpirationDate( 555, 'abcd' );
+        $this->MockedMailer->updateReportRequestExpirationDate( 555, 'abcd' );
     }
 
     public function testMailerCreatesLigitExpirationDateForReportRequests() {
@@ -166,7 +166,7 @@ class TestMailer extends HfTestCase {
 
         $this->expectOnce( $this->MockDatabase, 'recordReportRequest', array(123, 1, 5, "2014-06-30 14:18:24") );
 
-        $this->MailerWithMockedDependencies->sendReportRequestEmail( 1 );
+        $this->MockedMailer->sendReportRequestEmail( 1 );
     }
 
     public function testDeleteExpiredInvitesGetsInvites() {
@@ -177,7 +177,7 @@ class TestMailer extends HfTestCase {
 
         $this->expectOnce( $this->MockDatabase, 'getAllInvites' );
 
-        $this->MailerWithMockedDependencies->deleteExpiredInvites();
+        $this->MockedMailer->deleteExpiredInvites();
     }
 
     public function testDeleteExpiredInvitesDeletesExpiredInvite() {
@@ -189,7 +189,7 @@ class TestMailer extends HfTestCase {
 
         $this->expectOnce( $this->MockDatabase, 'deleteInvite', array('5ab') );
 
-        $this->MailerWithMockedDependencies->deleteExpiredInvites();
+        $this->MockedMailer->deleteExpiredInvites();
     }
 
     public function testDeleteExpiredInviteDoesNotDeleteFreshInvite() {
@@ -205,7 +205,7 @@ class TestMailer extends HfTestCase {
 
         $this->expectNever( $this->MockDatabase, 'deleteInvite' );
 
-        $this->MailerWithMockedDependencies->deleteExpiredInvites();
+        $this->MockedMailer->deleteExpiredInvites();
     }
 
     public function testDeleteExpiredInviteDeletesStaleKeepsFresh() {
@@ -223,7 +223,7 @@ class TestMailer extends HfTestCase {
         $this->expectOnce( $this->MockDatabase, 'deleteInvite' );
         $this->expectOnce( $this->MockDatabase, 'deleteInvite', array('stale') );
 
-        $this->MailerWithMockedDependencies->deleteExpiredInvites();
+        $this->MockedMailer->deleteExpiredInvites();
     }
 
     public function testDeleteExpiredReportRequestsGetsReportRequests() {
@@ -231,7 +231,7 @@ class TestMailer extends HfTestCase {
         $this->setReturnValue($this->MockDatabase, 'getAllReportRequests', array($staleReportRequest));
 
         $this->expectOnce($this->MockDatabase, 'getAllReportRequests');
-        $this->MailerWithMockedDependencies->deleteExpiredReportRequests();
+        $this->MockedMailer->deleteExpiredReportRequests();
     }
 
     public function testDeleteExpiredReportRequestsDeletesExpiredReportRequest() {
@@ -241,7 +241,7 @@ class TestMailer extends HfTestCase {
         $this->setReturnValue($this->MockDatabase, 'getAllReportRequests', array($staleReportRequest));
 
         $this->expectOnce($this->MockDatabase, 'deleteReportRequest', array('stale'));
-        $this->MailerWithMockedDependencies->deleteExpiredReportRequests();
+        $this->MockedMailer->deleteExpiredReportRequests();
     }
 
     public function testDeleteExpiredReportRequestsDoesNotDeleteFreshReportRequest() {
@@ -253,7 +253,7 @@ class TestMailer extends HfTestCase {
         $this->setReturnValue($this->MockDatabase, 'getAllReportRequests', array($freshReportRequest));
 
         $this->expectNever($this->MockDatabase, 'deleteReportRequest');
-        $this->MailerWithMockedDependencies->deleteExpiredReportRequests();
+        $this->MockedMailer->deleteExpiredReportRequests();
     }
 
     public function testDeleteExpiredReportRequestsDeletesStaleAndKeepsFresh() {
@@ -269,6 +269,6 @@ class TestMailer extends HfTestCase {
         $this->expectOnce($this->MockDatabase, 'deleteReportRequest');
         $this->expectOnce($this->MockDatabase, 'deleteReportRequest', array('stale'));
 
-        $this->MailerWithMockedDependencies->deleteExpiredReportRequests();
+        $this->MockedMailer->deleteExpiredReportRequests();
     }
 }
