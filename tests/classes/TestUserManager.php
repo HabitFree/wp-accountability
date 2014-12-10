@@ -12,7 +12,7 @@ class TestUserManager extends HfTestCase {
         $this->setReturnValue( $this->MockMessenger, 'generateSecureEmailId', 555 );
         $this->setReturnValue( $this->MockDatabase, 'generateEmailID', 5 );
 
-        $result = $this->UserManagerWithMockedDependencies->sendInvitation( 1, 'me@test.com', 3 );
+        $result = $this->MockedUserManager->sendInvitation( 1, 'me@test.com', 3 );
 
         $this->assertEquals( $result, 555 );
     }
@@ -44,34 +44,34 @@ class TestUserManager extends HfTestCase {
     public function testGetFriends() {
         $this->setReturnValue( $this->MockDatabase, 'getPartners', 'duck' );
 
-        $this->assertEquals( 'duck', $this->UserManagerWithMockedDependencies->getPartners( 1 ) );
+        $this->assertEquals( 'duck', $this->MockedUserManager->getPartners( 1 ) );
     }
 
     public function testSendInvitationUsesCodeLibraryToConvertStringToTime() {
         $this->expectOnce( $this->MockCodeLibrary, 'convertStringToTime', array('+7 days') );
 
-        $this->UserManagerWithMockedDependencies->sendInvitation( 1, 'me@my.com' );
+        $this->MockedUserManager->sendInvitation( 1, 'me@my.com' );
     }
 
     public function testProcessInviteDeletesExpiredInvites() {
         $this->expectOnce($this->MockMessenger, 'deleteExpiredInvites');
 
-        $this->UserManagerWithMockedDependencies->processInvite('', '');
+        $this->MockedUserManager->processInvite('', '');
     }
 
     public function testDeleteRelationship() {
         $this->expectOnce($this->MockDatabase, 'deleteRelationship', array('dog', 'cat'));
-        $this->UserManagerWithMockedDependencies->deleteRelationship('dog', 'cat');
+        $this->MockedUserManager->deleteRelationship('dog', 'cat');
     }
 
     public function testUserManagerAddsDefaultSubWhenProcessingNewUser() {
         $this->expectOnce($this->MockDatabase, 'setDefaultGoalSubscription', array(9));
-        $this->UserManagerWithMockedDependencies->processNewUser(9);
+        $this->MockedUserManager->processNewUser(9);
     }
 
     public function testUserManagerUsesDatabaseToRecordInvite() {
         $this->expectOnce($this->MockDatabase, 'recordInvite');
-        $this->UserManagerWithMockedDependencies->sendInvitation(1, 'test@test.com');
+        $this->MockedUserManager->sendInvitation(1, 'test@test.com');
     }
 
     public function testProcessAllUsersDoesntSendEmails() {
@@ -79,7 +79,7 @@ class TestUserManager extends HfTestCase {
         $this->setReturnValue($this->MockCms, 'getUsers', $users);
 
         $this->expectNever($this->MockMessenger, 'sendEmailToUser');
-        $this->UserManagerWithMockedDependencies->processAllUsers();
+        $this->MockedUserManager->processAllUsers();
     }
 
     public function testProcessAllUsersGetsUsers() {
@@ -87,7 +87,7 @@ class TestUserManager extends HfTestCase {
         $this->setReturnValue($this->MockCms, 'getUsers', $users);
 
         $this->expectOnce($this->MockCms, 'getUsers');
-        $this->UserManagerWithMockedDependencies->processAllUsers();
+        $this->MockedUserManager->processAllUsers();
     }
 
     public function testProcessAllUsersSetsDefaultGoalSubscriptions() {
@@ -95,6 +95,6 @@ class TestUserManager extends HfTestCase {
         $this->setReturnValue($this->MockCms, 'getUsers', $users);
 
         $this->expectAtLeastOnce($this->MockDatabase, 'setDefaultGoalSubscription', array(7));
-        $this->UserManagerWithMockedDependencies->processAllUsers();
+        $this->MockedUserManager->processAllUsers();
     }
 }

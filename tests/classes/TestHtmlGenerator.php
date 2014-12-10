@@ -132,7 +132,7 @@ class TestHtmlGenerator extends HfTestCase {
         $levelDaysToComplete = 14;
         $levelBar = '';
 
-        $result = $this->MarkupGeneratorWithMockedDependencies->makeGoalCard(
+        $result = $this->MockedMarkupGenerator->makeGoalCard(
             $goalTitle,
             $goalDescription,
             $goalId,
@@ -170,7 +170,7 @@ class TestHtmlGenerator extends HfTestCase {
         $levelDaysToComplete = 14;
         $levelBar = '';
 
-        $result = $this->MarkupGeneratorWithMockedDependencies->makeGoalCard(
+        $result = $this->MockedMarkupGenerator->makeGoalCard(
             $goalTitle,
             $goalDescription,
             $goalId,
@@ -198,7 +198,7 @@ class TestHtmlGenerator extends HfTestCase {
     }
 
     public function testMakeParagraphWithClass() {
-        $result = $this->MarkupGeneratorWithMockedDependencies->makeParagraph('duck','classy');
+        $result = $this->MockedMarkupGenerator->makeParagraph('duck','classy');
         $expected = "<p class='classy'>duck</p>";
         $this->assertEquals($expected, $result);
     }
@@ -214,7 +214,7 @@ class TestHtmlGenerator extends HfTestCase {
         $levelDaysToComplete = 14;
         $levelBar = '';
 
-        $result = $this->MarkupGeneratorWithMockedDependencies->makeGoalCard(
+        $result = $this->MockedMarkupGenerator->makeGoalCard(
             $goalTitle,
             $goalDescription,
             $goalId,
@@ -252,7 +252,7 @@ class TestHtmlGenerator extends HfTestCase {
         $levelDaysToComplete = 14;
         $levelBar = '';
 
-        $result = $this->MarkupGeneratorWithMockedDependencies->makeGoalCard(
+        $result = $this->MockedMarkupGenerator->makeGoalCard(
             $goalTitle,
             $goalDescription,
             $goalId,

@@ -22,17 +22,18 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     protected $MockPartnerListShortcode;
     protected $MockInvitePartnerShortcode;
 
-    protected $InvitePartnerShortcodeWithMockedDependencies;
-    protected $UserManagerWithMockedDependencies;
-    protected $MailerWithMockedDependencies;
-    protected $GoalsShortcodeWithMockDependencies;
-    protected $DatabaseWithMockedDependencies;
-    protected $AssetLocatorWithMockedDependencies;
-    protected $PartnerListShortcodeWithMockedDependencies;
-    protected $AuthenticateShortcodeWithMockedDependencies;
-    protected $GoalsWithMockedDependencies;
-    protected $ManagePartnersShortcodeWithMockedDependencies;
-    protected $MarkupGeneratorWithMockedDependencies;
+    protected $MockedInvitePartnerShortcode;
+    protected $MockedUserManager;
+    protected $MockedMailer;
+    protected $MockedGoalsShortcode;
+    protected $MockedDatabase;
+    protected $MockedAssetLocator;
+    protected $MockedPartnerListShortcode;
+    protected $MockedAuthenticateShortcode;
+    protected $MockedGoals;
+    protected $MockedManagePartnersShortcode;
+    protected $MockedMarkupGenerator;
+    protected $MockedLoginForm;
 
     function __construct() {
         $this->Factory = new HfFactory();
@@ -43,7 +44,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $_GET  = array();
 
         $this->resetMocks();
-        $this->resetObjectsWithMockDependencies();
+        $this->resetMockedObjects();
     }
 
     private function resetMocks() {
@@ -63,18 +64,19 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptests_' );
     }
 
-    private function resetObjectsWithMockDependencies() {
-        $this->resetUserManagerWithMockedDependencies();
-        $this->resetMailerWithMockedDependencies();
-        $this->resetGoalsShortcodeWithMockDependencies();
-        $this->resetDatabaseWithMockedDependencies();
-        $this->resetAssetLocatorWithMockedDependencies();
-        $this->resetInvitePartnerShortcodeWithMockedDependencies();
-        $this->resetPartnerListShortcodeWithMockedDependencies();
-        $this->resetAuthenticateShortcodeWithMockedDependencies();
-        $this->resetGoalsWithMockedDependencies();
-        $this->resetManagePartnersShortcodeWithMockedDependencies();
-        $this->MarkupGeneratorWithMockedDependencies = new HfHtmlGenerator($this->MockCms);
+    private function resetMockedObjects() {
+        $this->resetMockedUserManager();
+        $this->resetMockedMailer();
+        $this->resetMockedGoalsShortcode();
+        $this->resetMockedDatabase();
+        $this->resetMockedAssetLocator();
+        $this->resetMockedInvitePartnerShortcode();
+        $this->resetMockedPartnerListShortcode();
+        $this->resetMockedAuthenticateShortcode();
+        $this->resetMockedGoals();
+        $this->resetMockedManagePartnersShortcode();
+        $this->MockedMarkupGenerator = new HfHtmlGenerator($this->MockCms);
+        $this->MockedLoginForm = new HfLoginForm('url', 'jo');
     }
 
     protected function makeMock( $className ) {
@@ -85,8 +87,8 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         return $Mock->expects( $this->any() )->method( $method )->will( $this->returnValue( $value ) );
     }
 
-    private function resetUserManagerWithMockedDependencies() {
-        $this->UserManagerWithMockedDependencies = new HfUserManager(
+    private function resetMockedUserManager() {
+        $this->MockedUserManager = new HfUserManager(
             $this->MockDatabase,
             $this->MockMessenger,
             $this->MockAssetLocator,
@@ -95,8 +97,8 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         );
     }
 
-    private function resetMailerWithMockedDependencies() {
-        $this->MailerWithMockedDependencies = new HfMailer(
+    private function resetMockedMailer() {
+        $this->MockedMailer = new HfMailer(
             $this->MockAssetLocator,
             $this->MockSecurity,
             $this->MockDatabase,
@@ -105,8 +107,8 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         );
     }
 
-    private function resetGoalsShortcodeWithMockDependencies() {
-        $this->GoalsShortcodeWithMockDependencies = new HfGoalsShortcode(
+    private function resetMockedGoalsShortcode() {
+        $this->MockedGoalsShortcode = new HfGoalsShortcode(
             $this->MockUserManager,
             $this->MockMessenger,
             $this->MockPageLocator,
@@ -118,35 +120,35 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         );
     }
 
-    private function resetDatabaseWithMockedDependencies() {
-        $this->DatabaseWithMockedDependencies = new HfMysqlDatabase(
+    private function resetMockedDatabase() {
+        $this->MockedDatabase = new HfMysqlDatabase(
             $this->MockCms,
             $this->MockCodeLibrary
         );
     }
 
-    private function resetAssetLocatorWithMockedDependencies() {
-        $this->AssetLocatorWithMockedDependencies = new HfUrlFinder( $this->MockCms );
+    private function resetMockedAssetLocator() {
+        $this->MockedAssetLocator = new HfUrlFinder( $this->MockCms );
     }
 
-    private function resetInvitePartnerShortcodeWithMockedDependencies() {
-        $this->InvitePartnerShortcodeWithMockedDependencies = new HfInvitePartnerShortcode(
+    private function resetMockedInvitePartnerShortcode() {
+        $this->MockedInvitePartnerShortcode = new HfInvitePartnerShortcode(
             $this->MockAssetLocator,
             $this->MockMarkupGenerator,
             $this->MockUserManager
         );
     }
 
-    private function resetPartnerListShortcodeWithMockedDependencies() {
-        $this->PartnerListShortcodeWithMockedDependencies = new HfPartnerListShortcode(
+    private function resetMockedPartnerListShortcode() {
+        $this->MockedPartnerListShortcode = new HfPartnerListShortcode(
             $this->MockUserManager,
             $this->MockMarkupGenerator,
             $this->MockAssetLocator
         );
     }
 
-    private function resetAuthenticateShortcodeWithMockedDependencies() {
-        $this->AuthenticateShortcodeWithMockedDependencies = new HfAuthenticateShortcode(
+    private function resetMockedAuthenticateShortcode() {
+        $this->MockedAuthenticateShortcode = new HfAuthenticateShortcode(
             $this->MockMarkupGenerator,
             $this->MockAssetLocator,
             $this->MockCms,
@@ -154,8 +156,8 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         );
     }
 
-    private function resetGoalsWithMockedDependencies() {
-        $this->GoalsWithMockedDependencies = new HfGoals(
+    private function resetMockedGoals() {
+        $this->MockedGoals = new HfGoals(
             $this->MockMessenger,
             $this->MockCms,
             $this->MockMarkupGenerator,
@@ -163,8 +165,8 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         );
     }
 
-    private function resetManagePartnersShortcodeWithMockedDependencies() {
-        $this->ManagePartnersShortcodeWithMockedDependencies = new HfManagePartnersShortcode(
+    private function resetMockedManagePartnersShortcode() {
+        $this->MockedManagePartnersShortcode = new HfManagePartnersShortcode(
             $this->MockSecurity,
             $this->MockUserManager,
             $this->MockPartnerListShortcode,
