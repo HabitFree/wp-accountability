@@ -75,4 +75,9 @@ class TestFactory extends HfTestCase {
         $ManagePartnersShortcode = $this->Factory->makeManagePartnersShortcode();
         $this->assertTrue(is_a($ManagePartnersShortcode, 'HfManagePartnersShortcode'));
     }
+
+    public function testMakeLoginForm() {
+        $f = $this->Factory->makeLoginForm('jo');
+        $this->assertInstanceOf('HfLoginForm', $f);
+    }
 }
