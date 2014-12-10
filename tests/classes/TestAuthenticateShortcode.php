@@ -41,15 +41,10 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeIncludesLogInForm() {
-        $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
-        $AssetLocator          = $this->Factory->makeAssetLocator();
-
-        $result = $AuthenticateShortcode->getOutput();
-        $url    = $AssetLocator->getCurrentPageUrl();
-
-        $logInHtml = '<form action="' . $url . '" method="post"><p><label for="username"><span class="required">*</span> Username: <input type="text" name="username" value="" required /></label></p><p><label for="password"><span class="required">*</span> Password: <input type="password" name="password" required /></label></p><p><input type="submit" name="login" value="Log In" /></p></form>';
-
-        $this->assertTrue( strstr( $result, $logInHtml ) != false );
+        $this->setReturnValue($this->MockLoginForm,'getHtml','LoginForm');
+        $auth = $this->makeExpressiveAuthenticateShortcode();
+        $result = $auth->getOutput();
+        $this->assertContains('LoginForm',$result);
     }
 
     public function testAuthenticateShortcodeIncludesRegistrationForm() {
@@ -80,13 +75,14 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->Factory->makeMarkupGenerator(),
             $this->MockAssetLocator,
             $this->Factory->makeCms(),
-            $this->Factory->makeUserManager()
+            $this->Factory->makeUserManager(),
+            $this->MockLoginForm
         );
 
         $this->setReturnValue( $this->MockAssetLocator, 'getCurrentPageUrl', $currentUrl );
         $result = $AuthenticateShortcode->getOutput();
 
-        $this->assertEquals( 2, substr_count( $result, $currentUrl ) );
+        $this->assertContains( $currentUrl, $result );
     }
 
     public function testAuthenticateShortcodeRemembersUsernameOnPost() {
@@ -97,7 +93,7 @@ class TestAuthenticateShortcode extends HfTestCase {
         $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
         $html                  = $AuthenticateShortcode->getOutput();
 
-        $this->assertEquals( 2, substr_count( $html, $_POST['username'] ) );
+        $this->assertContains( $_POST['username'], $html );
     }
 
     public function testAuthenticateShortcodeRemembersEmailOnPost() {
@@ -287,7 +283,8 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->Factory->makeMarkupGenerator(),
             $this->Factory->makeAssetLocator(),
             $this->MockCms,
-            $this->Factory->makeUserManager()
+            $this->Factory->makeUserManager(),
+            $this->MockLoginForm
         );
 
         $AuthenticateShortcode->attemptLogin();
@@ -302,7 +299,8 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->Factory->makeMarkupGenerator(),
             $this->Factory->makeAssetLocator(),
             $this->MockCms,
-            $this->Factory->makeUserManager()
+            $this->Factory->makeUserManager(),
+            $this->MockLoginForm
         );
 
         $haystack = $AuthenticateShortcode->getOutput();
@@ -320,7 +318,8 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->Factory->makeMarkupGenerator(),
             $this->Factory->makeAssetLocator(),
             $this->MockCms,
-            $this->Factory->makeUserManager()
+            $this->Factory->makeUserManager(),
+            $this->MockLoginForm
         );
 
         $haystack = $AuthenticateShortcode->getOutput();
@@ -338,7 +337,8 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->Factory->makeMarkupGenerator(),
             $this->Factory->makeAssetLocator(),
             $this->MockCms,
-            $this->MockUserManager
+            $this->MockUserManager,
+            $this->MockLoginForm
         );
 
         $haystack = $AuthenticateShortcode->getOutput();
@@ -365,7 +365,8 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->Factory->makeMarkupGenerator(),
             $this->Factory->makeAssetLocator(),
             $this->MockCms,
-            $this->Factory->makeUserManager()
+            $this->Factory->makeUserManager(),
+            $this->MockLoginForm
         );
 
         $AuthenticateShortcode->getOutput();
@@ -380,7 +381,8 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->Factory->makeMarkupGenerator(),
             $this->Factory->makeAssetLocator(),
             $this->MockCms,
-            $this->Factory->makeUserManager()
+            $this->Factory->makeUserManager(),
+            $this->MockLoginForm
         );
 
         $AuthenticateShortcode->getOutput();
@@ -395,7 +397,8 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->Factory->makeMarkupGenerator(),
             $this->Factory->makeAssetLocator(),
             $this->MockCms,
-            $this->Factory->makeUserManager()
+            $this->Factory->makeUserManager(),
+            $this->MockLoginForm
         );
 
         $haystack = $AuthenticateShortcode->getOutput();
@@ -430,7 +433,8 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->Factory->makeMarkupGenerator(),
             $this->Factory->makeAssetLocator(),
             $this->MockCms,
-            $this->MockUserManager
+            $this->MockUserManager,
+            $this->MockLoginForm
         );
 
         $AuthenticateShortcode->getOutput();
@@ -454,7 +458,8 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->Factory->makeMarkupGenerator(),
             $this->Factory->makeAssetLocator(),
             $this->MockCms,
-            $this->MockUserManager
+            $this->MockUserManager,
+            $this->MockLoginForm
         );
 
         $AuthenticateShortcode->getOutput();
@@ -469,7 +474,8 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->Factory->makeMarkupGenerator(),
             $this->Factory->makeAssetLocator(),
             $this->MockCms,
-            $this->Factory->makeUserManager()
+            $this->Factory->makeUserManager(),
+            $this->MockLoginForm
         );
 
         $haystack = $AuthenticateShortcode->getOutput();
@@ -518,7 +524,8 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->Factory->makeMarkupGenerator(),
             $this->Factory->makeAssetLocator(),
             $this->MockCms,
-            $this->MockUserManager
+            $this->MockUserManager,
+            $this->MockLoginForm
         );
 
         $haystack = $AuthenticateShortcode->getOutput();
@@ -577,7 +584,8 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->Factory->makeMarkupGenerator(),
             $this->MockAssetLocator,
             $this->MockCms,
-            $this->MockUserManager
+            $this->MockUserManager,
+            $this->MockLoginForm
         );
 
         return $AuthenticateShortcode;
@@ -707,7 +715,8 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->Factory->makeMarkupGenerator(),
             $this->Factory->makeAssetLocator(),
             $this->MockCms,
-            $this->MockUserManager
+            $this->MockUserManager,
+            $this->MockLoginForm
         );
 
         $haystack = $AuthenticateShortcode->getOutput();
@@ -814,5 +823,10 @@ class TestAuthenticateShortcode extends HfTestCase {
         $this->setReturnValue($this->MockCms, 'authenticateUser', True);
         $this->expectOnce($this->MockMarkupGenerator, 'makeRefreshScript');
         $this->MockedAuthenticateShortcode->attemptLogin();
+    }
+
+    public function testUsesLoginForm() {
+        $this->expectOnce($this->MockLoginForm, 'getHtml');
+        $this->MockedAuthenticateShortcode->getOutput();
     }
 }
