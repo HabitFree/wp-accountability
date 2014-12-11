@@ -35,6 +35,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     protected $MockedManagePartnersShortcode;
     protected $MockedMarkupGenerator;
     protected $MockedLoginForm;
+    protected $MockedRegistrationForm;
 
     function __construct() {
         $this->Factory = new HfFactory();
@@ -79,6 +80,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->resetMockedManagePartnersShortcode();
         $this->MockedMarkupGenerator = new HfHtmlGenerator($this->MockCms);
         $this->MockedLoginForm = new HfLoginForm('url', 'jo');
+        $this->MockedRegistrationForm = new HfRegistrationForm('url');
     }
 
     protected function makeMock( $className ) {
