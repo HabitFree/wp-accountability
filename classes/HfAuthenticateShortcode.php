@@ -27,14 +27,16 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         Hf_iCms $ContentManagementSystem,
         Hf_iUserManager $UserManager,
         $LoginForm,
-        $RegistrationForm
+        $RegistrationForm,
+        $InviteResponseForm
     ) {
-        $this->MarkupGenerator  = $MarkupGenerator;
-        $this->AssetLocator     = $AssetLocator;
-        $this->Cms              = $ContentManagementSystem;
-        $this->UserManager      = $UserManager;
-        $this->LoginForm        = $LoginForm;
-        $this->RegistrationForm = $RegistrationForm;
+        $this->MarkupGenerator   = $MarkupGenerator;
+        $this->AssetLocator      = $AssetLocator;
+        $this->Cms               = $ContentManagementSystem;
+        $this->UserManager       = $UserManager;
+        $this->LoginForm         = $LoginForm;
+        $this->RegistrationForm  = $RegistrationForm;
+        $this->InviteResponeForm = $InviteResponseForm;
     }
 
     public function getOutput() {
@@ -93,6 +95,8 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
             $Form->addInfoMessage( "Looks like you're responding to an invite. What would you like to do?" );
             $Form->addSubmitButton( 'accept', 'Accept invitation' );
             $Form->addSubmitButton( 'ignore', 'Ignore invitation' );
+
+            $this->InviteResponeForm->getHtml();
 
             $this->output .= $Form->getHtml();
         }

@@ -268,7 +268,8 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->MockCms,
             $this->Factory->makeUserManager(),
             $this->MockLoginForm,
-            $this->MockRegistrationForm
+            $this->MockRegistrationForm,
+            $this->MockInviteResponseForm
         );
 
         $AuthenticateShortcode->attemptLogin();
@@ -285,7 +286,8 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->MockCms,
             $this->Factory->makeUserManager(),
             $this->MockLoginForm,
-            $this->MockRegistrationForm
+            $this->MockRegistrationForm,
+            $this->MockInviteResponseForm
         );
 
         $haystack = $AuthenticateShortcode->getOutput();
@@ -305,7 +307,8 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->MockCms,
             $this->Factory->makeUserManager(),
             $this->MockLoginForm,
-            $this->MockRegistrationForm
+            $this->MockRegistrationForm,
+            $this->MockInviteResponseForm
         );
 
         $haystack = $AuthenticateShortcode->getOutput();
@@ -325,7 +328,8 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->MockCms,
             $this->MockUserManager,
             $this->MockLoginForm,
-            $this->MockRegistrationForm
+            $this->MockRegistrationForm,
+            $this->MockInviteResponseForm
         );
 
         $haystack = $AuthenticateShortcode->getOutput();
@@ -354,7 +358,8 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->MockCms,
             $this->Factory->makeUserManager(),
             $this->MockLoginForm,
-            $this->MockRegistrationForm
+            $this->MockRegistrationForm,
+            $this->MockInviteResponseForm
         );
 
         $AuthenticateShortcode->getOutput();
@@ -371,7 +376,8 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->MockCms,
             $this->Factory->makeUserManager(),
             $this->MockLoginForm,
-            $this->MockRegistrationForm
+            $this->MockRegistrationForm,
+            $this->MockInviteResponseForm
         );
 
         $AuthenticateShortcode->getOutput();
@@ -388,7 +394,8 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->MockCms,
             $this->Factory->makeUserManager(),
             $this->MockLoginForm,
-            $this->MockRegistrationForm
+            $this->MockRegistrationForm,
+            $this->MockInviteResponseForm
         );
 
         $haystack = $AuthenticateShortcode->getOutput();
@@ -425,7 +432,8 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->MockCms,
             $this->MockUserManager,
             $this->MockLoginForm,
-            $this->MockRegistrationForm
+            $this->MockRegistrationForm,
+            $this->MockInviteResponseForm
         );
 
         $AuthenticateShortcode->getOutput();
@@ -451,7 +459,8 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->MockCms,
             $this->MockUserManager,
             $this->MockLoginForm,
-            $this->MockRegistrationForm
+            $this->MockRegistrationForm,
+            $this->MockInviteResponseForm
         );
 
         $AuthenticateShortcode->getOutput();
@@ -468,7 +477,8 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->MockCms,
             $this->Factory->makeUserManager(),
             $this->MockLoginForm,
-            $this->MockRegistrationForm
+            $this->MockRegistrationForm,
+            $this->MockInviteResponseForm
         );
 
         $haystack = $AuthenticateShortcode->getOutput();
@@ -519,7 +529,8 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->MockCms,
             $this->MockUserManager,
             $this->MockLoginForm,
-            $this->MockRegistrationForm
+            $this->MockRegistrationForm,
+            $this->MockInviteResponseForm
         );
 
         $haystack = $AuthenticateShortcode->getOutput();
@@ -580,7 +591,8 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->MockCms,
             $this->MockUserManager,
             $this->MockLoginForm,
-            $this->MockRegistrationForm
+            $this->MockRegistrationForm,
+            $this->MockInviteResponseForm
         );
 
         return $AuthenticateShortcode;
@@ -712,7 +724,8 @@ class TestAuthenticateShortcode extends HfTestCase {
             $this->MockCms,
             $this->MockUserManager,
             $this->MockLoginForm,
-            $this->MockRegistrationForm
+            $this->MockRegistrationForm,
+            $this->MockInviteResponseForm
         );
 
         $haystack = $AuthenticateShortcode->getOutput();
@@ -823,5 +836,12 @@ class TestAuthenticateShortcode extends HfTestCase {
         $shortcode = $this->makeExpressiveAuthenticateShortcode();
         $output = $shortcode->getOutput();
         $this->assertContains('reg form', $output);
+    }
+
+    public function testGetsInviteResponseFormHtml() {
+        $_GET['n'] = '555';
+        $this->setReturnValue($this->MockUserManager, 'isUserLoggedIn', True);
+        $this->expectOnce($this->MockInviteResponseForm, 'getHtml');
+        $this->MockedAuthenticateShortcode->getOutput();
     }
 }
