@@ -78,7 +78,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
             $tabbedForms = $this->MarkupGenerator->generateTabs( array(
                 'Log In'   => $this->loginMessages . $this->LoginForm->getHtml(),
-                'Register' => $this->registrationMessages . $this->generateRegistrationForm()
+                'Register' => $this->registrationMessages . $this->RegistrationForm->getHtml()
             ), $activeTabNumber );
 
             $this->output .= $tabbedForms;
@@ -180,30 +180,6 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         } else {
             return 1;
         }
-    }
-
-    private function generateRegistrationForm() {
-        $Form = new HfGenericForm( $this->AssetLocator->getCurrentPageUrl() );
-
-        $usernameChoiceMessage = '<strong>Important:</strong> HabitFree is a '
-                . 'support community. For this reason, please choose a '
-                . 'non-personally-identifiable username.';
-        $passwordChoiceMessage = '<strong>Important:</strong> Please '
-                . 'choose a secure password. The most secure passwords are '
-                . 'randomly generated. You can do that '
-                . '<a href="https://lastpass.com/generate">here.</a>';
-        
-        $Form->addInfoMessage( $usernameChoiceMessage );
-        $Form->addTextBox( 'username', 'Username', $this->username, true );
-        $Form->addTextBox( 'email', 'Email', $this->email, true );
-        $Form->addInfoMessage( $passwordChoiceMessage );
-        $Form->addPasswordBox( 'password', 'Password', true );
-        $Form->addPasswordBox( 'passwordConfirmation', 'Confirm Password', true );
-        $Form->addSubmitButton( 'register', 'Register' );
-
-        $this->RegistrationForm->getHtml();
-
-        return $Form->getHtml();
     }
 
     private function isInvite() {
