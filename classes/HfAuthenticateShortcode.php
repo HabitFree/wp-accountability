@@ -26,13 +26,15 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         Hf_iAssetLocator $AssetLocator,
         Hf_iCms $ContentManagementSystem,
         Hf_iUserManager $UserManager,
-        $LoginForm
+        $LoginForm,
+        $RegistrationForm
     ) {
-        $this->MarkupGenerator = $MarkupGenerator;
-        $this->AssetLocator    = $AssetLocator;
-        $this->Cms             = $ContentManagementSystem;
-        $this->UserManager     = $UserManager;
-        $this->LoginForm       = $LoginForm;
+        $this->MarkupGenerator  = $MarkupGenerator;
+        $this->AssetLocator     = $AssetLocator;
+        $this->Cms              = $ContentManagementSystem;
+        $this->UserManager      = $UserManager;
+        $this->LoginForm        = $LoginForm;
+        $this->RegistrationForm = $RegistrationForm;
     }
 
     public function getOutput() {
@@ -198,6 +200,8 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         $Form->addPasswordBox( 'password', 'Password', true );
         $Form->addPasswordBox( 'passwordConfirmation', 'Confirm Password', true );
         $Form->addSubmitButton( 'register', 'Register' );
+
+        $this->RegistrationForm->getHtml();
 
         return $Form->getHtml();
     }

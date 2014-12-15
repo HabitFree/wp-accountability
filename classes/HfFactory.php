@@ -89,13 +89,14 @@ class HfFactory {
     }
 
     public function makeAuthenticateShortcode() {
-        $MarkupGenerator = $this->makeMarkupGenerator();
-        $AssetLocator    = $this->makeAssetLocator();
-        $Cms             = $this->makeCms();
-        $UserManager     = $this->makeUserManager();
-        $LoginForm       = $this->makeLoginForm();
+        $MarkupGenerator  = $this->makeMarkupGenerator();
+        $AssetLocator     = $this->makeAssetLocator();
+        $Cms              = $this->makeCms();
+        $UserManager      = $this->makeUserManager();
+        $LoginForm        = $this->makeLoginForm();
+        $RegistrationForm = $this->makeRegistrationForm();
 
-        return new HfAuthenticateShortcode( $MarkupGenerator, $AssetLocator, $Cms, $UserManager, $LoginForm );
+        return new HfAuthenticateShortcode( $MarkupGenerator, $AssetLocator, $Cms, $UserManager, $LoginForm, $RegistrationForm );
     }
 
     public function makeGoalsShortcode() {
@@ -143,5 +144,12 @@ class HfFactory {
         $actionUrl = $AssetLocator->getCurrentPageUrl();
 
         return new HfLoginForm($actionUrl);
+    }
+
+    public function makeRegistrationForm() {
+        $AssetLocator = $this->makeAssetLocator();
+        $actionUrl = $AssetLocator->getCurrentPageUrl();
+
+        return new HfRegistrationForm($actionUrl);
     }
 } 
