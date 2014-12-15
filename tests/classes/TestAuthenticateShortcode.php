@@ -68,24 +68,6 @@ class TestAuthenticateShortcode extends HfTestCase {
         $this->assertContains($usernameField, $result);
     }
 
-    public function testAuthenticateShortcodeUsesCurrentUrl() {
-        $currentUrl = 'mysite.com';
-
-        $AuthenticateShortcode = new HfAuthenticateShortcode(
-            $this->Factory->makeMarkupGenerator(),
-            $this->MockAssetLocator,
-            $this->Factory->makeCms(),
-            $this->Factory->makeUserManager(),
-            $this->MockLoginForm,
-            $this->MockRegistrationForm
-        );
-
-        $this->setReturnValue( $this->MockAssetLocator, 'getCurrentPageUrl', $currentUrl );
-        $result = $AuthenticateShortcode->getOutput();
-
-        $this->assertContains( $currentUrl, $result );
-    }
-
     public function testAuthenticateShortcodeRemembersUsernameOnPost() {
         $_POST['login']    = '';
         $_POST['username'] = 'CharlieBrown';
@@ -750,19 +732,6 @@ class TestAuthenticateShortcode extends HfTestCase {
 
         $this->MockedAuthenticateShortcode->attemptLogin();
     }
-    
-    public function testAuthenticateShortcodeTellsUserToChooseSecurePassword() {
-        $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
-
-        $result = $AuthenticateShortcode->getOutput();
-
-        $expectedHtml = '<p class="info"><strong>Important:</strong> Please '
-                . 'choose a secure password. The most secure passwords are '
-                . 'randomly generated. You can do that '
-                . '<a href="https://lastpass.com/generate">here.</a></p>';
-
-        $this->assertContains( $expectedHtml, $result );
-    }
 
     public function testRegistrationTestForErrors() {
         $this->setRegistrationPost();
@@ -847,5 +816,12 @@ class TestAuthenticateShortcode extends HfTestCase {
     public function testUsesRegistrationForm() {
         $this->expectOnce($this->MockRegistrationForm, 'getHtml');
         $this->MockedAuthenticateShortcode->getOutput();
+    }
+
+    public function testUsesRegistrationFormOutput() {
+        $this->setReturnValue($this->MockRegistrationForm, 'getHtml', 'reg form');
+        $shortcode = $this->makeExpressiveAuthenticateShortcode();
+        $output = $shortcode->getOutput();
+        $this->assertContains('reg form', $output);
     }
 }
