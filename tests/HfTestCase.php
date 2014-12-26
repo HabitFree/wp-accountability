@@ -7,23 +7,10 @@ if ( !defined( 'ABSPATH' ) ) {
 //require_once( dirname( dirname( __FILE__ ) ) . '/wp-hf-accountability.php' );
 
 abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
+    private $data = array();
+
     protected $backupGlobals = false;
     protected $Factory;
-
-    protected $MockDatabase;
-    protected $MockMessenger;
-    protected $MockAssetLocator;
-    protected $MockCms;
-    protected $MockSecurity;
-    protected $MockCodeLibrary;
-    protected $MockUserManager;
-    protected $MockGoals;
-    protected $MockMarkupGenerator;
-    protected $MockPartnerListShortcode;
-    protected $MockInvitePartnerShortcode;
-    protected $MockLoginForm;
-    protected $MockRegistrationForm;
-    protected $MockInviteResponseForm;
 
     protected $MockedInvitePartnerShortcode;
     protected $MockedUserManager;
@@ -53,23 +40,37 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     }
 
     private function resetMocks() {
-        $this->MockDatabase               = $this->makeMock( 'HfMysqlDatabase' );
-        $this->MockMessenger              = $this->makeMock( 'HfMailer' );
-        $this->MockAssetLocator           = $this->makeMock( 'HfUrlFinder' );
-        $this->MockCms                    = $this->makeMock( 'HfWordPress' );
-        $this->MockSecurity               = $this->makeMock( 'HfSecurity' );
-        $this->MockCodeLibrary            = $this->makeMock( 'HfPhpLibrary' );
-        $this->MockUserManager            = $this->makeMock( 'HfUserManager' );
-        $this->MockPageLocator            = $this->makeMock( 'HfUrlFinder' );
-        $this->MockGoals                  = $this->makeMock( 'HfGoals' );
-        $this->MockMarkupGenerator        = $this->makeMock( 'HfHtmlGenerator' );
-        $this->MockPartnerListShortcode   = $this->makeMock( 'HfPartnerListShortcode' );
-        $this->MockInvitePartnerShortcode = $this->makeMock( 'HfInvitePartnerShortcode' );
-        $this->MockLoginForm              = $this->makeMock( 'HfLoginForm' );
-        $this->MockRegistrationForm       = $this->makeMock( 'HfRegistrationForm' );
-        $this->MockInviteResponseForm     = $this->makeMock( 'HfInviteResponseForm' );
+//        $this->MockMysqlDatabase               = $this->makeMock( 'HfMysqlDatabase' );
+//        $this->MockMailer              = $this->makeMock( 'HfMailer' );
+//        $this->MockUrlFinder           = $this->makeMock( 'HfUrlFinder' );
+//        $this->MockWordPress                    = $this->makeMock( 'HfWordPress' );
+//        $this->MockSecurity               = $this->makeMock( 'HfSecurity' );
+//        $this->MockPhpLibrary            = $this->makeMock( 'HfPhpLibrary' );
+//        $this->MockUserManager            = $this->makeMock( 'HfUserManager' );
+//        $this->MockPageLocator            = $this->makeMock( 'HfUrlFinder' );
+//        $this->MockGoals                  = $this->makeMock( 'HfGoals' );
+//        $this->MockHtmlGenerator        = $this->makeMock( 'HfHtmlGenerator' );
+//        $this->MockPartnerListShortcode   = $this->makeMock( 'HfPartnerListShortcode' );
+//        $this->MockInvitePartnerShortcode = $this->makeMock( 'HfInvitePartnerShortcode' );
+//        $this->MockLoginForm              = $this->makeMock( 'HfLoginForm' );
+//        $this->MockRegistrationForm       = $this->makeMock( 'HfRegistrationForm' );
+//        $this->MockInviteResponseForm     = $this->makeMock( 'HfInviteResponseForm' );
 
-        $this->setReturnValue( $this->MockCms, 'getDbPrefix', 'wptests_' );
+        $folder = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'classes';
+        print_r($folder . '<br />');
+        foreach ( scandir($folder) as $filename ) {
+            $path = $folder . DIRECTORY_SEPARATOR . $filename;
+            if ( is_file( $path ) ) {
+                $nameExtSplit = explode('.', $filename);
+                $namePrefixSplit = explode('Hf', $nameExtSplit[0]);
+                $propertyName = 'Mock'.$namePrefixSplit[1];
+                print 'prop name';
+                print $nameExtSplit[0];
+                $this->__set($propertyName, $this->makeMock($nameExtSplit[0]));
+            }
+        }
+
+        #$this->setReturnValue( $this->MockWordPress, 'getDbPrefix', 'wptests_' );
     }
 
     private function resetMockedObjects() {
@@ -83,7 +84,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->resetMockedAuthenticateShortcode();
         $this->resetMockedGoals();
         $this->resetMockedManagePartnersShortcode();
-        $this->MockedMarkupGenerator = new HfHtmlGenerator($this->MockCms);
+        $this->MockedMarkupGenerator = new HfHtmlGenerator($this->MockWordPress);
         $this->MockedLoginForm = new HfLoginForm('url');
         $this->MockedRegistrationForm = new HfRegistrationForm('url');
         $this->MockedInviteResponseForm = new HfInviteResponseForm('url');
@@ -99,52 +100,52 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
 
     private function resetMockedUserManager() {
         $this->MockedUserManager = new HfUserManager(
-            $this->MockDatabase,
-            $this->MockMessenger,
-            $this->MockAssetLocator,
-            $this->MockCms,
-            $this->MockCodeLibrary
+            $this->MockMysqlDatabase,
+            $this->MockMailer,
+            $this->MockUrlFinder,
+            $this->MockWordPress,
+            $this->MockPhpLibrary
         );
     }
 
     private function resetMockedMailer() {
         $this->MockedMailer = new HfMailer(
-            $this->MockAssetLocator,
+            $this->MockUrlFinder,
             $this->MockSecurity,
-            $this->MockDatabase,
-            $this->MockCms,
-            $this->MockCodeLibrary
+            $this->MockMysqlDatabase,
+            $this->MockWordPress,
+            $this->MockPhpLibrary
         );
     }
 
     private function resetMockedGoalsShortcode() {
         $this->MockedGoalsShortcode = new HfGoalsShortcode(
             $this->MockUserManager,
-            $this->MockMessenger,
-            $this->MockAssetLocator,
+            $this->MockMailer,
+            $this->MockUrlFinder,
             $this->MockGoals,
             $this->MockSecurity,
-            $this->MockMarkupGenerator,
-            $this->MockCodeLibrary,
-            $this->MockDatabase
+            $this->MockHtmlGenerator,
+            $this->MockPhpLibrary,
+            $this->MockMysqlDatabase
         );
     }
 
     private function resetMockedDatabase() {
         $this->MockedDatabase = new HfMysqlDatabase(
-            $this->MockCms,
-            $this->MockCodeLibrary
+            $this->MockWordPress,
+            $this->MockPhpLibrary
         );
     }
 
     private function resetMockedAssetLocator() {
-        $this->MockedAssetLocator = new HfUrlFinder( $this->MockCms );
+        $this->MockedAssetLocator = new HfUrlFinder( $this->MockWordPress );
     }
 
     private function resetMockedInvitePartnerShortcode() {
         $this->MockedInvitePartnerShortcode = new HfInvitePartnerShortcode(
-            $this->MockAssetLocator,
-            $this->MockMarkupGenerator,
+            $this->MockUrlFinder,
+            $this->MockHtmlGenerator,
             $this->MockUserManager
         );
     }
@@ -152,16 +153,16 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     private function resetMockedPartnerListShortcode() {
         $this->MockedPartnerListShortcode = new HfPartnerListShortcode(
             $this->MockUserManager,
-            $this->MockMarkupGenerator,
-            $this->MockAssetLocator
+            $this->MockHtmlGenerator,
+            $this->MockUrlFinder
         );
     }
 
     private function resetMockedAuthenticateShortcode() {
         $this->MockedAuthenticateShortcode = new HfAuthenticateShortcode(
-            $this->MockMarkupGenerator,
-            $this->MockAssetLocator,
-            $this->MockCms,
+            $this->MockHtmlGenerator,
+            $this->MockUrlFinder,
+            $this->MockWordPress,
             $this->MockUserManager,
             $this->MockLoginForm,
             $this->MockRegistrationForm,
@@ -171,10 +172,10 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
 
     private function resetMockedGoals() {
         $this->MockedGoals = new HfGoals(
-            $this->MockMessenger,
-            $this->MockCms,
-            $this->MockMarkupGenerator,
-            $this->MockDatabase
+            $this->MockMailer,
+            $this->MockWordPress,
+            $this->MockHtmlGenerator,
+            $this->MockMysqlDatabase
         );
     }
 
@@ -291,5 +292,41 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     protected function assertMethodExists($object, $method)
     {
         $this->assertTrue(method_exists($object, $method));
+    }
+
+    public function __set($name, $value)
+    {
+        echo "Setting '$name'\n";
+        $this->data[$name] = $value;
+    }
+
+    public function __get($name)
+    {
+        echo "Getting '$name'\n";
+        if (array_key_exists($name, $this->data)) {
+            return $this->data[$name];
+        }
+
+        $trace = debug_backtrace();
+        trigger_error(
+            'Undefined property via __get(): ' . $name .
+            ' in ' . $trace[0]['file'] .
+            ' on line ' . $trace[0]['line'],
+            E_USER_NOTICE);
+        return null;
+    }
+
+    /**  As of PHP 5.1.0  */
+    public function __isset($name)
+    {
+        echo "Is '$name' set?\n";
+        return isset($this->data[$name]);
+    }
+
+    /**  As of PHP 5.1.0  */
+    public function __unset($name)
+    {
+        echo "Unsetting '$name'\n";
+        unset($this->data[$name]);
     }
 } 
