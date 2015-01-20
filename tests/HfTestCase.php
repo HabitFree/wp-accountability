@@ -87,9 +87,9 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->resetMockedGoals();
         $this->resetMockedManagePartnersShortcode();
         $this->MockedMarkupGenerator = new HfHtmlGenerator($this->MockWordPress);
-        $this->MockedLoginForm = new HfLoginForm('url');
-        $this->MockedRegistrationForm = new HfRegistrationForm('url');
-        $this->MockedInviteResponseForm = new HfInviteResponseForm('url');
+        $this->MockedLoginForm = new HfLoginForm('url', $this->MockHtmlGenerator);
+        $this->MockedRegistrationForm = new HfRegistrationForm('url', $this->MockHtmlGenerator);
+        $this->MockedInviteResponseForm = new HfInviteResponseForm('url', $this->MockHtmlGenerator);
     }
 
     protected function makeMock( $className ) {

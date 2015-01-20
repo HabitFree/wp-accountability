@@ -139,33 +139,43 @@ class HfFactory {
     }
 
     public function makeAdminPanel() {
+        $AssetLocator = $this->makeAssetLocator();
+        $actionUrl = $AssetLocator->getCurrentPageUrl();
+
+        $markupGenerator = $this->makeMarkupGenerator();
         $Messenger    = $this->makeMessenger();
         $AssetLocator = $this->makeAssetLocator();
         $Database     = $this->makeDatabase();
         $UserManager  = $this->makeUserManager();
         $Cms          = $this->makeCms();
 
-        return new HfAdminPanel( $Messenger, $AssetLocator, $Database, $UserManager, $Cms );
+        return new HfAdminPanel( $actionUrl, $markupGenerator, $Messenger, $AssetLocator, $Database, $UserManager, $Cms );
     }
 
     public function makeLoginForm() {
         $AssetLocator = $this->makeAssetLocator();
         $actionUrl = $AssetLocator->getCurrentPageUrl();
 
-        return new HfLoginForm($actionUrl);
+        $markupGenerator = $this->makeMarkupGenerator();
+
+        return new HfLoginForm($actionUrl, $markupGenerator);
     }
 
     public function makeRegistrationForm() {
         $AssetLocator = $this->makeAssetLocator();
         $actionUrl = $AssetLocator->getCurrentPageUrl();
 
-        return new HfRegistrationForm($actionUrl);
+        $markupGenerator = $this->makeMarkupGenerator();
+
+        return new HfRegistrationForm($actionUrl, $markupGenerator);
     }
 
     public function makeInviteResponseForm() {
         $AssetLocator = $this->makeAssetLocator();
         $actionUrl = $AssetLocator->getCurrentPageUrl();
 
-        return new HfInviteResponseForm($actionUrl);
+        $markupGenerator = $this->makeMarkupGenerator();
+
+        return new HfInviteResponseForm($actionUrl, $markupGenerator);
     }
 } 

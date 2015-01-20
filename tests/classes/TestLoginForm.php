@@ -45,7 +45,12 @@ class TestLoginForm extends HfTestCase {
         $haystack              = $this->MockedLoginForm->getOutput();
         $needle                = "<p class='error'>Please enter your username.</p>";
 
-        print $haystack;
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
+    }
+
+    public function testMakesMissingUsernameMessage() {
+        $this->setEmptyLoginPost();
+        $this->expectOnce($this->MockHtmlGenerator, 'makeErrorMessage', array('Please enter your username.'));
+        $this->MockedLoginForm->getOutput();
     }
 }

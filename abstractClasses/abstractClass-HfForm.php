@@ -2,10 +2,13 @@
 
 abstract class HfForm {
     protected $elements;
+    protected $markupGenerator;
 
-    public function __construct($actionUrl) {
+    public function __construct($actionUrl, Hf_iMarkupGenerator $markupGenerator) {
         $this->elements = array();
         $this->elements[] = '<form action="'.$actionUrl.'" method="post">';
+
+        $this->markupGenerator = $markupGenerator;
     }
 
     public function addTextBox($name, $label, $defaultValue, $isRequired) {

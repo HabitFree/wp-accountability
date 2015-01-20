@@ -1,7 +1,7 @@
 <?php
 if (!defined('ABSPATH')) exit;
 
-class HfAdminPanel {
+class HfAdminPanel extends HfForm {
 
     private $Messenger;
     private $PageLocator;
@@ -9,13 +9,18 @@ class HfAdminPanel {
     private $UserManager;
     private $Cms;
 
-    function HfAdminPanel(
+    public function __construct(
+        $actionUrl,
+        Hf_iMarkupGenerator $markupGenerator,
         Hf_iMessenger $Messenger,
         Hf_iAssetLocator $PageLocator,
         Hf_iDatabase $Database,
         Hf_iUserManager $UserManager,
         Hf_iCms $ContentManagementSystem
     ) {
+        $this->elements = array();
+        $this->elements[] = '<form action="'.$actionUrl.'" method="post">';
+
         $this->Cms         = $ContentManagementSystem;
         $this->Database    = $Database;
         $this->PageLocator = $PageLocator;
@@ -54,14 +59,11 @@ class HfAdminPanel {
     }
 
     function generateAdminPanelForm() {
-        $currentURL = $this->PageLocator->getCurrentPageURL();
-        $Form       = new HfGenericForm($currentURL);
+        $this->addSubmitButton('sendTestReportRequestEmail', 'Send test report request email');
+        $this->addSubmitButton('sendTestInvite', 'Send test invite');
+        $this->addSubmitButton('sudoReactivateExtension', 'Sudo reactivate extension');
 
-        $Form->addSubmitButton('sendTestReportRequestEmail', 'Send test report request email');
-        $Form->addSubmitButton('sendTestInvite', 'Send test invite');
-        $Form->addSubmitButton('sudoReactivateExtension', 'Sudo reactivate extension');
-
-        return $Form->getOutput();
+        return $this->getOutput();
     }
 
     function addToAdminHead() {
