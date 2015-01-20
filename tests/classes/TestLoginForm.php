@@ -50,7 +50,24 @@ class TestLoginForm extends HfTestCase {
 
     public function testMakesMissingUsernameMessage() {
         $this->setEmptyLoginPost();
-        $this->expectOnce($this->mockMarkupGenerator, 'makeErrorMessage', array('Please enter your username.'));
+        $this->expectAt($this->mockMarkupGenerator, 'makeErrorMessage', 0, array('Please enter your username.'));
         $this->mockedLoginForm->getOutput();
     }
+
+    public function testMakesMissingPasswordMessage() {
+        $this->setEmptyLoginPost();
+        $this->expectAt($this->mockMarkupGenerator, 'makeErrorMessage', 1, array('Please enter your password.'));
+        $this->mockedLoginForm->getOutput();
+    }
+
+    public function testRequiresPassword() {
+        $this->setEmptyLoginPost();
+
+        $this->setReturnValues($this->mockMarkupGenerator,'makeErrorMessage',array('usernameError','passError'));
+        $haystack              = $this->mockedLoginForm->getOutput();
+
+        $this->assertTrue( $this->haystackContainsNeedle( $haystack, 'passError' ) );
+    }
+
+
 }
