@@ -23,7 +23,7 @@ class HfInvitePartnerShortcode implements Hf_iShortcode {
         $header = $this->MarkupGenerator->makeHeader('Invite Partner', 2);
         $form   = $this->generateForm();
 
-        return $header . $this->messages . $form->getHtml();
+        return $header . $this->messages . $form->getOutput();
     }
 
     private function processForm() {

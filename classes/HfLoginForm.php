@@ -1,7 +1,7 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
 class HfLoginForm extends HfForm {
-    public function getHtml() {
+    public function getOutput() {
         $this->makeForm();
 
         $html = '';

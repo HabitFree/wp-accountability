@@ -2,7 +2,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class HfRegistrationForm extends HfForm {
-    public function getHtml() {
+    public function getOutput() {
         $this->makeForm();
 
         $html = '';

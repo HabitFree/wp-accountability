@@ -27,7 +27,7 @@ class TestRegistrationForm extends HfTestCase {
 
     private function assertRegistrationFormOutputContainsNeedle($needle)
     {
-        $haystack = $this->MockedRegistrationForm->getHtml();
+        $haystack = $this->MockedRegistrationForm->getOutput();
         $this->assertContains($needle, $haystack);
     }
 

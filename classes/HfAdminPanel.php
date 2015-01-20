@@ -61,7 +61,7 @@ class HfAdminPanel {
         $Form->addSubmitButton('sendTestInvite', 'Send test invite');
         $Form->addSubmitButton('sudoReactivateExtension', 'Sudo reactivate extension');
 
-        return $Form->getHtml();
+        return $Form->getOutput();
     }
 
     function addToAdminHead() {

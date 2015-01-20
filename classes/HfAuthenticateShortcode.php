@@ -79,8 +79,8 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
             $activeTabNumber = $this->determineActiveTab();
 
             $tabbedForms = $this->MarkupGenerator->generateTabs( array(
-                'Log In'   => $this->loginMessages . $this->LoginForm->getHtml(),
-                'Register' => $this->registrationMessages . $this->RegistrationForm->getHtml()
+                'Log In'   => $this->loginMessages . $this->LoginForm->getOutput(),
+                'Register' => $this->registrationMessages . $this->RegistrationForm->getOutput()
             ), $activeTabNumber );
 
             $this->output .= $tabbedForms;
@@ -89,7 +89,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     private function makeInviteResponseForm() {
         if ( $this->isInvite() and $this->UserManager->isUserLoggedIn() and !$this->isInviteFormSubmitted() ) {
-            $inviteResponseForm = $this->InviteResponeForm->getHtml();
+            $inviteResponseForm = $this->InviteResponeForm->getOutput();
             $this->output .= $inviteResponseForm;
         }
     }

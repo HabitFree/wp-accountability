@@ -37,7 +37,7 @@ abstract class HfForm {
         $this->elements[] = '<p class="info">'.$message.'</p>';
     }
 
-    public function getHtml() {
+    public function getOutput() {
         $html = '';
         foreach ($this->elements as $element) {
             $html .= $element;

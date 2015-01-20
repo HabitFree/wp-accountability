@@ -13,7 +13,7 @@ class TestGenericForm extends HfTestCase {
 
     public function testFormOuterTags() {
         $Form = new HfGenericForm( 'test.com' );
-        $html = $Form->getHtml();
+        $html = $Form->getOutput();
 
         $this->assertEquals( $html, '<form action="test.com" method="post"></form>' );
     }
@@ -25,7 +25,7 @@ class TestGenericForm extends HfTestCase {
 
         $Form->addTextBox( $name, $label, '', false );
 
-        $html = $Form->getHtml();
+        $html = $Form->getOutput();
 
         $this->assertEquals( $html,
             '<form action="test.com" method="post"><p><label for="test">Hello, there: <input type="text" name="test" value="" /></label></p></form>'
@@ -39,7 +39,7 @@ class TestGenericForm extends HfTestCase {
 
         $Form->addSubmitButton( $name, $label );
 
-        $html = $Form->getHtml();
+        $html = $Form->getOutput();
 
         $this->assertEquals( $html, '<form action="test.com" method="post"><p><input type="submit" name="submit" value="Submit" /></p></form>' );
     }
@@ -48,7 +48,7 @@ class TestGenericForm extends HfTestCase {
         $Form = new HfGenericForm('test.com');
         $Form->addInfoMessage('message');
 
-        $result = $Form->getHtml();
+        $result = $Form->getOutput();
         $expected = '<form action="test.com" method="post"><p class="info">message</p></form>';
 
         $this->assertEquals($expected, $result);

@@ -41,7 +41,7 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testAuthenticateShortcodeIncludesLogInForm() {
-        $this->setReturnValue($this->MockLoginForm,'getHtml','LoginForm');
+        $this->setReturnValue($this->MockLoginForm,'getOutput','LoginForm');
         $auth = $this->makeExpressiveAuthenticateShortcode();
         $result = $auth->getOutput();
         $this->assertContains('LoginForm',$result);
@@ -775,17 +775,17 @@ class TestAuthenticateShortcode extends HfTestCase {
     }
 
     public function testUsesLoginForm() {
-        $this->expectOnce($this->MockLoginForm, 'getHtml');
+        $this->expectOnce($this->MockLoginForm, 'getOutput');
         $this->MockedAuthenticateShortcode->getOutput();
     }
 
     public function testUsesRegistrationForm() {
-        $this->expectOnce($this->MockRegistrationForm, 'getHtml');
+        $this->expectOnce($this->MockRegistrationForm, 'getOutput');
         $this->MockedAuthenticateShortcode->getOutput();
     }
 
     public function testUsesRegistrationFormOutput() {
-        $this->setReturnValue($this->MockRegistrationForm, 'getHtml', 'reg form');
+        $this->setReturnValue($this->MockRegistrationForm, 'getOutput', 'reg form');
         $shortcode = $this->makeExpressiveAuthenticateShortcode();
         $output = $shortcode->getOutput();
         $this->assertContains('reg form', $output);
@@ -794,14 +794,14 @@ class TestAuthenticateShortcode extends HfTestCase {
     public function testGetsInviteResponseFormHtml() {
         $_GET['n'] = '555';
         $this->setReturnValue($this->MockUserManager, 'isUserLoggedIn', True);
-        $this->expectOnce($this->MockInviteResponseForm, 'getHtml');
+        $this->expectOnce($this->MockInviteResponseForm, 'getOutput');
         $this->MockedAuthenticateShortcode->getOutput();
     }
 
     public function testUsesInviteResponseFormOutput() {
         $_GET['n'] = '555';
         $this->setReturnValue($this->MockUserManager, 'isUserLoggedIn', True);
-        $this->setReturnValue($this->MockInviteResponseForm, 'getHtml', 'formOutput');
+        $this->setReturnValue($this->MockInviteResponseForm, 'getOutput', 'formOutput');
         $result = $this->MockedAuthenticateShortcode->getOutput();
         $this->assertContains('formOutput', $result);
     }

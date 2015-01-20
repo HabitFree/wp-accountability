@@ -101,7 +101,7 @@ class HfGoalsShortcode implements Hf_iShortcode {
 
         $AccountabilityForm->populate( $goalSubs );
 
-        return $AccountabilityForm->getHtml();
+        return $AccountabilityForm->getOutput();
     }
 
     private function isRequested() {

@@ -14,7 +14,7 @@ class TestInviteResponseForm extends HfTestCase {
 
     private function assertFormOutputContains($needle)
     {
-        $haystack = $this->MockedInviteResponseForm->getHtml();
+        $haystack = $this->MockedInviteResponseForm->getOutput();
         $this->assertContains($needle, $haystack);
     }
 

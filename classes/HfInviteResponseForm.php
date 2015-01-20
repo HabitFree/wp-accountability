@@ -2,7 +2,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class HfInviteResponseForm extends HfForm {
-    public function getHtml() {
+    public function getOutput() {
         $this->makeForm();
 
         $html = '';
