@@ -89,16 +89,8 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     private function makeInviteResponseForm() {
         if ( $this->isInvite() and $this->UserManager->isUserLoggedIn() and !$this->isInviteFormSubmitted() ) {
-            $currentUrl = $this->AssetLocator->getCurrentPageUrl();
-
-            $Form = new HfGenericForm( $currentUrl );
-            $Form->addInfoMessage( "Looks like you're responding to an invite. What would you like to do?" );
-            $Form->addSubmitButton( 'accept', 'Accept invitation' );
-            $Form->addSubmitButton( 'ignore', 'Ignore invitation' );
-
-            $this->InviteResponeForm->getHtml();
-
-            $this->output .= $Form->getHtml();
+            $inviteResponseForm = $this->InviteResponeForm->getHtml();
+            $this->output .= $inviteResponseForm;
         }
     }
 

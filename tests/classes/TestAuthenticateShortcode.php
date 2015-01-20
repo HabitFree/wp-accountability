@@ -553,17 +553,6 @@ class TestAuthenticateShortcode extends HfTestCase {
         $this->MockedAuthenticateShortcode->getOutput();
     }
 
-    public function testAuthenticationShortcodeCreatesWhenUserLoggedInAndInvited() {
-        $_GET['n'] = 555;
-        $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
-        $this->setReturnValue( $this->MockUrlFinder, 'getCurrentPageUrl', 'here.there' );
-
-        $needle   = '<form action="here.there" method="post">';
-        $haystack = $this->MockedAuthenticateShortcode->getOutput();
-
-        $this->assertContains( $needle, $haystack );
-    }
-
     public function testAuthenticationShortcodeDoesntMentionRegisteringWhenUserLoggedInAndInvited() {
         $_GET['n'] = 555;
         $this->setLoggedInUser();
@@ -596,42 +585,6 @@ class TestAuthenticateShortcode extends HfTestCase {
         );
 
         return $AuthenticateShortcode;
-    }
-
-    public function testAuthenticateShortcodeHasAcceptButton() {
-        $_GET['n'] = 555;
-        $this->setLoggedInUser();
-
-        $AuthenticateShortcode = $this->makeExpressiveAuthenticateShortcode();
-
-        $needle   = '<input type="submit" name="accept" value="Accept invitation" />';
-        $haystack = $AuthenticateShortcode->getOutput();
-
-        $this->assertContains( $needle, $haystack );
-    }
-
-    public function testAuthenticateShortcodeHasIgnoreButton() {
-        $_GET['n'] = 555;
-        $this->setLoggedInUser();
-
-        $AuthenticateShortcode = $this->makeExpressiveAuthenticateShortcode();
-
-        $needle   = '<input type="submit" name="ignore" value="Ignore invitation" />';
-        $haystack = $AuthenticateShortcode->getOutput();
-
-        $this->assertContains( $needle, $haystack );
-    }
-
-    public function testAuthenticateShortcodeDisplaysInviteMessageWhenUserLoggedIn() {
-        $_GET['n'] = 555;
-        $this->setLoggedInUser();
-
-        $AuthenticateShortcode = $this->makeExpressiveAuthenticateShortcode();
-
-        $needle   = '<p class="info">Looks like you\'re responding to an invite. What would you like to do?</p>';
-        $haystack = $AuthenticateShortcode->getOutput();
-
-        $this->assertContains( $needle, $haystack );
     }
 
     public function testAuthenticateShortcodeProcessesInviteWhenLoggedInUserAccepts() {
@@ -843,5 +796,13 @@ class TestAuthenticateShortcode extends HfTestCase {
         $this->setReturnValue($this->MockUserManager, 'isUserLoggedIn', True);
         $this->expectOnce($this->MockInviteResponseForm, 'getHtml');
         $this->MockedAuthenticateShortcode->getOutput();
+    }
+
+    public function testUsesInviteResponseFormOutput() {
+        $_GET['n'] = '555';
+        $this->setReturnValue($this->MockUserManager, 'isUserLoggedIn', True);
+        $this->setReturnValue($this->MockInviteResponseForm, 'getHtml', 'formOutput');
+        $result = $this->MockedAuthenticateShortcode->getOutput();
+        $this->assertContains('formOutput', $result);
     }
 }
