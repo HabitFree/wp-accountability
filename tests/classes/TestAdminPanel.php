@@ -14,7 +14,7 @@ class TestAdminPanel extends HfTestCase {
         $UserManager  = $this->makeMock( 'HfUserManager' );
         $Cms          = $this->makeMock( 'HfWordPress' );
 
-        $AdminPanel = new HfAdminPanel( 'test.com', $this->MockHtmlGenerator, $Mailer, $URLFinder, $DbConnection, $UserManager, $Cms );
+        $AdminPanel = new HfAdminPanel( 'test.com', $this->mockMarkupGenerator, $Mailer, $URLFinder, $DbConnection, $UserManager, $Cms );
 
         $expectedHtml = '<form action="test.com" method="post"><p><input type="submit" name="sendTestReportRequestEmail" value="Send test report request email" /></p><p><input type="submit" name="sendTestInvite" value="Send test invite" /></p><p><input type="submit" name="sudoReactivateExtension" value="Sudo reactivate extension" /></p></form>';
         $resultHtml   = $AdminPanel->generateAdminPanelForm();

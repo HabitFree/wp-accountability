@@ -160,7 +160,7 @@ class TestGoals extends HfTestCase {
         $this->setReturnValsForGoalCardCreation();
         $MockSub = $this->makeMockGoalSub();
 
-        $this->expectOnce($this->MockHtmlGenerator, 'makeGoalCard', array(
+        $this->expectOnce($this->mockMarkupGenerator, 'makeGoalCard', array(
             'Title',
             'Description',
             1,
@@ -178,7 +178,7 @@ class TestGoals extends HfTestCase {
     public function testReturnsHtmlGeneratorMadeGoalCard() {
         $this->setReturnValsForGoalCardCreation();
         $MockSub = $this->makeMockGoalSub();
-        $this->setReturnValue($this->MockHtmlGenerator, 'makeGoalCard', 'goose');
+        $this->setReturnValue($this->mockMarkupGenerator, 'makeGoalCard', 'goose');
 
         $result = $this->MockedGoals->generateGoalCard($MockSub);
 

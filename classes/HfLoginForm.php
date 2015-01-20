@@ -35,7 +35,7 @@ class HfLoginForm extends HfForm {
     {
         if (empty($_POST['username'])) {
             $error = $this->markupGenerator->makeErrorMessage('Please enter your username.');
-            array_unshift($this->elements, "<p class='error'>Please enter your username.</p>");
+            array_unshift($this->elements, $error);
         }
     }
 } 

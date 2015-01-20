@@ -21,7 +21,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     protected $MockUserManager;
     protected $MockPageLocator;
     protected $MockGoals;
-    protected $MockHtmlGenerator;
+    protected $mockMarkupGenerator;
     protected $MockPartnerListShortcode;
     protected $MockInvitePartnerShortcode;
     protected $MockLoginForm;
@@ -39,7 +39,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     protected $MockedGoals;
     protected $MockedManagePartnersShortcode;
     protected $MockedMarkupGenerator;
-    protected $MockedLoginForm;
+    protected $mockedLoginForm;
     protected $MockedRegistrationForm;
     protected $MockedInviteResponseForm;
 
@@ -65,7 +65,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->MockUserManager            = $this->makeMock( 'HfUserManager' );
         $this->MockPageLocator            = $this->makeMock( 'HfUrlFinder' );
         $this->MockGoals                  = $this->makeMock( 'HfGoals' );
-        $this->MockHtmlGenerator        = $this->makeMock( 'HfHtmlGenerator' );
+        $this->mockMarkupGenerator        = $this->makeMock( 'HfHtmlGenerator' );
         $this->MockPartnerListShortcode   = $this->makeMock( 'HfPartnerListShortcode' );
         $this->MockInvitePartnerShortcode = $this->makeMock( 'HfInvitePartnerShortcode' );
         $this->MockLoginForm              = $this->makeMock( 'HfLoginForm' );
@@ -87,9 +87,9 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->resetMockedGoals();
         $this->resetMockedManagePartnersShortcode();
         $this->MockedMarkupGenerator = new HfHtmlGenerator($this->MockWordPress);
-        $this->MockedLoginForm = new HfLoginForm('url', $this->MockHtmlGenerator);
-        $this->MockedRegistrationForm = new HfRegistrationForm('url', $this->MockHtmlGenerator);
-        $this->MockedInviteResponseForm = new HfInviteResponseForm('url', $this->MockHtmlGenerator);
+        $this->mockedLoginForm = new HfLoginForm('url', $this->mockMarkupGenerator);
+        $this->MockedRegistrationForm = new HfRegistrationForm('url', $this->mockMarkupGenerator);
+        $this->MockedInviteResponseForm = new HfInviteResponseForm('url', $this->mockMarkupGenerator);
     }
 
     protected function makeMock( $className ) {
@@ -127,7 +127,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
             $this->MockUrlFinder,
             $this->MockGoals,
             $this->MockSecurity,
-            $this->MockHtmlGenerator,
+            $this->mockMarkupGenerator,
             $this->MockPhpLibrary,
             $this->MockMysqlDatabase
         );
@@ -147,7 +147,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     private function resetMockedInvitePartnerShortcode() {
         $this->MockedInvitePartnerShortcode = new HfInvitePartnerShortcode(
             $this->MockUrlFinder,
-            $this->MockHtmlGenerator,
+            $this->mockMarkupGenerator,
             $this->MockUserManager
         );
     }
@@ -155,14 +155,14 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     private function resetMockedPartnerListShortcode() {
         $this->MockedPartnerListShortcode = new HfPartnerListShortcode(
             $this->MockUserManager,
-            $this->MockHtmlGenerator,
+            $this->mockMarkupGenerator,
             $this->MockUrlFinder
         );
     }
 
     private function resetMockedAuthenticateShortcode() {
         $this->MockedAuthenticateShortcode = new HfAuthenticateShortcode(
-            $this->MockHtmlGenerator,
+            $this->mockMarkupGenerator,
             $this->MockUrlFinder,
             $this->MockWordPress,
             $this->MockUserManager,
@@ -176,7 +176,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->MockedGoals = new HfGoals(
             $this->MockMailer,
             $this->MockWordPress,
-            $this->MockHtmlGenerator,
+            $this->mockMarkupGenerator,
             $this->MockMysqlDatabase
         );
     }

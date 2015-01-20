@@ -12,14 +12,14 @@ class TestGenericForm extends HfTestCase {
     }
 
     public function testFormOuterTags() {
-        $Form = new HfGenericForm( 'test.com', $this->MockHtmlGenerator );
+        $Form = new HfGenericForm( 'test.com', $this->mockMarkupGenerator );
         $html = $Form->getOutput();
 
         $this->assertEquals( $html, '<form action="test.com" method="post"></form>' );
     }
 
     public function testAddTextBoxInputToForm() {
-        $Form  = new HfGenericForm( 'test.com', $this->MockHtmlGenerator );
+        $Form  = new HfGenericForm( 'test.com', $this->mockMarkupGenerator );
         $name  = 'test';
         $label = 'Hello, there';
 
@@ -33,7 +33,7 @@ class TestGenericForm extends HfTestCase {
     }
 
     public function testAddSubmitButton() {
-        $Form  = new HfGenericForm( 'test.com', $this->MockHtmlGenerator );
+        $Form  = new HfGenericForm( 'test.com', $this->mockMarkupGenerator );
         $name  = 'submit';
         $label = 'Submit';
 
@@ -45,7 +45,7 @@ class TestGenericForm extends HfTestCase {
     }
 
     public function testAddInfoBox() {
-        $Form = new HfGenericForm('test.com', $this->MockHtmlGenerator);
+        $Form = new HfGenericForm('test.com', $this->mockMarkupGenerator);
         $Form->addInfoMessage('message');
 
         $result = $Form->getOutput();

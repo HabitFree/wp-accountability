@@ -271,7 +271,7 @@ class TestGoalsShortcode extends HfTestCase {
 
         $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
 
-        $this->expectOnce( $this->MockHtmlGenerator, 'makeSuccessMessage', array('Thanks for checking in!') );
+        $this->expectOnce( $this->mockMarkupGenerator, 'makeSuccessMessage', array('Thanks for checking in!') );
 
         $this->MockedGoalsShortcode->getOutput();
     }
@@ -283,7 +283,7 @@ class TestGoalsShortcode extends HfTestCase {
         $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
         $this->setReturnValue($this->MockMysqlDatabase, 'getQuotations', 'duck');
 
-        $this->expectOnce($this->MockHtmlGenerator, 'makeQuoteMessage');
+        $this->expectOnce($this->mockMarkupGenerator, 'makeQuoteMessage');
 
         $this->MockedGoalsShortcode->getOutput();
     }
@@ -295,7 +295,7 @@ class TestGoalsShortcode extends HfTestCase {
         $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
         $this->setReturnValue($this->MockMysqlDatabase, 'getQuotations', array($this->makeMockQuotation()));
 
-        $this->expectOnce($this->MockHtmlGenerator, 'makeQuoteMessage', array($this->makeMockQuotation()));
+        $this->expectOnce($this->mockMarkupGenerator, 'makeQuoteMessage', array($this->makeMockQuotation()));
 
         $this->MockedGoalsShortcode->getOutput();
     }
@@ -342,7 +342,7 @@ class TestGoalsShortcode extends HfTestCase {
         $this->setReturnValue( $this->MockUserManager, 'isUserLoggedIn', true );
         $this->setReturnValue($this->MockMysqlDatabase, 'getQuotations', array());
 
-        $this->expectNever($this->MockHtmlGenerator, 'makeQuoteMessage');
+        $this->expectNever($this->mockMarkupGenerator, 'makeQuoteMessage');
 
         $this->MockedGoalsShortcode->getOutput();
     }
