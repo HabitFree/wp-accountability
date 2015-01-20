@@ -31,4 +31,21 @@ class TestLoginForm extends HfTestCase {
         $needle = '<p><label for="username"><span class="required">*</span> Username: <input type="text" name="username" value="duck" required /></label></p>';
         $this->assertContains($needle,$haystack);
     }
+
+    private function setEmptyLoginPost()
+    {
+        $_POST['login'] = '';
+        $_POST['username'] = '';
+        $_POST['password'] = '';
+    }
+
+    public function testRequiresLogInUsername() {
+        $this->setEmptyLoginPost();
+
+        $haystack              = $this->MockedLoginForm->getOutput();
+        $needle                = "<p class='error'>Please enter your username.</p>";
+
+        print $haystack;
+        $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
+    }
 }

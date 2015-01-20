@@ -3,6 +3,9 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class HfLoginForm extends HfForm {
     public function getOutput() {
         $this->makeForm();
+        if (empty($_POST['username'])) {
+            array_unshift($this->elements, "<p class='error'>Please enter your username.</p>");
+        }
         $html = $this->getElementsAsString();
         return $html;
     }
