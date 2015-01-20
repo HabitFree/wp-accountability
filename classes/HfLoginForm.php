@@ -3,12 +3,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class HfLoginForm extends HfForm {
     public function getOutput() {
         $this->makeForm();
-
-        $html = '';
-        foreach ($this->elements as $element) {
-            $html .= $element;
-        }
-        $html .= '</form>';
+        $html = $this->getElementsAsString();
         return $html;
     }
 
@@ -23,5 +18,15 @@ class HfLoginForm extends HfForm {
     {
         $username = (isset($_POST['username']) ? $_POST['username'] : '');
         $this->addTextBox('username', 'Username', $username, true);
+    }
+
+    private function getElementsAsString()
+    {
+        $html = '';
+        foreach ($this->elements as $element) {
+            $html .= $element;
+        }
+        $html .= '</form>';
+        return $html;
     }
 } 
