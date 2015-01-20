@@ -12,6 +12,22 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     protected $backupGlobals = false;
     protected $Factory;
 
+    protected $MockMysqlDatabase;
+    protected $MockMailer;
+    protected $MockUrlFinder;
+    protected $MockWordPress;
+    protected $MockSecurity;
+    protected $MockPhpLibrary;
+    protected $MockUserManager;
+    protected $MockPageLocator;
+    protected $MockGoals;
+    protected $MockHtmlGenerator;
+    protected $MockPartnerListShortcode;
+    protected $MockInvitePartnerShortcode;
+    protected $MockLoginForm;
+    protected $MockRegistrationForm;
+    protected $MockInviteResponseForm;
+
     protected $MockedInvitePartnerShortcode;
     protected $MockedUserManager;
     protected $MockedMailer;
@@ -40,37 +56,23 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     }
 
     private function resetMocks() {
-//        $this->MockMysqlDatabase               = $this->makeMock( 'HfMysqlDatabase' );
-//        $this->MockMailer              = $this->makeMock( 'HfMailer' );
-//        $this->MockUrlFinder           = $this->makeMock( 'HfUrlFinder' );
-//        $this->MockWordPress                    = $this->makeMock( 'HfWordPress' );
-//        $this->MockSecurity               = $this->makeMock( 'HfSecurity' );
-//        $this->MockPhpLibrary            = $this->makeMock( 'HfPhpLibrary' );
-//        $this->MockUserManager            = $this->makeMock( 'HfUserManager' );
-//        $this->MockPageLocator            = $this->makeMock( 'HfUrlFinder' );
-//        $this->MockGoals                  = $this->makeMock( 'HfGoals' );
-//        $this->MockHtmlGenerator        = $this->makeMock( 'HfHtmlGenerator' );
-//        $this->MockPartnerListShortcode   = $this->makeMock( 'HfPartnerListShortcode' );
-//        $this->MockInvitePartnerShortcode = $this->makeMock( 'HfInvitePartnerShortcode' );
-//        $this->MockLoginForm              = $this->makeMock( 'HfLoginForm' );
-//        $this->MockRegistrationForm       = $this->makeMock( 'HfRegistrationForm' );
-//        $this->MockInviteResponseForm     = $this->makeMock( 'HfInviteResponseForm' );
+        $this->MockMysqlDatabase               = $this->makeMock( 'HfMysqlDatabase' );
+        $this->MockMailer              = $this->makeMock( 'HfMailer' );
+        $this->MockUrlFinder           = $this->makeMock( 'HfUrlFinder' );
+        $this->MockWordPress                    = $this->makeMock( 'HfWordPress' );
+        $this->MockSecurity               = $this->makeMock( 'HfSecurity' );
+        $this->MockPhpLibrary            = $this->makeMock( 'HfPhpLibrary' );
+        $this->MockUserManager            = $this->makeMock( 'HfUserManager' );
+        $this->MockPageLocator            = $this->makeMock( 'HfUrlFinder' );
+        $this->MockGoals                  = $this->makeMock( 'HfGoals' );
+        $this->MockHtmlGenerator        = $this->makeMock( 'HfHtmlGenerator' );
+        $this->MockPartnerListShortcode   = $this->makeMock( 'HfPartnerListShortcode' );
+        $this->MockInvitePartnerShortcode = $this->makeMock( 'HfInvitePartnerShortcode' );
+        $this->MockLoginForm              = $this->makeMock( 'HfLoginForm' );
+        $this->MockRegistrationForm       = $this->makeMock( 'HfRegistrationForm' );
+        $this->MockInviteResponseForm     = $this->makeMock( 'HfInviteResponseForm' );
 
-        $folder = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'classes';
-        print_r($folder . '<br />');
-        foreach ( scandir($folder) as $filename ) {
-            $path = $folder . DIRECTORY_SEPARATOR . $filename;
-            if ( is_file( $path ) ) {
-                $nameExtSplit = explode('.', $filename);
-                $namePrefixSplit = explode('Hf', $nameExtSplit[0]);
-                $propertyName = 'Mock'.$namePrefixSplit[1];
-                print 'prop name';
-                print $nameExtSplit[0];
-                $this->__set($propertyName, $this->makeMock($nameExtSplit[0]));
-            }
-        }
-
-        #$this->setReturnValue( $this->MockWordPress, 'getDbPrefix', 'wptests_' );
+        $this->setReturnValue( $this->MockWordPress, 'getDbPrefix', 'wptests_' );
     }
 
     private function resetMockedObjects() {
@@ -292,41 +294,5 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     protected function assertMethodExists($object, $method)
     {
         $this->assertTrue(method_exists($object, $method));
-    }
-
-    public function __set($name, $value)
-    {
-        echo "Setting '$name'\n";
-        $this->data[$name] = $value;
-    }
-
-    public function __get($name)
-    {
-        echo "Getting '$name'\n";
-        if (array_key_exists($name, $this->data)) {
-            return $this->data[$name];
-        }
-
-        $trace = debug_backtrace();
-        trigger_error(
-            'Undefined property via __get(): ' . $name .
-            ' in ' . $trace[0]['file'] .
-            ' on line ' . $trace[0]['line'],
-            E_USER_NOTICE);
-        return null;
-    }
-
-    /**  As of PHP 5.1.0  */
-    public function __isset($name)
-    {
-        echo "Is '$name' set?\n";
-        return isset($this->data[$name]);
-    }
-
-    /**  As of PHP 5.1.0  */
-    public function __unset($name)
-    {
-        echo "Unsetting '$name'\n";
-        unset($this->data[$name]);
     }
 } 

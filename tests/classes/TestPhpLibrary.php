@@ -7,7 +7,7 @@ class TestPhpLibrary extends HfTestCase {
     // Helper Functions
 
     public function helperTestMethodExists($methodName) {
-        $this->assertTrue( method_exists( $this->MockCodeLibrary, $methodName ) );
+        $this->assertTrue( method_exists( $this->MockPhpLibrary, $methodName ) );
     }
 
     // Tests

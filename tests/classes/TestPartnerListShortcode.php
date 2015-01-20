@@ -43,7 +43,7 @@ class TestPartnerListShortcode extends HfTestCase {
         $PartnerListShortcode = new HfPartnerListShortcode(
             $this->MockUserManager,
             $this->Factory->makeMarkupGenerator(),
-            $this->MockAssetLocator
+            $this->MockUrlFinder
         );
 
         return $PartnerListShortcode;
@@ -51,7 +51,7 @@ class TestPartnerListShortcode extends HfTestCase {
 
     public function testPartnerListShortcodeGeneratesList() {
         $this->setReturnValue( $this->MockUserManager, 'getPartners', array() );
-        $this->expectOnce( $this->MockMarkupGenerator, 'makeList' );
+        $this->expectOnce( $this->MockHtmlGenerator, 'makeList' );
         $this->MockedPartnerListShortcode->getOutput();
     }
 
@@ -71,19 +71,19 @@ class TestPartnerListShortcode extends HfTestCase {
 
     public function testShortcodeGetsCurrentPageUrl() {
         $this->setDefaultReturnValues();
-        $this->expectOnce( $this->MockAssetLocator, 'getCurrentPageUrl' );
+        $this->expectOnce( $this->MockUrlFinder, 'getCurrentPageUrl' );
         $this->MockedPartnerListShortcode->getOutput();
     }
 
     public function testShortcodeMakesForm() {
         $this->setDefaultReturnValues();
-        $this->expectOnce( $this->MockMarkupGenerator, 'makeForm' );
+        $this->expectOnce( $this->MockHtmlGenerator, 'makeForm' );
         $this->MockedPartnerListShortcode->getOutput();
     }
 
     public function testShortcodeReturnsForm() {
         $this->setDefaultReturnValues();
-        $this->setReturnValue( $this->MockMarkupGenerator, 'makeForm', 'duck' );
+        $this->setReturnValue( $this->MockHtmlGenerator, 'makeForm', 'duck' );
         $actual   = $this->MockedPartnerListShortcode->getOutput();
         $expected = 'duck';
         $this->assertEquals( $expected, $actual );

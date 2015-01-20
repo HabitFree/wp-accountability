@@ -6,21 +6,21 @@ class TestUrlFinder extends HfTestCase {
     // Helper Functions
 
 
-    private function makeMockCmsReturnMockPage() {
+    private function makeMockWordPressReturnMockPage() {
         $MockPage     = new stdClass();
         $MockPage->ID = 5;
-        $this->setReturnValue( $this->MockCms, 'getPageByTitle', $MockPage );
+        $this->setReturnValue( $this->MockWordPress, 'getPageByTitle', $MockPage );
     }
 
     private function setDefaultCmsReturnValues() {
-        $this->makeMockCmsReturnMockPage();
-        $this->setReturnValue( $this->MockCms, 'getPermalink', 'www.site.com/page' );
+        $this->makeMockWordPressReturnMockPage();
+        $this->setReturnValue( $this->MockWordPress, 'getPermalink', 'www.site.com/page' );
     }
     
     // Tests
     
     public function testGetHomePageUrl() {
-        $this->setReturnValue($this->MockCms, 'getHomeUrl', 'thePond');
+        $this->setReturnValue($this->MockWordPress, 'getHomeUrl', 'thePond');
         $actual = $this->MockedAssetLocator->getHomePageUrl();
 
         $this->assertEquals('thePond', $actual);
@@ -29,8 +29,8 @@ class TestUrlFinder extends HfTestCase {
     public function testGetPageUrlByTitleUsesCms() {
         $this->setDefaultCmsReturnValues();
 
-        $this->expectOnce($this->MockCms, 'getPageByTitle', array('test'));
-        $this->expectOnce($this->MockCms, 'getPermalink', array(5));
+        $this->expectOnce($this->MockWordPress, 'getPageByTitle', array('test'));
+        $this->expectOnce($this->MockWordPress, 'getPermalink', array(5));
 
         $actual = $this->MockedAssetLocator->getPageUrlByTitle('test');
 

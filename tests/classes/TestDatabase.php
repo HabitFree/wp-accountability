@@ -171,8 +171,8 @@ class TestDatabase extends HfTestCase {
 
     public function testDaysSinceLastEmail() {
         $this->setReturnValue( $this->MockWordPress, 'getVar', '2014-05-27 16:04:29' );
-        $this->setReturnValue( $this->MockCodeLibrary, 'convertStringToTime', 1401224669.0 );
-        $this->setReturnValue( $this->MockCodeLibrary, 'getCurrentTime', 1401483869.0 );
+        $this->setReturnValue( $this->MockPhpLibrary, 'convertStringToTime', 1401224669.0 );
+        $this->setReturnValue( $this->MockPhpLibrary, 'getCurrentTime', 1401483869.0 );
 
         $result = $this->MockedDatabase->daysSinceLastEmail( 1 );
 
