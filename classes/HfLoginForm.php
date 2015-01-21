@@ -33,11 +33,20 @@ class HfLoginForm extends HfForm {
 
     private function validateForm()
     {
+        $this->validateUsername();
+        $this->validatePassword();
+    }
+
+    private function validateUsername()
+    {
         if (empty($_POST['username'])) {
             $error = $this->markupGenerator->makeErrorMessage('Please enter your username.');
             array_unshift($this->elements, $error);
         }
+    }
 
+    private function validatePassword()
+    {
         if (empty($_POST['password'])) {
             $error = $this->markupGenerator->makeErrorMessage('Please enter your password.');
             array_unshift($this->elements, $error);
