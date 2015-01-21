@@ -11,9 +11,6 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     private $LoginForm;
 
-    private $username;
-    private $email;
-
     private $loginMessages;
     private $registrationMessages;
     private $output;
@@ -40,7 +37,6 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     public function getOutput() {
-        $this->recallPostData();
         $this->validateForms();
         $this->processSubmissions();
 
@@ -50,16 +46,6 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         $this->displayLoginAndRegistrationSuccessMessages();
 
         return $this->output;
-    }
-
-    private function recallPostData() {
-        if ( $this->isRegistering() or $this->isLoggingIn() ) {
-            $this->username = $_POST['username'];
-        }
-
-        if ( $this->isRegistering() ) {
-            $this->email = $_POST['email'];
-        }
     }
 
     private function validateForms() {
