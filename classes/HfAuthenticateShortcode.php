@@ -63,7 +63,6 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     private function validateForms() {
-        $this->validateLoginForm();
         $this->validateRegistrationForm();
     }
 
@@ -106,14 +105,6 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     private function isLoggingIn() {
         return isset( $_POST['login'] );
-    }
-
-    private function validateLoginForm() {
-        if ( $this->isLoggingIn() ) {
-            $this->loginMessages .=
-                $this->missingUsernameError() .
-                $this->missingPasswordError();
-        }
     }
 
     private function validateRegistrationForm() {

@@ -247,16 +247,6 @@ class TestAuthenticateShortcode extends HfTestCase {
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }
 
-    public function testAuthenticateShortcodeRequiresPassword() {
-        $this->setEmptyLoginPost();
-
-        $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
-        $haystack              = $AuthenticateShortcode->getOutput();
-        $needle                = "<p class='error'>Please enter your password.</p>";
-
-        $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
-    }
-
     public function testAuthenticateShortcodeAttemptsLogIn() {
         $this->setLoginPost();
 
