@@ -69,5 +69,11 @@ class TestLoginForm extends HfTestCase {
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, 'passError' ) );
     }
 
-
+    public function testAttemptsLogin() {
+        $_POST['login'] = '';
+        $_POST['username'] = 'user';
+        $_POST['password'] = 'pass';
+        $this->expectOnce($this->mockCms, 'authenticateUser', array('user','pass'));
+        $this->mockedLoginForm->getOutput();
+    }
 }

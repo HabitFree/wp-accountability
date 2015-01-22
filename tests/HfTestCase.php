@@ -15,7 +15,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     protected $MockMysqlDatabase;
     protected $MockMailer;
     protected $MockUrlFinder;
-    protected $MockWordPress;
+    protected $mockCms;
     protected $MockSecurity;
     protected $MockPhpLibrary;
     protected $MockUserManager;
@@ -59,7 +59,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->MockMysqlDatabase               = $this->makeMock( 'HfMysqlDatabase' );
         $this->MockMailer              = $this->makeMock( 'HfMailer' );
         $this->MockUrlFinder           = $this->makeMock( 'HfUrlFinder' );
-        $this->MockWordPress                    = $this->makeMock( 'HfWordPress' );
+        $this->mockCms                    = $this->makeMock( 'HfWordPress' );
         $this->MockSecurity               = $this->makeMock( 'HfSecurity' );
         $this->MockPhpLibrary            = $this->makeMock( 'HfPhpLibrary' );
         $this->MockUserManager            = $this->makeMock( 'HfUserManager' );
@@ -72,7 +72,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->MockRegistrationForm       = $this->makeMock( 'HfRegistrationForm' );
         $this->MockInviteResponseForm     = $this->makeMock( 'HfInviteResponseForm' );
 
-        $this->setReturnValue( $this->MockWordPress, 'getDbPrefix', 'wptests_' );
+        $this->setReturnValue( $this->mockCms, 'getDbPrefix', 'wptests_' );
     }
 
     private function resetMockedObjects() {
@@ -86,8 +86,8 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->resetMockedAuthenticateShortcode();
         $this->resetMockedGoals();
         $this->resetMockedManagePartnersShortcode();
-        $this->MockedMarkupGenerator = new HfHtmlGenerator($this->MockWordPress);
-        $this->mockedLoginForm = new HfLoginForm('url', $this->mockMarkupGenerator);
+        $this->MockedMarkupGenerator = new HfHtmlGenerator($this->mockCms);
+        $this->mockedLoginForm = new HfLoginForm('url', $this->mockMarkupGenerator, $this->mockCms);
         $this->MockedRegistrationForm = new HfRegistrationForm('url', $this->mockMarkupGenerator);
         $this->MockedInviteResponseForm = new HfInviteResponseForm('url', $this->mockMarkupGenerator);
     }
@@ -105,7 +105,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
             $this->MockMysqlDatabase,
             $this->MockMailer,
             $this->MockUrlFinder,
-            $this->MockWordPress,
+            $this->mockCms,
             $this->MockPhpLibrary
         );
     }
@@ -115,7 +115,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
             $this->MockUrlFinder,
             $this->MockSecurity,
             $this->MockMysqlDatabase,
-            $this->MockWordPress,
+            $this->mockCms,
             $this->MockPhpLibrary
         );
     }
@@ -135,13 +135,13 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
 
     private function resetMockedDatabase() {
         $this->MockedDatabase = new HfMysqlDatabase(
-            $this->MockWordPress,
+            $this->mockCms,
             $this->MockPhpLibrary
         );
     }
 
     private function resetMockedAssetLocator() {
-        $this->MockedAssetLocator = new HfUrlFinder( $this->MockWordPress );
+        $this->MockedAssetLocator = new HfUrlFinder( $this->mockCms );
     }
 
     private function resetMockedInvitePartnerShortcode() {
@@ -164,7 +164,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->MockedAuthenticateShortcode = new HfAuthenticateShortcode(
             $this->mockMarkupGenerator,
             $this->MockUrlFinder,
-            $this->MockWordPress,
+            $this->mockCms,
             $this->MockUserManager,
             $this->MockLoginForm,
             $this->MockRegistrationForm,
@@ -175,7 +175,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     private function resetMockedGoals() {
         $this->MockedGoals = new HfGoals(
             $this->MockMailer,
-            $this->MockWordPress,
+            $this->mockCms,
             $this->mockMarkupGenerator,
             $this->MockMysqlDatabase
         );

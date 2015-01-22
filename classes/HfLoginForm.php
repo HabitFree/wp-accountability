@@ -1,7 +1,18 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
 class HfLoginForm extends HfForm {
+    private $cms;
+
+    public function __construct($actionUrl, Hf_iMarkupGenerator $markupGenerator, Hf_iCms $cms) {
+        $this->elements = array();
+        $this->elements[] = '<form action="'.$actionUrl.'" method="post">';
+
+        $this->markupGenerator = $markupGenerator;
+        $this->cms = $cms;
+    }
+
     public function getOutput() {
+        $this->attemptLogin();
         $this->makeForm();
         $this->validateForm();
         $html = $this->getElementsAsString();
@@ -50,6 +61,13 @@ class HfLoginForm extends HfForm {
         if (empty($_POST['password'])) {
             $error = $this->markupGenerator->makeErrorMessage('Please enter your password.');
             array_unshift($this->elements, $error);
+        }
+    }
+
+    private function attemptLogin()
+    {
+        if (isset($_POST['username']) && isset($_POST['password'])) {
+            $this->cms->authenticateUser($_POST['username'], $_POST['password']);
         }
     }
 } 

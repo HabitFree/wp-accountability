@@ -16,7 +16,7 @@ class TestGoals extends HfTestCase {
 
     private function setMockReturns() {
         $mockUsers = $this->makeMockUsers();
-        $this->setReturnValue( $this->MockWordPress, 'getSubscribedUsers', $mockUsers );
+        $this->setReturnValue( $this->mockCms, 'getSubscribedUsers', $mockUsers );
 
         $mockGoalSubs = $this->makeMockGoalSubs();
         $this->setReturnValue( $this->MockMysqlDatabase, 'getGoalSubscriptions', $mockGoalSubs );

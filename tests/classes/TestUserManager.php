@@ -76,7 +76,7 @@ class TestUserManager extends HfTestCase {
 
     public function testProcessAllUsersDoesntSendEmails() {
         $users = $this->makeMockUsers();
-        $this->setReturnValue($this->MockWordPress, 'getUsers', $users);
+        $this->setReturnValue($this->mockCms, 'getUsers', $users);
 
         $this->expectNever($this->MockMailer, 'sendEmailToUser');
         $this->MockedUserManager->processAllUsers();
@@ -84,15 +84,15 @@ class TestUserManager extends HfTestCase {
 
     public function testProcessAllUsersGetsUsers() {
         $users = $this->makeMockUsers();
-        $this->setReturnValue($this->MockWordPress, 'getUsers', $users);
+        $this->setReturnValue($this->mockCms, 'getUsers', $users);
 
-        $this->expectOnce($this->MockWordPress, 'getUsers');
+        $this->expectOnce($this->mockCms, 'getUsers');
         $this->MockedUserManager->processAllUsers();
     }
 
     public function testProcessAllUsersSetsDefaultGoalSubscriptions() {
         $users = $this->makeMockUsers();
-        $this->setReturnValue($this->MockWordPress, 'getUsers', $users);
+        $this->setReturnValue($this->mockCms, 'getUsers', $users);
 
         $this->expectAtLeastOnce($this->MockMysqlDatabase, 'setDefaultGoalSubscription', array(7));
         $this->MockedUserManager->processAllUsers();

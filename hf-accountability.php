@@ -55,7 +55,6 @@ $HfUserManager           = $HfFactory->makeUserManager();
 $HfAdminPanel            = $HfFactory->makeAdminPanel();
 $HfAuthenticateShortcode = $HfFactory->makeAuthenticateShortcode();
 
-add_action( 'after_setup_theme', array( $HfAuthenticateShortcode, 'attemptLogin' ) );
 add_action( 'hfEmailCronHook', array( $HfGoals, 'sendReportRequestEmails' ) );
 add_action( 'user_register', array( $HfUserManager, 'processNewUser' ) );
 add_action( 'admin_menu', array( $HfAdminPanel, 'registerAdminPanel' ) );

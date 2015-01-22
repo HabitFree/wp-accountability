@@ -31,8 +31,8 @@ class TestMailer extends HfTestCase {
     // Tests
 
     public function testSendEmailByUserID() {
-        $this->setReturnValue( $this->MockWordPress, 'getVar', 5 );
-        $this->setReturnValue( $this->MockWordPress, 'getUserEmail', 'me@test.com' );
+        $this->setReturnValue( $this->mockCms, 'getVar', 5 );
+        $this->setReturnValue( $this->mockCms, 'getUserEmail', 'me@test.com' );
 
         $this->expectAtLeastOnce( $this->MockMysqlDatabase, 'recordEmail', array(1, 'test', 'test', 5, 'me@test.com') );
 
@@ -40,8 +40,8 @@ class TestMailer extends HfTestCase {
     }
 
     public function testSendEmailToUserAndSpecifyEmailID() {
-        $this->setReturnValue( $this->MockWordPress, 'sendWpEmail', true );
-        $this->setReturnValue( $this->MockWordPress, 'getUserEmail', 'me@test.com' );
+        $this->setReturnValue( $this->mockCms, 'sendWpEmail', true );
+        $this->setReturnValue( $this->mockCms, 'getUserEmail', 'me@test.com' );
 
         $this->expectAtLeastOnce( $this->MockMysqlDatabase, 'recordEmail', array(1, 'test subject', 'test body', 123, 'me@test.com') );
 

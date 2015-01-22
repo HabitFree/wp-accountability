@@ -17,7 +17,7 @@ class TestWordPress extends HfTestCase {
         );
 
         foreach($methods as $method) {
-            $this->assertMethodExists($this->MockWordPress, $method);
+            $this->assertMethodExists($this->mockCms, $method);
         }
     }
 
