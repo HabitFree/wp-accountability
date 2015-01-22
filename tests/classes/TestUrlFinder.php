@@ -21,7 +21,7 @@ class TestUrlFinder extends HfTestCase {
     
     public function testGetHomePageUrl() {
         $this->setReturnValue($this->mockCms, 'getHomeUrl', 'thePond');
-        $actual = $this->MockedAssetLocator->getHomePageUrl();
+        $actual = $this->mockedAssetLocator->getHomePageUrl();
 
         $this->assertEquals('thePond', $actual);
     }
@@ -32,7 +32,7 @@ class TestUrlFinder extends HfTestCase {
         $this->expectOnce($this->mockCms, 'getPageByTitle', array('test'));
         $this->expectOnce($this->mockCms, 'getPermalink', array(5));
 
-        $actual = $this->MockedAssetLocator->getPageUrlByTitle('test');
+        $actual = $this->mockedAssetLocator->getPageUrlByTitle('test');
 
         $this->assertEquals('www.site.com/page', $actual);
     }
@@ -40,7 +40,7 @@ class TestUrlFinder extends HfTestCase {
     public function testGetLoginUrl() {
         $this->setDefaultCmsReturnValues();
 
-        $actual = $this->MockedAssetLocator->getLoginUrl();
+        $actual = $this->mockedAssetLocator->getLoginUrl();
 
         $this->assertEquals('www.site.com/page', $actual);
     }

@@ -6,12 +6,12 @@ class TestGoals extends HfTestCase {
     public function testSendReportRequestEmailsChecksThrottling() {
         $this->setMockReturns();
 
-        $this->setReturnValue( $this->MockMysqlDatabase, 'daysSinceLastReport', 2 );
-        $this->setReturnValue( $this->MockMailer, 'isThrottled', true );
+        $this->setReturnValue( $this->mockDatabase, 'daysSinceLastReport', 2 );
+        $this->setReturnValue( $this->mockMessenger, 'isThrottled', true );
 
-        $this->expectAtLeastOnce( $this->MockMailer, 'isThrottled' );
+        $this->expectAtLeastOnce( $this->mockMessenger, 'isThrottled' );
 
-        $this->MockedGoals->sendReportRequestEmails();
+        $this->mockedGoals->sendReportRequestEmails();
     }
 
     private function setMockReturns() {
@@ -19,10 +19,10 @@ class TestGoals extends HfTestCase {
         $this->setReturnValue( $this->mockCms, 'getSubscribedUsers', $mockUsers );
 
         $mockGoalSubs = $this->makeMockGoalSubs();
-        $this->setReturnValue( $this->MockMysqlDatabase, 'getGoalSubscriptions', $mockGoalSubs );
+        $this->setReturnValue( $this->mockDatabase, 'getGoalSubscriptions', $mockGoalSubs );
 
         $mockLevel = $this->makeMockLevel();
-        $this->setReturnValue( $this->MockMysqlDatabase, 'getLevel', $mockLevel );
+        $this->setReturnValue( $this->mockDatabase, 'getLevel', $mockLevel );
     }
 
     private function makeMockGoalSubs() {
@@ -53,43 +53,43 @@ class TestGoals extends HfTestCase {
     public function testSendReportRequestEmailsSendsEmailWhenReportDue() {
         $this->setMockReturns();
 
-        $this->setReturnValue( $this->MockMysqlDatabase, 'daysSinceLastEmail', 2 );
-        $this->setReturnValue( $this->MockMysqlDatabase, 'daysSinceLastReport', 2 );
-        $this->setReturnValue( $this->MockMailer, 'isThrottled', false );
+        $this->setReturnValue( $this->mockDatabase, 'daysSinceLastEmail', 2 );
+        $this->setReturnValue( $this->mockDatabase, 'daysSinceLastReport', 2 );
+        $this->setReturnValue( $this->mockMessenger, 'isThrottled', false );
 
-        $this->expectAtLeastOnce( $this->MockMailer, 'sendReportRequestEmail' );
+        $this->expectAtLeastOnce( $this->mockMessenger, 'sendReportRequestEmail' );
 
-        $this->MockedGoals->sendReportRequestEmails();
+        $this->mockedGoals->sendReportRequestEmails();
     }
 
     public function testSendReportRequestEmailsDoesNotSendEmailWhenReportNotDue() {
         $this->setMockReturns();
 
-        $this->setReturnValue( $this->MockMysqlDatabase, 'daysSinceLastEmail', 2 );
-        $this->setReturnValue( $this->MockMysqlDatabase, 'daysSinceLastReport', 0 );
+        $this->setReturnValue( $this->mockDatabase, 'daysSinceLastEmail', 2 );
+        $this->setReturnValue( $this->mockDatabase, 'daysSinceLastReport', 0 );
 
-        $this->expectNever( $this->MockMailer, 'sendReportRequestEmail' );
+        $this->expectNever( $this->mockMessenger, 'sendReportRequestEmail' );
 
-        $this->MockedGoals->sendReportRequestEmails();
+        $this->mockedGoals->sendReportRequestEmails();
     }
 
     public function testSendReportRequestEmailsDoesNotSendEmailWhenUserThrottled() {
         $this->setMockReturns();
 
-        $this->setReturnValue( $this->MockMysqlDatabase, 'daysSinceLastEmail', 2 );
-        $this->setReturnValue( $this->MockMysqlDatabase, 'daysSinceLastReport', 5 );
-        $this->setReturnValue( $this->MockMailer, 'IsThrottled', true );
+        $this->setReturnValue( $this->mockDatabase, 'daysSinceLastEmail', 2 );
+        $this->setReturnValue( $this->mockDatabase, 'daysSinceLastReport', 5 );
+        $this->setReturnValue( $this->mockMessenger, 'IsThrottled', true );
 
-        $this->expectNever( $this->MockMailer, 'sendReportRequestEmail' );
+        $this->expectNever( $this->mockMessenger, 'sendReportRequestEmail' );
 
-        $this->MockedGoals->sendReportRequestEmails();
+        $this->mockedGoals->sendReportRequestEmails();
     }
 
     public function testCurrentLevelTarget() {
         $mockLevel = $this->makeMockLevel();
-        $this->setReturnValue( $this->MockMysqlDatabase, 'getLevel', $mockLevel );
+        $this->setReturnValue( $this->mockDatabase, 'getLevel', $mockLevel );
 
-        $target = $this->MockedGoals->currentLevelTarget( 5 );
+        $target = $this->mockedGoals->currentLevelTarget( 5 );
 
         $this->assertEquals( $target, 14 );
     }
@@ -97,25 +97,25 @@ class TestGoals extends HfTestCase {
     public function testGetGoalTitle() {
         $mockGoal        = new stdClass();
         $mockGoal->title = 'Eat durian';
-        $this->setReturnValue( $this->MockMysqlDatabase, 'getGoal', $mockGoal );
+        $this->setReturnValue( $this->mockDatabase, 'getGoal', $mockGoal );
 
-        $goalTitle = $this->MockedGoals->getGoalTitle( 1 );
+        $goalTitle = $this->mockedGoals->getGoalTitle( 1 );
 
         $this->assertEquals( $mockGoal->title, $goalTitle );
     }
 
     public function testRecordAccountabilityReport() {
-        $this->expectOnce( $this->MockMysqlDatabase, 'recordAccountabilityReport', array(1, 2, 3, 4) );
+        $this->expectOnce( $this->mockDatabase, 'recordAccountabilityReport', array(1, 2, 3, 4) );
 
-        $this->MockedGoals->recordAccountabilityReport( 1, 2, 3, 4 );
+        $this->mockedGoals->recordAccountabilityReport( 1, 2, 3, 4 );
     }
 
     public function testGetGoalSubscriptions() {
         $expected = array(1, 2, 3, 4);
 
-        $this->setReturnValue( $this->MockMysqlDatabase, 'getGoalSubscriptions', $expected );
+        $this->setReturnValue( $this->mockDatabase, 'getGoalSubscriptions', $expected );
 
-        $actual = $this->MockedGoals->getGoalSubscriptions( 1 );
+        $actual = $this->mockedGoals->getGoalSubscriptions( 1 );
 
         $this->assertEquals( $expected, $actual );
     }
@@ -129,18 +129,18 @@ class TestGoals extends HfTestCase {
     public function testIsAnyGoalDueGetsGoalSubscriptionsFromDatabase() {
         $this->setMockReturns();
 
-        $this->expectOnce( $this->MockMysqlDatabase, 'getGoalSubscriptions', array(7) );
+        $this->expectOnce( $this->mockDatabase, 'getGoalSubscriptions', array(7) );
 
-        $this->MockedGoals->sendReportRequestEmails();
+        $this->mockedGoals->sendReportRequestEmails();
     }
 
     public function testGenerateGoalCardUsesDatabaseGetGoalMethod() {
         $this->setReturnValsForGoalCardCreation();
 
-        $this->expectOnce( $this->MockMysqlDatabase, 'getGoal', array(1) );
+        $this->expectOnce( $this->mockDatabase, 'getGoal', array(1) );
 
         $MockSub = $this->makeMockGoalSub();
-        $this->MockedGoals->generateGoalCard( $MockSub );
+        $this->mockedGoals->generateGoalCard( $MockSub );
     }
 
     private function setReturnValsForGoalCardCreation()
@@ -148,12 +148,12 @@ class TestGoals extends HfTestCase {
         $MockGoal = new stdClass();
         $MockGoal->title = 'Title';
         $MockGoal->description = 'Description';
-        $this->setReturnValue($this->MockMysqlDatabase, 'getGoal', $MockGoal);
+        $this->setReturnValue($this->mockDatabase, 'getGoal', $MockGoal);
 
         $MockLevel = $this->makeMockLevel();
-        $this->setReturnValue($this->MockMysqlDatabase, 'getLevel', $MockLevel);
+        $this->setReturnValue($this->mockDatabase, 'getLevel', $MockLevel);
 
-        $this->setReturnValue($this->MockMysqlDatabase, 'daysSinceLastReport', 3.1415);
+        $this->setReturnValue($this->mockDatabase, 'daysSinceLastReport', 3.1415);
     }
 
     public function testUsesHtmlGeneratorToMakeGoalCard() {
@@ -172,7 +172,7 @@ class TestGoals extends HfTestCase {
             ''
         ));
 
-        $this->MockedGoals->generateGoalCard($MockSub);
+        $this->mockedGoals->generateGoalCard($MockSub);
     }
 
     public function testReturnsHtmlGeneratorMadeGoalCard() {
@@ -180,7 +180,7 @@ class TestGoals extends HfTestCase {
         $MockSub = $this->makeMockGoalSub();
         $this->setReturnValue($this->mockMarkupGenerator, 'makeGoalCard', 'goose');
 
-        $result = $this->MockedGoals->generateGoalCard($MockSub);
+        $result = $this->mockedGoals->generateGoalCard($MockSub);
 
         $this->assertEquals('goose', $result);
     }

@@ -4,7 +4,7 @@ require_once( dirname( dirname( __FILE__ ) ) . '/HfTestCase.php' );
 
 class TestInviteResponseForm extends HfTestCase {
     public function testExtendsForm() {
-        $this->assertInstanceOf('HfForm',$this->MockedInviteResponseForm);
+        $this->assertInstanceOf('HfForm',$this->mockedInviteResponseForm);
     }
 
     public function testMakesInfoMessage() {
@@ -14,7 +14,7 @@ class TestInviteResponseForm extends HfTestCase {
 
     private function assertFormOutputContains($needle)
     {
-        $haystack = $this->MockedInviteResponseForm->getOutput();
+        $haystack = $this->mockedInviteResponseForm->getOutput();
         $this->assertContains($needle, $haystack);
     }
 

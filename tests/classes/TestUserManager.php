@@ -9,60 +9,60 @@ class TestUserManager extends HfTestCase {
     // Tests
 
     public function testEmailInviteSendingUsingMocks() {
-        $this->setReturnValue( $this->MockMailer, 'generateSecureEmailId', 555 );
-        $this->setReturnValue( $this->MockMysqlDatabase, 'generateEmailID', 5 );
+        $this->setReturnValue( $this->mockMessenger, 'generateSecureEmailId', 555 );
+        $this->setReturnValue( $this->mockDatabase, 'generateEmailID', 5 );
 
-        $result = $this->MockedUserManager->sendInvitation( 1, 'me@test.com', 3 );
+        $result = $this->mockedUserManager->sendInvitation( 1, 'me@test.com', 3 );
 
         $this->assertEquals( $result, 555 );
     }
 
     public function testGettingCurrentUserLogin() {
-        $UserManager = $this->Factory->makeUserManager();
+        $UserManager = $this->factory->makeUserManager();
         $user        = wp_get_current_user();
 
         $this->assertEquals( $UserManager->getCurrentUserLogin(), $user->user_login );
     }
 
     public function testGetFriends() {
-        $this->setReturnValue( $this->MockMysqlDatabase, 'getPartners', 'duck' );
+        $this->setReturnValue( $this->mockDatabase, 'getPartners', 'duck' );
 
-        $this->assertEquals( 'duck', $this->MockedUserManager->getPartners( 1 ) );
+        $this->assertEquals( 'duck', $this->mockedUserManager->getPartners( 1 ) );
     }
 
     public function testSendInvitationUsesCodeLibraryToConvertStringToTime() {
-        $this->expectOnce( $this->MockPhpLibrary, 'convertStringToTime', array('+7 days') );
+        $this->expectOnce( $this->mockCodeLibrary, 'convertStringToTime', array('+7 days') );
 
-        $this->MockedUserManager->sendInvitation( 1, 'me@my.com' );
+        $this->mockedUserManager->sendInvitation( 1, 'me@my.com' );
     }
 
     public function testProcessInviteDeletesExpiredInvites() {
-        $this->expectOnce($this->MockMailer, 'deleteExpiredInvites');
+        $this->expectOnce($this->mockMessenger, 'deleteExpiredInvites');
 
-        $this->MockedUserManager->processInvite('', '');
+        $this->mockedUserManager->processInvite('', '');
     }
 
     public function testDeleteRelationship() {
-        $this->expectOnce($this->MockMysqlDatabase, 'deleteRelationship', array('dog', 'cat'));
-        $this->MockedUserManager->deleteRelationship('dog', 'cat');
+        $this->expectOnce($this->mockDatabase, 'deleteRelationship', array('dog', 'cat'));
+        $this->mockedUserManager->deleteRelationship('dog', 'cat');
     }
 
     public function testUserManagerAddsDefaultSubWhenProcessingNewUser() {
-        $this->expectOnce($this->MockMysqlDatabase, 'setDefaultGoalSubscription', array(9));
-        $this->MockedUserManager->processNewUser(9);
+        $this->expectOnce($this->mockDatabase, 'setDefaultGoalSubscription', array(9));
+        $this->mockedUserManager->processNewUser(9);
     }
 
     public function testUserManagerUsesDatabaseToRecordInvite() {
-        $this->expectOnce($this->MockMysqlDatabase, 'recordInvite');
-        $this->MockedUserManager->sendInvitation(1, 'test@test.com');
+        $this->expectOnce($this->mockDatabase, 'recordInvite');
+        $this->mockedUserManager->sendInvitation(1, 'test@test.com');
     }
 
     public function testProcessAllUsersDoesntSendEmails() {
         $users = $this->makeMockUsers();
         $this->setReturnValue($this->mockCms, 'getUsers', $users);
 
-        $this->expectNever($this->MockMailer, 'sendEmailToUser');
-        $this->MockedUserManager->processAllUsers();
+        $this->expectNever($this->mockMessenger, 'sendEmailToUser');
+        $this->mockedUserManager->processAllUsers();
     }
 
     public function testProcessAllUsersGetsUsers() {
@@ -70,14 +70,14 @@ class TestUserManager extends HfTestCase {
         $this->setReturnValue($this->mockCms, 'getUsers', $users);
 
         $this->expectOnce($this->mockCms, 'getUsers');
-        $this->MockedUserManager->processAllUsers();
+        $this->mockedUserManager->processAllUsers();
     }
 
     public function testProcessAllUsersSetsDefaultGoalSubscriptions() {
         $users = $this->makeMockUsers();
         $this->setReturnValue($this->mockCms, 'getUsers', $users);
 
-        $this->expectAtLeastOnce($this->MockMysqlDatabase, 'setDefaultGoalSubscription', array(7));
-        $this->MockedUserManager->processAllUsers();
+        $this->expectAtLeastOnce($this->mockDatabase, 'setDefaultGoalSubscription', array(7));
+        $this->mockedUserManager->processAllUsers();
     }
 }

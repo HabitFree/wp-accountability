@@ -10,7 +10,7 @@ class TestManagePartnersShortcode extends HfTestCase {
     }
 
     public function testManagePartnersShortcodeImplementsShortcodeInterface() {
-        $this->assertTrue( $this->classImplementsInterface( $this->MockedManagePartnersShortcode, 'Hf_iShortcode' ) );
+        $this->assertTrue( $this->classImplementsInterface( $this->mockedManagePartnersShortcode, 'Hf_iShortcode' ) );
     }
 
     public function testManagePartnersShortcodeRegistered() {
@@ -18,45 +18,45 @@ class TestManagePartnersShortcode extends HfTestCase {
     }
 
     public function testManagePartnersShortcodeRequiresLogin() {
-        $this->expectOnce( $this->MockSecurity, 'requireLogin' );
-        $this->MockedManagePartnersShortcode->getOutput();
+        $this->expectOnce( $this->mockSecurity, 'requireLogin' );
+        $this->mockedManagePartnersShortcode->getOutput();
     }
 
     public function testManagePartnersShortcodeDoesntRequireLoginWhenUserLoggedIn() {
-        $this->setReturnValue($this->MockUserManager, 'isUserLoggedIn', true);
-        $this->expectNever($this->MockSecurity, 'requireLogin');
-        $this->MockedManagePartnersShortcode->getOutput();
+        $this->setReturnValue($this->mockUserManager, 'isUserLoggedIn', true);
+        $this->expectNever($this->mockSecurity, 'requireLogin');
+        $this->mockedManagePartnersShortcode->getOutput();
     }
 
     public function testManagePartnerShortcodeReturnsLoginForm() {
-        $this->setReturnValue($this->MockSecurity, 'requireLogin', 'duck');
-        $result = $this->MockedManagePartnersShortcode->getOutput();
+        $this->setReturnValue($this->mockSecurity, 'requireLogin', 'duck');
+        $result = $this->mockedManagePartnersShortcode->getOutput();
         $this->assertEquals('duck', $result);
     }
 
     public function testShortcodeQueriesPartnerList() {
-        $this->expectOnce($this->MockPartnerListShortcode, 'getOutput');
-        $this->setReturnValue($this->MockUserManager, 'isUserLoggedIn', true);
-        $this->MockedManagePartnersShortcode->getOutput();
+        $this->expectOnce($this->mockPartnerListShortcode, 'getOutput');
+        $this->setReturnValue($this->mockUserManager, 'isUserLoggedIn', true);
+        $this->mockedManagePartnersShortcode->getOutput();
     }
 
     public function testShortcodeQueriesInvitePartnerForm() {
-        $this->expectOnce($this->MockInvitePartnerShortcode, 'getOutput');
-        $this->setReturnValue($this->MockUserManager, 'isUserLoggedIn', true);
-        $this->MockedManagePartnersShortcode->getOutput();
+        $this->expectOnce($this->mockInvitePartnerShortcode, 'getOutput');
+        $this->setReturnValue($this->mockUserManager, 'isUserLoggedIn', true);
+        $this->mockedManagePartnersShortcode->getOutput();
     }
 
     public function testShortcodeReturnsPartnerList() {
-        $this->setReturnValue($this->MockUserManager, 'isUserLoggedIn', true);
-        $this->setReturnValue($this->MockPartnerListShortcode, 'getOutput', 'duck');
-        $result = $this->MockedManagePartnersShortcode->getOutput();
+        $this->setReturnValue($this->mockUserManager, 'isUserLoggedIn', true);
+        $this->setReturnValue($this->mockPartnerListShortcode, 'getOutput', 'duck');
+        $result = $this->mockedManagePartnersShortcode->getOutput();
         $this->assertContains('duck', $result);
     }
 
     public function testShortcodeReturnsInviteForm() {
-        $this->setReturnValue($this->MockUserManager, 'isUserLoggedIn', true);
-        $this->setReturnValue($this->MockInvitePartnerShortcode, 'getOutput', 'goose');
-        $result = $this->MockedManagePartnersShortcode->getOutput();
+        $this->setReturnValue($this->mockUserManager, 'isUserLoggedIn', true);
+        $this->setReturnValue($this->mockInvitePartnerShortcode, 'getOutput', 'goose');
+        $result = $this->mockedManagePartnersShortcode->getOutput();
         $this->assertContains('goose', $result);
     }
 }

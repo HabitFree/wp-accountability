@@ -4,7 +4,7 @@ require_once( dirname( dirname( __FILE__ ) ) . '/HfTestCase.php' );
 
 class TestRegistrationForm extends HfTestCase {
     public function testExtendsForm() {
-        $this->assertInstanceOf('HfForm', $this->MockedRegistrationForm);
+        $this->assertInstanceOf('HfForm', $this->mockedRegistrationForm);
     }
 
     public function testAddsUsernameChoiceMessage() {
@@ -27,7 +27,7 @@ class TestRegistrationForm extends HfTestCase {
 
     private function assertRegistrationFormOutputContainsNeedle($needle)
     {
-        $haystack = $this->MockedRegistrationForm->getOutput();
+        $haystack = $this->mockedRegistrationForm->getOutput();
         $this->assertContains($needle, $haystack);
     }
 

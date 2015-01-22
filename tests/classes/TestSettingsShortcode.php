@@ -8,7 +8,7 @@ class TestSettingsShortcode extends HfTestCase {
     // Tests
 
     public function testSettingsShortcodeOutputsAnything() {
-        $SettingsShortcode = $this->Factory->makeSettingsShortcode();
+        $SettingsShortcode = $this->factory->makeSettingsShortcode();
         $output            = $SettingsShortcode->getOutput();
 
         $this->assertTrue( strlen( $output ) > 0 );
