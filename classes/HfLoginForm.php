@@ -7,7 +7,8 @@ class HfLoginForm extends HfForm {
         $actionUrl,
         Hf_iMarkupGenerator $markupGenerator,
         Hf_iCms $cms,
-        Hf_iAssetLocator $assetLocator
+        Hf_iAssetLocator $assetLocator,
+        Hf_iUserManager $userManager
     ) {
         $this->elements = array();
         $this->elements[] = '<form action="'.$actionUrl.'" method="post">';
@@ -15,6 +16,7 @@ class HfLoginForm extends HfForm {
         $this->markupGenerator = $markupGenerator;
         $this->cms = $cms;
         $this->assetLocator = $assetLocator;
+        $this->userManager = $userManager;
     }
 
     public function getOutput() {
@@ -50,8 +52,10 @@ class HfLoginForm extends HfForm {
 
     private function validateForm()
     {
-        $this->validateUsername();
-        $this->validatePassword();
+        if ($this->isLoggingIn()) {
+            $this->validateUsername();
+            $this->validatePassword();
+        }
     }
 
     private function validateUsername()
@@ -75,7 +79,10 @@ class HfLoginForm extends HfForm {
         if ($this->isLoggingIn()) {
             $userOrError = $this->cms->authenticateUser($_POST['username'], $_POST['password']);
 
-            if (!$this->cms->isError($userOrError)) {
+            if ($this->isLoginSuccessful($userOrError)) {
+                if ($this->isInvite()) {
+                    $this->userManager->processInvite($userOrError->ID, $_GET['n']);
+                }
                 $this->redirectUser();
             }
         }
@@ -89,7 +96,7 @@ class HfLoginForm extends HfForm {
 
     private function isLoggingIn()
     {
-        return isset($_POST['username']) && isset($_POST['password']);
+        return isset($_POST['login']) && isset($_POST['username']) && isset($_POST['password']);
     }
 
     private function makeLoginFailureError()
@@ -103,5 +110,15 @@ class HfLoginForm extends HfForm {
     private function enqueError($error)
     {
         array_unshift($this->elements, $error);
+    }
+
+    private function isLoginSuccessful($userOrError)
+    {
+        return !$this->cms->isError($userOrError);
+    }
+
+    private function isInvite()
+    {
+        return isset($_GET['n']);
     }
 } 

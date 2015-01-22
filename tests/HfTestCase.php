@@ -83,7 +83,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->resetMockedGoals();
         $this->resetMockedManagePartnersShortcode();
         $this->mockedMarkupGenerator = new HfHtmlGenerator($this->mockCms);
-        $this->mockedLoginForm = new HfLoginForm('url', $this->mockMarkupGenerator, $this->mockCms, $this->mockAssetLocator);
+        $this->resetMockedLoginForm();
         $this->mockedRegistrationForm = new HfRegistrationForm('url', $this->mockMarkupGenerator);
         $this->mockedInviteResponseForm = new HfInviteResponseForm('url', $this->mockMarkupGenerator);
     }
@@ -290,5 +290,16 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     protected function assertMethodExists($object, $method)
     {
         $this->assertTrue(method_exists($object, $method));
+    }
+
+    private function resetMockedLoginForm()
+    {
+        $this->mockedLoginForm = new HfLoginForm(
+            'url',
+            $this->mockMarkupGenerator,
+            $this->mockCms,
+            $this->mockAssetLocator,
+            $this->mockUserManager
+        );
     }
 } 

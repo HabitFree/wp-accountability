@@ -97,7 +97,7 @@ class TestLoginForm extends HfTestCase {
     }
 
     public function testDoesntMakeLoginErrorWhenNoPost() {
-        $this->expectAt($this->mockMarkupGenerator,'makeErrorMessage',0,array('Please enter your username.'));
+        $this->expectNever($this->mockMarkupGenerator,'makeErrorMessage');
         $this->mockedLoginForm->getOutput();
     }
 
@@ -116,7 +116,19 @@ class TestLoginForm extends HfTestCase {
         $this->mockedLoginForm->attemptLogin();
     }
 
-    public function PASStestProcessesInvite() {
+    public function testProcessesInvite() {
+        $this->setValidLoginPost();
+        $_GET['n'] = '555';
+        $mockUser = new stdClass();
+        $mockUser->ID = 7;
+        $this->setReturnValue($this->mockCms, 'isError', false);
+        $this->setReturnValue($this->mockCms, 'authenticateUser',$mockUser);
+        $this->expectOnce($this->mockUserManager,'processInvite',array(7,'555'));
+        $this->mockedLoginForm->attemptLogin();
+    }
 
+    public function testDoesntValidateUnsubmittedForm() {
+        $this->expectNever($this->mockMarkupGenerator, 'makeErrorMessage', array('Please enter your username.'));
+        $this->mockedLoginForm->getOutput();
     }
 }
