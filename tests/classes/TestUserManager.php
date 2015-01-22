@@ -24,23 +24,6 @@ class TestUserManager extends HfTestCase {
         $this->assertEquals( $UserManager->getCurrentUserLogin(), $user->user_login );
     }
 
-    public function testProcessInviteByInviteeEmail() {
-        $UserManager = new HfUserManager(
-            $this->MockMysqlDatabase,
-            $this->MockMailer,
-            $this->MockUrlFinder,
-            $this->Factory->makeCms(),
-            $this->MockPhpLibrary
-        );
-
-        $user = get_user_by( 'email', 'taken@taken.com' );
-
-        $this->setReturnValue( $this->MockMysqlDatabase, 'getInviterID', 1 );
-        $this->expectOnce( $this->MockMysqlDatabase, 'createRelationship', array($user->ID, 1) );
-
-        $UserManager->processInvite( 'taken@taken.com', 555 );
-    }
-
     public function testGetFriends() {
         $this->setReturnValue( $this->MockMysqlDatabase, 'getPartners', 'duck' );
 

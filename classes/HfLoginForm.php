@@ -3,16 +3,22 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class HfLoginForm extends HfForm {
     private $cms;
 
-    public function __construct($actionUrl, Hf_iMarkupGenerator $markupGenerator, Hf_iCms $cms) {
+    public function __construct(
+        $actionUrl,
+        Hf_iMarkupGenerator $markupGenerator,
+        Hf_iCms $cms,
+        Hf_iAssetLocator $assetLocator
+    ) {
         $this->elements = array();
         $this->elements[] = '<form action="'.$actionUrl.'" method="post">';
 
         $this->markupGenerator = $markupGenerator;
         $this->cms = $cms;
+        $this->assetLocator = $assetLocator;
     }
 
     public function getOutput() {
-        $this->attemptLogin();
+        $this->makeLoginFailureError();
         $this->makeForm();
         $this->validateForm();
         $html = $this->getElementsAsString();
@@ -52,7 +58,7 @@ class HfLoginForm extends HfForm {
     {
         if (empty($_POST['username'])) {
             $error = $this->markupGenerator->makeErrorMessage('Please enter your username.');
-            array_unshift($this->elements, $error);
+            $this->enqueError($error);
         }
     }
 
@@ -60,14 +66,42 @@ class HfLoginForm extends HfForm {
     {
         if (empty($_POST['password'])) {
             $error = $this->markupGenerator->makeErrorMessage('Please enter your password.');
-            array_unshift($this->elements, $error);
+            $this->enqueError($error);
         }
     }
 
-    private function attemptLogin()
+    public function attemptLogin()
     {
-        if (isset($_POST['username']) && isset($_POST['password'])) {
-            $this->cms->authenticateUser($_POST['username'], $_POST['password']);
+        if ($this->isLoggingIn()) {
+            $userOrError = $this->cms->authenticateUser($_POST['username'], $_POST['password']);
+
+            if (!$this->cms->isError($userOrError)) {
+                $this->redirectUser();
+            }
         }
+    }
+
+    private function redirectUser()
+    {
+        $homeUrl = $this->assetLocator->getHomePageUrl();
+        print $this->markupGenerator->makeRedirectScript($homeUrl);
+    }
+
+    private function isLoggingIn()
+    {
+        return isset($_POST['username']) && isset($_POST['password']);
+    }
+
+    private function makeLoginFailureError()
+    {
+        if ($this->isLoggingIn()) {
+            $error = $this->markupGenerator->makeErrorMessage('That username and password combination is incorrect.');
+            $this->enqueError($error);
+        }
+    }
+
+    private function enqueError($error)
+    {
+        array_unshift($this->elements, $error);
     }
 } 

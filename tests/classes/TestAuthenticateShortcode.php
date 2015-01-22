@@ -247,77 +247,6 @@ class TestAuthenticateShortcode extends HfTestCase {
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }
 
-    public function testAuthenticateShortcodeDisplaysLogInFailureError() {
-        $this->setLoginPost();
-
-        $this->setReturnValue( $this->mockCms, 'authenticateUser', false );
-
-        $AuthenticateShortcode = new HfAuthenticateShortcode(
-            $this->Factory->makeMarkupGenerator(),
-            $this->Factory->makeAssetLocator(),
-            $this->mockCms,
-            $this->Factory->makeUserManager(),
-            $this->MockLoginForm,
-            $this->MockRegistrationForm,
-            $this->MockInviteResponseForm
-        );
-
-        $haystack = $AuthenticateShortcode->getOutput();
-        $needle   = "<p class='error'>That username and password combination is incorrect.</p>";
-
-        $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
-    }
-
-    public function testAuthenticateShortcodeDisplaysLogInFailureErrorWithinTab() {
-        $this->setLoginPost();
-
-        $this->setReturnValue( $this->mockCms, 'authenticateUser', false );
-
-        $AuthenticateShortcode = new HfAuthenticateShortcode(
-            $this->Factory->makeMarkupGenerator(),
-            $this->Factory->makeAssetLocator(),
-            $this->mockCms,
-            $this->Factory->makeUserManager(),
-            $this->MockLoginForm,
-            $this->MockRegistrationForm,
-            $this->MockInviteResponseForm
-        );
-
-        $haystack = $AuthenticateShortcode->getOutput();
-        $needle   = "[su_tab title=\"Log In\"]<p class='error'>That username and password combination is incorrect.</p>";
-
-        $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
-    }
-
-    public function testAuthenticateShortcodeDisplaysLogInSuccessMessage() {
-        $this->setLoginPost();
-
-        $this->setReturnValue( $this->MockUserManager, 'getCurrentUserLogin', 'Joe');
-
-        $AuthenticateShortcode = new HfAuthenticateShortcode(
-            $this->Factory->makeMarkupGenerator(),
-            $this->Factory->makeAssetLocator(),
-            $this->mockCms,
-            $this->MockUserManager,
-            $this->MockLoginForm,
-            $this->MockRegistrationForm,
-            $this->MockInviteResponseForm
-        );
-
-        $haystack = $AuthenticateShortcode->getOutput();
-        $needle   = "<p class='success'>Welcome back!</p>";
-
-        $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
-    }
-
-    public function testAuthenticateShortcodeGeneratesRedirectScript() {
-        $this->setLoginPost();
-
-        $this->setReturnValue( $this->MockUserManager, 'getCurrentUserLogin', 'Joe');
-        $this->expectOnce($this->mockMarkupGenerator, 'makeRedirectScript');
-        $this->MockedAuthenticateShortcode->getOutput();
-    }
-
     public function testAuthenticateShortcodeDoesNotAttemptLogInWhenFormFailsToValidate() {
         $this->setLoginPost();
         $_POST['password'] = '';
@@ -393,37 +322,9 @@ class TestAuthenticateShortcode extends HfTestCase {
         $mockUser     = new stdClass();
         $mockUser->ID = 7;
 
-        $this->setReturnValue( $this->mockCms, 'createUser', true );
+        $this->setReturnValue( $this->mockCms, 'createUser', 7 );
         $this->setReturnValue( $this->mockCms, 'currentUser', $mockUser );
-        $this->setReturnValue( $this->mockCms, 'getUserEmail', 'joe@wallysworld.com' );
-        $this->expectOnce( $this->MockUserManager, 'processInvite', array('joe@wallysworld.com', 555) );
-
-        $AuthenticateShortcode = new HfAuthenticateShortcode(
-            $this->Factory->makeMarkupGenerator(),
-            $this->Factory->makeAssetLocator(),
-            $this->mockCms,
-            $this->MockUserManager,
-            $this->MockLoginForm,
-            $this->MockRegistrationForm,
-            $this->MockInviteResponseForm
-        );
-
-        $AuthenticateShortcode->getOutput();
-    }
-
-    public function testAuthenticateShortcodeLoginProcessInvite() {
-        $_POST['login']    = '';
-        $_POST['username'] = 'Joe';
-        $_POST['password'] = 'bo';
-        $_GET['n']         = 555;
-
-        $mockUser     = new stdClass();
-        $mockUser->ID = 7;
-
-        $this->setReturnValue( $this->MockUserManager, 'getCurrentUserLogin', 'Joe');
-        $this->setReturnValue( $this->mockCms, 'currentUser', $mockUser );
-        $this->setReturnValue( $this->mockCms, 'getUserEmail', 'joe@wallysworld.com' );
-        $this->expectOnce( $this->MockUserManager, 'processInvite', array('joe@wallysworld.com', 555) );
+        $this->expectOnce( $this->MockUserManager, 'processInvite', array(7, 555) );
 
         $AuthenticateShortcode = new HfAuthenticateShortcode(
             $this->Factory->makeMarkupGenerator(),
@@ -488,30 +389,6 @@ class TestAuthenticateShortcode extends HfTestCase {
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }
 
-    public function testAuthenticateShortcodeLoginDisplaysRedirectMessage() {
-        $_POST['login']    = '';
-        $_POST['username'] = 'Joe';
-        $_POST['password'] = 'bo';
-
-        $this->setReturnValue( $this->MockUserManager, 'getCurrentUserLogin', 'Joe');
-
-        $AuthenticateShortcode = new HfAuthenticateShortcode(
-            $this->Factory->makeMarkupGenerator(),
-            $this->Factory->makeAssetLocator(),
-            $this->mockCms,
-            $this->MockUserManager,
-            $this->MockLoginForm,
-            $this->MockRegistrationForm,
-            $this->MockInviteResponseForm
-        );
-
-        $haystack = $AuthenticateShortcode->getOutput();
-
-        $needle = '<p class="info">Redirecting...';
-
-        $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
-    }
-
     public function testMakeAuthenticateShortcode() {
         $AuthenticateShortcode = $this->Factory->makeAuthenticateShortcode();
 
@@ -548,7 +425,7 @@ class TestAuthenticateShortcode extends HfTestCase {
     private function makeExpressiveAuthenticateShortcode() {
         $AuthenticateShortcode = new HfAuthenticateShortcode(
             $this->Factory->makeMarkupGenerator(),
-            $this->MockUrlFinder,
+            $this->mockAssetLocator,
             $this->mockCms,
             $this->MockUserManager,
             $this->MockLoginForm,
@@ -636,29 +513,6 @@ class TestAuthenticateShortcode extends HfTestCase {
         $this->assertDoesntContain($needle, $haystack);
     }
 
-    public function testAuthenticateShortcodeLoginDisplaysOnlyOneRedirectMessage() {
-        $_POST['login']    = '';
-        $_POST['username'] = 'Joe';
-        $_POST['password'] = 'bo';
-
-        $this->setReturnValue( $this->MockUserManager, 'getCurrentUserLogin', 'Joe');
-
-        $AuthenticateShortcode = new HfAuthenticateShortcode(
-            $this->Factory->makeMarkupGenerator(),
-            $this->Factory->makeAssetLocator(),
-            $this->mockCms,
-            $this->MockUserManager,
-            $this->MockLoginForm,
-            $this->MockRegistrationForm,
-            $this->MockInviteResponseForm
-        );
-
-        $haystack = $AuthenticateShortcode->getOutput();
-        $needle = '<p class="info">Redirecting...';
-
-        $this->assertEquals( 1, substr_count($haystack, $needle) );
-    }
-
     public function testAuthenticateShortcodeDoesntRedirectOnFailedLogin() {
         $_POST['login']    = '';
         $_POST['username'] = 'Joe';
@@ -705,14 +559,6 @@ class TestAuthenticateShortcode extends HfTestCase {
         $this->setRegistrationPost();
         $this->setReturnValue($this->mockCms, 'isError', False);
         $this->expectOnce($this->mockMarkupGenerator, 'makeSuccessMessage');
-        $this->MockedAuthenticateShortcode->getOutput();
-    }
-
-    public function testAuthShortcodeUsesCreateUserReturnedIdToGetEmailAddressForInvites() {
-        $this->setRegistrationPost();
-        $_GET['n'] = 555;
-        $this->setReturnValue($this->mockCms, 'createUser', 999);
-        $this->expectOnce($this->mockCms, 'getUserEmail', array(999));
         $this->MockedAuthenticateShortcode->getOutput();
     }
 
@@ -776,5 +622,12 @@ class TestAuthenticateShortcode extends HfTestCase {
         $this->setReturnValue($this->MockInviteResponseForm, 'getOutput', 'formOutput');
         $result = $this->MockedAuthenticateShortcode->getOutput();
         $this->assertContains('formOutput', $result);
+    }
+
+    public function testAttemptLoginChecksIfError() {
+        $this->setLoginPost();
+        $this->setReturnValue($this->mockCms, 'authenticateUser','result');
+        $this->expectOnce($this->mockCms, 'isError', array('result'));
+        $this->MockedAuthenticateShortcode->attemptLogin();
     }
 }

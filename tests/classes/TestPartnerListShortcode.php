@@ -43,7 +43,7 @@ class TestPartnerListShortcode extends HfTestCase {
         $PartnerListShortcode = new HfPartnerListShortcode(
             $this->MockUserManager,
             $this->Factory->makeMarkupGenerator(),
-            $this->MockUrlFinder
+            $this->mockAssetLocator
         );
 
         return $PartnerListShortcode;
@@ -71,7 +71,7 @@ class TestPartnerListShortcode extends HfTestCase {
 
     public function testShortcodeGetsCurrentPageUrl() {
         $this->setDefaultReturnValues();
-        $this->expectOnce( $this->MockUrlFinder, 'getCurrentPageUrl' );
+        $this->expectOnce( $this->mockAssetLocator, 'getCurrentPageUrl' );
         $this->MockedPartnerListShortcode->getOutput();
     }
 

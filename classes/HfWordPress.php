@@ -66,10 +66,7 @@ class HfWordPress implements Hf_iCms {
         $credentials['user_login']    = $username;
         $credentials['user_password'] = $password;
 
-        $result = wp_signon( $credentials );
-        $success = !$this->isError($result);
-
-        return $success;
+        return wp_signon( $credentials );
     }
 
     public function isError( $thing ) {

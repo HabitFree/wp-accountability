@@ -155,8 +155,9 @@ class HfFactory {
         $actionUrl = $this->getCurrentUrl();
         $markupGenerator = $this->makeMarkupGenerator();
         $cms = $this->makeCms();
+        $assetLocator = $this->makeAssetLocator();
 
-        return new HfLoginForm($actionUrl, $markupGenerator, $cms);
+        return new HfLoginForm($actionUrl, $markupGenerator, $cms, $assetLocator);
     }
 
     public function makeRegistrationForm() {

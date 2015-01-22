@@ -304,7 +304,7 @@ class TestGoalsShortcode extends HfTestCase {
         $GoalsShortcode = new HfGoalsShortcode(
             $this->MockUserManager,
             $this->MockMailer,
-            $this->MockUrlFinder,
+            $this->mockAssetLocator,
             $this->MockGoals,
             $this->MockSecurity,
             $this->Factory->makeMarkupGenerator(),

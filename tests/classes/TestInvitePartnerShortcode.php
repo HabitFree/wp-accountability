@@ -18,12 +18,12 @@ class TestInvitePartnerShortcode extends HfTestCase {
     }
 
     public function testInvitePartnerShortcodeCallsGetCurrentUrl() {
-        $this->expectOnce($this->MockUrlFinder, 'getCurrentPageUrl');
+        $this->expectOnce($this->mockAssetLocator, 'getCurrentPageUrl');
         $this->MockedInvitePartnerShortcode->getOutput();
     }
 
     public function testInvitePartnerShortcodeUsesCurrentUrlAsFormAction() {
-        $this->setReturnValue($this->MockUrlFinder, 'getCurrentPageUrl', 'test.com');
+        $this->setReturnValue($this->mockAssetLocator, 'getCurrentPageUrl', 'test.com');
         $output = $this->MockedInvitePartnerShortcode->getOutput();
         $this->assertContains('<form action="test.com"', $output);
     }
@@ -42,7 +42,7 @@ class TestInvitePartnerShortcode extends HfTestCase {
         $_POST['submit'] = '';
         $_POST['email'] = '';
         $InviteShortcode = new HfInvitePartnerShortcode(
-            $this->MockUrlFinder,
+            $this->mockAssetLocator,
             $this->Factory->makeMarkupGenerator(),
             $this->MockUserManager
         );
@@ -54,7 +54,7 @@ class TestInvitePartnerShortcode extends HfTestCase {
         $_POST['submit'] = '';
         $_POST['email'] = 'narthur.a@gmail.com';
         $InviteShortcode = new HfInvitePartnerShortcode(
-            $this->MockUrlFinder,
+            $this->mockAssetLocator,
             $this->Factory->makeMarkupGenerator(),
             $this->MockUserManager
         );
@@ -71,7 +71,7 @@ class TestInvitePartnerShortcode extends HfTestCase {
         $_POST['submit'] = '';
         $_POST['email'] = 'fakeItTilYouMakeIt';
         $InviteShortcode = new HfInvitePartnerShortcode(
-            $this->MockUrlFinder,
+            $this->mockAssetLocator,
             $this->Factory->makeMarkupGenerator(),
             $this->MockUserManager
         );
@@ -104,7 +104,7 @@ class TestInvitePartnerShortcode extends HfTestCase {
         $_POST['email'] = 'test@test.com';
 
         $InviteShortcode = new HfInvitePartnerShortcode(
-            $this->MockUrlFinder,
+            $this->mockAssetLocator,
             $this->Factory->makeMarkupGenerator(),
             $this->MockUserManager
         );
@@ -121,7 +121,7 @@ class TestInvitePartnerShortcode extends HfTestCase {
         $this->expectNever($this->MockUserManager, 'sendInvitation');
 
         $InviteShortcode = new HfInvitePartnerShortcode(
-            $this->MockUrlFinder,
+            $this->mockAssetLocator,
             $this->Factory->makeMarkupGenerator(),
             $this->MockUserManager
         );
@@ -131,7 +131,7 @@ class TestInvitePartnerShortcode extends HfTestCase {
 
     public function testInvitePartnerShortcodeIncludesHeader() {
         $InviteShortcode = new HfInvitePartnerShortcode(
-            $this->MockUrlFinder,
+            $this->mockAssetLocator,
             $this->Factory->makeMarkupGenerator(),
             $this->MockUserManager
         );

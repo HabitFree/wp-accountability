@@ -69,7 +69,7 @@ class TestMailer extends HfTestCase {
     }
 
     public function testMailerPointsInviteUrlToRegistrationTab() {
-        $this->setReturnValue( $this->MockUrlFinder, 'getPageUrlByTitle', 'habitfree.org/authenticate' );
+        $this->setReturnValue( $this->mockAssetLocator, 'getPageUrlByTitle', 'habitfree.org/authenticate' );
 
         $result   = $this->MockedMailer->generateInviteURL( 777 );
         $expected = 'habitfree.org/authenticate?n=777&tab=2';
@@ -90,7 +90,7 @@ class TestMailer extends HfTestCase {
 
     public function testGenerateReportUrlUsesNonce() {
         $baseURL = 'habitfree.org/test';
-        $this->setReturnValue( $this->MockUrlFinder, 'getPageUrlByTitle', $baseURL );
+        $this->setReturnValue( $this->mockAssetLocator, 'getPageUrlByTitle', $baseURL );
 
         $actual = $this->MockedMailer->generateReportURL( 555 );
 
@@ -102,7 +102,7 @@ class TestMailer extends HfTestCase {
     public function testSendReportRequestEmailUsesNonceToCreateUrl() {
         $this->setReturnValue( $this->MockSecurity, 'createRandomString', 555 );
         $baseURL = 'habitfree.org/test';
-        $this->setReturnValue( $this->MockUrlFinder, 'getPageUrlByTitle', $baseURL );
+        $this->setReturnValue( $this->mockAssetLocator, 'getPageUrlByTitle', $baseURL );
         $reportUrl = $baseURL . '?n=555';
 
         $userID  = 1;

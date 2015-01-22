@@ -14,7 +14,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
 
     protected $MockMysqlDatabase;
     protected $MockMailer;
-    protected $MockUrlFinder;
+    protected $mockAssetLocator;
     protected $mockCms;
     protected $MockSecurity;
     protected $MockPhpLibrary;
@@ -58,7 +58,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     private function resetMocks() {
         $this->MockMysqlDatabase               = $this->makeMock( 'HfMysqlDatabase' );
         $this->MockMailer              = $this->makeMock( 'HfMailer' );
-        $this->MockUrlFinder           = $this->makeMock( 'HfUrlFinder' );
+        $this->mockAssetLocator           = $this->makeMock( 'HfUrlFinder' );
         $this->mockCms                    = $this->makeMock( 'HfWordPress' );
         $this->MockSecurity               = $this->makeMock( 'HfSecurity' );
         $this->MockPhpLibrary            = $this->makeMock( 'HfPhpLibrary' );
@@ -87,7 +87,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->resetMockedGoals();
         $this->resetMockedManagePartnersShortcode();
         $this->MockedMarkupGenerator = new HfHtmlGenerator($this->mockCms);
-        $this->mockedLoginForm = new HfLoginForm('url', $this->mockMarkupGenerator, $this->mockCms);
+        $this->mockedLoginForm = new HfLoginForm('url', $this->mockMarkupGenerator, $this->mockCms, $this->mockAssetLocator);
         $this->MockedRegistrationForm = new HfRegistrationForm('url', $this->mockMarkupGenerator);
         $this->MockedInviteResponseForm = new HfInviteResponseForm('url', $this->mockMarkupGenerator);
     }
@@ -104,7 +104,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->MockedUserManager = new HfUserManager(
             $this->MockMysqlDatabase,
             $this->MockMailer,
-            $this->MockUrlFinder,
+            $this->mockAssetLocator,
             $this->mockCms,
             $this->MockPhpLibrary
         );
@@ -112,7 +112,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
 
     private function resetMockedMailer() {
         $this->MockedMailer = new HfMailer(
-            $this->MockUrlFinder,
+            $this->mockAssetLocator,
             $this->MockSecurity,
             $this->MockMysqlDatabase,
             $this->mockCms,
@@ -124,7 +124,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->MockedGoalsShortcode = new HfGoalsShortcode(
             $this->MockUserManager,
             $this->MockMailer,
-            $this->MockUrlFinder,
+            $this->mockAssetLocator,
             $this->MockGoals,
             $this->MockSecurity,
             $this->mockMarkupGenerator,
@@ -146,7 +146,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
 
     private function resetMockedInvitePartnerShortcode() {
         $this->MockedInvitePartnerShortcode = new HfInvitePartnerShortcode(
-            $this->MockUrlFinder,
+            $this->mockAssetLocator,
             $this->mockMarkupGenerator,
             $this->MockUserManager
         );
@@ -156,14 +156,14 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->MockedPartnerListShortcode = new HfPartnerListShortcode(
             $this->MockUserManager,
             $this->mockMarkupGenerator,
-            $this->MockUrlFinder
+            $this->mockAssetLocator
         );
     }
 
     private function resetMockedAuthenticateShortcode() {
         $this->MockedAuthenticateShortcode = new HfAuthenticateShortcode(
             $this->mockMarkupGenerator,
-            $this->MockUrlFinder,
+            $this->mockAssetLocator,
             $this->mockCms,
             $this->MockUserManager,
             $this->MockLoginForm,
