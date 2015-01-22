@@ -11,7 +11,6 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     private $loginForm;
 
-    private $loginMessages;
     private $registrationMessages;
     private $output;
 
@@ -63,7 +62,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
             $activeTabNumber = $this->determineActiveTab();
 
             $tabbedForms = $this->markupGenerator->generateTabs( array(
-                'Log In'   => $this->loginMessages . $this->loginForm->getOutput(),
+                'Log In'   => $this->loginForm->getOutput(),
                 'Register' => $this->registrationMessages . $this->RegistrationForm->getOutput()
             ), $activeTabNumber );
 
@@ -80,7 +79,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     private function displayLoginAndRegistrationSuccessMessages() {
         if ( $this->isLoginSuccessful or $this->isRegistrationSuccessful ) {
-            $this->output = $this->loginMessages . $this->registrationMessages . $this->output;
+            $this->output = $this->registrationMessages . $this->output;
         }
     }
 
@@ -100,22 +99,6 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
                 $this->emailTakenError() .
                 $this->missingPasswordError() .
                 $this->passwordMatchError();
-        }
-    }
-
-    private function postProcessLogin() {
-        if ( $this->isLoggingIn() and $this->isLoginFormValid() ) {
-            $this->determineLoginSuccess();
-
-            if ( $this->isLoginSuccessful ) {
-                $userId = $this->userManager->getCurrentUserId();
-                $this->processInvite($userId);
-                $this->loginMessages .= $this->markupGenerator->makeSuccessMessage( 'Welcome back!' );
-                $this->redirectUserHome();
-            } else {
-                $errorMessageText = 'That username and password combination is incorrect.';
-                $this->loginMessages .= $this->markupGenerator->makeErrorMessage( $errorMessageText );
-            }
         }
     }
 
@@ -192,10 +175,6 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         return ( $this->isPasswordMismatch() ) ? $errorMessage : '';
     }
 
-    private function isLoginFormValid() {
-        return empty( $this->loginMessages );
-    }
-
     public function attemptLogin() {
         if ($this->isLoggingIn()) {
             $userOrError = $this->cms->authenticateUser($_POST['username'], $_POST['password']);
@@ -266,14 +245,6 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         $infoMessageText = 'Redirecting... <a href="' . $url . '">Click here</a> if you are not automatically redirected. <a href="' . $url . '">Onward!</a>';
 
         return $this->markupGenerator->makeInfoMessage( $infoMessageText );
-    }
-
-    private function determineLoginSuccess() {
-        $currentUserUsername = $this->userManager->getCurrentUserLogin();
-        $success = ( $currentUserUsername === $_POST['username'] );
-        if ( $success ) {
-            $this->isLoginSuccessful = true;
-        }
     }
 
     private function enqueueRegistrationErrorMessage()
