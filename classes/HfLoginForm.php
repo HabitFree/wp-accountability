@@ -74,6 +74,21 @@ class HfLoginForm extends HfForm {
         }
     }
 
+    private function makeLoginFailureError()
+    {
+        if ($this->isLoggingIn()) {
+            $error = $this->markupGenerator->makeErrorMessage('That username and password combination is incorrect.');
+            $this->enqueError($error);
+        }
+    }
+
+    private function enqueError($error)
+    {
+        array_unshift($this->elements, $error);
+    }
+
+    //=====
+
     public function attemptLogin()
     {
         if ($this->isLoggingIn()) {
@@ -88,28 +103,9 @@ class HfLoginForm extends HfForm {
         }
     }
 
-    private function redirectUser()
-    {
-        $homeUrl = $this->assetLocator->getHomePageUrl();
-        print $this->markupGenerator->makeRedirectScript($homeUrl);
-    }
-
     private function isLoggingIn()
     {
         return isset($_POST['login']) && isset($_POST['username']) && isset($_POST['password']);
-    }
-
-    private function makeLoginFailureError()
-    {
-        if ($this->isLoggingIn()) {
-            $error = $this->markupGenerator->makeErrorMessage('That username and password combination is incorrect.');
-            $this->enqueError($error);
-        }
-    }
-
-    private function enqueError($error)
-    {
-        array_unshift($this->elements, $error);
     }
 
     private function isLoginSuccessful($userOrError)
@@ -120,5 +116,11 @@ class HfLoginForm extends HfForm {
     private function isInvite()
     {
         return isset($_GET['n']);
+    }
+
+    private function redirectUser()
+    {
+        $homeUrl = $this->assetLocator->getHomePageUrl();
+        print $this->markupGenerator->makeRedirectScript($homeUrl);
     }
 } 
