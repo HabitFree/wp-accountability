@@ -201,7 +201,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     private function attemptRegistration() {
-        $userIdOrError = $this->cms->createUser( $_POST['username'], $_POST['password'], $_POST['email'] );
+        $userIdOrError = $this->cms->createUser( $_POST['username'], $_POST['password'], $_POST['hfEmail'] );
         if ( !$this->cms->isError($userIdOrError) ) {
             $this->isRegistrationSuccessful = true;
             $this->attemptLogin();
@@ -230,11 +230,11 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     private function isEmailMalformed() {
-        return !filter_var( $_POST['email'], FILTER_VALIDATE_EMAIL );
+        return !filter_var( $_POST['hfEmail'], FILTER_VALIDATE_EMAIL );
     }
 
     private function isEmailTaken() {
-        return $this->cms->isEmailTaken( $_POST['email'] );
+        return $this->cms->isEmailTaken( $_POST['hfEmail'] );
     }
 
     private function isPasswordMismatch() {

@@ -32,13 +32,13 @@ class TestRegistrationForm extends HfTestCase {
     }
 
     public function testAddsEmailField() {
-        $needle = '<p><label for="hfemail"><span class="required">*</span> Email: <input type="text" name="hfemail" value="" required /></label></p>';
+        $needle = '<p><label for="hfEmail"><span class="required">*</span> Email: <input type="text" name="hfEmail" value="" required /></label></p>';
         $this->assertRegistrationFormOutputContainsNeedle($needle);
     }
 
     public function testPrefillsEmailFieldWithPostData() {
-        $_POST['email'] = 'myEmail';
-        $needle = '<p><label for="hfemail"><span class="required">*</span> Email: <input type="text" name="hfemail" value="myEmail" required /></label></p>';
+        $_POST['hfEmail'] = 'myEmail';
+        $needle = '<p><label for="hfEmail"><span class="required">*</span> Email: <input type="text" name="hfEmail" value="myEmail" required /></label></p>';
         $this->assertRegistrationFormOutputContainsNeedle($needle);
     }
 
