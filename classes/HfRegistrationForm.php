@@ -39,7 +39,7 @@ class HfRegistrationForm extends HfForm {
     private function addEmailField()
     {
         $email = $this->getPostOrEmptyString('email');
-        $this->addTextBox('email', 'Email', $email, true);
+        $this->addTextBox('hfemail', 'Email', $email, true);
     }
 
     private function getPostOrEmptyString($index)
