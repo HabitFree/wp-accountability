@@ -1,14 +1,14 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
 class HfSettingsShortcode implements Hf_iShortcode {
-    private $UserManager;
-    private $PageLocator;
-    private $Security;
+    private $userManager;
+    private $pageLocator;
+    private $security;
 
-    function __construct( Hf_iAssetLocator $PageLocator, Hf_iUserManager $UserManager, Hf_iSecurity $Security ) {
-        $this->PageLocator = $PageLocator;
-        $this->UserManager = $UserManager;
-        $this->Security    = $Security;
+    function __construct( Hf_iAssetLocator $pageLocator, Hf_iUserManager $userManager, Hf_iSecurity $security ) {
+        $this->pageLocator = $pageLocator;
+        $this->userManager = $userManager;
+        $this->security    = $security;
     }
 
     public function getOutput() {
@@ -20,12 +20,12 @@ class HfSettingsShortcode implements Hf_iShortcode {
 
             return do_shortcode( $html );
         } else {
-            return $this->Security->requireLogin();
+            return $this->security->requireLogin();
         }
     }
 
     private function subscriptionSettings() {
-        $userID  = $this->UserManager->getCurrentUserId();
+        $userID  = $this->userManager->getCurrentUserId();
         $message = '';
 
         if ( isset( $_POST ) && array_key_exists( 'formSubmit', $_POST ) ) {
@@ -40,7 +40,7 @@ class HfSettingsShortcode implements Hf_iShortcode {
             $additionalProperties = '';
         }
 
-        $currentURL = $this->PageLocator->getCurrentPageURL();
+        $currentURL = $this->pageLocator->getCurrentPageURL();
         $html       = $message . '<form action="' . $currentURL . '" method="post">
 					<p><label>
 						<input type="checkbox" name="accountability" value="yes" ' . $additionalProperties . ' />

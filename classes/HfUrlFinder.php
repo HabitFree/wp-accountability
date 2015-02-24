@@ -1,10 +1,10 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
 class HfUrlFinder implements Hf_iAssetLocator {
-    private $Cms;
+    private $cms;
 
-    function __construct( Hf_iCms $ContentManagementSystem ) {
-        $this->Cms = $ContentManagementSystem;
+    function __construct( Hf_iCms $contentManagementSystem ) {
+        $this->cms = $contentManagementSystem;
     }
 
     public function getCurrentPageUrl() {
@@ -31,15 +31,15 @@ class HfUrlFinder implements Hf_iAssetLocator {
     }
 
     public function getPluginAssetUrl( $fileName ) {
-        return $this->Cms->getPluginAssetUrl( $fileName );
+        return $this->cms->getPluginAssetUrl( $fileName );
     }
 
     public function getHomePageUrl() {
-        return $this->Cms->getHomeUrl();
+        return $this->cms->getHomeUrl();
     }
 
     public function getLogoutUrl( $redirect ) {
-        return $this->Cms->getLogoutUrl( $redirect );
+        return $this->cms->getLogoutUrl( $redirect );
     }
 
     public function getLoginUrl() {
@@ -47,8 +47,8 @@ class HfUrlFinder implements Hf_iAssetLocator {
     }
 
     public function getPageUrlByTitle( $title ) {
-        $page = $this->Cms->getPageByTitle( $title );
+        $page = $this->cms->getPageByTitle( $title );
 
-        return $this->Cms->getPermalink( $page->ID );
+        return $this->cms->getPermalink( $page->ID );
     }
 }
