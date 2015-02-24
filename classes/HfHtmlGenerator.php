@@ -3,8 +3,12 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class HfHtmlGenerator implements Hf_iMarkupGenerator {
     private $Cms;
 
-    function __construct( Hf_iCms $ContentManagementSystem ) {
+    function __construct(
+        Hf_iCms $ContentManagementSystem,
+        Hf_iAssetLocator $assetLocator
+    ) {
         $this->Cms = $ContentManagementSystem;
+        $this->assetLocator = $assetLocator;
     }
 
     public function progressBar( $percent, $label ) {
@@ -75,7 +79,8 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     }
 
     public function makeRefreshScript() {
-        return '<script>window.location.reload();</script>';
+        $url = $this->assetLocator->getCurrentPageUrl();
+        return $this->makeRedirectScript($url);
     }
 
     public function makeHeader($content, $level) {

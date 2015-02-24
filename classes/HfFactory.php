@@ -68,8 +68,9 @@ class HfFactory {
 
     public function makeMarkupGenerator() {
         $Cms = $this->makeCms();
+        $assetLocator = $this->makeAssetLocator();
 
-        return new HfHtmlGenerator( $Cms );
+        return new HfHtmlGenerator( $Cms, $assetLocator );
     }
 
     public function makeInvitePartnerShortcode() {

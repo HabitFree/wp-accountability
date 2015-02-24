@@ -40,4 +40,6 @@ interface Hf_iMarkupGenerator {
         $levelDaysToComplete,
         $levelBar
     );
+
+    public function makeRefreshScript();
 }

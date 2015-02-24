@@ -175,25 +175,10 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         return ( $this->isPasswordMismatch() ) ? $errorMessage : '';
     }
 
-    public function attemptLogin() {
-        if ($this->isLoggingIn()) {
-            $userOrError = $this->cms->authenticateUser($_POST['username'], $_POST['password']);
-            if (!$this->cms->isError($userOrError)) {
-                $this->refreshPage();
-            }
-        }
-    }
-
     private function processInvite($userId) {
         if ( $this->isInvite() ) {
             $this->userManager->processInvite( $userId, $_GET['n'] );
         }
-    }
-
-    private function redirectUserHome() {
-        $url = $this->assetLocator->getHomePageUrl();
-        $this->output .= $this->makeRedirectMessage( $url );
-        $this->output .= $this->markupGenerator->makeRedirectScript($url);
     }
 
     private function isRegistrationFormValid() {
@@ -203,11 +188,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private function attemptRegistration() {
         $userIdOrError = $this->cms->createUser( $_POST['username'], $_POST['password'], $_POST['hfEmail'] );
         if ( !$this->cms->isError($userIdOrError) ) {
-            $this->isRegistrationSuccessful = true;
-            $this->attemptLogin();
-            $this->processInvite($userIdOrError);
-            $this->enqueueRegistrationSuccessMessage();
-            $this->redirectUserHome();
+            $this->processSuccessfulRegistration($userIdOrError);
         } else {
             $this->enqueueRegistrationErrorMessage();
         }
@@ -258,8 +239,11 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         $this->registrationMessages .= $this->markupGenerator->makeSuccessMessage('Welcome to HabitFree!');
     }
 
-    private function refreshPage()
+    private function processSuccessfulRegistration($userIdOrError)
     {
-        print $this->markupGenerator->makeRefreshScript();
+        $this->isRegistrationSuccessful = true;
+        $this->processInvite($userIdOrError);
+        $this->enqueueRegistrationSuccessMessage();
+        $this->registrationMessages .= $this->loginForm->getOutput();
     }
 } 

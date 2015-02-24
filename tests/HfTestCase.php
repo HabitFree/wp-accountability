@@ -82,7 +82,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->resetMockedAuthenticateShortcode();
         $this->resetMockedGoals();
         $this->resetMockedManagePartnersShortcode();
-        $this->mockedMarkupGenerator = new HfHtmlGenerator($this->mockCms);
+        $this->mockedMarkupGenerator = new HfHtmlGenerator($this->mockCms, $this->mockAssetLocator);
         $this->resetMockedLoginForm();
         $this->mockedRegistrationForm = new HfRegistrationForm('url', $this->mockMarkupGenerator);
         $this->mockedInviteResponseForm = new HfInviteResponseForm('url', $this->mockMarkupGenerator);

@@ -110,15 +110,14 @@ class TestHtmlGenerator extends HfTestCase {
     }
 
     public function testMakeRedirectScript() {
-        $HtmlGenerator = $this->factory->makeMarkupGenerator();
-        $result = $HtmlGenerator->makeRedirectScript('duck');
+        $result = $this->mockedMarkupGenerator->makeRedirectScript('duck');
         $this->assertEquals('<script>window.location.replace("duck");</script>', $result);
     }
 
     public function testMakeRefreshScript() {
-        $generator = $this->factory->makeMarkupGenerator();
-        $result = $generator->makeRefreshScript();
-        $this->assertEquals('<script>window.location.reload();</script>', $result);
+        $this->setReturnValue($this->mockAssetLocator,'getCurrentPageUrl','duck');
+        $result = $this->mockedMarkupGenerator->makeRefreshScript();
+        $this->assertEquals('<script>window.location.replace("duck");</script>', $result);
     }
 
     public function testMakeGoalCard() {
