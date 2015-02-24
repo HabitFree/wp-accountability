@@ -27,7 +27,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
         global $wpdb;
         $prefix = $wpdb->prefix;
 
-        $emailTableSql = "CREATE TABLE " . $prefix . "hf_email (
+        $emailTableSql = "CREATE TABLE {$prefix}hf_email (
 					emailID int NOT NULL AUTO_INCREMENT,
 					sendTime timestamp DEFAULT current_timestamp NOT NULL,
 					subject VARCHAR(500) NOT NULL,
@@ -40,7 +40,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
 					PRIMARY KEY  (emailID)
 				);";
 
-        $goalTableSql = "CREATE TABLE " . $prefix . "hf_goal (
+        $goalTableSql = "CREATE TABLE {$prefix}hf_goal (
 					goalID int NOT NULL AUTO_INCREMENT,
 					title VARCHAR(500) NOT NULL,
 					description text NULL,
@@ -53,7 +53,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
 					PRIMARY KEY  (goalID)
 				);";
 
-        $reportTableSql = "CREATE TABLE " . $prefix . "hf_report (
+        $reportTableSql = "CREATE TABLE {$prefix}hf_report (
 					reportID int NOT NULL AUTO_INCREMENT,
 					userID int NOT NULL,
 					goalID int NOT NULL,
@@ -66,7 +66,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
 					PRIMARY KEY  (reportID)
 				);";
 
-        $userGoalTableSql = "CREATE TABLE " . $prefix . "hf_user_goal (
+        $userGoalTableSql = "CREATE TABLE {$prefix}hf_user_goal (
 					userID int NOT NULL,
 					goalID int NOT NULL,
 					dateStarted timestamp DEFAULT current_timestamp NOT NULL,
@@ -74,7 +74,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
 					PRIMARY KEY  (userID, goalID)
 				);";
 
-        $levelTableSql = "CREATE TABLE " . $prefix . "hf_level (
+        $levelTableSql = "CREATE TABLE {$prefix}hf_level (
 					levelID int NOT NULL,
 					title VARCHAR(500) NOT NULL,
 					description text NULL,
@@ -84,7 +84,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
 					PRIMARY KEY  (levelID)
 				);";
 
-        $inviteTableSql = "CREATE TABLE " . $prefix . "hf_invite (
+        $inviteTableSql = "CREATE TABLE {$prefix}hf_invite (
 					inviteID varchar(250) NOT NULL,
 					inviterID int NOT NULL,
 					inviteeEmail VARCHAR(80) NOT NULL,
@@ -95,13 +95,13 @@ class HfMysqlDatabase implements Hf_iDatabase {
 					PRIMARY KEY  (inviteID)
 				);";
 
-        $relationshipTableSql = "CREATE TABLE " . $prefix . "hf_relationship (
+        $relationshipTableSql = "CREATE TABLE {$prefix}hf_relationship (
 					userID1 int NOT NULL,
 					userID2 int NOT NULL,
 					PRIMARY KEY  (userID1, userID2)
 				);";
 
-        $reportRequestTableSql = "CREATE TABLE " . $prefix . "hf_report_request (
+        $reportRequestTableSql = "CREATE TABLE {$prefix}hf_report_request (
 					requestID varchar(250) NOT NULL,
 					userID int NOT NULL,
 					emailID int NOT NULL,
@@ -452,9 +452,8 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $usersTable         = $this->cms->getDbPrefix() . 'users';
         $relationshipsTable = $this->cms->getDbPrefix() . 'hf_relationship';
 
-        $format = 'SELECT * FROM ' . $usersTable . ' INNER JOIN ' . $relationshipsTable . '
-            WHERE (userID1 = ID OR userID2 = ID)
-            AND (userID1 = %d OR userID2 = %d) AND ID != %d';
+        $format = "SELECT * FROM $usersTable INNER JOIN $relationshipsTable " .
+            "WHERE (userID1 = ID OR userID2 = ID) AND (userID1 = %d OR userID2 = %d) AND ID != %d";
         $query  = $this->cms->prepareQuery( $format, array( $userId, $userId, $userId ) );
 
         return $this->cms->getResults( $query );
@@ -488,7 +487,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
     public function isReportRequestValid( $requestId ) {
         $table = $this->cms->getDbPrefix() . 'hf_report_request';
 
-        $format = 'SELECT * FROM ' . $table . ' WHERE requestID = %d';
+        $format = "SELECT * FROM $table WHERE requestID = %d";
         $query  = $this->cms->prepareQuery( $format, array( $requestId ) );
 
         return $this->cms->getResults( $query ) != null;

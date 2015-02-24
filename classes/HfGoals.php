@@ -22,7 +22,7 @@ class HfGoals implements Hf_iGoals {
         $userID        = intval( $sub->userID );
 
         $goalID        = intval( $sub->goalID );
-        $goal          = $this->Database->getGoal( $goalID, 2 );
+        $goal          = $this->Database->getGoal( $goalID );
         $daysOfSuccess = $this->daysOfSuccess( $goalID, $userID );
         $daysSinceLastReport = round($this->Database->daysSinceLastReport($goalID, $userID));
 
