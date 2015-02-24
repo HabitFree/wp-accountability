@@ -91,7 +91,7 @@ class HfLoginForm extends HfForm {
 
     public function attemptLogin()
     {
-        if ($this->isLoggingIn()) {
+        if ($this->isOkToAttemptLogin()) {
             $userOrError = $this->cms->authenticateUser($_POST['username'], $_POST['password']);
             if ($this->isLoginSuccessful($userOrError)) {
                 $this->processLoginSuccess($userOrError);
@@ -131,5 +131,10 @@ class HfLoginForm extends HfForm {
     private function addNonceField()
     {
         $this->elements[] = $this->cms->getNonceField('hfAttemptLogin');
+    }
+
+    private function isOkToAttemptLogin()
+    {
+        return $this->isLoggingIn() && $this->cms->isNonceValid($_POST['_wpnonce'], 'hfAttemptLogin');
     }
 } 

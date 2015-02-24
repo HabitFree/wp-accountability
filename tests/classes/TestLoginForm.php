@@ -70,28 +70,27 @@ class TestLoginForm extends HfTestCase {
     }
 
     public function testAttemptsLogin() {
-        $this->setValidLoginPost();
+        $this->setupValidLogin();
         $this->expectOnce($this->mockCms, 'authenticateUser', array('user','pass'));
         $this->mockedLoginForm->attemptLogin();
     }
 
     public function testMakesRedirectScriptOnSuccessfulLogin() {
-        $this->setValidLoginPost();
+        $this->setupValidLogin();
         $this->setReturnValue($this->mockCms, 'authenticateUser', true);
         $this->setReturnValue($this->mockAssetLocator, 'getHomePageUrl', 'currentUrl');
         $this->expectOnce($this->mockMarkupGenerator, 'makeRedirectScript', array('currentUrl'));
         $this->mockedLoginForm->attemptLogin();
     }
 
-    private function setValidLoginPost()
+    private function setupValidLogin()
     {
-        $_POST['login'] = '';
-        $_POST['username'] = 'user';
-        $_POST['password'] = 'pass';
+        $this->setValidLoginPost();
+        $this->setReturnValue($this->mockCms,'isNonceValid',true);
     }
 
     public function testMakesLoginFailureError() {
-        $this->setValidLoginPost();
+        $this->setupValidLogin();
         $this->expectOnce($this->mockMarkupGenerator,'makeErrorMessage',array('That username and password combination is incorrect.'));
         $this->mockedLoginForm->getOutput();
     }
@@ -102,7 +101,7 @@ class TestLoginForm extends HfTestCase {
     }
 
     public function testOutputsLoginErrorMessage() {
-        $this->setValidLoginPost();
+        $this->setupValidLogin();
         $this->setReturnValue($this->mockMarkupGenerator, 'makeErrorMessage','loginFailure');
         $haystack = $this->mockedLoginForm->getOutput();
         $needle = 'loginFailure';
@@ -110,14 +109,14 @@ class TestLoginForm extends HfTestCase {
     }
 
     public function testAttemptLoginChecksIfError() {
-        $this->setValidLoginPost();
+        $this->setupValidLogin();
         $this->setReturnValue($this->mockCms, 'authenticateUser','result');
         $this->expectOnce($this->mockCms, 'isError', array('result'));
         $this->mockedLoginForm->attemptLogin();
     }
 
     public function testProcessesInvite() {
-        $this->setValidLoginPost();
+        $this->setupValidLogin();
         $_GET['n'] = '555';
         $mockUser = new stdClass();
         $mockUser->ID = 7;
@@ -141,5 +140,26 @@ class TestLoginForm extends HfTestCase {
         $this->setReturnValue($this->mockCms,'getNonceField','nonceField');
         $haystack = $this->mockedLoginForm->getOutput();
         $this->assertContains('nonceField',$haystack);
+    }
+
+    public function testChecksNonce() {
+        $this->setupValidLogin();
+        $this->expectOnce($this->mockCms,'isNonceValid',array(0101,'hfAttemptLogin'));
+        $this->mockedLoginForm->attemptLogin();
+    }
+
+    public function testDoesntLoginIfNonceInvalid() {
+        $this->setValidLoginPost();
+        $this->setReturnValue($this->mockCms,'isNonceValid',false);
+        $this->expectNever($this->mockCms,'authenticateUser');
+        $this->mockedLoginForm->attemptLogin();
+    }
+
+    private function setValidLoginPost()
+    {
+        $_POST['login'] = '';
+        $_POST['username'] = 'user';
+        $_POST['password'] = 'pass';
+        $_POST['_wpnonce'] = 0101;
     }
 }

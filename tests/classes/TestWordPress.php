@@ -14,7 +14,8 @@ class TestWordPress extends HfTestCase {
             'insertOrReplaceRow',
             'getOption',
             'getPluginDirectoryUrl',
-            'getNonceField'
+            'getNonceField',
+            'isNonceValid'
         );
 
         foreach($methods as $method) {

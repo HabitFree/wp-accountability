@@ -66,4 +66,6 @@ interface Hf_iCms {
     public function getUsers();
 
     public function getNonceField($action);
+
+    public function isNonceValid($nonce, $action);
 }
