@@ -1,20 +1,20 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
 class HfUserButtonsShortcode implements Hf_iShortcode {
-    private $UserManager;
-    private $AssetLocator;
-    private $MarkupGenerator;
+    private $userManager;
+    private $assetLocator;
+    private $markupGenerator;
 
-    function __construct( Hf_iUserManager $UserManager, Hf_iAssetLocator $AssetLocator, Hf_iMarkupGenerator $MarkupGenerator ) {
-        $this->UserManager     = $UserManager;
-        $this->AssetLocator    = $AssetLocator;
-        $this->MarkupGenerator = $MarkupGenerator;
+    function __construct( Hf_iUserManager $userManager, Hf_iAssetLocator $assetLocator, Hf_iMarkupGenerator $markupGenerator ) {
+        $this->userManager     = $userManager;
+        $this->assetLocator    = $assetLocator;
+        $this->markupGenerator = $markupGenerator;
     }
 
     public function getOutput() {
-        $content = ( $this->UserManager->isUserLoggedIn() ) ? $this->userLinks() : $this->visitorLinks();
+        $content = ( $this->userManager->isUserLoggedIn() ) ? $this->userLinks() : $this->visitorLinks();
 
-        return $this->MarkupGenerator->makeParagraph( $content );
+        return $this->markupGenerator->makeParagraph( $content );
     }
 
     private function userLinks() {
@@ -26,33 +26,33 @@ class HfUserButtonsShortcode implements Hf_iShortcode {
     }
 
     private function welcomeMessage() {
-        return ( $this->UserManager->isUserLoggedIn() ) ? 'Welcome back, ' . $this->UserManager->getCurrentUserLogin() : '';
+        return ( $this->userManager->isUserLoggedIn() ) ? 'Welcome back, ' . $this->userManager->getCurrentUserLogin() : '';
     }
 
     private function logoutLink() {
-        $currentPageUrl = $this->AssetLocator->getCurrentPageUrl();
-        $logoutUrl      = $this->AssetLocator->getLogoutUrl( $currentPageUrl );
+        $currentPageUrl = $this->assetLocator->getCurrentPageUrl();
+        $logoutUrl      = $this->assetLocator->getLogoutUrl( $currentPageUrl );
 
-        return $this->MarkupGenerator->makeLink( $logoutUrl, 'Log Out' );
+        return $this->markupGenerator->makeLink( $logoutUrl, 'Log Out' );
     }
 
     private function loginLink() {
-        $loginUrl = $this->AssetLocator->getLoginUrl();
+        $loginUrl = $this->assetLocator->getLoginUrl();
 
-        return $this->MarkupGenerator->makeLink( $loginUrl, 'Log In' );
+        return $this->markupGenerator->makeLink( $loginUrl, 'Log In' );
     }
 
     private function settingsLink() {
-        $settingsUrl = $this->AssetLocator->getPageUrlByTitle( 'Settings' );
+        $settingsUrl = $this->assetLocator->getPageUrlByTitle( 'Settings' );
 
-        return $this->MarkupGenerator->makeLink( $settingsUrl, 'Settings' );
+        return $this->markupGenerator->makeLink( $settingsUrl, 'Settings' );
 
     }
 
     private function registerLink() {
-        $registerUrl = $this->AssetLocator->getPageUrlByTitle( 'Authenticate' );
+        $registerUrl = $this->assetLocator->getPageUrlByTitle( 'Authenticate' );
 
-        return $this->MarkupGenerator->makeLink( $registerUrl, 'Register' );
+        return $this->markupGenerator->makeLink( $registerUrl, 'Register' );
 
     }
 }

@@ -12,20 +12,20 @@ class TestGenericForm extends HfTestCase {
     }
 
     public function testFormOuterTags() {
-        $Form = new HfGenericForm( 'test.com' );
-        $html = $Form->getHtml();
+        $Form = new HfGenericForm( 'test.com', $this->mockMarkupGenerator );
+        $html = $Form->getOutput();
 
         $this->assertEquals( $html, '<form action="test.com" method="post"></form>' );
     }
 
     public function testAddTextBoxInputToForm() {
-        $Form  = new HfGenericForm( 'test.com' );
+        $Form  = new HfGenericForm( 'test.com', $this->mockMarkupGenerator );
         $name  = 'test';
         $label = 'Hello, there';
 
         $Form->addTextBox( $name, $label, '', false );
 
-        $html = $Form->getHtml();
+        $html = $Form->getOutput();
 
         $this->assertEquals( $html,
             '<form action="test.com" method="post"><p><label for="test">Hello, there: <input type="text" name="test" value="" /></label></p></form>'
@@ -33,22 +33,22 @@ class TestGenericForm extends HfTestCase {
     }
 
     public function testAddSubmitButton() {
-        $Form  = new HfGenericForm( 'test.com' );
+        $Form  = new HfGenericForm( 'test.com', $this->mockMarkupGenerator );
         $name  = 'submit';
         $label = 'Submit';
 
         $Form->addSubmitButton( $name, $label );
 
-        $html = $Form->getHtml();
+        $html = $Form->getOutput();
 
         $this->assertEquals( $html, '<form action="test.com" method="post"><p><input type="submit" name="submit" value="Submit" /></p></form>' );
     }
 
     public function testAddInfoBox() {
-        $Form = new HfGenericForm('test.com');
+        $Form = new HfGenericForm('test.com', $this->mockMarkupGenerator);
         $Form->addInfoMessage('message');
 
-        $result = $Form->getHtml();
+        $result = $Form->getOutput();
         $expected = '<form action="test.com" method="post"><p class="info">message</p></form>';
 
         $this->assertEquals($expected, $result);

@@ -1,14 +1,14 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
 class HfPartnerListShortcode implements Hf_iShortcode {
-    private $UserManager;
-    private $MarkupGenerator;
-    private $AssetLocator;
+    private $userManager;
+    private $markupGenerator;
+    private $assetLocator;
 
-    function __construct( Hf_iUserManager $UserManager, Hf_iMarkupGenerator $MarkupGenerator, Hf_iAssetLocator $AssetLocator ) {
-        $this->UserManager     = $UserManager;
-        $this->MarkupGenerator = $MarkupGenerator;
-        $this->AssetLocator    = $AssetLocator;
+    function __construct( Hf_iUserManager $userManager, Hf_iMarkupGenerator $markupGenerator, Hf_iAssetLocator $assetLocator ) {
+        $this->userManager     = $userManager;
+        $this->markupGenerator = $markupGenerator;
+        $this->assetLocator    = $assetLocator;
     }
 
     public function getOutput() {
@@ -16,9 +16,9 @@ class HfPartnerListShortcode implements Hf_iShortcode {
 
         $Partners      = $this->getPartners();
         $listItems     = $this->makeListItems( $Partners );
-        $currentUrl    = $this->AssetLocator->getCurrentPageUrl();
-        $list          = $this->MarkupGenerator->makeList( $listItems );
-        $hiddenField   = $this->MarkupGenerator->makeHiddenField( 'userId' );
+        $currentUrl    = $this->assetLocator->getCurrentPageUrl();
+        $list          = $this->markupGenerator->makeList( $listItems );
+        $hiddenField   = $this->markupGenerator->makeHiddenField( 'userId' );
         $submitHandler =
             '<script>
                 function submitValue (n) {
@@ -28,21 +28,21 @@ class HfPartnerListShortcode implements Hf_iShortcode {
                 }
             </script>';
 
-        return $this->MarkupGenerator->makeForm( $currentUrl, $submitHandler . $hiddenField . $list, 'partnerlist' );
+        return $this->markupGenerator->makeForm( $currentUrl, $submitHandler . $hiddenField . $list, 'partnerlist' );
     }
 
     private function processSubmittedForm() {
         if ( $this->isFormSubmitted() ) {
-            $currentUserId = $this->UserManager->getCurrentUserId();
+            $currentUserId = $this->userManager->getCurrentUserId();
             foreach ( $_POST as $partnerId ) {
-                $this->UserManager->deleteRelationship( $currentUserId, $partnerId );
+                $this->userManager->deleteRelationship( $currentUserId, $partnerId );
             }
         }
     }
 
     private function getPartners() {
-        $userId   = $this->UserManager->getCurrentUserId();
-        $Partners = $this->UserManager->getPartners( $userId );
+        $userId   = $this->userManager->getCurrentUserId();
+        $Partners = $this->userManager->getPartners( $userId );
 
         return $Partners;
     }
@@ -62,7 +62,7 @@ class HfPartnerListShortcode implements Hf_iShortcode {
 
     private function makeUnpartnerButton( $Partner ) {
         return
-            $this->MarkupGenerator->makeButtonInput(
+            $this->markupGenerator->makeButtonInput(
                 $Partner->ID,
                 'unpartner', "if (confirm('Are you sure you want to stop partnering with " . $Partner->user_nicename . "?')) { submitValue(" . $Partner->ID . ");}"
             );

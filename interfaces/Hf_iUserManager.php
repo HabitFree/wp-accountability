@@ -5,7 +5,7 @@ interface Hf_iUserManager {
 
     public function getCurrentUserLogin();
 
-    public function processInvite( $inviteeEmail, $nonce );
+    public function processInvite( $inviteeId, $nonce );
 
     public function getCurrentUserId();
 

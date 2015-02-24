@@ -23,7 +23,7 @@ class HfInvitePartnerShortcode implements Hf_iShortcode {
         $header = $this->MarkupGenerator->makeHeader('Invite Partner', 2);
         $form   = $this->generateForm();
 
-        return $header . $this->messages . $form->getHtml();
+        return $header . $this->messages . $form->getOutput();
     }
 
     private function processForm() {
@@ -35,7 +35,7 @@ class HfInvitePartnerShortcode implements Hf_iShortcode {
 
     private function generateForm() {
         $currentUrl = $this->AssetLocator->getCurrentPageUrl();
-        $form       = new HfGenericForm( $currentUrl );
+        $form       = new HfGenericForm( $currentUrl, $this->MarkupGenerator );
 
         $form->addInfoMessage( '<strong>Note:</strong> By inviting someone to become a partner you grant them access to all your goals and progress history.' );
         $form->addTextBox( 'email', 'Email', '', true );

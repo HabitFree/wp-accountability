@@ -1,0 +1,134 @@
+<?php
+if ( ! defined( 'ABSPATH' ) ) exit;
+require_once( dirname( dirname( __FILE__ ) ) . '/HfTestCase.php' );
+
+class TestLoginForm extends HfTestCase {
+    public function testLoginFormExtendsForm() {
+        $this->assertInstanceOf('HfForm',$this->mockedLoginForm);
+    }
+
+    public function testAddsUsernameField() {
+        $haystack = $this->mockedLoginForm->getOutput();
+        $needle = '<p><label for="username"><span class="required">*</span> Username: <input type="text" name="username" value="" required /></label></p>';
+        $this->assertContains($needle,$haystack);
+    }
+
+    public function testAddsPasswordField() {
+        $haystack = $this->mockedLoginForm->getOutput();
+        $needle = '<p><label for="password"><span class="required">*</span> Password: <input type="password" name="password" required /></label></p>';
+        $this->assertContains($needle, $haystack);
+    }
+
+    public function testAddsSubmitButton() {
+        $haystack = $this->mockedLoginForm->getOutput();
+        $needle = '<p><input type="submit" name="login" value="Log In" /></p>';
+        $this->assertContains($needle, $haystack);
+    }
+
+    public function testPicksUpExistingUsername() {
+        $_POST['username'] = 'duck';
+        $haystack = $this->mockedLoginForm->getOutput();
+        $needle = '<p><label for="username"><span class="required">*</span> Username: <input type="text" name="username" value="duck" required /></label></p>';
+        $this->assertContains($needle,$haystack);
+    }
+
+    private function setEmptyLoginPost()
+    {
+        $_POST['login'] = '';
+        $_POST['username'] = '';
+        $_POST['password'] = '';
+    }
+
+    public function testRequiresLogInUsername() {
+        $this->setEmptyLoginPost();
+
+        $this->setReturnValue($this->mockMarkupGenerator,'makeErrorMessage','errorMessage');
+        $haystack              = $this->mockedLoginForm->getOutput();
+
+        $this->assertTrue( $this->haystackContainsNeedle( $haystack, 'errorMessage' ) );
+    }
+
+    public function testMakesMissingUsernameMessage() {
+        $this->setEmptyLoginPost();
+        $this->expectAt($this->mockMarkupGenerator, 'makeErrorMessage', 1, array('Please enter your username.'));
+        $this->mockedLoginForm->getOutput();
+    }
+
+    public function testMakesMissingPasswordMessage() {
+        $this->setEmptyLoginPost();
+        $this->expectAt($this->mockMarkupGenerator, 'makeErrorMessage', 2, array('Please enter your password.'));
+        $this->mockedLoginForm->getOutput();
+    }
+
+    public function testRequiresPassword() {
+        $this->setEmptyLoginPost();
+
+        $this->setReturnValues($this->mockMarkupGenerator,'makeErrorMessage',array('usernameError','passError'));
+        $haystack              = $this->mockedLoginForm->getOutput();
+
+        $this->assertTrue( $this->haystackContainsNeedle( $haystack, 'passError' ) );
+    }
+
+    public function testAttemptsLogin() {
+        $this->setValidLoginPost();
+        $this->expectOnce($this->mockCms, 'authenticateUser', array('user','pass'));
+        $this->mockedLoginForm->attemptLogin();
+    }
+
+    public function testMakesRedirectScriptOnSuccessfulLogin() {
+        $this->setValidLoginPost();
+        $this->setReturnValue($this->mockCms, 'authenticateUser', true);
+        $this->setReturnValue($this->mockAssetLocator, 'getHomePageUrl', 'currentUrl');
+        $this->expectOnce($this->mockMarkupGenerator, 'makeRedirectScript', array('currentUrl'));
+        $this->mockedLoginForm->attemptLogin();
+    }
+
+    private function setValidLoginPost()
+    {
+        $_POST['login'] = '';
+        $_POST['username'] = 'user';
+        $_POST['password'] = 'pass';
+    }
+
+    public function testMakesLoginFailureError() {
+        $this->setValidLoginPost();
+        $this->expectOnce($this->mockMarkupGenerator,'makeErrorMessage',array('That username and password combination is incorrect.'));
+        $this->mockedLoginForm->getOutput();
+    }
+
+    public function testDoesntMakeLoginErrorWhenNoPost() {
+        $this->expectNever($this->mockMarkupGenerator,'makeErrorMessage');
+        $this->mockedLoginForm->getOutput();
+    }
+
+    public function testOutputsLoginErrorMessage() {
+        $this->setValidLoginPost();
+        $this->setReturnValue($this->mockMarkupGenerator, 'makeErrorMessage','loginFailure');
+        $haystack = $this->mockedLoginForm->getOutput();
+        $needle = 'loginFailure';
+        $this->assertContains($needle,$haystack);
+    }
+
+    public function testAttemptLoginChecksIfError() {
+        $this->setValidLoginPost();
+        $this->setReturnValue($this->mockCms, 'authenticateUser','result');
+        $this->expectOnce($this->mockCms, 'isError', array('result'));
+        $this->mockedLoginForm->attemptLogin();
+    }
+
+    public function testProcessesInvite() {
+        $this->setValidLoginPost();
+        $_GET['n'] = '555';
+        $mockUser = new stdClass();
+        $mockUser->ID = 7;
+        $this->setReturnValue($this->mockCms, 'isError', false);
+        $this->setReturnValue($this->mockCms, 'authenticateUser',$mockUser);
+        $this->expectOnce($this->mockUserManager,'processInvite',array(7,'555'));
+        $this->mockedLoginForm->attemptLogin();
+    }
+
+    public function testDoesntValidateUnsubmittedForm() {
+        $this->expectNever($this->mockMarkupGenerator, 'makeErrorMessage', array('Please enter your username.'));
+        $this->mockedLoginForm->getOutput();
+    }
+}

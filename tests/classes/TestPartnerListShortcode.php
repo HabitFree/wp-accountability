@@ -4,29 +4,29 @@ require_once( dirname( dirname( __FILE__ ) ) . '/HfTestCase.php' );
 
 class TestPartnerListShortcode extends HfTestCase {
     public function testPartnerListShortcodeImplementsShortcodeInterface() {
-        $this->assertTrue( $this->classImplementsInterface( $this->PartnerListShortcodeWithMockedDependencies, 'Hf_iShortcode' ) );
+        $this->assertTrue( $this->classImplementsInterface( $this->mockedPartnerListShortcode, 'Hf_iShortcode' ) );
     }
 
     public function testPartnerListShortcodeGetsCurrentUser() {
         $this->setDefaultReturnValues();
 
-        $this->expectAtLeastOnce( $this->MockUserManager, 'getCurrentUserId' );
-        $this->PartnerListShortcodeWithMockedDependencies->getOutput();
+        $this->expectAtLeastOnce( $this->mockUserManager, 'getCurrentUserId' );
+        $this->mockedPartnerListShortcode->getOutput();
     }
 
     private function setDefaultReturnValues() {
         $MockPartner                = new stdClass();
         $MockPartner->user_nicename = 'ludwig';
         $MockPartner->ID            = 7;
-        $this->setReturnValue( $this->MockUserManager, 'getPartners', array($MockPartner) );
+        $this->setReturnValue( $this->mockUserManager, 'getPartners', array($MockPartner) );
     }
 
     public function testPartnerListShortcodeUsesCurrentUserIdToGetPartners() {
         $this->setDefaultReturnValues();
 
-        $this->setReturnValue( $this->MockUserManager, 'getCurrentUserId', 'duck' );
-        $this->expectOnce( $this->MockUserManager, 'getPartners', array('duck') );
-        $this->PartnerListShortcodeWithMockedDependencies->getOutput();
+        $this->setReturnValue( $this->mockUserManager, 'getCurrentUserId', 'duck' );
+        $this->expectOnce( $this->mockUserManager, 'getPartners', array('duck') );
+        $this->mockedPartnerListShortcode->getOutput();
     }
 
     public function testPartnerListShortcodeOutputsPartnersName() {
@@ -41,18 +41,18 @@ class TestPartnerListShortcode extends HfTestCase {
 
     private function makeExpressivePartnerListShortcode() {
         $PartnerListShortcode = new HfPartnerListShortcode(
-            $this->MockUserManager,
-            $this->Factory->makeMarkupGenerator(),
-            $this->MockAssetLocator
+            $this->mockUserManager,
+            $this->factory->makeMarkupGenerator(),
+            $this->mockAssetLocator
         );
 
         return $PartnerListShortcode;
     }
 
     public function testPartnerListShortcodeGeneratesList() {
-        $this->setReturnValue( $this->MockUserManager, 'getPartners', array() );
-        $this->expectOnce( $this->MockMarkupGenerator, 'makeList' );
-        $this->PartnerListShortcodeWithMockedDependencies->getOutput();
+        $this->setReturnValue( $this->mockUserManager, 'getPartners', array() );
+        $this->expectOnce( $this->mockMarkupGenerator, 'makeList' );
+        $this->mockedPartnerListShortcode->getOutput();
     }
 
     public function testShortcodeExists() {
@@ -71,20 +71,20 @@ class TestPartnerListShortcode extends HfTestCase {
 
     public function testShortcodeGetsCurrentPageUrl() {
         $this->setDefaultReturnValues();
-        $this->expectOnce( $this->MockAssetLocator, 'getCurrentPageUrl' );
-        $this->PartnerListShortcodeWithMockedDependencies->getOutput();
+        $this->expectOnce( $this->mockAssetLocator, 'getCurrentPageUrl' );
+        $this->mockedPartnerListShortcode->getOutput();
     }
 
     public function testShortcodeMakesForm() {
         $this->setDefaultReturnValues();
-        $this->expectOnce( $this->MockMarkupGenerator, 'makeForm' );
-        $this->PartnerListShortcodeWithMockedDependencies->getOutput();
+        $this->expectOnce( $this->mockMarkupGenerator, 'makeForm' );
+        $this->mockedPartnerListShortcode->getOutput();
     }
 
     public function testShortcodeReturnsForm() {
         $this->setDefaultReturnValues();
-        $this->setReturnValue( $this->MockMarkupGenerator, 'makeForm', 'duck' );
-        $actual   = $this->PartnerListShortcodeWithMockedDependencies->getOutput();
+        $this->setReturnValue( $this->mockMarkupGenerator, 'makeForm', 'duck' );
+        $actual   = $this->mockedPartnerListShortcode->getOutput();
         $expected = 'duck';
         $this->assertEquals( $expected, $actual );
     }
@@ -112,9 +112,9 @@ class TestPartnerListShortcode extends HfTestCase {
     public function testShortcodeDeletesRelationshipOnSubmission() {
         $_POST['userId'] = '7';
         $this->setDefaultReturnValues();
-        $this->setReturnValue( $this->MockUserManager, 'getCurrentUserId', 1 );
-        $this->expectOnce( $this->MockUserManager, 'deleteRelationship', array(1, '7') );
-        $this->PartnerListShortcodeWithMockedDependencies->getOutput();
+        $this->setReturnValue( $this->mockUserManager, 'getCurrentUserId', 1 );
+        $this->expectOnce( $this->mockUserManager, 'deleteRelationship', array(1, '7') );
+        $this->mockedPartnerListShortcode->getOutput();
     }
 
     public function testShortcodeCreatesHiddenFieldForUserId() {

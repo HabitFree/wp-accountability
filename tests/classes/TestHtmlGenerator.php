@@ -4,27 +4,27 @@ require_once( dirname( dirname( __FILE__ ) ) . '/HfTestCase.php' );
 
 class TestHtmlGenerator extends HfTestCase {
     public function testCreateEmptyList() {
-        $list = $this->Factory->makeMarkupGenerator()->makeList(array());
+        $list = $this->factory->makeMarkupGenerator()->makeList(array());
 
         $this->assertEquals('<ul></ul>', $list);
     }
 
     public function testCreateListWithOneItem() {
-        $list = $this->Factory->makeMarkupGenerator()->makeList(array('item'));
+        $list = $this->factory->makeMarkupGenerator()->makeList(array('item'));
         $expected = '<ul><li>item</li></ul>';
 
         $this->assertEquals($expected, $list);
     }
 
     public function testCreateListWithTwoItems() {
-        $list = $this->Factory->makeMarkupGenerator()->makeList(array('item 1', 'item 2', 'item 3'));
+        $list = $this->factory->makeMarkupGenerator()->makeList(array('item 1', 'item 2', 'item 3'));
         $expected = '<ul><li>item 1</li><li>item 2</li><li>item 3</li></ul>';
 
         $this->assertEquals($expected, $list);
     }
 
     public function testHtmlGeneratorCreatesTabs() {
-        $HtmlGenerator = $this->Factory->makeMarkupGenerator();
+        $HtmlGenerator = $this->factory->makeMarkupGenerator();
 
         $contents = array(
             'duck1' => 'quack',
@@ -40,7 +40,7 @@ class TestHtmlGenerator extends HfTestCase {
     }
 
     public function testHtmlGeneratorCreatesDifferentTabs() {
-        $HtmlGenerator = $this->Factory->makeMarkupGenerator();
+        $HtmlGenerator = $this->factory->makeMarkupGenerator();
 
         $contents = array(
             'duck1' => 'quack',
@@ -56,19 +56,19 @@ class TestHtmlGenerator extends HfTestCase {
     }
 
     public function testMakeError() {
-        $HtmlGenerator = $this->Factory->makeMarkupGenerator();
+        $HtmlGenerator = $this->factory->makeMarkupGenerator();
         $result = $HtmlGenerator->makeErrorMessage('duck');
         $this->assertEquals("<p class='error'>duck</p>", $result);
     }
 
     public function testMakeSuccessMessage() {
-        $HtmlGenerator = $this->Factory->makeMarkupGenerator();
+        $HtmlGenerator = $this->factory->makeMarkupGenerator();
         $result = $HtmlGenerator->makeSuccessMessage('duck');
         $this->assertEquals("<p class='success'>duck</p>", $result);
     }
 
     public function testMakeQuoteMessage() {
-        $HtmlGenerator = $this->Factory->makeMarkupGenerator();
+        $HtmlGenerator = $this->factory->makeMarkupGenerator();
 
         $MockQuotation = new stdClass();
         $MockQuotation->post_content = 'hello';
@@ -80,14 +80,14 @@ class TestHtmlGenerator extends HfTestCase {
     }
 
     public function testMakeForm() {
-        $HtmlGenerator = $this->Factory->makeMarkupGenerator();
+        $HtmlGenerator = $this->factory->makeMarkupGenerator();
         $expected = '<form action="pond.net" method="post" name="waterform">duck</form>';
         $actual = $HtmlGenerator->makeForm('pond.net', 'duck', 'waterform');
         $this->assertEquals($expected, $actual);
     }
 
     public function testMakeButton() {
-        $HtmlGenerator = $this->Factory->makeMarkupGenerator();
+        $HtmlGenerator = $this->factory->makeMarkupGenerator();
         $name = 'DUCK';
         $label = 'duck';
         $onclick = 'quack';
@@ -97,28 +97,27 @@ class TestHtmlGenerator extends HfTestCase {
     }
 
     public function testMakeHiddenField() {
-        $HtmlGenerator = $this->Factory->makeMarkupGenerator();
+        $HtmlGenerator = $this->factory->makeMarkupGenerator();
         $actual = $HtmlGenerator->makeHiddenField('ghost');
         $expected = '<input type="hidden" name="ghost" />';
         $this->assertEquals($expected, $actual);
     }
 
     public function testMakeInfoMessage() {
-        $HtmlGenerator = $this->Factory->makeMarkupGenerator();
+        $HtmlGenerator = $this->factory->makeMarkupGenerator();
         $result = $HtmlGenerator->makeInfoMessage('duck');
         $this->assertEquals('<p class="info">duck</p>', $result);
     }
 
     public function testMakeRedirectScript() {
-        $HtmlGenerator = $this->Factory->makeMarkupGenerator();
-        $result = $HtmlGenerator->makeRedirectScript('duck');
+        $result = $this->mockedMarkupGenerator->makeRedirectScript('duck');
         $this->assertEquals('<script>window.location.replace("duck");</script>', $result);
     }
 
     public function testMakeRefreshScript() {
-        $generator = $this->Factory->makeMarkupGenerator();
-        $result = $generator->makeRefreshScript();
-        $this->assertEquals('<script>window.location.reload();</script>', $result);
+        $this->setReturnValue($this->mockAssetLocator,'getCurrentPageUrl','duck');
+        $result = $this->mockedMarkupGenerator->makeRefreshScript();
+        $this->assertEquals('<script>window.location.replace("duck");</script>', $result);
     }
 
     public function testMakeGoalCard() {
@@ -132,7 +131,7 @@ class TestHtmlGenerator extends HfTestCase {
         $levelDaysToComplete = 14;
         $levelBar = '';
 
-        $result = $this->MarkupGeneratorWithMockedDependencies->makeGoalCard(
+        $result = $this->mockedMarkupGenerator->makeGoalCard(
             $goalTitle,
             $goalDescription,
             $goalId,
@@ -170,7 +169,7 @@ class TestHtmlGenerator extends HfTestCase {
         $levelDaysToComplete = 14;
         $levelBar = '';
 
-        $result = $this->MarkupGeneratorWithMockedDependencies->makeGoalCard(
+        $result = $this->mockedMarkupGenerator->makeGoalCard(
             $goalTitle,
             $goalDescription,
             $goalId,
@@ -198,7 +197,7 @@ class TestHtmlGenerator extends HfTestCase {
     }
 
     public function testMakeParagraphWithClass() {
-        $result = $this->MarkupGeneratorWithMockedDependencies->makeParagraph('duck','classy');
+        $result = $this->mockedMarkupGenerator->makeParagraph('duck','classy');
         $expected = "<p class='classy'>duck</p>";
         $this->assertEquals($expected, $result);
     }
@@ -214,7 +213,7 @@ class TestHtmlGenerator extends HfTestCase {
         $levelDaysToComplete = 14;
         $levelBar = '';
 
-        $result = $this->MarkupGeneratorWithMockedDependencies->makeGoalCard(
+        $result = $this->mockedMarkupGenerator->makeGoalCard(
             $goalTitle,
             $goalDescription,
             $goalId,
@@ -252,7 +251,7 @@ class TestHtmlGenerator extends HfTestCase {
         $levelDaysToComplete = 14;
         $levelBar = '';
 
-        $result = $this->MarkupGeneratorWithMockedDependencies->makeGoalCard(
+        $result = $this->mockedMarkupGenerator->makeGoalCard(
             $goalTitle,
             $goalDescription,
             $goalId,

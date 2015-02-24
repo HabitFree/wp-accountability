@@ -4,15 +4,13 @@ if ( !defined( 'ABSPATH' ) ) {
 }
 
 class HfAuthenticateShortcode implements Hf_iShortcode {
-    private $MarkupGenerator;
-    private $AssetLocator;
-    private $Cms;
-    private $UserManager;
+    private $markupGenerator;
+    private $assetLocator;
+    private $cms;
+    private $userManager;
 
-    private $username;
-    private $email;
+    private $loginForm;
 
-    private $loginMessages;
     private $registrationMessages;
     private $output;
 
@@ -20,19 +18,24 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private $isRegistrationSuccessful = false;
 
     function __construct(
-        Hf_iMarkupGenerator $MarkupGenerator,
-        Hf_iAssetLocator $AssetLocator,
-        Hf_iCms $ContentManagementSystem,
-        Hf_iUserManager $UserManager
+        Hf_iMarkupGenerator $markupGenerator,
+        Hf_iAssetLocator $assetLocator,
+        Hf_iCms $contentManagementSystem,
+        Hf_iUserManager $userManager,
+        $loginForm,
+        $registrationForm,
+        $inviteResponseForm
     ) {
-        $this->MarkupGenerator = $MarkupGenerator;
-        $this->AssetLocator    = $AssetLocator;
-        $this->Cms             = $ContentManagementSystem;
-        $this->UserManager     = $UserManager;
+        $this->markupGenerator   = $markupGenerator;
+        $this->assetLocator      = $assetLocator;
+        $this->cms               = $contentManagementSystem;
+        $this->userManager       = $userManager;
+        $this->loginForm         = $loginForm;
+        $this->registrationForm  = $registrationForm;
+        $this->inviteResponeForm = $inviteResponseForm;
     }
 
     public function getOutput() {
-        $this->recallPostData();
         $this->validateForms();
         $this->processSubmissions();
 
@@ -44,35 +47,23 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         return $this->output;
     }
 
-    private function recallPostData() {
-        if ( $this->isRegistering() or $this->isLoggingIn() ) {
-            $this->username = $_POST['username'];
-        }
-
-        if ( $this->isRegistering() ) {
-            $this->email = $_POST['email'];
-        }
-    }
-
     private function validateForms() {
-        $this->validateLoginForm();
         $this->validateRegistrationForm();
     }
 
     private function processSubmissions() {
-        $this->postProcessLogin();
         $this->processRegistrationRequest();
         $this->processInviteFormSubmission();
     }
 
     private function makeAuthenticationForm() {
-        if ( !$this->UserManager->isUserLoggedIn() and !$this->isLoginSuccessful and !$this->isRegistrationSuccessful ) {
+        if ( !$this->userManager->isUserLoggedIn() and !$this->isLoginSuccessful and !$this->isRegistrationSuccessful ) {
             $this->informInvitedUser();
             $activeTabNumber = $this->determineActiveTab();
 
-            $tabbedForms = $this->MarkupGenerator->generateTabs( array(
-                'Log In'   => $this->loginMessages . $this->generateLoginForm(),
-                'Register' => $this->registrationMessages . $this->generateRegistrationForm()
+            $tabbedForms = $this->markupGenerator->generateTabs( array(
+                'Log In'   => $this->loginForm->getOutput(),
+                'Register' => $this->registrationMessages . $this->registrationForm->getOutput()
             ), $activeTabNumber );
 
             $this->output .= $tabbedForms;
@@ -80,21 +71,15 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     private function makeInviteResponseForm() {
-        if ( $this->isInvite() and $this->UserManager->isUserLoggedIn() and !$this->isInviteFormSubmitted() ) {
-            $currentUrl = $this->AssetLocator->getCurrentPageUrl();
-
-            $Form = new HfGenericForm( $currentUrl );
-            $Form->addInfoMessage( "Looks like you're responding to an invite. What would you like to do?" );
-            $Form->addSubmitButton( 'accept', 'Accept invitation' );
-            $Form->addSubmitButton( 'ignore', 'Ignore invitation' );
-
-            $this->output .= $Form->getHtml();
+        if ( $this->isInvite() and $this->userManager->isUserLoggedIn() and !$this->isInviteFormSubmitted() ) {
+            $inviteResponseForm = $this->inviteResponeForm->getOutput();
+            $this->output .= $inviteResponseForm;
         }
     }
 
     private function displayLoginAndRegistrationSuccessMessages() {
         if ( $this->isLoginSuccessful or $this->isRegistrationSuccessful ) {
-            $this->output = $this->loginMessages . $this->registrationMessages . $this->output;
+            $this->output = $this->registrationMessages . $this->output;
         }
     }
 
@@ -104,14 +89,6 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     private function isLoggingIn() {
         return isset( $_POST['login'] );
-    }
-
-    private function validateLoginForm() {
-        if ( $this->isLoggingIn() ) {
-            $this->loginMessages .=
-                $this->missingUsernameError() .
-                $this->missingPasswordError();
-        }
     }
 
     private function validateRegistrationForm() {
@@ -125,22 +102,6 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         }
     }
 
-    private function postProcessLogin() {
-        if ( $this->isLoggingIn() and $this->isLoginFormValid() ) {
-            $this->determineLoginSuccess();
-
-            if ( $this->isLoginSuccessful ) {
-                $userId = $this->UserManager->getCurrentUserId();
-                $this->processInvite($userId);
-                $this->loginMessages .= $this->MarkupGenerator->makeSuccessMessage( 'Welcome back!' );
-                $this->redirectUserHome();
-            } else {
-                $errorMessageText = 'That username and password combination is incorrect.';
-                $this->loginMessages .= $this->MarkupGenerator->makeErrorMessage( $errorMessageText );
-            }
-        }
-    }
-
     private function processRegistrationRequest() {
         if ( $this->isRegistering() and $this->isRegistrationFormValid() ) {
             $this->attemptRegistration();
@@ -149,18 +110,18 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
 
     private function processInviteFormSubmission() {
         if ( $this->isInvite() and $this->isInviteAccepted() ) {
-            $userId = $this->UserManager->getCurrentUserId();
+            $userId = $this->userManager->getCurrentUserId();
             $this->processInvite($userId);
-            $this->output .= $this->MarkupGenerator->makeSuccessMessage( 'Invitation processed successfully.' );
+            $this->output .= $this->markupGenerator->makeSuccessMessage( 'Invitation processed successfully.' );
         } elseif ( $this->isInviteIgnored() ) {
-            $this->output .= $this->MarkupGenerator->makeSuccessMessage( 'Invitation ignored successfully.' );
+            $this->output .= $this->markupGenerator->makeSuccessMessage( 'Invitation ignored successfully.' );
         }
     }
 
     private function informInvitedUser() {
         if ( $this->isInvite() ) {
             $infoMessageText = "Looks like you're responding to an invitation. Feel free to either register or log into an existing account—either way we'll automatically set up accountability between you and the user who invited you.";
-            $this->output .= $this->MarkupGenerator->makeInfoMessage( $infoMessageText );
+            $this->output .= $this->markupGenerator->makeInfoMessage( $infoMessageText );
         }
     }
 
@@ -176,38 +137,6 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         }
     }
 
-    private function generateLoginForm() {
-        $Form = new HfGenericForm( $this->AssetLocator->getCurrentPageUrl() );
-
-        $Form->addTextBox( 'username', 'Username', $this->username, true );
-        $Form->addPasswordBox( 'password', 'Password', true );
-        $Form->addSubmitButton( 'login', 'Log In' );
-
-        return $Form->getHtml();
-    }
-
-    private function generateRegistrationForm() {
-        $Form = new HfGenericForm( $this->AssetLocator->getCurrentPageUrl() );
-
-        $usernameChoiceMessage = '<strong>Important:</strong> HabitFree is a '
-                . 'support community. For this reason, please choose a '
-                . 'non-personally-identifiable username.';
-        $passwordChoiceMessage = '<strong>Important:</strong> Please '
-                . 'choose a secure password. The most secure passwords are '
-                . 'randomly generated. You can do that '
-                . '<a href="https://lastpass.com/generate">here.</a>';
-        
-        $Form->addInfoMessage( $usernameChoiceMessage );
-        $Form->addTextBox( 'username', 'Username', $this->username, true );
-        $Form->addTextBox( 'email', 'Email', $this->email, true );
-        $Form->addInfoMessage( $passwordChoiceMessage );
-        $Form->addPasswordBox( 'password', 'Password', true );
-        $Form->addPasswordBox( 'passwordConfirmation', 'Confirm Password', true );
-        $Form->addSubmitButton( 'register', 'Register' );
-
-        return $Form->getHtml();
-    }
-
     private function isInvite() {
         return !empty( $_GET['n'] );
     }
@@ -217,59 +146,39 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     private function missingUsernameError() {
-        $errorMessage = $this->MarkupGenerator->makeErrorMessage( 'Please enter your username.' );
+        $errorMessage = $this->markupGenerator->makeErrorMessage( 'Please enter your username.' );
 
         return ( $this->isUsernameMissing() ) ? $errorMessage : '';
     }
 
     private function missingPasswordError() {
-        $errorMessage = $this->MarkupGenerator->makeErrorMessage( 'Please enter your password.' );
+        $errorMessage = $this->markupGenerator->makeErrorMessage( 'Please enter your password.' );
 
         return ( $this->isPasswordMissing() ) ? $errorMessage : '';
     }
 
     private function invalidEmailError() {
-        $errorMessage = $this->MarkupGenerator->makeErrorMessage( 'Please enter a valid email address.' );
+        $errorMessage = $this->markupGenerator->makeErrorMessage( 'Please enter a valid email address.' );
 
         return ( $this->isEmailMalformed() ) ? $errorMessage : '';
     }
 
     private function emailTakenError() {
-        $errorMessage = $this->MarkupGenerator->makeErrorMessage( 'That email is already taken. Did you mean to log in?' );
+        $errorMessage = $this->markupGenerator->makeErrorMessage( 'That email is already taken. Did you mean to log in?' );
 
         return ( $this->isEmailTaken() ) ? $errorMessage : '';
     }
 
     private function passwordMatchError() {
-        $errorMessage = $this->MarkupGenerator->makeErrorMessage( 'Please make sure your passwords match.' );
+        $errorMessage = $this->markupGenerator->makeErrorMessage( 'Please make sure your passwords match.' );
 
         return ( $this->isPasswordMismatch() ) ? $errorMessage : '';
     }
 
-    private function isLoginFormValid() {
-        return empty( $this->loginMessages );
-    }
-
-    public function attemptLogin() {
-        if ($this->isLoggingIn()) {
-            $success = $this->Cms->authenticateUser($_POST['username'], $_POST['password']);
-            if ($success) {
-                $this->refreshPage();
-            }
-        }
-    }
-
     private function processInvite($userId) {
         if ( $this->isInvite() ) {
-            $inviteeEmail = $this->Cms->getUserEmail( $userId );
-            $this->UserManager->processInvite( $inviteeEmail, $_GET['n'] );
+            $this->userManager->processInvite( $userId, $_GET['n'] );
         }
-    }
-
-    private function redirectUserHome() {
-        $url = $this->AssetLocator->getHomePageUrl();
-        $this->output .= $this->makeRedirectMessage( $url );
-        $this->output .= $this->MarkupGenerator->makeRedirectScript($url);
     }
 
     private function isRegistrationFormValid() {
@@ -277,13 +186,9 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     private function attemptRegistration() {
-        $userIdOrError = $this->Cms->createUser( $_POST['username'], $_POST['password'], $_POST['email'] );
-        if ( !$this->Cms->isError($userIdOrError) ) {
-            $this->isRegistrationSuccessful = true;
-            $this->attemptLogin();
-            $this->processInvite($userIdOrError);
-            $this->enqueueRegistrationSuccessMessage();
-            $this->redirectUserHome();
+        $userIdOrError = $this->cms->createUser( $_POST['username'], $_POST['password'], $_POST['hfEmail'] );
+        if ( !$this->cms->isError($userIdOrError) ) {
+            $this->processSuccessfulRegistration($userIdOrError);
         } else {
             $this->enqueueRegistrationErrorMessage();
         }
@@ -306,11 +211,11 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     private function isEmailMalformed() {
-        return !filter_var( $_POST['email'], FILTER_VALIDATE_EMAIL );
+        return !filter_var( $_POST['hfEmail'], FILTER_VALIDATE_EMAIL );
     }
 
     private function isEmailTaken() {
-        return $this->Cms->isEmailTaken( $_POST['email'] );
+        return $this->cms->isEmailTaken( $_POST['hfEmail'] );
     }
 
     private function isPasswordMismatch() {
@@ -320,30 +225,25 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private function makeRedirectMessage( $url ) {
         $infoMessageText = 'Redirecting... <a href="' . $url . '">Click here</a> if you are not automatically redirected. <a href="' . $url . '">Onward!</a>';
 
-        return $this->MarkupGenerator->makeInfoMessage( $infoMessageText );
-    }
-
-    private function determineLoginSuccess() {
-        $currentUserUsername = $this->UserManager->getCurrentUserLogin();
-        $success = ( $currentUserUsername === $_POST['username'] );
-        if ( $success ) {
-            $this->isLoginSuccessful = true;
-        }
+        return $this->markupGenerator->makeInfoMessage( $infoMessageText );
     }
 
     private function enqueueRegistrationErrorMessage()
     {
         $errorMessageText = "We're very sorry, but something seems to have gone wrong with your registration.";
-        $this->registrationMessages .= $this->MarkupGenerator->makeErrorMessage($errorMessageText);
+        $this->registrationMessages .= $this->markupGenerator->makeErrorMessage($errorMessageText);
     }
 
     private function enqueueRegistrationSuccessMessage()
     {
-        $this->registrationMessages .= $this->MarkupGenerator->makeSuccessMessage('Welcome to HabitFree!');
+        $this->registrationMessages .= $this->markupGenerator->makeSuccessMessage('Welcome to HabitFree!');
     }
 
-    private function refreshPage()
+    private function processSuccessfulRegistration($userIdOrError)
     {
-        print $this->MarkupGenerator->makeRefreshScript();
+        $this->isRegistrationSuccessful = true;
+        $this->processInvite($userIdOrError);
+        $this->enqueueRegistrationSuccessMessage();
+        $this->registrationMessages .= $this->loginForm->getOutput();
     }
 } 

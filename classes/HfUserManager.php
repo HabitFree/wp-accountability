@@ -1,61 +1,61 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
 class HfUserManager implements Hf_iUserManager {
-    private $Database;
-    private $Messenger;
-    private $AssetLocator;
-    private $Cms;
-    private $CodeLibrary;
+    private $database;
+    private $messenger;
+    private $assetLocator;
+    private $cms;
+    private $codeLibrary;
 
-    function HfUserManager( Hf_iDatabase $Database, Hf_iMessenger $Messenger, Hf_iAssetLocator $PageLocator, Hf_iCms $ContentManagementSystem, Hf_iCodeLibrary $CodeLibrary ) {
-        $this->Database     = $Database;
-        $this->Messenger    = $Messenger;
-        $this->AssetLocator = $PageLocator;
-        $this->Cms          = $ContentManagementSystem;
-        $this->CodeLibrary  = $CodeLibrary;
+    function HfUserManager( Hf_iDatabase $database, Hf_iMessenger $messenger, Hf_iAssetLocator $pageLocator, Hf_iCms $contentManagementSystem, Hf_iCodeLibrary $codeLibrary ) {
+        $this->database     = $database;
+        $this->messenger    = $messenger;
+        $this->assetLocator = $pageLocator;
+        $this->cms          = $contentManagementSystem;
+        $this->codeLibrary  = $codeLibrary;
     }
 
     function processAllUsers() {
-        $users = $this->Cms->getUsers();
+        $users = $this->cms->getUsers();
         foreach ( $users as $user ) {
-            $this->Database->setDefaultGoalSubscription($user->ID);
+            $this->database->setDefaultGoalSubscription($user->ID);
         }
     }
 
     function processNewUser( $userId ) {
-        $this->Database->setDefaultGoalSubscription($userId);
+        $this->database->setDefaultGoalSubscription($userId);
         $this->sendWelcomeMessage($userId);
     }
 
     function getCurrentUserLogin() {
-        $user = $this->Cms->currentUser();
+        $user = $this->cms->currentUser();
         return $user->user_login;
     }
 
     function getCurrentUserId() {
-        return $this->Cms->currentUser()->ID;
+        return $this->cms->currentUser()->ID;
     }
 
     public function sendInvitation( $inviterId, $address ) {
-        $inviteId        = $this->Messenger->generateSecureEmailId();
-        $inviteURL       = $this->Messenger->generateInviteURL( $inviteId );
+        $inviteId        = $this->messenger->generateSecureEmailId();
+        $inviteURL       = $this->messenger->generateInviteURL( $inviteId );
         $inviterUsername = $this->getUsernameById( $inviterId, true );
         $subject         = $inviterUsername . ' just invited you to partner with them at HabitFree!';
         $body            = "<p>" . $inviterUsername . " would like to become accountability partners with you on HabitFree. HabitFree is a community of young people striving for God's ideal of purity and Christian freedom.</p><p><a href='" . $inviteURL . "'>Click here to join " . $inviterUsername . " in his quest!</a></p>";
 
-        $emailId = $this->Messenger->sendEmailToAddress( $address, $subject, $body );
+        $emailId = $this->messenger->sendEmailToAddress( $address, $subject, $body );
 
         $expirationDate = $this->generateExpirationDate( 7 );
 
         if ( $emailId !== false ) {
-            $this->Database->recordInvite( $inviteId, $inviterId, $address, $emailId, $expirationDate );
+            $this->database->recordInvite( $inviteId, $inviterId, $address, $emailId, $expirationDate );
         }
 
         return $inviteId;
     }
 
     private function generateExpirationDate( $daysToExpire ) {
-        $expirationTime = $this->CodeLibrary->convertStringToTime( '+' . $daysToExpire . ' days' );
+        $expirationTime = $this->codeLibrary->convertStringToTime( '+' . $daysToExpire . ' days' );
 
         return date( 'Y-m-d H:i:s', $expirationTime );
     }
@@ -69,34 +69,33 @@ class HfUserManager implements Hf_iUserManager {
         }
     }
 
-    public function processInvite( $inviteeEmail, $nonce ) {
-        $this->Messenger->deleteExpiredInvites();
+    public function processInvite( $inviteeId, $nonce ) {
+        $this->messenger->deleteExpiredInvites();
 
-        $inviteeID = $this->Cms->getUserIdByEmail( $inviteeEmail );
-        $inviterID = $this->Database->getInviterId( $nonce );
+        $inviterId = $this->database->getInviterId( $nonce );
 
-        $this->Database->createRelationship( $inviteeID, $inviterID );
-        $this->Database->deleteInvite( $nonce );
+        $this->database->createRelationship( $inviteeId, $inviterId );
+        $this->database->deleteInvite( $nonce );
     }
 
     public function isUserLoggedIn() {
-        return $this->Cms->isUserLoggedIn();
+        return $this->cms->isUserLoggedIn();
     }
 
     public function getPartners( $userId ) {
-        return $this->Database->getPartners( $userId );
+        return $this->database->getPartners( $userId );
     }
 
     public function deleteRelationship($userId1, $userId2) {
-        $this->Database->deleteRelationship($userId1, $userId2);
+        $this->database->deleteRelationship($userId1, $userId2);
     }
 
     private function sendWelcomeMessage($userId)
     {
-        $settingsPageURL = $this->AssetLocator->getPageUrlByTitle('Settings');
+        $settingsPageURL = $this->assetLocator->getPageUrlByTitle('Settings');
         $message = "<p>Welcome to HabitFree!
 				You've been subscribed to periodic accountability emails.
 				You can <a href='" . $settingsPageURL . "'>edit your subscription settings by clicking here</a>.</p>";
-        $this->Messenger->sendEmailToUser($userId, 'Welcome!', $message);
+        $this->messenger->sendEmailToUser($userId, 'Welcome!', $message);
     }
 }

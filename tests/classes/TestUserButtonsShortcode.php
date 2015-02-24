@@ -22,7 +22,7 @@ class TestUserButtonsShortcode extends HfTestCase {
     public function testUserButtonsShortcodeWelcomesUser() {
         $AssetLocator = $this->makeMock('HfUrlFinder');
         $UserManager = $this->makeMock('HfUserManager');
-        $MarkupGenerator = $this->Factory->makeMarkupGenerator();
+        $MarkupGenerator = $this->factory->makeMarkupGenerator();
 
         $this->setReturnValue($UserManager, 'getCurrentUserLogin', 'Admin');
         $this->setReturnValue($UserManager, 'isUserLoggedIn', true);
@@ -38,7 +38,7 @@ class TestUserButtonsShortcode extends HfTestCase {
     public function testUserButtonsShortcodeWelcomesDifferentUser() {
         $AssetLocator = $this->makeMock('HfUrlFinder');
         $UserManager = $this->makeMock('HfUserManager');
-        $MarkupGenerator = $this->Factory->makeMarkupGenerator();
+        $MarkupGenerator = $this->factory->makeMarkupGenerator();
 
         $this->setReturnValue($UserManager, 'getCurrentUserLogin', 'Rodney');
         $this->setReturnValue($UserManager, 'isUserLoggedIn', true);
@@ -54,7 +54,7 @@ class TestUserButtonsShortcode extends HfTestCase {
     public function testUserButtonsShortcodeDisplaysLogOutLink() {
         $AssetLocator = $this->makeMock('HfUrlFinder');
         $UserManager = $this->makeMock('HfUserManager');
-        $MarkupGenerator = $this->Factory->makeMarkupGenerator();
+        $MarkupGenerator = $this->factory->makeMarkupGenerator();
 
         $this->setReturnValue($UserManager, 'getCurrentUserLogin', 'Rodney');
         $this->setReturnValue($AssetLocator, 'getLogoutUrl', 'google.com');
@@ -73,7 +73,7 @@ class TestUserButtonsShortcode extends HfTestCase {
     public function testUserButtonsShortcodeDoesntDisplayLogoutLinkWhenNotLoggedIn() {
         $UserManager = $this->makeMock('HfUserManager');
         $AssetLocator = $this->makeMock('HfUrlFinder');
-        $MarkupGenerator = $this->Factory->makeMarkupGenerator();
+        $MarkupGenerator = $this->factory->makeMarkupGenerator();
 
         $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator, $MarkupGenerator);
 
@@ -86,9 +86,9 @@ class TestUserButtonsShortcode extends HfTestCase {
     }
 
     public function testUserButtonsShortcodeIncludesClosingParagraphTag() {
-        $UserManager = $this->Factory->makeUserManager();
+        $UserManager = $this->factory->makeUserManager();
         $AssetLocator = $this->makeMock('HfUrlFinder');
-        $MarkupGenerator = $this->Factory->makeMarkupGenerator();
+        $MarkupGenerator = $this->factory->makeMarkupGenerator();
 
         $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator, $MarkupGenerator);
 
@@ -101,7 +101,7 @@ class TestUserButtonsShortcode extends HfTestCase {
     public function testUserButtonsShortcodeDisplaysLogInLink() {
         $AssetLocator = $this->makeMock('HfUrlFinder');
         $UserManager = $this->makeMock('HfUserManager');
-        $MarkupGenerator = $this->Factory->makeMarkupGenerator();
+        $MarkupGenerator = $this->factory->makeMarkupGenerator();
 
         $this->setReturnValue($UserManager, 'getCurrentUserLogin', 'Rodney');
         $this->setReturnValue($AssetLocator, 'getLoginUrl', 'google.com');
@@ -119,7 +119,7 @@ class TestUserButtonsShortcode extends HfTestCase {
     public function testUserButtonsShortcodeDisplaysSettingsLink() {
         $AssetLocator = $this->makeMock('HfUrlFinder');
         $UserManager = $this->makeMock('HfUserManager');
-        $MarkupGenerator = $this->Factory->makeMarkupGenerator();
+        $MarkupGenerator = $this->factory->makeMarkupGenerator();
 
         $this->setReturnValue($UserManager, 'getCurrentUserLogin', 'Rodney');
         $this->setReturnValue($AssetLocator, 'getPageUrlByTitle', 'yahoo.com');
@@ -137,7 +137,7 @@ class TestUserButtonsShortcode extends HfTestCase {
     public function testUserButtonsShortcodeDisplaysRegisterLink() {
         $AssetLocator = $this->makeMock('HfUrlFinder');
         $UserManager = $this->makeMock('HfUserManager');
-        $MarkupGenerator = $this->Factory->makeMarkupGenerator();
+        $MarkupGenerator = $this->factory->makeMarkupGenerator();
 
         $this->setReturnValue($UserManager, 'getCurrentUserLogin', 'Rodney');
         $this->setReturnValue($AssetLocator, 'getPageUrlByTitle', 'nathanarthur.com');

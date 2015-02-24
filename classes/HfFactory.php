@@ -68,8 +68,9 @@ class HfFactory {
 
     public function makeMarkupGenerator() {
         $Cms = $this->makeCms();
+        $assetLocator = $this->makeAssetLocator();
 
-        return new HfHtmlGenerator( $Cms );
+        return new HfHtmlGenerator( $Cms, $assetLocator );
     }
 
     public function makeInvitePartnerShortcode() {
@@ -89,12 +90,23 @@ class HfFactory {
     }
 
     public function makeAuthenticateShortcode() {
-        $MarkupGenerator = $this->makeMarkupGenerator();
-        $AssetLocator    = $this->makeAssetLocator();
-        $Cms             = $this->makeCms();
-        $UserManager     = $this->makeUserManager();
+        $MarkupGenerator    = $this->makeMarkupGenerator();
+        $AssetLocator       = $this->makeAssetLocator();
+        $Cms                = $this->makeCms();
+        $UserManager        = $this->makeUserManager();
+        $LoginForm          = $this->makeLoginForm();
+        $RegistrationForm   = $this->makeRegistrationForm();
+        $InviteResponseForm = $this->makeInviteResponseForm();
 
-        return new HfAuthenticateShortcode( $MarkupGenerator, $AssetLocator, $Cms, $UserManager );
+        return new HfAuthenticateShortcode(
+            $MarkupGenerator,
+            $AssetLocator,
+            $Cms,
+            $UserManager,
+            $LoginForm,
+            $RegistrationForm,
+            $InviteResponseForm
+        );
     }
 
     public function makeGoalsShortcode() {
@@ -128,12 +140,46 @@ class HfFactory {
     }
 
     public function makeAdminPanel() {
-        $Messenger    = $this->makeMessenger();
-        $AssetLocator = $this->makeAssetLocator();
-        $Database     = $this->makeDatabase();
-        $UserManager  = $this->makeUserManager();
-        $Cms          = $this->makeCms();
+        $actionUrl = $this->getCurrentUrl();
 
-        return new HfAdminPanel( $Messenger, $AssetLocator, $Database, $UserManager, $Cms );
+        $markupGenerator = $this->makeMarkupGenerator();
+        $messenger    = $this->makeMessenger();
+        $assetLocator = $this->makeAssetLocator();
+        $database     = $this->makeDatabase();
+        $userManager  = $this->makeUserManager();
+        $cms          = $this->makeCms();
+
+        return new HfAdminPanel( $actionUrl, $markupGenerator, $messenger, $assetLocator, $database, $userManager, $cms );
+    }
+
+    public function makeLoginForm() {
+        $actionUrl = $this->getCurrentUrl();
+        $markupGenerator = $this->makeMarkupGenerator();
+        $cms = $this->makeCms();
+        $assetLocator = $this->makeAssetLocator();
+        $userManager = $this->makeUserManager();
+
+        return new HfLoginForm($actionUrl, $markupGenerator, $cms, $assetLocator, $userManager);
+    }
+
+    public function makeRegistrationForm() {
+        $actionUrl = $this->getCurrentUrl();
+        $markupGenerator = $this->makeMarkupGenerator();
+
+        return new HfRegistrationForm($actionUrl, $markupGenerator);
+    }
+
+    public function makeInviteResponseForm() {
+        $actionUrl = $this->getCurrentUrl();
+        $markupGenerator = $this->makeMarkupGenerator();
+
+        return new HfInviteResponseForm($actionUrl, $markupGenerator);
+    }
+
+    private function getCurrentUrl()
+    {
+        $assetLocator = $this->makeAssetLocator();
+        $actionUrl = $assetLocator->getCurrentPageUrl();
+        return $actionUrl;
     }
 } 
