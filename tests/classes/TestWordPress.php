@@ -13,7 +13,8 @@ class TestWordPress extends HfTestCase {
             'prepareQuery',
             'insertOrReplaceRow',
             'getOption',
-            'getPluginDirectoryUrl'
+            'getPluginDirectoryUrl',
+            'getNonceField'
         );
 
         foreach($methods as $method) {

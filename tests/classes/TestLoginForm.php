@@ -131,4 +131,15 @@ class TestLoginForm extends HfTestCase {
         $this->expectNever($this->mockMarkupGenerator, 'makeErrorMessage', array('Please enter your username.'));
         $this->mockedLoginForm->getOutput();
     }
+
+    public function testGetsNonceField() {
+        $this->expectOnce($this->mockCms,'getNonceField',array('hfAttemptLogin'));
+        $this->mockedLoginForm->getOutput();
+    }
+
+    public function testOutputsNonceField() {
+        $this->setReturnValue($this->mockCms,'getNonceField','nonceField');
+        $haystack = $this->mockedLoginForm->getOutput();
+        $this->assertContains('nonceField',$haystack);
+    }
 }

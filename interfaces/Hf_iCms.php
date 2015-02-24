@@ -64,4 +64,6 @@ interface Hf_iCms {
     public function getPluginDirectoryUrl($plugin);
 
     public function getUsers();
+
+    public function getNonceField($action);
 }
