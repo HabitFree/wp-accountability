@@ -62,7 +62,7 @@ class HfLoginForm extends HfForm {
     {
         if (empty($_POST['username'])) {
             $error = $this->markupGenerator->makeErrorMessage('Please enter your username.');
-            $this->enqueError($error);
+            $this->enqueueError($error);
         }
     }
 
@@ -70,7 +70,7 @@ class HfLoginForm extends HfForm {
     {
         if (empty($_POST['password'])) {
             $error = $this->markupGenerator->makeErrorMessage('Please enter your password.');
-            $this->enqueError($error);
+            $this->enqueueError($error);
         }
     }
 
@@ -78,11 +78,11 @@ class HfLoginForm extends HfForm {
     {
         if ($this->isLoggingIn()) {
             $error = $this->markupGenerator->makeErrorMessage('That username and password combination is incorrect.');
-            $this->enqueError($error);
+            $this->enqueueError($error);
         }
     }
 
-    private function enqueError($error)
+    private function enqueueError($error)
     {
         array_unshift($this->elements, $error);
     }
