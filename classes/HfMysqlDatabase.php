@@ -340,16 +340,12 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function daysSinceLastReport( $goalId, $userId ) {
-        $t = $this->cms->getDbPrefix() . 'hf_report';
-
-        $format = "SELECT date FROM $t " .
-            "WHERE reportID=( SELECT max(reportID) FROM $t WHERE goalID = %d AND userID = %d )";
-        $query  = $this->cms->prepareQuery( $format, array( $goalId, $userId ) );
-
-        $dateInSecondsOfLastReport = strtotime( $this->cms->getVar( $query ) );
+        $dateInSecondsOfLastReport = $this->getDateInSecondsOfLastReport($goalId, $userId);
         $secondsInADay             = 86400;
+        $secondsSinceLastReport = time() - $dateInSecondsOfLastReport;
+        $daysSinceLastReport = $secondsSinceLastReport / $secondsInADay;
 
-        return ( time() - $dateInSecondsOfLastReport ) / $secondsInADay;
+        return $dateInSecondsOfLastReport ? $daysSinceLastReport : false;
     }
 
     public function daysSinceAnyReport( $userId ) {
@@ -602,5 +598,17 @@ class HfMysqlDatabase implements Hf_iDatabase {
 
         $table = $this->cms->getDbPrefix() . "hf_invite";
         $this->cms->insertIntoDb( $table, $data, array( '%s', '%d', '%s', '%d', '%s' ) );
+    }
+
+    private function getDateInSecondsOfLastReport($goalId, $userId)
+    {
+        $t = $this->cms->getDbPrefix() . 'hf_report';
+
+        $format = "SELECT date FROM $t " .
+            "WHERE reportID=( SELECT max(reportID) FROM $t WHERE goalID = %d AND userID = %d )";
+        $query = $this->cms->prepareQuery($format, array($goalId, $userId));
+
+        $dateInSecondsOfLastReport = strtotime($this->cms->getVar($query));
+        return $dateInSecondsOfLastReport;
     }
 }

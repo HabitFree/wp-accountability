@@ -859,4 +859,10 @@ class TestDatabase extends HfTestCase {
 
         $this->mockedDatabase->getGoalSubscriptions( 3 );
     }
+
+    public function testDaysSinceLastReportReturnsFalseIfNoLastReport() {
+        $this->setReturnValue($this->mockCms,'getVar',false);
+        $result = $this->mockedDatabase->daysSinceLastReport(1,1);
+        $this->assertEquals($result,false);
+    }
 }

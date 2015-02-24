@@ -277,4 +277,80 @@ class TestHtmlGenerator extends HfTestCase {
 
         $this->assertEquals($result, $expected);
     }
+
+    public function testMakeGoalCardRecognizesNoReport() {
+        $goalTitle = 'Title';
+        $goalDescription = '';
+        $goalId = 1;
+        $daysSinceLastReport = false;
+        $levelId = 2;
+        $levelTitle = 'Title';
+        $levelPercent = 0;
+        $levelDaysToComplete = 14;
+        $levelBar = '';
+
+        $result = $this->mockedMarkupGenerator->makeGoalCard(
+            $goalTitle,
+            $goalDescription,
+            $goalId,
+            $daysSinceLastReport,
+            $levelId,
+            $levelTitle,
+            $levelPercent,
+            $levelDaysToComplete,
+            $levelBar
+        );
+
+        $expected = "<div class='report-card'>" .
+            "<div class='main'><div class='about'><h2>Title</h2></div>" .
+            "<div class='report'>Have you fallen in the last 24 hours?<div class='controls'>" .
+            "<label class='success'><input type='radio' name='1' value='1'> No</label>" .
+            "<label class='setback'><input type='radio' name='1' value='0'> Yes</label>" .
+            "</div></div></div>" .
+            "<div class='stats'>" .
+            "<p class='stat'>Level <span class='number'>2</span> Title</p>" .
+            "<p class='stat'>Level <span class='number'>0%</span> Complete</p>" .
+            "<p class='stat'>Days to <span class='number'>14</span> Next Level</p>" .
+            "</div></div>";
+
+        $this->assertEquals($result, $expected);
+    }
+
+    public function testMakeGoalCardRoundsNumbers() {
+        $goalTitle = 'Title';
+        $goalDescription = '';
+        $goalId = 1;
+        $daysSinceLastReport = 3.1415;
+        $levelId = 2;
+        $levelTitle = 'Title';
+        $levelPercent = 0;
+        $levelDaysToComplete = 14;
+        $levelBar = '';
+
+        $result = $this->mockedMarkupGenerator->makeGoalCard(
+            $goalTitle,
+            $goalDescription,
+            $goalId,
+            $daysSinceLastReport,
+            $levelId,
+            $levelTitle,
+            $levelPercent,
+            $levelDaysToComplete,
+            $levelBar
+        );
+
+        $expected = "<div class='report-card'>" .
+            "<div class='main'><div class='about'><h2>Title</h2></div>" .
+            "<div class='report'>Have you fallen since your last check-in 3 days ago?<div class='controls'>" .
+            "<label class='success'><input type='radio' name='1' value='1'> No</label>" .
+            "<label class='setback'><input type='radio' name='1' value='0'> Yes</label>" .
+            "</div></div></div>" .
+            "<div class='stats'>" .
+            "<p class='stat'>Level <span class='number'>2</span> Title</p>" .
+            "<p class='stat'>Level <span class='number'>0%</span> Complete</p>" .
+            "<p class='stat'>Days to <span class='number'>14</span> Next Level</p>" .
+            "</div></div>";
+
+        $this->assertEquals($result, $expected);
+    }
 }

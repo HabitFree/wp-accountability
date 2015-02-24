@@ -145,9 +145,7 @@ class TestGoals extends HfTestCase {
 
     private function setReturnValsForGoalCardCreation()
     {
-        $MockGoal = new stdClass();
-        $MockGoal->title = 'Title';
-        $MockGoal->description = 'Description';
+        $MockGoal = $this->makeMockGoal();
         $this->setReturnValue($this->mockDatabase, 'getGoal', $MockGoal);
 
         $MockLevel = $this->makeMockLevel();
@@ -164,7 +162,7 @@ class TestGoals extends HfTestCase {
             'Title',
             'Description',
             1,
-            3,
+            3.1415000000000002,
             2,
             'Title',
             0,
@@ -183,5 +181,34 @@ class TestGoals extends HfTestCase {
         $result = $this->mockedGoals->generateGoalCard($MockSub);
 
         $this->assertEquals('goose', $result);
+    }
+
+    public function testPassesFalseDaysSinceLastReportWhenMakingGoalCard() {
+        $this->setReturnValue($this->mockDatabase,'daysSinceLastReport',false);
+        $mockGoal = $this->makeMockGoal();
+        $this->setReturnValue( $this->mockDatabase, 'getGoal', $mockGoal );
+        $mockLevel = $this->makeMockLevel();
+        $this->setReturnValue( $this->mockDatabase, 'getLevel', $mockLevel );
+        $mockSub = $this->makeMockGoalSub();
+        $this->expectOnce($this->mockMarkupGenerator, 'makeGoalCard', array(
+            $mockGoal->title,
+            $mockGoal->description,
+            1,
+            false,
+            $mockLevel->levelID,
+            $mockLevel->title,
+            null,
+            14.0,
+            null
+        ));
+        $this->mockedGoals->generateGoalCard($mockSub);
+    }
+
+    private function makeMockGoal()
+    {
+        $MockGoal = new stdClass();
+        $MockGoal->title = 'Title';
+        $MockGoal->description = 'Description';
+        return $MockGoal;
     }
 } 

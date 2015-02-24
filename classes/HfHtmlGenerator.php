@@ -99,11 +99,11 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         $levelBar
     ) {
         $goalDescription = ($goalDescription === '' ? $goalDescription : $this->makeParagraph($goalDescription));
-        $timeElapsed = $this->makeDayPhrase($daysSinceLastReport);
+        $period = $this->makeDayPhrase($daysSinceLastReport);
 
         return "<div class='report-card'>" .
         "<div class='main'><div class='about'><h2>$goalTitle</h2>$goalDescription</div>" .
-        "<div class='report'>Have you fallen since your last check-in $timeElapsed ago?<div class='controls'>" .
+        "<div class='report'>Have you fallen $period?<div class='controls'>" .
         "<label class='success'><input type='radio' name='$goalId' value='1'> No</label>" .
         "<label class='setback'><input type='radio' name='$goalId' value='0'> Yes</label>" .
         "</div></div></div>" .
@@ -117,12 +117,18 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
 
     private function makeDayPhrase($daysSinceLastReport)
     {
-        if ($daysSinceLastReport == 0) {
-            return "less than a day";
-        } else if ($daysSinceLastReport == 1) {
-            return "$daysSinceLastReport day";
+        if ($daysSinceLastReport === false) {
+            return 'in the last 24 hours';
         } else {
-            return "$daysSinceLastReport days";
+            $days = round($daysSinceLastReport);
+            if ($days == 0) {
+                $elapsed = 'less than a day';
+            } else if ($days == 1) {
+                $elapsed = '1 day';
+            } else {
+                $elapsed = "$days days";
+            }
+            return "since your last check-in $elapsed ago";
         }
     }
 }
