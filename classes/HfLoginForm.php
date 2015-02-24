@@ -10,8 +10,7 @@ class HfLoginForm extends HfForm {
         Hf_iAssetLocator $assetLocator,
         Hf_iUserManager $userManager
     ) {
-        $this->elements = array();
-        $this->elements[] = '<form action="'.$actionUrl.'" method="post">';
+        $this->initializeElements($actionUrl);
 
         $this->markupGenerator = $markupGenerator;
         $this->cms = $cms;
@@ -32,6 +31,7 @@ class HfLoginForm extends HfForm {
         $this->addUsernameField();
         $this->addPasswordBox('password', 'Password', true);
         $this->addSubmitButton('login', 'Log In');
+        $this->addNonceField();
     }
 
     private function addUsernameField()
@@ -62,7 +62,7 @@ class HfLoginForm extends HfForm {
     {
         if (empty($_POST['username'])) {
             $error = $this->markupGenerator->makeErrorMessage('Please enter your username.');
-            $this->enqueError($error);
+            $this->enqueueError($error);
         }
     }
 
@@ -70,7 +70,7 @@ class HfLoginForm extends HfForm {
     {
         if (empty($_POST['password'])) {
             $error = $this->markupGenerator->makeErrorMessage('Please enter your password.');
-            $this->enqueError($error);
+            $this->enqueueError($error);
         }
     }
 
@@ -78,11 +78,11 @@ class HfLoginForm extends HfForm {
     {
         if ($this->isLoggingIn()) {
             $error = $this->markupGenerator->makeErrorMessage('That username and password combination is incorrect.');
-            $this->enqueError($error);
+            $this->enqueueError($error);
         }
     }
 
-    private function enqueError($error)
+    private function enqueueError($error)
     {
         array_unshift($this->elements, $error);
     }
@@ -91,14 +91,10 @@ class HfLoginForm extends HfForm {
 
     public function attemptLogin()
     {
-        if ($this->isLoggingIn()) {
+        if ($this->isOkToAttemptLogin()) {
             $userOrError = $this->cms->authenticateUser($_POST['username'], $_POST['password']);
-
             if ($this->isLoginSuccessful($userOrError)) {
-                if ($this->isInvite()) {
-                    $this->userManager->processInvite($userOrError->ID, $_GET['n']);
-                }
-                $this->redirectUser();
+                $this->processLoginSuccess($userOrError);
             }
         }
     }
@@ -122,5 +118,23 @@ class HfLoginForm extends HfForm {
     {
         $homeUrl = $this->assetLocator->getHomePageUrl();
         print $this->markupGenerator->makeRedirectScript($homeUrl);
+    }
+
+    private function processLoginSuccess($userOrError)
+    {
+        if ($this->isInvite()) {
+            $this->userManager->processInvite($userOrError->ID, $_GET['n']);
+        }
+        $this->redirectUser();
+    }
+
+    private function addNonceField()
+    {
+        $this->elements[] = $this->cms->getNonceField('hfAttemptLogin');
+    }
+
+    private function isOkToAttemptLogin()
+    {
+        return $this->isLoggingIn() && $this->cms->isNonceValid($_POST['_wpnonce'], 'hfAttemptLogin');
     }
 } 

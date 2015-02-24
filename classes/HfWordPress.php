@@ -147,4 +147,12 @@ class HfWordPress implements Hf_iCms {
     public function getUsers() {
         return get_users();
     }
+
+    public function getNonceField($action) {
+        return wp_nonce_field($action,'_wpnonce',true,false);
+    }
+
+    public function isNonceValid($nonce, $action) {
+        return wp_verify_nonce($nonce, $action);
+    }
 } 

@@ -5,8 +5,7 @@ abstract class HfForm {
     protected $markupGenerator;
 
     public function __construct($actionUrl, Hf_iMarkupGenerator $markupGenerator) {
-        $this->elements = array();
-        $this->elements[] = '<form action="'.$actionUrl.'" method="post">';
+        $this->initializeElements($actionUrl);
 
         $this->markupGenerator = $markupGenerator;
     }
@@ -47,5 +46,10 @@ abstract class HfForm {
         }
         $html .= '</form>';
         return $html;
+    }
+
+    protected function initializeElements($actionUrl)
+    {
+        $this->elements = array('<form action="' . $actionUrl . '" method="post">');
     }
 } 
