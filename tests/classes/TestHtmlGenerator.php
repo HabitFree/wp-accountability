@@ -121,7 +121,7 @@ class TestHtmlGenerator extends HfTestCase {
     }
 
     public function testMakeGoalCard() {
-        $goalTitle = 'Title';
+        $verb = 'Title';
         $goalDescription = 'Description';
         $goalId = 1;
         $daysSinceLastReport = 3;
@@ -132,7 +132,7 @@ class TestHtmlGenerator extends HfTestCase {
         $levelBar = '';
 
         $result = $this->mockedMarkupGenerator->makeGoalCard(
-            $goalTitle,
+            $verb,
             $goalDescription,
             $goalId,
             $daysSinceLastReport,
@@ -145,10 +145,7 @@ class TestHtmlGenerator extends HfTestCase {
 
         $expected = "<div class='report-card'>" .
             "<div class='main'>" .
-            "<div class='report'>Did you Title since your last check-in 3 days ago?<div class='controls'>" .
-            "<label class='success'><input type='radio' name='1' value='1'> No</label>" .
-            "<label class='setback'><input type='radio' name='1' value='0'> Yes</label>" .
-            "</div></div></div>" .
+            $this->makeReportDiv($verb,'since your last check-in 3 days ago') . "</div></div>" .
             "<div class='stats'>" .
             "<p class='stat'>Level <span class='number'>2</span> Title</p>" .
             "<p class='stat'>Level <span class='number'>0%</span> Complete</p>" .
@@ -159,7 +156,7 @@ class TestHtmlGenerator extends HfTestCase {
     }
 
     public function testMakeGoalCardDoesntIncludeEmptyDescriptionParagraph() {
-        $goalTitle = 'Title';
+        $verb = 'Title';
         $goalDescription = '';
         $goalId = 1;
         $daysSinceLastReport = 3;
@@ -170,7 +167,7 @@ class TestHtmlGenerator extends HfTestCase {
         $levelBar = '';
 
         $result = $this->mockedMarkupGenerator->makeGoalCard(
-            $goalTitle,
+            $verb,
             $goalDescription,
             $goalId,
             $daysSinceLastReport,
@@ -183,10 +180,7 @@ class TestHtmlGenerator extends HfTestCase {
 
         $expected = "<div class='report-card'>" .
             "<div class='main'>" .
-            "<div class='report'>Did you Title since your last check-in 3 days ago?<div class='controls'>" .
-            "<label class='success'><input type='radio' name='1' value='1'> No</label>" .
-            "<label class='setback'><input type='radio' name='1' value='0'> Yes</label>" .
-            "</div></div></div>" .
+            $this->makeReportDiv($verb,'since your last check-in 3 days ago') . "</div></div>" .
             "<div class='stats'>" .
             "<p class='stat'>Level <span class='number'>2</span> Title</p>" .
             "<p class='stat'>Level <span class='number'>0%</span> Complete</p>" .
@@ -203,7 +197,7 @@ class TestHtmlGenerator extends HfTestCase {
     }
 
     public function testMakeGoalCardDoesntSay1Days() {
-        $goalTitle = 'Title';
+        $verb = 'Title';
         $goalDescription = '';
         $goalId = 1;
         $daysSinceLastReport = 1;
@@ -214,7 +208,7 @@ class TestHtmlGenerator extends HfTestCase {
         $levelBar = '';
 
         $result = $this->mockedMarkupGenerator->makeGoalCard(
-            $goalTitle,
+            $verb,
             $goalDescription,
             $goalId,
             $daysSinceLastReport,
@@ -227,10 +221,7 @@ class TestHtmlGenerator extends HfTestCase {
 
         $expected = "<div class='report-card'>" .
             "<div class='main'>" .
-            "<div class='report'>Did you Title since your last check-in 1 day ago?<div class='controls'>" .
-            "<label class='success'><input type='radio' name='1' value='1'> No</label>" .
-            "<label class='setback'><input type='radio' name='1' value='0'> Yes</label>" .
-            "</div></div></div>" .
+            $this->makeReportDiv($verb,'since your last check-in 1 day ago') . "</div></div>" .
             "<div class='stats'>" .
             "<p class='stat'>Level <span class='number'>2</span> Title</p>" .
             "<p class='stat'>Level <span class='number'>0%</span> Complete</p>" .
@@ -265,10 +256,7 @@ class TestHtmlGenerator extends HfTestCase {
 
         $expected = "<div class='report-card'>" .
             "<div class='main'>" .
-            "<div class='report'>Did you Title since your last check-in less than a day ago?<div class='controls'>" .
-            "<label class='success'><input type='radio' name='1' value='1'> No</label>" .
-            "<label class='setback'><input type='radio' name='1' value='0'> Yes</label>" .
-            "</div></div></div>" .
+            $this->makeReportDiv($goalTitle, 'since your last check-in less than a day ago') . "</div></div>" .
             "<div class='stats'>" .
             "<p class='stat'>Level <span class='number'>2</span> Title</p>" .
             "<p class='stat'>Level <span class='number'>0%</span> Complete</p>" .
@@ -279,7 +267,7 @@ class TestHtmlGenerator extends HfTestCase {
     }
 
     public function testMakeGoalCardRecognizesNoReport() {
-        $goalTitle = 'Title';
+        $verb = 'Title';
         $goalDescription = '';
         $goalId = 1;
         $daysSinceLastReport = false;
@@ -290,7 +278,7 @@ class TestHtmlGenerator extends HfTestCase {
         $levelBar = '';
 
         $result = $this->mockedMarkupGenerator->makeGoalCard(
-            $goalTitle,
+            $verb,
             $goalDescription,
             $goalId,
             $daysSinceLastReport,
@@ -301,12 +289,11 @@ class TestHtmlGenerator extends HfTestCase {
             $levelBar
         );
 
+        $reportDiv = $this->makeReportDiv($verb,'in the last 24 hours');
+
         $expected = "<div class='report-card'>" .
             "<div class='main'>" .
-            "<div class='report'>Did you Title in the last 24 hours?<div class='controls'>" .
-            "<label class='success'><input type='radio' name='1' value='1'> No</label>" .
-            "<label class='setback'><input type='radio' name='1' value='0'> Yes</label>" .
-            "</div></div></div>" .
+            $reportDiv ."</div></div>" .
             "<div class='stats'>" .
             "<p class='stat'>Level <span class='number'>2</span> Title</p>" .
             "<p class='stat'>Level <span class='number'>0%</span> Complete</p>" .
@@ -339,12 +326,10 @@ class TestHtmlGenerator extends HfTestCase {
             $levelBar
         );
 
+        $reportDiv = $this->makeReportDiv($verb, 'since your last check-in 3 days ago');
         $expected = "<div class='report-card'>" .
             "<div class='main'>" .
-            "<div class='report'>Did you verb since your last check-in 3 days ago?<div class='controls'>" .
-            "<label class='success'><input type='radio' name='1' value='1'> No</label>" .
-            "<label class='setback'><input type='radio' name='1' value='0'> Yes</label>" .
-            "</div></div></div>" .
+            $reportDiv ."</div></div>" .
             "<div class='stats'>" .
             "<p class='stat'>Level <span class='number'>2</span> Title</p>" .
             "<p class='stat'>Level <span class='number'>0%</span> Complete</p>" .
@@ -352,5 +337,14 @@ class TestHtmlGenerator extends HfTestCase {
             "</div></div>";
 
         $this->assertEquals($result, $expected);
+    }
+
+    private function makeReportDiv($verb, $periodPhrase)
+    {
+        $reportDiv = "<div class='report'>Did you <em>$verb</em> $periodPhrase?<div class='controls'>" .
+            "<label class='success'><input type='radio' name='1' value='1'> No</label>" .
+            "<label class='setback'><input type='radio' name='1' value='0'> Yes</label>" .
+            "</div>";
+        return $reportDiv;
     }
 }

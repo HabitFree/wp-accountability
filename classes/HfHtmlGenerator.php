@@ -102,7 +102,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
 
         return "<div class='report-card'>" .
         "<div class='main'>" .
-        "<div class='report'>Did you $goalVerb $periodPhrase?<div class='controls'>" .
+        "<div class='report'>Did you <em>$goalVerb</em> $periodPhrase?<div class='controls'>" .
         "<label class='success'><input type='radio' name='$goalId' value='1'> No</label>" .
         "<label class='setback'><input type='radio' name='$goalId' value='0'> Yes</label>" .
         "</div></div></div>" .
