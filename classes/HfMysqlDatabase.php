@@ -131,8 +131,8 @@ class HfMysqlDatabase implements Hf_iDatabase {
     private function populateGoalTable() {
         $pornographyGoal = array(
             'goalID'     => 1,
-            'title'      => 'Freedom from Pornography',
-            'isPositive' => 1,
+            'title'      => 'view pornography',
+            'isPositive' => 0,
             'isPrivate'  => 0
         );
 

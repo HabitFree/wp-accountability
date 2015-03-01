@@ -457,8 +457,8 @@ class TestDatabase extends HfTestCase {
     public function testInstallDbPopulatesGoalTable() {
         $defaultGoal = array(
             'goalID'     => 1,
-            'title'      => 'Freedom from Pornography',
-            'isPositive' => 1,
+            'title'      => 'view pornography',
+            'isPositive' => 0,
             'isPrivate'  => 0
         );
 
