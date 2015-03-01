@@ -457,8 +457,8 @@ class TestDatabase extends HfTestCase {
     public function testInstallDbPopulatesGoalTable() {
         $defaultGoal = array(
             'goalID'     => 1,
-            'title'      => 'Freedom from Pornography',
-            'isPositive' => 1,
+            'title'      => 'view pornography',
+            'isPositive' => 0,
             'isPrivate'  => 0
         );
 
@@ -480,8 +480,8 @@ class TestDatabase extends HfTestCase {
     public function testInstallDbPopulatesGoalTableWithSelfAbuseGoal() {
         $defaultGoal = array(
             'goalID'     => 2,
-            'title'      => 'Freedom from Self-Abuse',
-            'isPositive' => 1,
+            'title'      => 'practice self-abuse',
+            'isPositive' => 0,
             'isPrivate'  => 0
         );
 
@@ -628,9 +628,8 @@ class TestDatabase extends HfTestCase {
 
     public function testGetPartnersPreparesQuery() {
         $this->expectOnce( $this->mockCms, 'prepareQuery', array(
-            'SELECT * FROM wptests_users INNER JOIN wptests_hf_relationship
-            WHERE (userID1 = ID OR userID2 = ID)
-            AND (userID1 = %d OR userID2 = %d) AND ID != %d',
+            'SELECT * FROM wptests_users INNER JOIN wptests_hf_relationship ' .
+            'WHERE (userID1 = ID OR userID2 = ID) AND (userID1 = %d OR userID2 = %d) AND ID != %d',
             array( 2, 2, 2 )
         ) );
 
@@ -859,5 +858,11 @@ class TestDatabase extends HfTestCase {
         ) );
 
         $this->mockedDatabase->getGoalSubscriptions( 3 );
+    }
+
+    public function testDaysSinceLastReportReturnsFalseIfNoLastReport() {
+        $this->setReturnValue($this->mockCms,'getVar',false);
+        $result = $this->mockedDatabase->daysSinceLastReport(1,1);
+        $this->assertEquals($result,false);
     }
 }
