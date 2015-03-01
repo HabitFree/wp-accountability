@@ -144,8 +144,8 @@ class TestHtmlGenerator extends HfTestCase {
         );
 
         $expected = "<div class='report-card'>" .
-            "<div class='main'><div class='about'><h2>Title</h2><p>Description</p></div>" .
-            "<div class='report'>Have you fallen since your last check-in 3 days ago?<div class='controls'>" .
+            "<div class='main'>" .
+            "<div class='report'>Did you Title since your last check-in 3 days ago?<div class='controls'>" .
             "<label class='success'><input type='radio' name='1' value='1'> No</label>" .
             "<label class='setback'><input type='radio' name='1' value='0'> Yes</label>" .
             "</div></div></div>" .
@@ -182,8 +182,8 @@ class TestHtmlGenerator extends HfTestCase {
         );
 
         $expected = "<div class='report-card'>" .
-            "<div class='main'><div class='about'><h2>Title</h2></div>" .
-            "<div class='report'>Have you fallen since your last check-in 3 days ago?<div class='controls'>" .
+            "<div class='main'>" .
+            "<div class='report'>Did you Title since your last check-in 3 days ago?<div class='controls'>" .
             "<label class='success'><input type='radio' name='1' value='1'> No</label>" .
             "<label class='setback'><input type='radio' name='1' value='0'> Yes</label>" .
             "</div></div></div>" .
@@ -226,8 +226,8 @@ class TestHtmlGenerator extends HfTestCase {
         );
 
         $expected = "<div class='report-card'>" .
-            "<div class='main'><div class='about'><h2>Title</h2></div>" .
-            "<div class='report'>Have you fallen since your last check-in 1 day ago?<div class='controls'>" .
+            "<div class='main'>" .
+            "<div class='report'>Did you Title since your last check-in 1 day ago?<div class='controls'>" .
             "<label class='success'><input type='radio' name='1' value='1'> No</label>" .
             "<label class='setback'><input type='radio' name='1' value='0'> Yes</label>" .
             "</div></div></div>" .
@@ -264,8 +264,8 @@ class TestHtmlGenerator extends HfTestCase {
         );
 
         $expected = "<div class='report-card'>" .
-            "<div class='main'><div class='about'><h2>Title</h2></div>" .
-            "<div class='report'>Have you fallen since your last check-in less than a day ago?<div class='controls'>" .
+            "<div class='main'>" .
+            "<div class='report'>Did you Title since your last check-in less than a day ago?<div class='controls'>" .
             "<label class='success'><input type='radio' name='1' value='1'> No</label>" .
             "<label class='setback'><input type='radio' name='1' value='0'> Yes</label>" .
             "</div></div></div>" .
@@ -302,8 +302,8 @@ class TestHtmlGenerator extends HfTestCase {
         );
 
         $expected = "<div class='report-card'>" .
-            "<div class='main'><div class='about'><h2>Title</h2></div>" .
-            "<div class='report'>Have you fallen in the last 24 hours?<div class='controls'>" .
+            "<div class='main'>" .
+            "<div class='report'>Did you Title in the last 24 hours?<div class='controls'>" .
             "<label class='success'><input type='radio' name='1' value='1'> No</label>" .
             "<label class='setback'><input type='radio' name='1' value='0'> Yes</label>" .
             "</div></div></div>" .
@@ -317,7 +317,7 @@ class TestHtmlGenerator extends HfTestCase {
     }
 
     public function testMakeGoalCardRoundsNumbers() {
-        $goalTitle = 'Title';
+        $verb = 'verb';
         $goalDescription = '';
         $goalId = 1;
         $daysSinceLastReport = 3.1415;
@@ -328,7 +328,7 @@ class TestHtmlGenerator extends HfTestCase {
         $levelBar = '';
 
         $result = $this->mockedMarkupGenerator->makeGoalCard(
-            $goalTitle,
+            $verb,
             $goalDescription,
             $goalId,
             $daysSinceLastReport,
@@ -340,8 +340,8 @@ class TestHtmlGenerator extends HfTestCase {
         );
 
         $expected = "<div class='report-card'>" .
-            "<div class='main'><div class='about'><h2>Title</h2></div>" .
-            "<div class='report'>Have you fallen since your last check-in 3 days ago?<div class='controls'>" .
+            "<div class='main'>" .
+            "<div class='report'>Did you verb since your last check-in 3 days ago?<div class='controls'>" .
             "<label class='success'><input type='radio' name='1' value='1'> No</label>" .
             "<label class='setback'><input type='radio' name='1' value='0'> Yes</label>" .
             "</div></div></div>" .

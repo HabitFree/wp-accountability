@@ -88,7 +88,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     }
 
     public function makeGoalCard(
-        $goalTitle,
+        $goalVerb,
         $goalDescription,
         $goalId,
         $daysSinceLastReport,
@@ -98,12 +98,11 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         $levelDaysToComplete,
         $levelBar
     ) {
-        $goalDescription = ($goalDescription === '' ? $goalDescription : $this->makeParagraph($goalDescription));
-        $period = $this->makeDayPhrase($daysSinceLastReport);
+        $periodPhrase = $this->makePeriodPhrase($daysSinceLastReport);
 
         return "<div class='report-card'>" .
-        "<div class='main'><div class='about'><h2>$goalTitle</h2>$goalDescription</div>" .
-        "<div class='report'>Have you fallen $period?<div class='controls'>" .
+        "<div class='main'>" .
+        "<div class='report'>Did you $goalVerb $periodPhrase?<div class='controls'>" .
         "<label class='success'><input type='radio' name='$goalId' value='1'> No</label>" .
         "<label class='setback'><input type='radio' name='$goalId' value='0'> Yes</label>" .
         "</div></div></div>" .
@@ -115,7 +114,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         "</div></div>";
     }
 
-    private function makeDayPhrase($daysSinceLastReport)
+    private function makePeriodPhrase($daysSinceLastReport)
     {
         if ($daysSinceLastReport === false) {
             return 'in the last 24 hours';

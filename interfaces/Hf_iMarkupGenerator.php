@@ -30,7 +30,7 @@ interface Hf_iMarkupGenerator {
     public function makeHeader($content, $level);
 
     public function makeGoalCard(
-        $goalTitle,
+        $goalVerb,
         $goalDescription,
         $goalId,
         $daysSinceLastReport,
