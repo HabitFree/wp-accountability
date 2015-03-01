@@ -480,8 +480,8 @@ class TestDatabase extends HfTestCase {
     public function testInstallDbPopulatesGoalTableWithSelfAbuseGoal() {
         $defaultGoal = array(
             'goalID'     => 2,
-            'title'      => 'Freedom from Self-Abuse',
-            'isPositive' => 1,
+            'title'      => 'practice self-abuse',
+            'isPositive' => 0,
             'isPrivate'  => 0
         );
 

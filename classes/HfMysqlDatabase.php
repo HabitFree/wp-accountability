@@ -138,8 +138,8 @@ class HfMysqlDatabase implements Hf_iDatabase {
 
         $selfAbuseGoal = array(
             'goalID'     => 2,
-            'title'      => 'Freedom from Self-Abuse',
-            'isPositive' => 1,
+            'title'      => 'practice self-abuse',
+            'isPositive' => 0,
             'isPrivate'  => 0
         );
 
