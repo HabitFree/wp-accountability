@@ -39,15 +39,10 @@ class HfMailer implements Hf_iMessenger {
     function sendReportRequestEmail( $userId ) {
         $subject = "How's it going?";
         $emailId = $this->Database->generateEmailId();
-
         $nonce     = $this->Security->createRandomString( 250 );
-        $reportUrl = $this->generateReportURL( $nonce );
-        $message   = "<p>Time to <a href='$reportUrl'>check in</a>.</p>";
+        $body = $this->generateReportRequestBody($nonce);
 
-        $this->sendEmailToUserAndSpecifyEmailID( $userId, $subject, $message, $emailId );
-
-        $expirationDate = $this->generateReportRequestExpirationDate();
-        $this->Database->recordReportRequest( $nonce, $userId, $emailId, $expirationDate );
+        $this->sendAndRecordEmailWithAutoAuth($userId, $subject, $body, $emailId, $nonce);
     }
 
     function generateReportURL( $reportRequestId ) {
@@ -186,5 +181,19 @@ class HfMailer implements Hf_iMessenger {
         $isExpired      = $expirationTime < $this->CodeLibrary->getCurrentTime();
 
         return $isExpired;
+    }
+
+    private function sendAndRecordEmailWithAutoAuth($userId, $subject, $message, $emailId, $nonce)
+    {
+        $this->sendEmailToUserAndSpecifyEmailID($userId, $subject, $message, $emailId);
+        $expirationDate = $this->generateReportRequestExpirationDate();
+        $this->Database->recordReportRequest($nonce, $userId, $emailId, $expirationDate);
+    }
+
+    private function generateReportRequestBody($nonce)
+    {
+        $reportUrl = $this->generateReportURL($nonce);
+        $message = "<p>Time to <a href='$reportUrl'>check in</a>.</p>";
+        return $message;
     }
 }
