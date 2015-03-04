@@ -43,7 +43,7 @@ interface Hf_iDatabase {
 
     public function getGoal( $goalId );
 
-    public function recordReportRequest( $requestId, $userId, $emailId, $expirationDate );
+    public function recordReportRequest( $nonceString, $userId, $emailId, $expirationDate );
 
     public function isReportRequestValid( $requestId );
 

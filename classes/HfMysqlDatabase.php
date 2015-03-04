@@ -466,9 +466,9 @@ class HfMysqlDatabase implements Hf_iDatabase {
         return $this->cms->getRow( $query );
     }
 
-    public function recordReportRequest( $requestId, $userId, $emailId, $expirationDate ) {
+    public function recordReportRequest( $nonceString, $userId, $emailId, $expirationDate ) {
         $data = array(
-            'requestID'      => $requestId,
+            'requestID'      => $nonceString,
             'userID'         => $userId,
             'emailID'        => $emailId,
             'expirationDate' => $expirationDate
