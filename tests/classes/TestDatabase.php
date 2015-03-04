@@ -593,16 +593,16 @@ class TestDatabase extends HfTestCase {
 
     public function testRecordReportRequestRecordsReportRequest() {
         $expectedRow = array(
-            'requestID'      => 1,
+            'requestID'      => '1',
             'userID'         => 2,
             'emailID'        => 3,
             'expirationDate' => 4
         );
 
         $this->setReturnValue( $this->mockCms, 'getDbPrefix', 'wptests_' );
-        $this->expectOnce( $this->mockCms, 'insertIntoDb', array( 'wptests_hf_report_request', $expectedRow ) );
+        $this->expectOnce( $this->mockCms, 'insertIntoDb', array( 'wptests_hf_report_request', $expectedRow, array( '%s', '%d', '%d', '%s' ) ) );
 
-        $this->mockedDatabase->recordReportRequest( 1, 2, 3, 4 );
+        $this->mockedDatabase->recordReportRequest( '1', 2, 3, 4 );
     }
 
     public function testIsReportRequestValidPreparesQuery() {

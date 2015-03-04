@@ -477,7 +477,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $table = $this->cms->getDbPrefix() . 'hf_report_request';
         $data  = $this->removeNullValuePairs( $data );
 
-        $this->cms->insertIntoDb( $table, $data, array( '%d', '%d', '%d', '%s' ) );
+        $this->cms->insertIntoDb( $table, $data, array( '%s', '%d', '%d', '%s' ) );
     }
 
     public function isReportRequestValid( $requestId ) {
