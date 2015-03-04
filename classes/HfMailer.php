@@ -42,7 +42,7 @@ class HfMailer implements Hf_iMessenger {
 
         $nonce     = $this->Security->createRandomString( 250 );
         $reportUrl = $this->generateReportURL( $nonce );
-        $message   = "<p>Time to <a href='" . $reportUrl . "'>check in</a>.</p>";
+        $message   = "<p>Time to <a href='$reportUrl'>check in</a>.</p>";
 
         $this->sendEmailToUserAndSpecifyEmailID( $userId, $subject, $message, $emailId );
 

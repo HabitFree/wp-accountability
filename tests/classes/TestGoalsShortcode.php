@@ -63,6 +63,7 @@ class TestGoalsShortcode extends HfTestCase {
         $this->setReturnValue( $this->mockUserManager, 'isUserLoggedIn', true );
         $this->setReturnValue( $this->mockUserManager, 'getUsernameById', 'Don' );
         $this->setReturnValues( $this->mockGoals, 'getGoalTitle', array('eat durian', 'go running') );
+        $this->setReturnValue($this->mockAssetLocator, 'getPageUrlByTitle', 'url');
 
         $Goals = new HfGoalsShortcode(
             $this->mockUserManager,
