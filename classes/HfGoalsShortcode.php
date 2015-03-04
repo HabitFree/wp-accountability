@@ -172,8 +172,8 @@ class HfGoalsShortcode implements Hf_iShortcode {
 
     private function generateReportsListItem( $goalId, $isSuccessful ) {
         $goalTitle = $this->Goals->getGoalTitle( $goalId );
-        $report    = $goalTitle . ': ';
-        $report .= ( $isSuccessful ) ? 'Success' : 'Setback';
+        $report    = "Don't $goalTitle: ";
+        $report .= ( $isSuccessful ) ? "<span style='color:#088A08;'>Success</span>" : "<span style='color:#8A0808;'>Setback</span>";
 
         return $report;
     }

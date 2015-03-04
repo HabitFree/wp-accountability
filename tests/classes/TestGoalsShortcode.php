@@ -62,7 +62,7 @@ class TestGoalsShortcode extends HfTestCase {
 
         $this->setReturnValue( $this->mockUserManager, 'isUserLoggedIn', true );
         $this->setReturnValue( $this->mockUserManager, 'getUsernameById', 'Don' );
-        $this->setReturnValues( $this->mockGoals, 'getGoalTitle', array('Eat durian', 'Go running') );
+        $this->setReturnValues( $this->mockGoals, 'getGoalTitle', array('eat durian', 'go running') );
 
         $Goals = new HfGoalsShortcode(
             $this->mockUserManager,
@@ -76,7 +76,9 @@ class TestGoalsShortcode extends HfTestCase {
         );
 
         $expectedBody =
-            "<p>Hello, Dan,</p><p>Your friend Don just reported on their progress. Here's how they're doing:</p><ul><li>Eat durian: Success</li><li>Go running: Setback</li></ul>";
+            "<p>Hello, Dan,</p><p>Your friend Don just reported on their progress. Here's how they're doing:</p>" .
+            "<ul><li>Don't eat durian: <span style='color:#088A08;'>Success</span></li>" .
+            "<li>Don't go running: <span style='color:#8A0808;'>Setback</span></li></ul>";
 
         $this->expectOnce( $this->mockMessenger, 'sendEmailToUser', array(1, 'Don just reported', $expectedBody) );
 
@@ -92,7 +94,7 @@ class TestGoalsShortcode extends HfTestCase {
 
         $this->setReturnValue( $this->mockUserManager, 'isUserLoggedIn', true );
         $this->setReturnValue( $this->mockUserManager, 'getUsernameById', 'Jim' );
-        $this->setReturnValue( $this->mockGoals, 'getGoalTitle', 'Eat durian' );
+        $this->setReturnValue( $this->mockGoals, 'getGoalTitle', 'eat durian' );
 
         $Goals = new HfGoalsShortcode(
             $this->mockUserManager,
@@ -106,7 +108,8 @@ class TestGoalsShortcode extends HfTestCase {
         );
 
         $expectedBody =
-            "<p>Hello, Jack,</p><p>Your friend Jim just reported on their progress. Here's how they're doing:</p><ul><li>Eat durian: Setback</li></ul>";
+            "<p>Hello, Jack,</p><p>Your friend Jim just reported on their progress. Here's how they're doing:</p>" .
+            "<ul><li>Don't eat durian: <span style='color:#8A0808;'>Setback</span></li></ul>";
 
         $this->expectOnce( $this->mockMessenger, 'sendEmailToUser', array(1, 'Jim just reported', $expectedBody) );
 
