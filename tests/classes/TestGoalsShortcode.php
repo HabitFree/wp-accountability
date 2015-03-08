@@ -65,16 +65,7 @@ class TestGoalsShortcode extends HfTestCase {
         $this->setReturnValues( $this->mockGoals, 'getGoalTitle', array('eat durian', 'go running') );
         $this->setReturnValue($this->mockAssetLocator, 'getPageUrlByTitle', 'url');
 
-        $Goals = new HfGoalsShortcode(
-            $this->mockUserManager,
-            $this->mockMessenger,
-            $this->mockAssetLocator,
-            $this->mockGoals,
-            $this->mockSecurity,
-            $this->factory->makeMarkupGenerator(),
-            $this->mockCodeLibrary,
-            $this->mockDatabase
-        );
+        $goalsShortcode = $this->makeEloquentGoalsShortcode();
 
         $expectedBody =
             "<p>Hello, Dan,</p><p>Your friend Don just reported on their progress. Here's how they're doing:</p>" .
@@ -83,7 +74,7 @@ class TestGoalsShortcode extends HfTestCase {
 
         $this->expectOnce( $this->mockMessenger, 'sendReportNotificationEmail', array(1, 'Don just reported', $expectedBody) );
 
-        $Goals->getOutput();
+        $goalsShortcode->getOutput();
     }
 
     public function testGoalsShortcodeGenerateReportNoticeEmailScenarioTwo() {
@@ -97,16 +88,7 @@ class TestGoalsShortcode extends HfTestCase {
         $this->setReturnValue( $this->mockUserManager, 'getUsernameById', 'Jim' );
         $this->setReturnValue( $this->mockGoals, 'getGoalTitle', 'eat durian' );
 
-        $Goals = new HfGoalsShortcode(
-            $this->mockUserManager,
-            $this->mockMessenger,
-            $this->mockAssetLocator,
-            $this->mockGoals,
-            $this->mockSecurity,
-            $this->factory->makeMarkupGenerator(),
-            $this->mockCodeLibrary,
-            $this->mockDatabase
-        );
+        $GoalsShortcode = $this->makeEloquentGoalsShortcode();
 
         $expectedBody =
             "<p>Hello, Jack,</p><p>Your friend Jim just reported on their progress. Here's how they're doing:</p>" .
@@ -114,7 +96,7 @@ class TestGoalsShortcode extends HfTestCase {
 
         $this->expectOnce( $this->mockMessenger, 'sendReportNotificationEmail', array(1, 'Jim just reported', $expectedBody) );
 
-        $Goals->getOutput();
+        $GoalsShortcode->getOutput();
     }
 
     public function testGoalsShortcodeClassExists() {
@@ -122,8 +104,8 @@ class TestGoalsShortcode extends HfTestCase {
     }
 
     public function testGoalsShortcodeOutputsAnything() {
-        $GoalsShortcode = $this->factory->makeGoalsShortcode();
-        $output         = $GoalsShortcode->getOutput();
+        $goalsShortcode = $this->factory->makeGoalsShortcode();
+        $output         = $goalsShortcode->getOutput();
 
         $this->assertTrue( strlen( $output ) > 0 );
     }
@@ -305,16 +287,7 @@ class TestGoalsShortcode extends HfTestCase {
     }
 
     public function testGoalsShortcodeDisplaysRandomQuotationOnSuccess() {
-        $GoalsShortcode = new HfGoalsShortcode(
-            $this->mockUserManager,
-            $this->mockMessenger,
-            $this->mockAssetLocator,
-            $this->mockGoals,
-            $this->mockSecurity,
-            $this->factory->makeMarkupGenerator(),
-            $this->mockCodeLibrary,
-            $this->mockDatabase
-        );
+        $goalsShortcode = $this->makeEloquentGoalsShortcode();
 
         $this->setReportSuccess();
         $this->setDefaultQuotationValues();
@@ -322,7 +295,7 @@ class TestGoalsShortcode extends HfTestCase {
         $this->setReturnValue( $this->mockUserManager, 'isUserLoggedIn', true );
         $this->setReturnValue($this->mockDatabase, 'getQuotations', array($this->makeMockQuotation()));
 
-        $haystack = $GoalsShortcode->getOutput();
+        $haystack = $goalsShortcode->getOutput();
         $needle = '<p class="quote">"hello" — Nathan</p>';
 
         $this->assertContains($needle, $haystack);
@@ -349,5 +322,19 @@ class TestGoalsShortcode extends HfTestCase {
         $this->expectNever($this->mockMarkupGenerator, 'makeQuoteMessage');
 
         $this->mockedGoalsShortcode->getOutput();
+    }
+
+    private function makeEloquentGoalsShortcode()
+    {
+        return new HfGoalsShortcode(
+            $this->mockUserManager,
+            $this->mockMessenger,
+            $this->mockAssetLocator,
+            $this->mockGoals,
+            $this->mockSecurity,
+            $this->factory->makeMarkupGenerator(),
+            $this->mockCodeLibrary,
+            $this->mockDatabase
+        );
     }
 }
