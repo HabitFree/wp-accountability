@@ -81,7 +81,7 @@ class TestGoalsShortcode extends HfTestCase {
             "<ul><li>Don't eat durian: <span style='color:#088A08;'>Success</span></li>" .
             "<li>Don't go running: <span style='color:#8A0808;'>Setback</span></li></ul>";
 
-        $this->expectOnce( $this->mockMessenger, 'sendEmailToUser', array(1, 'Don just reported', $expectedBody) );
+        $this->expectOnce( $this->mockMessenger, 'sendReportNotificationEmail', array(1, 'Don just reported', $expectedBody) );
 
         $Goals->getOutput();
     }
@@ -112,7 +112,7 @@ class TestGoalsShortcode extends HfTestCase {
             "<p>Hello, Jack,</p><p>Your friend Jim just reported on their progress. Here's how they're doing:</p>" .
             "<ul><li>Don't eat durian: <span style='color:#8A0808;'>Setback</span></li></ul>";
 
-        $this->expectOnce( $this->mockMessenger, 'sendEmailToUser', array(1, 'Jim just reported', $expectedBody) );
+        $this->expectOnce( $this->mockMessenger, 'sendReportNotificationEmail', array(1, 'Jim just reported', $expectedBody) );
 
         $Goals->getOutput();
     }

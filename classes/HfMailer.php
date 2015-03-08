@@ -45,11 +45,10 @@ class HfMailer implements Hf_iMessenger {
         $this->sendAndRecordEmailWithAutoAuth($userId, $subject, $body, $nonce);
     }
 
-    function generateReportURL( $reportRequestId ) {
+    function generateReportURL( $nonce ) {
         $baseURL = $this->PageLocator->getPageUrlByTitle( 'Goals' );
-
         $parameters = array(
-            'n' => $reportRequestId
+            'n' => $nonce
         );
 
         return $this->addParametersToUrl( $baseURL, $parameters );
@@ -197,9 +196,12 @@ class HfMailer implements Hf_iMessenger {
         return $message;
     }
 
-    public function sendReportNotificationEmail($partnerId, $userId, $subject, $report) {
+    public function sendReportNotificationEmail($partnerId, $subject, $report) {
         $nonce = $this->makeNonce();
-        $this->sendAndRecordEmailWithAutoAuth($partnerId,$subject,$report,$nonce);
+        $reportUrl = $this->generateReportURL($nonce);
+        $reportOffer = "<p><a href='$reportUrl'>Click here to submit your own report.</a></p>";
+        $body = $report . $reportOffer;
+        $this->sendAndRecordEmailWithAutoAuth($partnerId,$subject,$body,$nonce);
     }
 
     private function makeNonce()

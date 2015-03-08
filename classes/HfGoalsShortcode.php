@@ -133,7 +133,7 @@ class HfGoalsShortcode implements Hf_iShortcode {
         $subject          = $reporterUsername . ' just reported';
         $body             = $this->generatePartnerReportBody( $Partner, $reporterUsername );
 
-        $this->Messenger->sendEmailToUser( $Partner->ID, $subject, $body );
+        $this->Messenger->sendReportNotificationEmail( $Partner->ID, $subject, $body );
     }
 
     private function determineQuotationContext() {

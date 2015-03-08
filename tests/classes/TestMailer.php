@@ -280,16 +280,21 @@ class TestMailer extends HfTestCase {
     private function sendReportNotificationEmail()
     {
         $partnerId = 1;
-        $userId = 2;
         $subject = 'Somebody just reported';
         $report = 'They did this and that and the other';
-        $this->mockedMessenger->sendReportNotificationEmail($partnerId, $userId, $subject, $report);
+        $this->mockedMessenger->sendReportNotificationEmail($partnerId, $subject, $report);
     }
 
     public function testSendReportNotificationEmailSendsEmail() {
         $this->setReturnValue($this->mockCms,'getUserEmail','partner@email.com');
+        $this->setReturnValue($this->mockAssetLocator,'getPageUrlByTitle','url');
+        $this->setReturnValue($this->mockSecurity,'createRandomString','nonce');
         $this->expectOnce($this->mockCms,'sendEmail',
-            array('partner@email.com','Somebody just reported','They did this and that and the other')
+            array(
+                'partner@email.com',
+                'Somebody just reported',
+                "They did this and that and the other<p><a href='url?n=nonce'>Click here to submit your own report.</a></p>"
+            )
         );
         $this->sendReportNotificationEmail();
     }
