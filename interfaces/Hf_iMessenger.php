@@ -31,5 +31,5 @@ interface Hf_iMessenger {
 
     public function deleteExpiredReportRequests();
 
-    public function sendReportNotificationEmail($partnerId);
+    public function sendReportNotificationEmail($partnerId, $userId, $subject, $report);
 }

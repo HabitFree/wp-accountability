@@ -197,7 +197,7 @@ class HfMailer implements Hf_iMessenger {
         return $message;
     }
 
-    public function sendReportNotificationEmail($partnerId) {
-        $this->sendEmailToUser($partnerId,'report','report');
+    public function sendReportNotificationEmail($partnerId, $userId, $subject, $report) {
+        $this->sendEmailToUser($partnerId,$subject,$report);
     }
 }

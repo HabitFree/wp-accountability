@@ -286,5 +286,11 @@ class TestMailer extends HfTestCase {
         $this->mockedMessenger->sendReportNotificationEmail($partnerId, $userId, $subject, $report);
     }
 
-
+    public function testSendReportNotificationEmailSendsEmail() {
+        $this->setReturnValue($this->mockCms,'getUserEmail','partner@email.com');
+        $this->expectOnce($this->mockCms,'sendEmail',
+            array('partner@email.com','Somebody just reported','They did this and that and the other')
+        );
+        $this->sendReportNotificationEmail();
+    }
 }
