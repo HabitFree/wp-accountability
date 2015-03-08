@@ -15,12 +15,12 @@ class HfMailer implements Hf_iMessenger {
         $this->CodeLibrary             = $CodeLibrary;
     }
 
-    function sendEmailToUser( $userID, $subject, $body ) {
-        $to = $this->ContentManagementSystem->getUserEmail( $userID );
+    function sendEmailToUser( $userId, $subject, $body ) {
+        $to = $this->ContentManagementSystem->getUserEmail( $userId );
         $this->ContentManagementSystem->sendEmail( $to, $subject, $body );
-        $emailID = intval( $this->ContentManagementSystem->getVar( 'hf_email', 'max(emailID)' ) );
+        $emailId = intval( $this->ContentManagementSystem->getVar( 'hf_email', 'max(emailID)' ) );
 
-        $this->Database->recordEmail( $userID, $subject, $body, $emailID, $to );
+        $this->Database->recordEmail( $userId, $subject, $body, $emailId, $to );
     }
 
     function sendEmailToAddress( $address, $subject, $body ) {
@@ -195,5 +195,9 @@ class HfMailer implements Hf_iMessenger {
         $reportUrl = $this->generateReportURL($nonce);
         $message = "<p>Time to <a href='$reportUrl'>check in</a>.</p>";
         return $message;
+    }
+
+    public function sendReportNotificationEmail($partnerId) {
+        $this->sendEmailToUser($partnerId,'report','report');
     }
 }

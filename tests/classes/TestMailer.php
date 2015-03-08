@@ -271,4 +271,20 @@ class TestMailer extends HfTestCase {
 
         $this->mockedMessenger->deleteExpiredReportRequests();
     }
+
+    public function testSendReportNotificationEmail() {
+        $this->expectOnce($this->mockCms,'getUserEmail',array(1));
+        $this->sendReportNotificationEmail();
+    }
+
+    private function sendReportNotificationEmail()
+    {
+        $partnerId = 1;
+        $userId = 2;
+        $subject = 'Somebody just reported';
+        $report = 'They did this and that and the other';
+        $this->mockedMessenger->sendReportNotificationEmail($partnerId, $userId, $subject, $report);
+    }
+
+
 }
