@@ -11,9 +11,9 @@ interface Hf_iMessenger {
 
     public function sendReportRequestEmail( $userId );
 
-    public function generateReportURL( $reportRequestId );
+    public function generateReportURL( $nonce );
 
-    public function sendEmailToUser( $userID, $subject, $body );
+    public function sendEmailToUser( $userId, $subject, $body );
 
     public function sendEmailToUserAndSpecifyEmailID( $userID, $subject, $body, $emailID );
 
@@ -30,4 +30,6 @@ interface Hf_iMessenger {
     public function deleteExpiredInvites();
 
     public function deleteExpiredReportRequests();
+
+    public function sendReportNotificationEmail($partnerId, $subject, $report);
 }

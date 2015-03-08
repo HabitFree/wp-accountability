@@ -271,4 +271,47 @@ class TestMailer extends HfTestCase {
 
         $this->mockedMessenger->deleteExpiredReportRequests();
     }
+
+    public function testSendReportNotificationEmail() {
+        $this->expectOnce($this->mockCms,'getUserEmail',array(1));
+        $this->sendReportNotificationEmail();
+    }
+
+    private function sendReportNotificationEmail()
+    {
+        $partnerId = 1;
+        $subject = 'Somebody just reported';
+        $report = 'They did this and that and the other';
+        $this->mockedMessenger->sendReportNotificationEmail($partnerId, $subject, $report);
+    }
+
+    public function testSendReportNotificationEmailSendsEmail() {
+        $this->setReturnValue($this->mockCms,'getUserEmail','partner@email.com');
+        $this->setReturnValue($this->mockAssetLocator,'getPageUrlByTitle','url');
+        $this->setReturnValue($this->mockSecurity,'createRandomString','nonce');
+        $this->expectOnce($this->mockCms,'sendEmail',
+            array(
+                'partner@email.com',
+                'Somebody just reported',
+                "They did this and that and the other<p><a href='url?n=nonce'>Click here to submit your own report.</a></p>"
+            )
+        );
+        $this->sendReportNotificationEmail();
+    }
+
+    public function testSendReportNotifcationEmailGeneratesEmailId() {
+        $this->expectOnce($this->mockDatabase,'generateEmailId');
+        $this->sendReportNotificationEmail();
+    }
+
+    public function testSendReportNotificationEmailGeneratesNonce() {
+        $this->expectOnce($this->mockSecurity,'createRandomString',array(250));
+        $this->sendReportNotificationEmail();
+    }
+
+    public function testSendReportNotificationEmailUsesNonce() {
+        $this->setReturnValue($this->mockSecurity,'createRandomString','nonce');
+        $this->expectOnce($this->mockDatabase,'recordReportRequest',array('nonce',1,null,'1970-01-07 18:00:00'));
+        $this->sendReportNotificationEmail();
+    }
 }

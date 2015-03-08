@@ -466,9 +466,9 @@ class HfMysqlDatabase implements Hf_iDatabase {
         return $this->cms->getRow( $query );
     }
 
-    public function recordReportRequest( $requestId, $userId, $emailId, $expirationDate ) {
+    public function recordReportRequest( $nonceString, $userId, $emailId, $expirationDate ) {
         $data = array(
-            'requestID'      => $requestId,
+            'requestID'      => $nonceString,
             'userID'         => $userId,
             'emailID'        => $emailId,
             'expirationDate' => $expirationDate
@@ -477,7 +477,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
         $table = $this->cms->getDbPrefix() . 'hf_report_request';
         $data  = $this->removeNullValuePairs( $data );
 
-        $this->cms->insertIntoDb( $table, $data, array( '%d', '%d', '%d', '%s' ) );
+        $this->cms->insertIntoDb( $table, $data, array( '%s', '%d', '%d', '%s' ) );
     }
 
     public function isReportRequestValid( $requestId ) {
