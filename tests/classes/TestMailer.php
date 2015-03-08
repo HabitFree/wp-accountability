@@ -293,4 +293,20 @@ class TestMailer extends HfTestCase {
         );
         $this->sendReportNotificationEmail();
     }
+
+    public function testSendReportNotifcationEmailGeneratesEmailId() {
+        $this->expectOnce($this->mockDatabase,'generateEmailId');
+        $this->sendReportNotificationEmail();
+    }
+
+    public function testSendReportNotificationEmailGeneratesNonce() {
+        $this->expectOnce($this->mockSecurity,'createRandomString',array(250));
+        $this->sendReportNotificationEmail();
+    }
+
+    public function testSendReportNotificationEmailUsesNonce() {
+        $this->setReturnValue($this->mockSecurity,'createRandomString','nonce');
+        $this->expectOnce($this->mockDatabase,'recordReportRequest',array('nonce',1,null,'1970-01-07 18:00:00'));
+        $this->sendReportNotificationEmail();
+    }
 }
