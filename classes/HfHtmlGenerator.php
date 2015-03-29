@@ -96,7 +96,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         $levelTitle,
         $levelPercent,
         $levelDaysToComplete,
-        $levelBar
+        $progressBar
     ) {
         $periodPhrase = $this->makePeriodPhrase($daysSinceLastReport);
 
@@ -110,7 +110,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         "<p class='stat'>Level <span class='number'>$levelId</span> $levelTitle</p>" .
         "<p class='stat'>Level <span class='number'>$levelPercent%</span> Complete</p>" .
         "<p class='stat'>Days to <span class='number'>$levelDaysToComplete</span> Next Level</p>" .
-        $levelBar .
+        $progressBar .
         "</div></div>";
     }
 

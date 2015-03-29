@@ -38,7 +38,7 @@ interface Hf_iMarkupGenerator {
         $levelTitle,
         $levelPercent,
         $levelDaysToComplete,
-        $levelBar
+        $progressBar
     );
 
     public function makeRefreshScript();
