@@ -82,7 +82,9 @@ class HfGoals implements Hf_iGoals {
     }
 
     function goalProgressBar( $goalId, $userId ) {
-        $percent = $this->levelPercentComplete( $goalId, $userId );
+        $percent = 0;
+
+        $this->daysOfSuccess($goalId,$userId);
 
         return $this->MarkupGenerator->progressBar( $percent, '' );
     }

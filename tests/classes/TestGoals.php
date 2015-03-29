@@ -211,4 +211,9 @@ class TestGoals extends HfTestCase {
         $MockGoal->description = 'Description';
         return $MockGoal;
     }
+
+    public function testGoalProgressBarGetsCurrentStreak() {
+        $this->expectOnce($this->mockDatabase,'timeOfFirstSuccess');
+        $this->mockedGoals->goalProgressBar(1,7);
+    }
 } 
