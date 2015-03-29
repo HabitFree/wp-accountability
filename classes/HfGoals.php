@@ -29,7 +29,7 @@ class HfGoals implements Hf_iGoals {
         $level         = $this->Database->getLevel( $daysOfSuccess );
         $levelPercentComplete = round($this->levelPercentComplete($goalID, $userID), 1);
         $levelDaysToComplete = round($this->daysToNextLevel($goalID, $userID));
-        $bar          = $this->levelBarForGoal( $goalID, $userID );
+        $bar          = $this->goalProgressBar( $goalID, $userID );
 
         $card = $this->MarkupGenerator->makeGoalCard(
             $goal->title,
@@ -81,7 +81,7 @@ class HfGoals implements Hf_iGoals {
         return $target - $daysOfSuccess;
     }
 
-    function levelBarForGoal( $goalId, $userId ) {
+    function goalProgressBar( $goalId, $userId ) {
         $percent = $this->levelPercentComplete( $goalId, $userId );
 
         return $this->MarkupGenerator->progressBar( $percent, '' );
