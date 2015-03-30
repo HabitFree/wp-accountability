@@ -173,7 +173,8 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
             $this->mockMessenger,
             $this->mockCms,
             $this->mockMarkupGenerator,
-            $this->mockDatabase
+            $this->mockDatabase,
+            $this->mockCodeLibrary
         );
     }
 

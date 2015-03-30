@@ -127,8 +127,9 @@ class HfFactory {
         $Database      = $this->makeDatabase();
         $HtmlGenerator = $this->makeMarkupGenerator();
         $Mailer        = $this->makeMessenger();
+        $codeLibrary = $this->makeCodeLibrary();
 
-        return new HfGoals( $Mailer, $Cms, $HtmlGenerator, $Database );
+        return new HfGoals( $Mailer, $Cms, $HtmlGenerator, $Database, $codeLibrary );
     }
 
     public function makeSettingsShortcode() {

@@ -152,6 +152,7 @@ class TestGoals extends HfTestCase {
         $this->setReturnValue($this->mockDatabase, 'getLevel', $MockLevel);
 
         $this->setReturnValue($this->mockDatabase, 'daysSinceLastReport', 3.1415);
+        $this->setReturnValue($this->mockDatabase, 'getAllReportsForGoal', array());
     }
 
     public function testUsesHtmlGeneratorToMakeGoalCard() {
@@ -186,10 +187,11 @@ class TestGoals extends HfTestCase {
     public function testPassesFalseDaysSinceLastReportWhenMakingGoalCard() {
         $this->setReturnValue($this->mockDatabase,'daysSinceLastReport',false);
         $mockGoal = $this->makeMockGoal();
-        $this->setReturnValue( $this->mockDatabase, 'getGoal', $mockGoal );
         $mockLevel = $this->makeMockLevel();
-        $this->setReturnValue( $this->mockDatabase, 'getLevel', $mockLevel );
         $mockSub = $this->makeMockGoalSub();
+
+        $this->setReturnValsForGoalCardCreation();
+
         $this->expectOnce($this->mockMarkupGenerator, 'makeGoalCard', array(
             $mockGoal->title,
             $mockGoal->description,
@@ -213,7 +215,47 @@ class TestGoals extends HfTestCase {
     }
 
     public function testGoalProgressBarGetsCurrentStreak() {
+        $this->setReturnValsForGoalCardCreation();
         $this->expectOnce($this->mockDatabase,'timeOfFirstSuccess');
         $this->mockedGoals->goalProgressBar(1,7);
     }
-} 
+
+    public function testGoalProgressBarGetsAllReports() {
+        $this->setReturnValsForGoalCardCreation();
+        $this->expectOnce($this->mockDatabase, 'getAllReportsForGoal',array(1,7));
+        $this->mockedGoals->goalProgressBar(1,7);
+    }
+
+    public function testGoalProgressBarConvertsReportTimeStringsToTimes() {
+        $reports = $this->makeMockReports();
+        $this->setReturnValue($this->mockDatabase,'getAllReportsForGoal',$reports);
+        $this->expectAt($this->mockCodeLibrary,'convertStringToTime',0,array('2015-03-04 15:54:32'));
+        $this->mockedGoals->goalProgressBar(1,7);
+    }
+
+    public function testGoalProgressBarCreatesProgressBar() {
+        $reports = $this->makeMockReports();
+        $this->setReturnValue($this->mockDatabase,'getAllReportsForGoal',$reports);
+        $this->expectOnce($this->mockMarkupGenerator,'progressBar',array(.5));
+        $this->mockedGoals->goalProgressBar(1,7);
+    }
+
+    private function makeMockReports()
+    {
+        $genericReport = new stdClass();
+        $genericReport->isSuccessful = 1;
+        $report1 = clone $genericReport;
+        $report1->date = '2015-03-04 15:54:32';
+        $report2 = clone $genericReport;
+        $report2->date = '2015-03-06 15:54:32';
+        $report3 = clone $genericReport;
+        $report3->isSuccessful = 0;
+        $report3->date = '2015-03-07 15:54:32';
+        $report4 = clone $genericReport;
+        $report4->date = '2015-03-08 15:54:32';
+        $report5 = clone $genericReport;
+        $report5->date = '2015-03-09 15:54:32';
+        $reports = Array($report1, $report2, $report3, $report4, $report5);
+        return $reports;
+    }
+}

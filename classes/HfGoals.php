@@ -10,12 +10,14 @@ class HfGoals implements Hf_iGoals {
         Hf_iMessenger $Messenger,
         Hf_iCms $ContentManagementSystem,
         Hf_iMarkupGenerator $MarkupGenerator,
-        Hf_iDatabase $Database
+        Hf_iDatabase $Database,
+        Hf_iCodeLibrary $codeLibrary
     ) {
         $this->Messenger               = $Messenger;
         $this->ContentManagementSystem = $ContentManagementSystem;
         $this->MarkupGenerator         = $MarkupGenerator;
         $this->Database                = $Database;
+        $this->codeLibaray = $codeLibrary;
     }
 
     function generateGoalCard( $sub ) {
@@ -85,6 +87,11 @@ class HfGoals implements Hf_iGoals {
         $percent = 0;
 
         $this->currentStreak($goalId,$userId);
+
+        $reports = $this->Database->getAllReportsForGoal($goalId,$userId);
+        foreach ($reports as $report) {
+            $this->codeLibaray->convertStringToTime($report->date);
+        }
 
         return $this->MarkupGenerator->progressBar( $percent, '' );
     }
