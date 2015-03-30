@@ -84,15 +84,10 @@ class HfGoals implements Hf_iGoals {
     }
 
     function goalProgressBar( $goalId, $userId ) {
-        $percent = 0;
-
-        $this->currentStreak($goalId,$userId);
-
-        $reports = $this->Database->getAllReportsForGoal($goalId,$userId);
-        foreach ($reports as $report) {
-            $this->codeLibaray->convertStringToTime($report->date);
-        }
-
+        $currentStreak = $this->currentStreak($goalId,$userId);
+        $longestStreak = $this->findLongestStreak($goalId, $userId);
+        $percent = $this->determinePercentOfLongestStreak($longestStreak, $currentStreak);
+        $this->ContentManagementSystem->prepareQuery('%d / %d',array($currentStreak,$longestStreak));
         return $this->MarkupGenerator->progressBar( $percent, '' );
     }
 
@@ -142,5 +137,48 @@ class HfGoals implements Hf_iGoals {
 
     public function recordAccountabilityReport( $userId, $goalId, $isSuccessful, $emailId = null ) {
         $this->Database->recordAccountabilityReport( $userId, $goalId, $isSuccessful, $emailId );
+    }
+
+    private function convertSecondsToDays($seconds)
+    {
+        $minutes = $seconds / 60;
+        $hours = $minutes / 60;
+        $days = $hours / 24;
+        return $days;
+    }
+
+    private function findLongestStreak($goalId, $userId)
+    {
+        $reports = $this->Database->getAllReportsForGoal($goalId, $userId);
+        $longestStreak = 0;
+        $candidateStreak = 0;
+        foreach ($reports as $report) {
+            $currentTime = $this->codeLibaray->convertStringToTime($report->date);
+            if ($report->isSuccessful == 1) {
+                if (isset($lastTime)) {
+                    $seconds = $currentTime - $lastTime;
+                    $days = $this->convertSecondsToDays($seconds);
+                    $candidateStreak += $days;
+                    if ($candidateStreak > $longestStreak) {
+                        $longestStreak = $candidateStreak;
+                    }
+                }
+            } else {
+                $candidateStreak = 0;
+            }
+            $lastTime = $currentTime;
+        }
+        return $longestStreak;
+    }
+
+    private function determinePercentOfLongestStreak($longestStreak, $currentStreak)
+    {
+        if ($longestStreak) {
+            $percent = $currentStreak / $longestStreak;
+            return $percent;
+        } else {
+            $percent = $currentStreak / 1;
+            return $percent;
+        }
     }
 } 
