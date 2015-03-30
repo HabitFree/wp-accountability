@@ -87,8 +87,8 @@ class HfGoals implements Hf_iGoals {
         $currentStreak = $this->currentStreak($goalId,$userId);
         $longestStreak = $this->findLongestStreak($goalId, $userId);
         $percent = $this->determinePercentOfLongestStreak($longestStreak, $currentStreak);
-        $this->ContentManagementSystem->prepareQuery('%d / %d',array($currentStreak,$longestStreak));
-        return $this->MarkupGenerator->progressBar( $percent, '' );
+        $label = $this->ContentManagementSystem->prepareQuery('%d / %d',array($currentStreak,$longestStreak));
+        return $this->MarkupGenerator->progressBar( $percent, $label );
     }
 
     function currentLevelTarget( $daysOfSuccess ) {

@@ -14,7 +14,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     public function progressBar( $percent, $label ) {
         return '<div class="meter">
 					<span class="label">' . $label . '</span>
-					<span class="progress" style="width: ' . $percent . '%">' . $label . '</span>
+					<span class="progress" style="width: ' . $percent*100 . '%">' . $label . '</span>
 				</div>';
     }
 

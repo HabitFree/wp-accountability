@@ -347,4 +347,10 @@ class TestHtmlGenerator extends HfTestCase {
             "</div>";
         return $reportDiv;
     }
+
+    public function testProgressBar() {
+        $needle = 'width: 100%';
+        $haystack = $this->mockedMarkupGenerator->progressBar(1,'');
+        $this->assertContains($needle,$haystack);
+    }
 }

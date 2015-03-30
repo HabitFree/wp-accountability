@@ -234,9 +234,6 @@ class TestGoals extends HfTestCase {
     }
 
     public function testGoalProgressBarCreatesProgressBar() {
-        $reports = $this->makeMockReports();
-        $this->setReturnValue($this->mockDatabase,'getAllReportsForGoal',$reports);
-
         $this->setReturnValsForProgressBarCreation();
 
         $this->expectOnce($this->mockMarkupGenerator,'progressBar',array(.5));
@@ -264,6 +261,9 @@ class TestGoals extends HfTestCase {
 
     private function setReturnValsForProgressBarCreation()
     {
+        $reports = $this->makeMockReports();
+        $this->setReturnValue($this->mockDatabase,'getAllReportsForGoal',$reports);
+
         $time1 = 0 * 24 * 60 * 60;
         $time2 = 1 * 24 * 60 * 60;
         $time3 = 2 * 24 * 60 * 60;
@@ -279,12 +279,17 @@ class TestGoals extends HfTestCase {
     }
 
     public function testGoalProgressBarPreparesLabel() {
-        $reports = $this->makeMockReports();
-        $this->setReturnValue($this->mockDatabase,'getAllReportsForGoal',$reports);
-
         $this->setReturnValsForProgressBarCreation();
 
         $this->expectOnce($this->mockCms,'prepareQuery',array('%d / %d', array(1,2)));
+        $this->mockedGoals->goalProgressBar(1,7);
+    }
+
+    public function testGoalProgressBarUsesLabel() {
+        $this->setReturnValsForProgressBarCreation();
+
+        $this->setReturnValue($this->mockCms,'prepareQuery','label');
+        $this->expectOnce($this->mockMarkupGenerator,'progressBar',array(.5,'label'));
         $this->mockedGoals->goalProgressBar(1,7);
     }
 }
