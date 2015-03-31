@@ -613,7 +613,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
     }
 
     public function getAllReportsForGoal($goalId, $userId) {
-        $format = 'SELECT * FROM `wp_hf_report` WHERE userID = %d AND goalID = %d';
+        $format = 'SELECT * FROM `wp_hf_report` WHERE goalID = %d AND userID = %d';
         $query = $this->cms->prepareQuery($format,array($goalId,$userId));
         return $this->cms->getResults($query);
     }

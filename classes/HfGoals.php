@@ -84,7 +84,7 @@ class HfGoals implements Hf_iGoals {
         $currentStreak = $this->currentStreak($goalId,$userId);
         $longestStreak = $this->findLongestStreak($goalId, $userId);
         $percent = $this->determinePercentOfLongestStreak($longestStreak, $currentStreak);
-        $label = $this->cms->prepareQuery('%d / %d',array($currentStreak,$longestStreak));
+        $label = round($currentStreak,2) . ' / ' . round($longestStreak,2);
         return $this->markupGenerator->progressBar( $percent, $label );
     }
 
@@ -150,10 +150,10 @@ class HfGoals implements Hf_iGoals {
         $longestStreak = 0;
         $candidateStreak = 0;
         foreach ($reports as $report) {
-            $currentTime = $this->codeLibrary->convertStringToTime($report->date);
+            $reportTime = $this->codeLibrary->convertStringToTime($report->date);
             if ($report->isSuccessful == 1) {
                 if (isset($lastTime)) {
-                    $seconds = $currentTime - $lastTime;
+                    $seconds = $reportTime - $lastTime;
                     $days = $this->convertSecondsToDays($seconds);
                     $candidateStreak += $days;
                     if ($candidateStreak > $longestStreak) {
@@ -163,7 +163,7 @@ class HfGoals implements Hf_iGoals {
             } else {
                 $candidateStreak = 0;
             }
-            $lastTime = $currentTime;
+            $lastTime = $reportTime;
         }
         return $longestStreak;
     }
@@ -174,8 +174,7 @@ class HfGoals implements Hf_iGoals {
             $percent = $currentStreak / $longestStreak;
             return $percent;
         } else {
-            $percent = $currentStreak / 1;
-            return $percent;
+            return 1;
         }
     }
 

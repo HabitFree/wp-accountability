@@ -874,7 +874,7 @@ class TestDatabase extends HfTestCase {
 
     public function testGetAllReportsForGoalPreparesQuery() {
         $this->expectOnce( $this->mockCms, 'prepareQuery', array(
-            'SELECT * FROM `wp_hf_report` WHERE userID = %d AND goalID = %d',
+            'SELECT * FROM `wp_hf_report` WHERE goalID = %d AND userID = %d',
             array( 1,7 )
         ) );
         $this->mockedDatabase->getAllReportsForGoal(1,7);

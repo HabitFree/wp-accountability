@@ -278,18 +278,9 @@ class TestGoals extends HfTestCase {
         $this->setReturnValue($this->mockDatabase,'timeOfLastSuccess',$lastSuccess);
     }
 
-    public function testGoalProgressBarPreparesLabel() {
-        $this->setReturnValsForProgressBarCreation();
-
-        $this->expectOnce($this->mockCms,'prepareQuery',array('%d / %d', array(1,2)));
-        $this->mockedGoals->goalProgressBar(1,7);
-    }
-
     public function testGoalProgressBarUsesLabel() {
         $this->setReturnValsForProgressBarCreation();
-
-        $this->setReturnValue($this->mockCms,'prepareQuery','label');
-        $this->expectOnce($this->mockMarkupGenerator,'progressBar',array(.5,'label'));
+        $this->expectOnce($this->mockMarkupGenerator,'progressBar',array(.5,'1 / 2'));
         $this->mockedGoals->goalProgressBar(1,7);
     }
 }
