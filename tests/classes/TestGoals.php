@@ -234,7 +234,7 @@ class TestGoals extends HfTestCase {
     }
 
     public function testGoalProgressBarCreatesProgressBar() {
-        $this->setReturnValsForProgressBarCreation();
+        $this->setReturnValsForProgressBarCreation(1);
 
         $this->expectOnce($this->mockMarkupGenerator,'progressBar',array(.5));
         $this->mockedGoals->goalProgressBar(1,7);
@@ -259,7 +259,7 @@ class TestGoals extends HfTestCase {
         return $reports;
     }
 
-    private function setReturnValsForProgressBarCreation()
+    private function setReturnValsForProgressBarCreation($currentStreak)
     {
         $reports = $this->makeMockReports();
         $this->setReturnValue($this->mockDatabase,'getAllReportsForGoal',$reports);
@@ -273,14 +273,32 @@ class TestGoals extends HfTestCase {
         $this->setReturnValues($this->mockCodeLibrary, 'convertStringToTime', $times);
 
         $firstSuccess = 0;
-        $lastSuccess = 24 * 60 * 60;
+        $lastSuccess = $currentStreak * 24 * 60 * 60;
         $this->setReturnValue($this->mockDatabase,'timeOfFirstSuccess',$firstSuccess);
         $this->setReturnValue($this->mockDatabase,'timeOfLastSuccess',$lastSuccess);
     }
 
     public function testGoalProgressBarUsesLabel() {
-        $this->setReturnValsForProgressBarCreation();
-        $this->expectOnce($this->mockMarkupGenerator,'progressBar',array(.5,'1 / 2'));
+        $this->setReturnValsForProgressBarCreation(1);
+        $this->expectOnce($this->mockMarkupGenerator,'progressBar',array(.5,'1 day to longest streak'));
+        $this->mockedGoals->goalProgressBar(1,7);
+    }
+
+    public function testGoalProgressBarLabelsLongestStreak() {
+        $this->setReturnValsForProgressBarCreation(2);
+        $this->expectOnce($this->mockMarkupGenerator,'progressBar',array(1,'Longest streak!'));
+        $this->mockedGoals->goalProgressBar(1,7);
+    }
+
+    public function testGoalProgressBarLabelsUseProperDayForm() {
+        $this->setReturnValsForProgressBarCreation(0);
+        $this->expectOnce($this->mockMarkupGenerator,'progressBar',array(0,'2 days to longest streak'));
+        $this->mockedGoals->goalProgressBar(1,7);
+    }
+
+    public function testGoalProgressBarRoundsLabelProperly() {
+        $this->setReturnValsForProgressBarCreation(0.55);
+        $this->expectOnce($this->mockMarkupGenerator,'progressBar',array(0.27500000000000002,'1.5 days to longest streak'));
         $this->mockedGoals->goalProgressBar(1,7);
     }
 }

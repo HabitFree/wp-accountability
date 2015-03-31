@@ -34,10 +34,8 @@ interface Hf_iMarkupGenerator {
         $goalDescription,
         $goalId,
         $daysSinceLastReport,
-        $levelId,
-        $levelTitle,
-        $levelPercent,
-        $levelDaysToComplete,
+        $currentStreak,
+        $longestStreak,
         $progressBar
     );
 

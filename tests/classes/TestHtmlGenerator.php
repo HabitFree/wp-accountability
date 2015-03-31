@@ -125,10 +125,6 @@ class TestHtmlGenerator extends HfTestCase {
         $goalDescription = 'Description';
         $goalId = 1;
         $daysSinceLastReport = 3;
-        $levelId = 2;
-        $levelTitle = 'Title';
-        $levelPercent = 0;
-        $levelDaysToComplete = 14;
         $levelBar = '';
 
         $result = $this->mockedMarkupGenerator->makeGoalCard(
@@ -136,21 +132,13 @@ class TestHtmlGenerator extends HfTestCase {
             $goalDescription,
             $goalId,
             $daysSinceLastReport,
-            $levelId,
-            $levelTitle,
-            $levelPercent,
-            $levelDaysToComplete,
+            1,
+            2,
             $levelBar
         );
 
-        $expected = "<div class='report-card'>" .
-            "<div class='main'>" .
-            $this->makeReportDiv($verb,'since your last check-in 3 days ago') . "</div></div>" .
-            "<div class='stats'>" .
-            "<p class='stat'>Level <span class='number'>2</span> Title</p>" .
-            "<p class='stat'>Level <span class='number'>0%</span> Complete</p>" .
-            "<p class='stat'>Days to <span class='number'>14</span> Next Level</p>" .
-            "</div></div>";
+        $reportDiv = $this->makeReportDiv($verb, 'since your last check-in 3 days ago');
+        $expected = $this->makeReportCard($reportDiv,1,2);
 
         $this->assertEquals($expected, $result);
     }
@@ -160,10 +148,6 @@ class TestHtmlGenerator extends HfTestCase {
         $goalDescription = '';
         $goalId = 1;
         $daysSinceLastReport = 3;
-        $levelId = 2;
-        $levelTitle = 'Title';
-        $levelPercent = 0;
-        $levelDaysToComplete = 14;
         $levelBar = '';
 
         $result = $this->mockedMarkupGenerator->makeGoalCard(
@@ -171,21 +155,13 @@ class TestHtmlGenerator extends HfTestCase {
             $goalDescription,
             $goalId,
             $daysSinceLastReport,
-            $levelId,
-            $levelTitle,
-            $levelPercent,
-            $levelDaysToComplete,
+            1,
+            2,
             $levelBar
         );
 
-        $expected = "<div class='report-card'>" .
-            "<div class='main'>" .
-            $this->makeReportDiv($verb,'since your last check-in 3 days ago') . "</div></div>" .
-            "<div class='stats'>" .
-            "<p class='stat'>Level <span class='number'>2</span> Title</p>" .
-            "<p class='stat'>Level <span class='number'>0%</span> Complete</p>" .
-            "<p class='stat'>Days to <span class='number'>14</span> Next Level</p>" .
-            "</div></div>";
+        $reportDiv = $this->makeReportDiv($verb, 'since your last check-in 3 days ago');
+        $expected = $this->makeReportCard($reportDiv,1,2);
 
         $this->assertEquals($result, $expected);
     }
@@ -201,10 +177,6 @@ class TestHtmlGenerator extends HfTestCase {
         $goalDescription = '';
         $goalId = 1;
         $daysSinceLastReport = 1;
-        $levelId = 2;
-        $levelTitle = 'Title';
-        $levelPercent = 0;
-        $levelDaysToComplete = 14;
         $levelBar = '';
 
         $result = $this->mockedMarkupGenerator->makeGoalCard(
@@ -212,21 +184,13 @@ class TestHtmlGenerator extends HfTestCase {
             $goalDescription,
             $goalId,
             $daysSinceLastReport,
-            $levelId,
-            $levelTitle,
-            $levelPercent,
-            $levelDaysToComplete,
+            1,
+            2,
             $levelBar
         );
 
-        $expected = "<div class='report-card'>" .
-            "<div class='main'>" .
-            $this->makeReportDiv($verb,'since your last check-in 1 day ago') . "</div></div>" .
-            "<div class='stats'>" .
-            "<p class='stat'>Level <span class='number'>2</span> Title</p>" .
-            "<p class='stat'>Level <span class='number'>0%</span> Complete</p>" .
-            "<p class='stat'>Days to <span class='number'>14</span> Next Level</p>" .
-            "</div></div>";
+        $reportDiv = $this->makeReportDiv($verb, 'since your last check-in 1 day ago');
+        $expected = $this->makeReportCard($reportDiv,1,2);
 
         $this->assertEquals($result, $expected);
     }
@@ -236,10 +200,6 @@ class TestHtmlGenerator extends HfTestCase {
         $goalDescription = '';
         $goalId = 1;
         $daysSinceLastReport = 0;
-        $levelId = 2;
-        $levelTitle = 'Title';
-        $levelPercent = 0;
-        $levelDaysToComplete = 14;
         $levelBar = '';
 
         $result = $this->mockedMarkupGenerator->makeGoalCard(
@@ -247,21 +207,13 @@ class TestHtmlGenerator extends HfTestCase {
             $goalDescription,
             $goalId,
             $daysSinceLastReport,
-            $levelId,
-            $levelTitle,
-            $levelPercent,
-            $levelDaysToComplete,
+            1,
+            2,
             $levelBar
         );
-
-        $expected = "<div class='report-card'>" .
-            "<div class='main'>" .
-            $this->makeReportDiv($goalTitle, 'since your last check-in less than a day ago') . "</div></div>" .
-            "<div class='stats'>" .
-            "<p class='stat'>Level <span class='number'>2</span> Title</p>" .
-            "<p class='stat'>Level <span class='number'>0%</span> Complete</p>" .
-            "<p class='stat'>Days to <span class='number'>14</span> Next Level</p>" .
-            "</div></div>";
+        
+        $reportDiv = $this->makeReportDiv($goalTitle, 'since your last check-in less than a day ago');
+        $expected = $this->makeReportCard($reportDiv, 1, 2);
 
         $this->assertEquals($result, $expected);
     }
@@ -271,10 +223,6 @@ class TestHtmlGenerator extends HfTestCase {
         $goalDescription = '';
         $goalId = 1;
         $daysSinceLastReport = false;
-        $levelId = 2;
-        $levelTitle = 'Title';
-        $levelPercent = 0;
-        $levelDaysToComplete = 14;
         $levelBar = '';
 
         $result = $this->mockedMarkupGenerator->makeGoalCard(
@@ -282,23 +230,13 @@ class TestHtmlGenerator extends HfTestCase {
             $goalDescription,
             $goalId,
             $daysSinceLastReport,
-            $levelId,
-            $levelTitle,
-            $levelPercent,
-            $levelDaysToComplete,
+            1,
+            2,
             $levelBar
         );
 
         $reportDiv = $this->makeReportDiv($verb,'in the last 24 hours');
-
-        $expected = "<div class='report-card'>" .
-            "<div class='main'>" .
-            $reportDiv ."</div></div>" .
-            "<div class='stats'>" .
-            "<p class='stat'>Level <span class='number'>2</span> Title</p>" .
-            "<p class='stat'>Level <span class='number'>0%</span> Complete</p>" .
-            "<p class='stat'>Days to <span class='number'>14</span> Next Level</p>" .
-            "</div></div>";
+        $expected = $this->makeReportCard($reportDiv,1,2);
 
         $this->assertEquals($result, $expected);
     }
@@ -308,10 +246,6 @@ class TestHtmlGenerator extends HfTestCase {
         $goalDescription = '';
         $goalId = 1;
         $daysSinceLastReport = 3.1415;
-        $levelId = 2;
-        $levelTitle = 'Title';
-        $levelPercent = 0;
-        $levelDaysToComplete = 14;
         $levelBar = '';
 
         $result = $this->mockedMarkupGenerator->makeGoalCard(
@@ -319,22 +253,13 @@ class TestHtmlGenerator extends HfTestCase {
             $goalDescription,
             $goalId,
             $daysSinceLastReport,
-            $levelId,
-            $levelTitle,
-            $levelPercent,
-            $levelDaysToComplete,
+            1,
+            2,
             $levelBar
         );
 
         $reportDiv = $this->makeReportDiv($verb, 'since your last check-in 3 days ago');
-        $expected = "<div class='report-card'>" .
-            "<div class='main'>" .
-            $reportDiv ."</div></div>" .
-            "<div class='stats'>" .
-            "<p class='stat'>Level <span class='number'>2</span> Title</p>" .
-            "<p class='stat'>Level <span class='number'>0%</span> Complete</p>" .
-            "<p class='stat'>Days to <span class='number'>14</span> Next Level</p>" .
-            "</div></div>";
+        $expected = $this->makeReportCard($reportDiv,1,2);
 
         $this->assertEquals($result, $expected);
     }
@@ -352,5 +277,16 @@ class TestHtmlGenerator extends HfTestCase {
         $needle = 'width: 100%';
         $haystack = $this->mockedMarkupGenerator->progressBar(1,'');
         $this->assertContains($needle,$haystack);
+    }
+
+    private function makeReportCard($reportDiv, $currentStreak, $longestStreak)
+    {
+        $expected = "<div class='report-card'>" .
+            "<div class='main'>{$reportDiv}</div></div>" .
+            "<div class='stats'>" .
+            "<p class='stat'>Current Streak <span class='number'>{$currentStreak}</span> Days</p>" .
+            "<p class='stat'>Longest Streak <span class='number'>{$longestStreak}</span> Days</p>" .
+            "</div></div>";
+        return $expected;
     }
 }

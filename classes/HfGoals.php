@@ -84,7 +84,7 @@ class HfGoals implements Hf_iGoals {
         $currentStreak = $this->currentStreak($goalId,$userId);
         $longestStreak = $this->findLongestStreak($goalId, $userId);
         $percent = $this->determinePercentOfLongestStreak($longestStreak, $currentStreak);
-        $label = round($currentStreak,2) . ' / ' . round($longestStreak,2);
+        $label = $this->makeProgressBarLabel($longestStreak, $currentStreak);
         return $this->markupGenerator->progressBar( $percent, $label );
     }
 
@@ -197,5 +197,20 @@ class HfGoals implements Hf_iGoals {
             return $daysOfSuccess;
         }
         return $daysOfSuccess;
+    }
+
+    private function makeProgressBarLabel($longestStreak, $currentStreak)
+    {
+        $timeToLongestStreak = round($longestStreak - $currentStreak, 1);
+        if ($timeToLongestStreak == 0) {
+            $label = 'Longest streak!';
+            return $label;
+        } elseif ($timeToLongestStreak == 1) {
+            $label = "$timeToLongestStreak day to longest streak";
+            return $label;
+        } else {
+            $label = "$timeToLongestStreak days to longest streak";
+            return $label;
+        }
     }
 } 

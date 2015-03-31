@@ -92,10 +92,8 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         $goalDescription,
         $goalId,
         $daysSinceLastReport,
-        $levelId,
-        $levelTitle,
-        $levelPercent,
-        $levelDaysToComplete,
+        $currentStreak,
+        $longestStreak,
         $progressBar
     ) {
         $periodPhrase = $this->makePeriodPhrase($daysSinceLastReport);
@@ -107,9 +105,8 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         "<label class='setback'><input type='radio' name='$goalId' value='0'> Yes</label>" .
         "</div></div></div>" .
         "<div class='stats'>" .
-        "<p class='stat'>Level <span class='number'>$levelId</span> $levelTitle</p>" .
-        "<p class='stat'>Level <span class='number'>$levelPercent%</span> Complete</p>" .
-        "<p class='stat'>Days to <span class='number'>$levelDaysToComplete</span> Next Level</p>" .
+        "<p class='stat'>Current Streak <span class='number'>$currentStreak</span> Days</p>" .
+        "<p class='stat'>Longest Streak <span class='number'>$longestStreak</span> Days</p>" .
         $progressBar .
         "</div></div>";
     }
