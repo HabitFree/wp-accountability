@@ -26,12 +26,11 @@ class HfGoals implements Hf_iGoals {
 
         $goalID        = intval( $sub->goalID );
         $goal          = $this->database->getGoal( $goalID );
-        $daysOfSuccess = $this->currentStreak( $goalID, $userID );
         $daysSinceLastReport = $this->database->daysSinceLastReport($goalID, $userID);
 
-        $level         = $this->database->getLevel( $daysOfSuccess );
-        $levelPercentComplete = round($this->levelPercentComplete($goalID, $userID), 1);
-        $levelDaysToComplete = round($this->daysToNextLevel($goalID, $userID));
+        $currentStreak = $this->currentStreak($goalID,$userID);
+        $longestStreak = $this->findLongestStreak($goalID,$userID);
+
         $bar          = $this->goalProgressBar( $goalID, $userID );
 
         $card = $this->markupGenerator->makeGoalCard(
@@ -39,10 +38,8 @@ class HfGoals implements Hf_iGoals {
             $goal->description,
             $goalID,
             $daysSinceLastReport,
-            $level->levelID,
-            $level->title,
-            $levelPercentComplete,
-            $levelDaysToComplete,
+            $currentStreak,
+            $longestStreak,
             $bar
         );
 

@@ -98,17 +98,15 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     ) {
         $periodPhrase = $this->makePeriodPhrase($daysSinceLastReport);
 
+        $stats = $this->makeStats($currentStreak, $longestStreak, $progressBar);
+
         return "<div class='report-card'>" .
         "<div class='main'>" .
         "<div class='report'>Did you <em>$goalVerb</em> $periodPhrase?<div class='controls'>" .
         "<label class='success'><input type='radio' name='$goalId' value='1'> No</label>" .
         "<label class='setback'><input type='radio' name='$goalId' value='0'> Yes</label>" .
         "</div></div></div>" .
-        "<div class='stats'>" .
-        "<p class='stat'>Current Streak <span class='number'>$currentStreak</span> Days</p>" .
-        "<p class='stat'>Longest Streak <span class='number'>$longestStreak</span> Days</p>" .
-        $progressBar .
-        "</div></div>";
+        $stats ."</div>";
     }
 
     private function makePeriodPhrase($daysSinceLastReport)
@@ -126,5 +124,20 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
             }
             return "since your last check-in $elapsed ago";
         }
+    }
+
+    private function makeStats($currentStreak, $longestStreak, $progressBar)
+    {
+        $currentStreak = round($currentStreak, 1);
+        $longestStreak = round($longestStreak, 1);
+
+        $currentDays = ($currentStreak == 1) ? 'Day' : 'Days';
+        $longestDays = ($longestStreak == 1) ? 'Day' : 'Days';
+
+        return "<div class='stats'>" .
+            "<p class='stat'>Current Streak <span class='number'>$currentStreak</span> $currentDays</p>" .
+            "<p class='stat'>Longest Streak <span class='number'>$longestStreak</span> $longestDays</p>" .
+            $progressBar .
+            "</div>";
     }
 }

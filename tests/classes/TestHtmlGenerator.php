@@ -211,7 +211,7 @@ class TestHtmlGenerator extends HfTestCase {
             2,
             $levelBar
         );
-        
+
         $reportDiv = $this->makeReportDiv($goalTitle, 'since your last check-in less than a day ago');
         $expected = $this->makeReportCard($reportDiv, 1, 2);
 
@@ -253,13 +253,13 @@ class TestHtmlGenerator extends HfTestCase {
             $goalDescription,
             $goalId,
             $daysSinceLastReport,
-            1,
-            2,
+            1.111,
+            2.222,
             $levelBar
         );
 
         $reportDiv = $this->makeReportDiv($verb, 'since your last check-in 3 days ago');
-        $expected = $this->makeReportCard($reportDiv,1,2);
+        $expected = $this->makeReportCard($reportDiv,1.1,2.2);
 
         $this->assertEquals($result, $expected);
     }
@@ -281,12 +281,38 @@ class TestHtmlGenerator extends HfTestCase {
 
     private function makeReportCard($reportDiv, $currentStreak, $longestStreak)
     {
+        $currentDays = ($currentStreak == 1) ? 'Day' : 'Days';
+        $longestDays = ($longestStreak == 1) ? 'Day' : 'Days';
+
         $expected = "<div class='report-card'>" .
             "<div class='main'>{$reportDiv}</div></div>" .
             "<div class='stats'>" .
-            "<p class='stat'>Current Streak <span class='number'>{$currentStreak}</span> Days</p>" .
-            "<p class='stat'>Longest Streak <span class='number'>{$longestStreak}</span> Days</p>" .
+            "<p class='stat'>Current Streak <span class='number'>{$currentStreak}</span> $currentDays</p>" .
+            "<p class='stat'>Longest Streak <span class='number'>{$longestStreak}</span> $longestDays</p>" .
             "</div></div>";
         return $expected;
+    }
+
+    public function testMakeGoalCardRegonizesOneDay() {
+        $verb = 'verb';
+        $goalDescription = '';
+        $goalId = 1;
+        $daysSinceLastReport = 3.1415;
+        $levelBar = '';
+
+        $result = $this->mockedMarkupGenerator->makeGoalCard(
+            $verb,
+            $goalDescription,
+            $goalId,
+            $daysSinceLastReport,
+            1,
+            1,
+            $levelBar
+        );
+
+        $reportDiv = $this->makeReportDiv($verb, 'since your last check-in 3 days ago');
+        $expected = $this->makeReportCard($reportDiv,1,1);
+
+        $this->assertEquals($result, $expected);
     }
 }
