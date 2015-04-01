@@ -47,21 +47,8 @@ class HfGoals implements Hf_iGoals {
     }
 
     private function currentStreak( $goalId, $userId ) {
-        $dateInSecondsOfFirstSuccess = $this->database->timeOfFirstSuccess( $goalId, $userId );
-        $dateInSecondsOfLastSuccess  = $this->database->timeOfLastSuccess( $goalId, $userId );
-        $dateInSecondsOfLastFail     = $this->database->timeOfLastFail( $goalId, $userId );
-
-        if ( !$dateInSecondsOfLastSuccess ) {
-            return 0;
-        } else {
-            $secondsOfSuccess = $this->determineSecondsOfSuccess(
-                $dateInSecondsOfLastFail,
-                $dateInSecondsOfLastSuccess,
-                $dateInSecondsOfFirstSuccess
-            );
-
-            return $this->determineDaysOfSuccess($secondsOfSuccess);
-        }
+        $streaks = $this->findStreaks($goalId, $userId);
+        return end($streaks);
     }
 
     function levelPercentComplete( $goalId, $userId ) {
@@ -143,26 +130,8 @@ class HfGoals implements Hf_iGoals {
 
     private function findLongestStreak($goalId, $userId)
     {
-        $reports = $this->database->getAllReportsForGoal($goalId, $userId);
-        $longestStreak = 0;
-        $candidateStreak = 0;
-        foreach ($reports as $report) {
-            $reportTime = $this->codeLibrary->convertStringToTime($report->date);
-            if ($report->isSuccessful == 1) {
-                if (isset($lastTime)) {
-                    $seconds = $reportTime - $lastTime;
-                    $days = $this->convertSecondsToDays($seconds);
-                    $candidateStreak += $days;
-                    if ($candidateStreak > $longestStreak) {
-                        $longestStreak = $candidateStreak;
-                    }
-                }
-            } else {
-                $candidateStreak = 0;
-            }
-            $lastTime = $reportTime;
-        }
-        return $longestStreak;
+        $streaks = $this->findStreaks($goalId, $userId);
+        return max($streaks);
     }
 
     private function determinePercentOfLongestStreak($longestStreak, $currentStreak)
@@ -209,5 +178,31 @@ class HfGoals implements Hf_iGoals {
             $label = "$timeToLongestStreak days to longest streak";
             return $label;
         }
+    }
+
+    private function streakExtension($reportTime, $lastTime)
+    {
+        $seconds = $reportTime - $lastTime;
+        $days = $this->convertSecondsToDays($seconds);
+        return $days;
+    }
+
+    private function findStreaks($goalId, $userId)
+    {
+        $reports = $this->database->getAllReportsForGoal($goalId, $userId);
+        $streaks = array();
+        $candidateStreak = 0;
+        foreach ($reports as $report) {
+            $reportTime = $this->codeLibrary->convertStringToTime($report->date);
+            if ($report->isSuccessful == 1 && isset($lastTime)) {
+                $candidateStreak += $this->streakExtension($reportTime, $lastTime);
+            } else {
+                $streaks[] = $candidateStreak;
+                $candidateStreak = 0;
+            }
+            $lastTime = $reportTime;
+        }
+        $streaks[] = $candidateStreak;
+        return $streaks;
     }
 } 
