@@ -144,27 +144,6 @@ class HfGoals implements Hf_iGoals {
         }
     }
 
-    private function determineSecondsOfSuccess($dateInSecondsOfLastFail, $dateInSecondsOfLastSuccess, $dateInSecondsOfFirstSuccess)
-    {
-        if (!$dateInSecondsOfLastFail) {
-            $secondsOfSuccess = $dateInSecondsOfLastSuccess - $dateInSecondsOfFirstSuccess;
-            return $secondsOfSuccess;
-        } else {
-            $secondsOfSuccess = $dateInSecondsOfLastSuccess - $dateInSecondsOfLastFail;
-            return $secondsOfSuccess;
-        }
-    }
-
-    private function determineDaysOfSuccess($secondsOfSuccess)
-    {
-        $daysOfSuccess = $this->convertSecondsToDays($secondsOfSuccess);
-        if ($daysOfSuccess < 0) {
-            $daysOfSuccess = 0;
-            return $daysOfSuccess;
-        }
-        return $daysOfSuccess;
-    }
-
     private function makeProgressBarLabel($longestStreak, $currentStreak)
     {
         $timeToLongestStreak = round($longestStreak - $currentStreak, 1);

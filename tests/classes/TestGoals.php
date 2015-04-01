@@ -137,7 +137,7 @@ class TestGoals extends HfTestCase {
     }
 
     public function testGenerateGoalCardUsesDatabaseGetGoalMethod() {
-        $this->setReturnValsForGoalCardCreation(1);
+        $this->setReturnValsForGoalCardCreation();
         $this->setReturnValsForFindingStreaks(1);
 
         $this->expectOnce( $this->mockDatabase, 'getGoal', array(1) );
@@ -146,7 +146,7 @@ class TestGoals extends HfTestCase {
         $this->mockedGoals->generateGoalCard( $MockSub );
     }
 
-    private function setReturnValsForGoalCardCreation($currentStreak)
+    private function setReturnValsForGoalCardCreation()
     {
         $MockGoal = $this->makeMockGoal();
         $this->setReturnValue($this->mockDatabase, 'getGoal', $MockGoal);
@@ -155,11 +155,10 @@ class TestGoals extends HfTestCase {
         $this->setReturnValue($this->mockDatabase, 'getLevel', $MockLevel);
 
         $this->setReturnValue($this->mockDatabase, 'daysSinceLastReport', 3.1415);
-        //$this->setReturnValue($this->mockDatabase, 'getAllReportsForGoal', array());
     }
 
     public function testUsesHtmlGeneratorToMakeGoalCard() {
-        $this->setReturnValsForGoalCardCreation(1);
+        $this->setReturnValsForGoalCardCreation();
         $this->setReturnValsForFindingStreaks(1);
         $MockSub = $this->makeMockGoalSub();
 
@@ -177,7 +176,7 @@ class TestGoals extends HfTestCase {
     }
 
     public function testReturnsHtmlGeneratorMadeGoalCard() {
-        $this->setReturnValsForGoalCardCreation(1);
+        $this->setReturnValsForGoalCardCreation();
         $this->setReturnValsForFindingStreaks(1);
         $MockSub = $this->makeMockGoalSub();
         $this->setReturnValue($this->mockMarkupGenerator, 'makeGoalCard', 'goose');
@@ -192,7 +191,7 @@ class TestGoals extends HfTestCase {
         $mockGoal = $this->makeMockGoal();
         $mockSub = $this->makeMockGoalSub();
 
-        $this->setReturnValsForGoalCardCreation(1);
+        $this->setReturnValsForGoalCardCreation();
         $this->setReturnValsForFindingStreaks(1);
 
         $this->expectOnce($this->mockMarkupGenerator, 'makeGoalCard', array(
@@ -216,7 +215,7 @@ class TestGoals extends HfTestCase {
     }
 
     public function testGoalProgressBarGetsAllReports() {
-        $this->setReturnValsForGoalCardCreation(1);
+        $this->setReturnValsForGoalCardCreation();
         $this->setReturnValsForFindingStreaks(1);
         $this->expectAtLeastOnce($this->mockDatabase, 'getAllReportsForGoal',array(1,7));
         $this->mockedGoals->goalProgressBar(1,7);
