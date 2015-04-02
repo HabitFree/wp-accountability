@@ -284,12 +284,23 @@ class TestHtmlGenerator extends HfTestCase {
         $currentDays = ($currentStreak == 1) ? 'Day' : 'Days';
         $longestDays = ($longestStreak == 1) ? 'Day' : 'Days';
 
+        $offset = (1 - ($currentStreak / $longestStreak)) * 300;
+
         $expected = "<div class='report-card'>" .
             "<div class='main'>{$reportDiv}</div></div>" .
-            "<div class='stats'>" .
-            "<p class='stat'>Current Streak <span class='number'>{$currentStreak}</span> $currentDays</p>" .
-            "<p class='stat'>Longest Streak <span class='number'>{$longestStreak}</span> $longestDays</p>" .
-            "</div></div>";
+            "<div class='stats donut'>
+                <h2><span class='top'>$currentStreak</span>$longestStreak</h2>
+                <svg width='120' height='120' xmlns='http://www.w3.org/2000/svg'>
+                 <g>
+                  <title>Layer 1</title>
+                  <circle id='circle' class='circle_animation' r='47.7465' cy='60' cx='60' stroke-width='12' stroke='#BA0000' fill='none'/>
+                 </g>
+                </svg>
+            </div>
+            <style>
+                @-webkit-keyframes html { to { stroke-dashoffset: $offset; } }
+                @keyframes html { to { stroke-dashoffset: $offset; } }
+            </style></div>";
         return $expected;
     }
 
