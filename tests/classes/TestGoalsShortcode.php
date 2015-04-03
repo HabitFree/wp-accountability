@@ -296,7 +296,7 @@ class TestGoalsShortcode extends HfTestCase {
         $this->setReturnValue($this->mockDatabase, 'getQuotations', array($this->makeMockQuotation()));
 
         $haystack = $goalsShortcode->getOutput();
-        $needle = '<p class="quote">"hello" — Nathan</p>';
+        $needle = '<p class=\'quote\'>"hello" — Nathan</p>';
 
         $this->assertContains($needle, $haystack);
     }

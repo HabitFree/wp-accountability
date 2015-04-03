@@ -40,10 +40,10 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     public function listMarkup( $items ) {
         $html = '';
         foreach ( $items as $item ) {
-            $html .= '<li>' . $item . '</li>';
+            $html .= "<li>$item</li>";
         }
 
-        return '<ul>' . $html . '</ul>';
+        return "<ul>$html</ul>";
     }
 
     public function errorMessage( $content ) {
@@ -55,11 +55,12 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     }
 
     public function quotation( $quotation ) {
-        return '<p class="quote">"' . $quotation->post_content . '" — ' . $quotation->post_title . '</p>';
+        $content = '"' . $quotation->post_content . '" — ' . $quotation->post_title;
+        return $this->paragraph($content,'quote');
     }
 
-    public function makeInfoMessage( $content ) {
-        return '<p class="info">' . $content . '</p>';
+    public function infoMessage( $content ) {
+        return $this->paragraph($content, 'info');
     }
 
     public function form( $url, $content, $name ) {
@@ -87,6 +88,11 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         return "<h$level>$content</h$level>";
     }
 
+    public function div( $content, $classes = NULL ) {
+        $properties = ($classes === NULL ? '' : " class='$classes'");
+        return "<div$properties>$content</div>";
+    }
+
     public function goalCard(
         $goalVerb,
         $goalDescription,
@@ -98,13 +104,13 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         $stats = $this->stats($currentStreak, $longestStreak, $goalId);
         $reportDiv = $this->reportDiv($goalVerb, $goalId, $daysSinceLastReport);
 
-        return "<div class='report-card'>$stats<div class='main'>$reportDiv</div></div>";
+        return $this->div($stats.$reportDiv,'report-card');
     }
 
     private function periodPhrase($daysSinceLastReport)
     {
         if ($daysSinceLastReport === false) {
-            return 'in the last 24 hours';
+            return 'in the last <strong>24 hours</strong>';
         } else {
             $days = round($daysSinceLastReport);
             if ($days == 0) {
@@ -114,7 +120,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
             } else {
                 $elapsed = "$days days";
             }
-            return "since your last check-in $elapsed ago";
+            return "since your last check-in <strong>$elapsed ago</strong>";
         }
     }
 
@@ -124,17 +130,12 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         $longestStreak = round($longestStreak, 1);
 
         $offset = (1 - ($currentStreak / $longestStreak)) * 300;
-        
-        return "<div class='stats donut graph$goalId'>
-                <h2><span class='top'>$currentStreak</span>$longestStreak</h2>
-                <svg width='120' height='120' xmlns='http://www.w3.org/2000/svg'>
-                 <g>
-                  <title>Layer 1</title>
-                  <circle id='circle' class='circle_animation' r='47.7465' cy='60' cx='60' stroke-width='12' stroke='#BA0000' fill='none'/>
-                 </g>
-                </svg>
-            </div>
-            <style>
+        $isGlowing = $currentStreak == $longestStreak;
+        $graphSvg = $this->donutSvg($isGlowing);
+
+        $label = "<h2><span class='top' title='Current Streak'>$currentStreak</span><span title='Longest Streak'>$longestStreak</span></h2>";
+        $graph = $this->div($label.$graphSvg,"donut graph$goalId");
+        $style = "<style>
                 .graph$goalId .circle_animation {
                   -webkit-animation: graph$goalId 1s ease-out forwards;
                   animation: graph$goalId 1s ease-out forwards;
@@ -142,15 +143,51 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
                 @-webkit-keyframes graph$goalId { to { stroke-dashoffset: $offset; } }
                 @keyframes graph$goalId { to { stroke-dashoffset: $offset; } }
             </style>";
+        return $this->div($graph . $style,'stats');
     }
 
     private function reportDiv($goalVerb, $goalId, $daysSinceLastReport)
     {
         $periodPhrase = $this->periodPhrase($daysSinceLastReport);
-        $reportDiv = "<div class='report'>Did you <em>$goalVerb</em> $periodPhrase?<div class='controls'>" .
+        $reportDiv = "<div class='report'>Did you <strong>$goalVerb</strong> $periodPhrase?<div class='controls'>" .
             "<label class='success'><input type='radio' name='$goalId' value='1'> No</label>" .
             "<label class='setback'><input type='radio' name='$goalId' value='0'> Yes</label>" .
             "</div></div>";
         return $reportDiv;
+    }
+
+    private function glowStyle($isGlowing)
+    {
+        $glowStyle = 'style="filter:url(#glow)"';
+        return ($isGlowing) ? $glowStyle : '';
+    }
+
+    private function glowDefinition($isGlowing)
+    {
+        $glowDefinition = "<defs>
+<filter id='glow'>
+            <feGaussianBlur stdDeviation='5' result='coloredBlur'/>
+            <feMerge>
+                <feMergeNode in='coloredBlur'/>
+                <feMergeNode in='SourceGraphic'/>
+            </feMerge>
+        </filter>
+    </defs>";
+
+        return ($isGlowing) ? $glowDefinition : '';
+    }
+
+    private function donutSvg($isGlowing)
+    {
+        $glowDef = $this->glowDefinition($isGlowing);
+        $glowStyle = $this->glowStyle($isGlowing);
+
+        return "<svg width='120' height='120' xmlns='http://www.w3.org/2000/svg'>
+                $glowDef
+                 <g>
+                  <title>Layer 1</title>
+                  <circle id='circle' class='circle_animation' r='47.7465' cy='60' cx='60' stroke-width='12' stroke='#BA0000' fill='none' $glowStyle/>
+                 </g>
+                </svg>";
     }
 }

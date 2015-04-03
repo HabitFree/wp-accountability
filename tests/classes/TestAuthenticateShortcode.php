@@ -356,7 +356,7 @@ class TestAuthenticateShortcode extends HfTestCase {
 
         $AuthenticateShortcode = $this->factory->makeAuthenticateShortcode();
         $haystack              = $AuthenticateShortcode->getOutput();
-        $needle                = "<p class=\"info\">Looks like you're responding to an invitation. Feel free to either register or log into an existing account—either way we'll automatically set up accountability between you and the user who invited you.</p>";
+        $needle                = "<p class='info'>Looks like you're responding to an invitation. Feel free to either register or log into an existing account—either way we'll automatically set up accountability between you and the user who invited you.</p>";
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }

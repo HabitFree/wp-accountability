@@ -121,7 +121,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private function informInvitedUser() {
         if ( $this->isInvite() ) {
             $infoMessageText = "Looks like you're responding to an invitation. Feel free to either register or log into an existing account—either way we'll automatically set up accountability between you and the user who invited you.";
-            $this->output .= $this->markupGenerator->makeInfoMessage( $infoMessageText );
+            $this->output .= $this->markupGenerator->infoMessage( $infoMessageText );
         }
     }
 
@@ -225,7 +225,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private function makeRedirectMessage( $url ) {
         $infoMessageText = 'Redirecting... <a href="' . $url . '">Click here</a> if you are not automatically redirected. <a href="' . $url . '">Onward!</a>';
 
-        return $this->markupGenerator->makeInfoMessage( $infoMessageText );
+        return $this->markupGenerator->infoMessage( $infoMessageText );
     }
 
     private function enqueueRegistrationErrorMessage()

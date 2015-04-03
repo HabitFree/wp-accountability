@@ -76,7 +76,7 @@ class TestHtmlGenerator extends HfTestCase {
 
         $result = $HtmlGenerator->quotation($MockQuotation);
 
-        $this->assertEquals('<p class="quote">"hello" — Nathan</p>', $result);
+        $this->assertEquals("<p class='quote'>\"hello\" — Nathan</p>", $result);
     }
 
     public function testMakeForm() {
@@ -105,8 +105,8 @@ class TestHtmlGenerator extends HfTestCase {
 
     public function testMakeInfoMessage() {
         $HtmlGenerator = $this->factory->makeMarkupGenerator();
-        $result = $HtmlGenerator->makeInfoMessage('duck');
-        $this->assertEquals('<p class="info">duck</p>', $result);
+        $result = $HtmlGenerator->infoMessage('duck');
+        $this->assertEquals("<p class='info'>duck</p>", $result);
     }
 
     public function testMakeRedirectScript() {
@@ -137,7 +137,7 @@ class TestHtmlGenerator extends HfTestCase {
             $levelBar
         );
 
-        $reportDiv = $this->makeReportDiv($verb, 'since your last check-in 3 days ago');
+        $reportDiv = $this->makeReportDiv($verb, 'since your last check-in <strong>3 days ago</strong>');
         $expected = $this->makeReportCard($reportDiv,1,2,$goalId);
 
         $this->assertEquals($expected, $result);
@@ -160,7 +160,7 @@ class TestHtmlGenerator extends HfTestCase {
             $levelBar
         );
 
-        $reportDiv = $this->makeReportDiv($verb, 'since your last check-in 3 days ago');
+        $reportDiv = $this->makeReportDiv($verb, 'since your last check-in <strong>3 days ago</strong>');
         $expected = $this->makeReportCard($reportDiv,1,2,$goalId);
 
         $this->assertEquals($result, $expected);
@@ -189,7 +189,7 @@ class TestHtmlGenerator extends HfTestCase {
             $levelBar
         );
 
-        $reportDiv = $this->makeReportDiv($verb, 'since your last check-in 1 day ago');
+        $reportDiv = $this->makeReportDiv($verb, 'since your last check-in <strong>1 day ago</strong>');
         $expected = $this->makeReportCard($reportDiv,1,2, $goalId);
 
         $this->assertEquals($result, $expected);
@@ -212,7 +212,7 @@ class TestHtmlGenerator extends HfTestCase {
             $levelBar
         );
 
-        $reportDiv = $this->makeReportDiv($goalTitle, 'since your last check-in less than a day ago');
+        $reportDiv = $this->makeReportDiv($goalTitle, 'since your last check-in <strong>less than a day ago</strong>');
         $expected = $this->makeReportCard($reportDiv, 1, 2,$goalId);
 
         $this->assertEquals($result, $expected);
@@ -235,7 +235,7 @@ class TestHtmlGenerator extends HfTestCase {
             $levelBar
         );
 
-        $reportDiv = $this->makeReportDiv($verb,'in the last 24 hours');
+        $reportDiv = $this->makeReportDiv($verb,'in the last <strong>24 hours</strong>');
         $expected = $this->makeReportCard($reportDiv,1,2,$goalId);
 
         $this->assertEquals($result, $expected);
@@ -258,7 +258,7 @@ class TestHtmlGenerator extends HfTestCase {
             $levelBar
         );
 
-        $reportDiv = $this->makeReportDiv($verb, 'since your last check-in 3 days ago');
+        $reportDiv = $this->makeReportDiv($verb, 'since your last check-in <strong>3 days ago</strong>');
         $expected = $this->makeReportCard($reportDiv,1.1,2.2,$goalId);
 
         $this->assertEquals($result, $expected);
@@ -266,7 +266,7 @@ class TestHtmlGenerator extends HfTestCase {
 
     private function makeReportDiv($verb, $periodPhrase)
     {
-        $reportDiv = "<div class='report'>Did you <em>$verb</em> $periodPhrase?<div class='controls'>" .
+        $reportDiv = "<div class='report'>Did you <strong>$verb</strong> $periodPhrase?<div class='controls'>" .
             "<label class='success'><input type='radio' name='1' value='1'> No</label>" .
             "<label class='setback'><input type='radio' name='1' value='0'> Yes</label>" .
             "</div></div>";
@@ -283,7 +283,7 @@ class TestHtmlGenerator extends HfTestCase {
     {
         $stats = $this->makeStats($currentStreak, $longestStreak, $goalId);
 
-        return "<div class='report-card'>$stats<div class='main'>$reportDiv</div></div>";
+        return "<div class='report-card'>$stats$reportDiv</div>";
     }
 
     public function testMakeGoalCardRegonizesOneDay() {
@@ -303,7 +303,7 @@ class TestHtmlGenerator extends HfTestCase {
             $levelBar
         );
 
-        $reportDiv = $this->makeReportDiv($verb, 'since your last check-in 3 days ago');
+        $reportDiv = $this->makeReportDiv($verb, 'since your last check-in <strong>3 days ago</strong>');
         $expected = $this->makeReportCard($reportDiv,1,1,$goalId);
 
         $this->assertEquals($result, $expected);
@@ -312,17 +312,37 @@ class TestHtmlGenerator extends HfTestCase {
     private function makeStats($currentStreak, $longestStreak, $goalId)
     {
         $offset = (1 - ($currentStreak / $longestStreak)) * 300;
+        $isGlowing = $currentStreak == $longestStreak;
+        if ($isGlowing) {
+            $glowStyle = 'style="filter:url(#glow)"';
+            $glowDef = "<defs>
+<filter id='glow'>
+            <feGaussianBlur stdDeviation='5' result='coloredBlur'/>
+            <feMerge>
+                <feMergeNode in='coloredBlur'/>
+                <feMergeNode in='SourceGraphic'/>
+            </feMerge>
+        </filter>
+    </defs>";
+        } else {
+            $glowStyle = '';
+            $glowDef = '';
+        }
 
-        return "<div class='stats donut graph$goalId'>
-                <h2><span class='top'>$currentStreak</span>$longestStreak</h2>
-                <svg width='120' height='120' xmlns='http://www.w3.org/2000/svg'>
+        $graph = "<div class='donut graph$goalId'><h2><span class='top' title='Current Streak'>$currentStreak</span><span title='Longest Streak'>$longestStreak</span></h2><svg width='120' height='120' xmlns='http://www.w3.org/2000/svg'>
+                $glowDef
                  <g>
                   <title>Layer 1</title>
-                  <circle id='circle' class='circle_animation' r='47.7465' cy='60' cx='60' stroke-width='12' stroke='#BA0000' fill='none'/>
+                  <circle id='circle' class='circle_animation' r='47.7465' cy='60' cx='60' stroke-width='12' stroke='#BA0000' fill='none' $glowStyle/>
                  </g>
-                </svg>
-            </div>
-            <style>
+                </svg></div>";
+        $css = $this->donutCss($goalId, $offset);
+        return "<div class='stats'>$graph$css</div>";
+    }
+
+    private function donutCss($goalId, $offset)
+    {
+        return "<style>
                 .graph$goalId .circle_animation {
                   -webkit-animation: graph$goalId 1s ease-out forwards;
                   animation: graph$goalId 1s ease-out forwards;
