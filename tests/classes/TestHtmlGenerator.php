@@ -138,7 +138,7 @@ class TestHtmlGenerator extends HfTestCase {
         );
 
         $reportDiv = $this->makeReportDiv($verb, 'since your last check-in 3 days ago');
-        $expected = $this->makeReportCard($reportDiv,1,2);
+        $expected = $this->makeReportCard($reportDiv,1,2,$goalId);
 
         $this->assertEquals($expected, $result);
     }
@@ -161,7 +161,7 @@ class TestHtmlGenerator extends HfTestCase {
         );
 
         $reportDiv = $this->makeReportDiv($verb, 'since your last check-in 3 days ago');
-        $expected = $this->makeReportCard($reportDiv,1,2);
+        $expected = $this->makeReportCard($reportDiv,1,2,$goalId);
 
         $this->assertEquals($result, $expected);
     }
@@ -190,7 +190,7 @@ class TestHtmlGenerator extends HfTestCase {
         );
 
         $reportDiv = $this->makeReportDiv($verb, 'since your last check-in 1 day ago');
-        $expected = $this->makeReportCard($reportDiv,1,2);
+        $expected = $this->makeReportCard($reportDiv,1,2, $goalId);
 
         $this->assertEquals($result, $expected);
     }
@@ -213,7 +213,7 @@ class TestHtmlGenerator extends HfTestCase {
         );
 
         $reportDiv = $this->makeReportDiv($goalTitle, 'since your last check-in less than a day ago');
-        $expected = $this->makeReportCard($reportDiv, 1, 2);
+        $expected = $this->makeReportCard($reportDiv, 1, 2,$goalId);
 
         $this->assertEquals($result, $expected);
     }
@@ -236,7 +236,7 @@ class TestHtmlGenerator extends HfTestCase {
         );
 
         $reportDiv = $this->makeReportDiv($verb,'in the last 24 hours');
-        $expected = $this->makeReportCard($reportDiv,1,2);
+        $expected = $this->makeReportCard($reportDiv,1,2,$goalId);
 
         $this->assertEquals($result, $expected);
     }
@@ -259,7 +259,7 @@ class TestHtmlGenerator extends HfTestCase {
         );
 
         $reportDiv = $this->makeReportDiv($verb, 'since your last check-in 3 days ago');
-        $expected = $this->makeReportCard($reportDiv,1.1,2.2);
+        $expected = $this->makeReportCard($reportDiv,1.1,2.2,$goalId);
 
         $this->assertEquals($result, $expected);
     }
@@ -279,16 +279,14 @@ class TestHtmlGenerator extends HfTestCase {
         $this->assertContains($needle,$haystack);
     }
 
-    private function makeReportCard($reportDiv, $currentStreak, $longestStreak)
+    private function makeReportCard($reportDiv, $currentStreak, $longestStreak, $goalId)
     {
-        $currentDays = ($currentStreak == 1) ? 'Day' : 'Days';
-        $longestDays = ($longestStreak == 1) ? 'Day' : 'Days';
 
         $offset = (1 - ($currentStreak / $longestStreak)) * 300;
 
         $expected = "<div class='report-card'>" .
             "<div class='main'>{$reportDiv}</div></div>" .
-            "<div class='stats donut'>
+            "<div class='stats donut graph$goalId'>
                 <h2><span class='top'>$currentStreak</span>$longestStreak</h2>
                 <svg width='120' height='120' xmlns='http://www.w3.org/2000/svg'>
                  <g>
@@ -298,8 +296,12 @@ class TestHtmlGenerator extends HfTestCase {
                 </svg>
             </div>
             <style>
-                @-webkit-keyframes html { to { stroke-dashoffset: $offset; } }
-                @keyframes html { to { stroke-dashoffset: $offset; } }
+                .graph$goalId .circle_animation {
+                  -webkit-animation: graph$goalId 1s ease-out forwards;
+                  animation: graph$goalId 1s ease-out forwards;
+                }
+                @-webkit-keyframes graph$goalId { to { stroke-dashoffset: $offset; } }
+                @keyframes graph$goalId { to { stroke-dashoffset: $offset; } }
             </style></div>";
         return $expected;
     }
@@ -322,7 +324,7 @@ class TestHtmlGenerator extends HfTestCase {
         );
 
         $reportDiv = $this->makeReportDiv($verb, 'since your last check-in 3 days ago');
-        $expected = $this->makeReportCard($reportDiv,1,1);
+        $expected = $this->makeReportCard($reportDiv,1,1,$goalId);
 
         $this->assertEquals($result, $expected);
     }

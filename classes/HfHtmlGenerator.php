@@ -98,7 +98,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     ) {
         $periodPhrase = $this->makePeriodPhrase($daysSinceLastReport);
 
-        $stats = $this->makeStats($currentStreak, $longestStreak, $progressBar);
+        $stats = $this->makeStats($currentStreak, $longestStreak, $progressBar, $goalId);
 
         return "<div class='report-card'>" .
         "<div class='main'>" .
@@ -126,7 +126,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         }
     }
 
-    private function makeStats($currentStreak, $longestStreak, $progressBar)
+    private function makeStats($currentStreak, $longestStreak, $progressBar, $goalId)
     {
         $currentStreak = round($currentStreak, 1);
         $longestStreak = round($longestStreak, 1);
@@ -136,7 +136,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
 
         $offset = (1 - ($currentStreak / $longestStreak)) * 300;
         
-        return "<div class='stats donut'>
+        return "<div class='stats donut graph$goalId'>
                 <h2><span class='top'>$currentStreak</span>$longestStreak</h2>
                 <svg width='120' height='120' xmlns='http://www.w3.org/2000/svg'>
                  <g>
@@ -146,8 +146,12 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
                 </svg>
             </div>
             <style>
-                @-webkit-keyframes html { to { stroke-dashoffset: $offset; } }
-                @keyframes html { to { stroke-dashoffset: $offset; } }
+                .graph$goalId .circle_animation {
+                  -webkit-animation: graph$goalId 1s ease-out forwards;
+                  animation: graph$goalId 1s ease-out forwards;
+                }
+                @-webkit-keyframes graph$goalId { to { stroke-dashoffset: $offset; } }
+                @keyframes graph$goalId { to { stroke-dashoffset: $offset; } }
             </style>";
     }
 }
