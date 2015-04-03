@@ -281,29 +281,9 @@ class TestHtmlGenerator extends HfTestCase {
 
     private function makeReportCard($reportDiv, $currentStreak, $longestStreak, $goalId)
     {
+        $stats = $this->makeStats($currentStreak, $longestStreak, $goalId);
 
-        $offset = (1 - ($currentStreak / $longestStreak)) * 300;
-
-        $expected = "<div class='report-card'>" .
-            "<div class='main'>{$reportDiv}</div>" .
-            "<div class='stats donut graph$goalId'>
-                <h2><span class='top'>$currentStreak</span>$longestStreak</h2>
-                <svg width='120' height='120' xmlns='http://www.w3.org/2000/svg'>
-                 <g>
-                  <title>Layer 1</title>
-                  <circle id='circle' class='circle_animation' r='47.7465' cy='60' cx='60' stroke-width='12' stroke='#BA0000' fill='none'/>
-                 </g>
-                </svg>
-            </div>
-            <style>
-                .graph$goalId .circle_animation {
-                  -webkit-animation: graph$goalId 1s ease-out forwards;
-                  animation: graph$goalId 1s ease-out forwards;
-                }
-                @-webkit-keyframes graph$goalId { to { stroke-dashoffset: $offset; } }
-                @keyframes graph$goalId { to { stroke-dashoffset: $offset; } }
-            </style></div>";
-        return $expected;
+        return "<div class='report-card'><div class='main'>$reportDiv</div>$stats</div>";
     }
 
     public function testMakeGoalCardRegonizesOneDay() {
@@ -327,5 +307,28 @@ class TestHtmlGenerator extends HfTestCase {
         $expected = $this->makeReportCard($reportDiv,1,1,$goalId);
 
         $this->assertEquals($result, $expected);
+    }
+
+    private function makeStats($currentStreak, $longestStreak, $goalId)
+    {
+        $offset = (1 - ($currentStreak / $longestStreak)) * 300;
+
+        return "<div class='stats donut graph$goalId'>
+                <h2><span class='top'>$currentStreak</span>$longestStreak</h2>
+                <svg width='120' height='120' xmlns='http://www.w3.org/2000/svg'>
+                 <g>
+                  <title>Layer 1</title>
+                  <circle id='circle' class='circle_animation' r='47.7465' cy='60' cx='60' stroke-width='12' stroke='#BA0000' fill='none'/>
+                 </g>
+                </svg>
+            </div>
+            <style>
+                .graph$goalId .circle_animation {
+                  -webkit-animation: graph$goalId 1s ease-out forwards;
+                  animation: graph$goalId 1s ease-out forwards;
+                }
+                @-webkit-keyframes graph$goalId { to { stroke-dashoffset: $offset; } }
+                @keyframes graph$goalId { to { stroke-dashoffset: $offset; } }
+            </style>";
     }
 }
