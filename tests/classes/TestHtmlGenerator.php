@@ -269,7 +269,7 @@ class TestHtmlGenerator extends HfTestCase {
         $reportDiv = "<div class='report'>Did you <em>$verb</em> $periodPhrase?<div class='controls'>" .
             "<label class='success'><input type='radio' name='1' value='1'> No</label>" .
             "<label class='setback'><input type='radio' name='1' value='0'> Yes</label>" .
-            "</div>";
+            "</div></div>";
         return $reportDiv;
     }
 
@@ -285,7 +285,7 @@ class TestHtmlGenerator extends HfTestCase {
         $offset = (1 - ($currentStreak / $longestStreak)) * 300;
 
         $expected = "<div class='report-card'>" .
-            "<div class='main'>{$reportDiv}</div></div>" .
+            "<div class='main'>{$reportDiv}</div>" .
             "<div class='stats donut graph$goalId'>
                 <h2><span class='top'>$currentStreak</span>$longestStreak</h2>
                 <svg width='120' height='120' xmlns='http://www.w3.org/2000/svg'>

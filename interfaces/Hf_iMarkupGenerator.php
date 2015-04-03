@@ -35,8 +35,7 @@ interface Hf_iMarkupGenerator {
         $goalId,
         $daysSinceLastReport,
         $currentStreak,
-        $longestStreak,
-        $progressBar
+        $longestStreak
     );
 
     public function makeRefreshScript();

@@ -93,12 +93,11 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         $goalId,
         $daysSinceLastReport,
         $currentStreak,
-        $longestStreak,
-        $progressBar
+        $longestStreak
     ) {
         $periodPhrase = $this->makePeriodPhrase($daysSinceLastReport);
 
-        $stats = $this->makeStats($currentStreak, $longestStreak, $progressBar, $goalId);
+        $stats = $this->makeStats($currentStreak, $longestStreak, $goalId);
 
         return "<div class='report-card'>" .
         "<div class='main'>" .
@@ -126,13 +125,10 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         }
     }
 
-    private function makeStats($currentStreak, $longestStreak, $progressBar, $goalId)
+    private function makeStats($currentStreak, $longestStreak, $goalId)
     {
         $currentStreak = round($currentStreak, 1);
         $longestStreak = round($longestStreak, 1);
-
-        $currentDays = ($currentStreak == 1) ? 'Day' : 'Days';
-        $longestDays = ($longestStreak == 1) ? 'Day' : 'Days';
 
         $offset = (1 - ($currentStreak / $longestStreak)) * 300;
         
