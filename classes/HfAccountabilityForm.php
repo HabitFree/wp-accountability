@@ -9,7 +9,7 @@ class HfAccountabilityForm extends HfForm {
     public function __construct($actionUrl, Hf_iGoals $Goals) {
         $this->Goals        = $Goals;
         $this->elements     = array();
-        $this->elements[]   = '<form action="'.$actionUrl.'" method="post">';
+        $this->elements[]   = '<form action="'.$actionUrl.'" method="post" class="report-cards">';
     }
 
     public function populate($goalSubs) {
