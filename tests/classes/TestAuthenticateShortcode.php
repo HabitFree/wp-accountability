@@ -530,14 +530,14 @@ class TestAuthenticateShortcode extends HfTestCase {
     public function testRegistrationRespectsErrors() {
         $this->setRegistrationPost();
         $this->setReturnValue($this->mockCms, 'isError', True);
-        $this->expectNever($this->mockMarkupGenerator, 'makeSuccessMessage');
+        $this->expectNever($this->mockMarkupGenerator, 'successMessage');
         $this->mockedAuthenticateShortcode->getOutput();
     }
 
     public function testRegistrationRespectsSuccess() {
         $this->setRegistrationPost();
         $this->setReturnValue($this->mockCms, 'isError', False);
-        $this->expectOnce($this->mockMarkupGenerator, 'makeSuccessMessage');
+        $this->expectOnce($this->mockMarkupGenerator, 'successMessage');
         $this->mockedAuthenticateShortcode->getOutput();
     }
 

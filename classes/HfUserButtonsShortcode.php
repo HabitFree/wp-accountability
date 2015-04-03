@@ -14,7 +14,7 @@ class HfUserButtonsShortcode implements Hf_iShortcode {
     public function getOutput() {
         $content = ( $this->userManager->isUserLoggedIn() ) ? $this->userLinks() : $this->visitorLinks();
 
-        return $this->markupGenerator->makeParagraph( $content );
+        return $this->markupGenerator->paragraph( $content );
     }
 
     private function userLinks() {
@@ -33,26 +33,26 @@ class HfUserButtonsShortcode implements Hf_iShortcode {
         $currentPageUrl = $this->assetLocator->getCurrentPageUrl();
         $logoutUrl      = $this->assetLocator->getLogoutUrl( $currentPageUrl );
 
-        return $this->markupGenerator->makeLink( $logoutUrl, 'Log Out' );
+        return $this->markupGenerator->linkMarkup( $logoutUrl, 'Log Out' );
     }
 
     private function loginLink() {
         $loginUrl = $this->assetLocator->getLoginUrl();
 
-        return $this->markupGenerator->makeLink( $loginUrl, 'Log In' );
+        return $this->markupGenerator->linkMarkup( $loginUrl, 'Log In' );
     }
 
     private function settingsLink() {
         $settingsUrl = $this->assetLocator->getPageUrlByTitle( 'Settings' );
 
-        return $this->markupGenerator->makeLink( $settingsUrl, 'Settings' );
+        return $this->markupGenerator->linkMarkup( $settingsUrl, 'Settings' );
 
     }
 
     private function registerLink() {
         $registerUrl = $this->assetLocator->getPageUrlByTitle( 'Authenticate' );
 
-        return $this->markupGenerator->makeLink( $registerUrl, 'Register' );
+        return $this->markupGenerator->linkMarkup( $registerUrl, 'Register' );
 
     }
 }

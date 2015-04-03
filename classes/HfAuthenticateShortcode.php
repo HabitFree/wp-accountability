@@ -61,7 +61,7 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
             $this->informInvitedUser();
             $activeTabNumber = $this->determineActiveTab();
 
-            $tabbedForms = $this->markupGenerator->generateTabs( array(
+            $tabbedForms = $this->markupGenerator->tabs( array(
                 'Log In'   => $this->loginForm->getOutput(),
                 'Register' => $this->registrationMessages . $this->registrationForm->getOutput()
             ), $activeTabNumber );
@@ -112,9 +112,9 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         if ( $this->isInvite() and $this->isInviteAccepted() ) {
             $userId = $this->userManager->getCurrentUserId();
             $this->processInvite($userId);
-            $this->output .= $this->markupGenerator->makeSuccessMessage( 'Invitation processed successfully.' );
+            $this->output .= $this->markupGenerator->successMessage( 'Invitation processed successfully.' );
         } elseif ( $this->isInviteIgnored() ) {
-            $this->output .= $this->markupGenerator->makeSuccessMessage( 'Invitation ignored successfully.' );
+            $this->output .= $this->markupGenerator->successMessage( 'Invitation ignored successfully.' );
         }
     }
 
@@ -146,31 +146,31 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     }
 
     private function missingUsernameError() {
-        $errorMessage = $this->markupGenerator->makeErrorMessage( 'Please enter your username.' );
+        $errorMessage = $this->markupGenerator->errorMessage( 'Please enter your username.' );
 
         return ( $this->isUsernameMissing() ) ? $errorMessage : '';
     }
 
     private function missingPasswordError() {
-        $errorMessage = $this->markupGenerator->makeErrorMessage( 'Please enter your password.' );
+        $errorMessage = $this->markupGenerator->errorMessage( 'Please enter your password.' );
 
         return ( $this->isPasswordMissing() ) ? $errorMessage : '';
     }
 
     private function invalidEmailError() {
-        $errorMessage = $this->markupGenerator->makeErrorMessage( 'Please enter a valid email address.' );
+        $errorMessage = $this->markupGenerator->errorMessage( 'Please enter a valid email address.' );
 
         return ( $this->isEmailMalformed() ) ? $errorMessage : '';
     }
 
     private function emailTakenError() {
-        $errorMessage = $this->markupGenerator->makeErrorMessage( 'That email is already taken. Did you mean to log in?' );
+        $errorMessage = $this->markupGenerator->errorMessage( 'That email is already taken. Did you mean to log in?' );
 
         return ( $this->isEmailTaken() ) ? $errorMessage : '';
     }
 
     private function passwordMatchError() {
-        $errorMessage = $this->markupGenerator->makeErrorMessage( 'Please make sure your passwords match.' );
+        $errorMessage = $this->markupGenerator->errorMessage( 'Please make sure your passwords match.' );
 
         return ( $this->isPasswordMismatch() ) ? $errorMessage : '';
     }
@@ -231,12 +231,12 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private function enqueueRegistrationErrorMessage()
     {
         $errorMessageText = "We're very sorry, but something seems to have gone wrong with your registration.";
-        $this->registrationMessages .= $this->markupGenerator->makeErrorMessage($errorMessageText);
+        $this->registrationMessages .= $this->markupGenerator->errorMessage($errorMessageText);
     }
 
     private function enqueueRegistrationSuccessMessage()
     {
-        $this->registrationMessages .= $this->markupGenerator->makeSuccessMessage('Welcome to HabitFree!');
+        $this->registrationMessages .= $this->markupGenerator->successMessage('Welcome to HabitFree!');
     }
 
     private function processSuccessfulRegistration($userIdOrError)

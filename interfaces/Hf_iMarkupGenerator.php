@@ -3,33 +3,33 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 interface Hf_iMarkupGenerator {
     public function progressBar( $percent, $label );
 
-    public function generateTabs( $contents, $defaultTabNumber );
+    public function tabs( $contents, $defaultTabNumber );
 
-    public function makeParagraph( $content );
+    public function paragraph( $content );
 
-    public function makeLink( $target, $content );
+    public function linkMarkup( $target, $content );
 
-    public function makeList( $items );
+    public function listMarkup( $items );
 
-    public function makeErrorMessage( $content );
+    public function errorMessage( $content );
 
-    public function makeSuccessMessage( $content );
+    public function successMessage( $content );
 
-    public function makeQuoteMessage( $content );
+    public function quotation( $content );
 
-    public function makeForm( $url, $content, $name );
+    public function form( $url, $content, $name );
 
-    public function makeButtonInput( $name, $label, $onclick );
+    public function buttonInput( $name, $label, $onclick );
 
-    public function makeHiddenField( $name );
+    public function hiddenField( $name );
 
     public function makeInfoMessage($content);
 
-    public function makeRedirectScript($url);
+    public function redirectScript($url);
 
-    public function makeHeader($content, $level);
+    public function head($content, $level);
 
-    public function makeGoalCard(
+    public function goalCard(
         $goalVerb,
         $goalDescription,
         $goalId,
@@ -38,5 +38,5 @@ interface Hf_iMarkupGenerator {
         $longestStreak
     );
 
-    public function makeRefreshScript();
+    public function refreshScript();
 }

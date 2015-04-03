@@ -18,7 +18,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
 				</div>';
     }
 
-    public function generateTabs( $contents, $defaultTabNumber ) {
+    public function tabs( $contents, $defaultTabNumber ) {
         $html = '[su_tabs active="' . $defaultTabNumber . '"]';
 
         foreach ( $contents as $title => $content ) {
@@ -28,16 +28,16 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         return $this->Cms->expandShortcodes( $html . '[/su_tabs]' );
     }
 
-    public function makeParagraph( $content, $classes = NULL ) {
+    public function paragraph( $content, $classes = NULL ) {
         $properties = ($classes === NULL ? '' : " class='$classes'");
         return "<p$properties>$content</p>";
     }
 
-    public function makeLink( $target, $content ) {
+    public function linkMarkup( $target, $content ) {
         return '<a href="' . $target . '">' . $content . '</a>';
     }
 
-    public function makeList( $items ) {
+    public function listMarkup( $items ) {
         $html = '';
         foreach ( $items as $item ) {
             $html .= '<li>' . $item . '</li>';
@@ -46,15 +46,15 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         return '<ul>' . $html . '</ul>';
     }
 
-    public function makeErrorMessage( $content ) {
-        return $this->makeParagraph($content, 'error');
+    public function errorMessage( $content ) {
+        return $this->paragraph($content, 'error');
     }
 
-    public function makeSuccessMessage( $content ) {
-        return $this->makeParagraph($content, 'success');
+    public function successMessage( $content ) {
+        return $this->paragraph($content, 'success');
     }
 
-    public function makeQuoteMessage( $quotation ) {
+    public function quotation( $quotation ) {
         return '<p class="quote">"' . $quotation->post_content . '" — ' . $quotation->post_title . '</p>';
     }
 
@@ -62,32 +62,32 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         return '<p class="info">' . $content . '</p>';
     }
 
-    public function makeForm( $url, $content, $name ) {
+    public function form( $url, $content, $name ) {
         return '<form action="' . $url . '" method="post" name="' . $name . '">' . $content . '</form>';
     }
 
-    public function makeButtonInput( $name, $label, $onclick ) {
+    public function buttonInput( $name, $label, $onclick ) {
         return '<input type="button" name="' . $name . '" value="' . $label . '" onclick="' . $onclick . '" />';
     }
 
-    public function makeHiddenField( $name ) {
+    public function hiddenField( $name ) {
         return '<input type="hidden" name="' . $name . '" />';
     }
 
-    public function makeRedirectScript($url) {
+    public function redirectScript($url) {
         return '<script>window.location.replace("'.$url.'");</script>';
     }
 
-    public function makeRefreshScript() {
+    public function refreshScript() {
         $url = $this->assetLocator->getCurrentPageUrl();
-        return $this->makeRedirectScript($url);
+        return $this->redirectScript($url);
     }
 
-    public function makeHeader($content, $level) {
+    public function head($content, $level) {
         return "<h$level>$content</h$level>";
     }
 
-    public function makeGoalCard(
+    public function goalCard(
         $goalVerb,
         $goalDescription,
         $goalId,
@@ -95,15 +95,13 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         $currentStreak,
         $longestStreak
     ) {
-        $periodPhrase = $this->makePeriodPhrase($daysSinceLastReport);
-
-        $stats = $this->makeStats($currentStreak, $longestStreak, $goalId);
-        $reportDiv = $this->reportDiv($goalVerb, $goalId, $periodPhrase);
+        $stats = $this->stats($currentStreak, $longestStreak, $goalId);
+        $reportDiv = $this->reportDiv($goalVerb, $goalId, $daysSinceLastReport);
 
         return "<div class='report-card'>$stats<div class='main'>$reportDiv</div></div>";
     }
 
-    private function makePeriodPhrase($daysSinceLastReport)
+    private function periodPhrase($daysSinceLastReport)
     {
         if ($daysSinceLastReport === false) {
             return 'in the last 24 hours';
@@ -120,7 +118,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         }
     }
 
-    private function makeStats($currentStreak, $longestStreak, $goalId)
+    private function stats($currentStreak, $longestStreak, $goalId)
     {
         $currentStreak = round($currentStreak, 1);
         $longestStreak = round($longestStreak, 1);
@@ -146,8 +144,9 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
             </style>";
     }
 
-    private function reportDiv($goalVerb, $goalId, $periodPhrase)
+    private function reportDiv($goalVerb, $goalId, $daysSinceLastReport)
     {
+        $periodPhrase = $this->periodPhrase($daysSinceLastReport);
         $reportDiv = "<div class='report'>Did you <em>$goalVerb</em> $periodPhrase?<div class='controls'>" .
             "<label class='success'><input type='radio' name='$goalId' value='1'> No</label>" .
             "<label class='setback'><input type='radio' name='$goalId' value='0'> Yes</label>" .

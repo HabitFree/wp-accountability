@@ -20,7 +20,7 @@ class HfInvitePartnerShortcode implements Hf_iShortcode {
 
         $this->processForm();
 
-        $header = $this->MarkupGenerator->makeHeader('Invite Partner', 2);
+        $header = $this->MarkupGenerator->head('Invite Partner', 2);
         $form   = $this->generateForm();
 
         return $header . $this->messages . $form->getOutput();
@@ -50,7 +50,7 @@ class HfInvitePartnerShortcode implements Hf_iShortcode {
 
     private function validateForm() {
         if ( $this->isFormSubmitted() and $this->isEmailInvalid() ) {
-            $this->messages .= $this->MarkupGenerator->makeErrorMessage( 'Please enter a valid email address.' );
+            $this->messages .= $this->MarkupGenerator->errorMessage( 'Please enter a valid email address.' );
         }
     }
 

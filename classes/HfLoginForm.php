@@ -61,7 +61,7 @@ class HfLoginForm extends HfForm {
     private function validateUsername()
     {
         if (empty($_POST['username'])) {
-            $error = $this->markupGenerator->makeErrorMessage('Please enter your username.');
+            $error = $this->markupGenerator->errorMessage('Please enter your username.');
             $this->enqueueError($error);
         }
     }
@@ -69,7 +69,7 @@ class HfLoginForm extends HfForm {
     private function validatePassword()
     {
         if (empty($_POST['password'])) {
-            $error = $this->markupGenerator->makeErrorMessage('Please enter your password.');
+            $error = $this->markupGenerator->errorMessage('Please enter your password.');
             $this->enqueueError($error);
         }
     }
@@ -77,7 +77,7 @@ class HfLoginForm extends HfForm {
     private function makeLoginFailureError()
     {
         if ($this->isLoggingIn()) {
-            $error = $this->markupGenerator->makeErrorMessage('That username and password combination is incorrect.');
+            $error = $this->markupGenerator->errorMessage('That username and password combination is incorrect.');
             $this->enqueueError($error);
         }
     }
@@ -117,7 +117,7 @@ class HfLoginForm extends HfForm {
     private function redirectUser()
     {
         $homeUrl = $this->assetLocator->getHomePageUrl();
-        print $this->markupGenerator->makeRedirectScript($homeUrl);
+        print $this->markupGenerator->redirectScript($homeUrl);
     }
 
     private function processLoginSuccess($userOrError)
