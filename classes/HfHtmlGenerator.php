@@ -98,14 +98,9 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         $periodPhrase = $this->makePeriodPhrase($daysSinceLastReport);
 
         $stats = $this->makeStats($currentStreak, $longestStreak, $goalId);
+        $reportDiv = $this->reportDiv($goalVerb, $goalId, $periodPhrase);
 
-        return "<div class='report-card'>" .
-        "<div class='main'>" .
-        "<div class='report'>Did you <em>$goalVerb</em> $periodPhrase?<div class='controls'>" .
-        "<label class='success'><input type='radio' name='$goalId' value='1'> No</label>" .
-        "<label class='setback'><input type='radio' name='$goalId' value='0'> Yes</label>" .
-        "</div></div></div>" .
-        $stats ."</div>";
+        return "<div class='report-card'>$stats<div class='main'>$reportDiv</div></div>";
     }
 
     private function makePeriodPhrase($daysSinceLastReport)
@@ -149,5 +144,14 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
                 @-webkit-keyframes graph$goalId { to { stroke-dashoffset: $offset; } }
                 @keyframes graph$goalId { to { stroke-dashoffset: $offset; } }
             </style>";
+    }
+
+    private function reportDiv($goalVerb, $goalId, $periodPhrase)
+    {
+        $reportDiv = "<div class='report'>Did you <em>$goalVerb</em> $periodPhrase?<div class='controls'>" .
+            "<label class='success'><input type='radio' name='$goalId' value='1'> No</label>" .
+            "<label class='setback'><input type='radio' name='$goalId' value='0'> Yes</label>" .
+            "</div></div>";
+        return $reportDiv;
     }
 }

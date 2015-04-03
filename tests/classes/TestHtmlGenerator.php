@@ -283,7 +283,7 @@ class TestHtmlGenerator extends HfTestCase {
     {
         $stats = $this->makeStats($currentStreak, $longestStreak, $goalId);
 
-        return "<div class='report-card'><div class='main'>$reportDiv</div>$stats</div>";
+        return "<div class='report-card'>$stats<div class='main'>$reportDiv</div></div>";
     }
 
     public function testMakeGoalCardRegonizesOneDay() {
