@@ -65,9 +65,9 @@ class TestUserButtonsShortcode extends HfTestCase {
         $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator, $MarkupGenerator);
 
         $haystack = $UserButtonsShortcode->getOutput();
-        $needle = '<a href="google.com">Log Out</a>';
+        $needle = "<a href='google.com'>Log Out</a>";
 
-        $this->assertTrue($this->haystackContainsNeedle($haystack, $needle));
+        $this->assertContains($needle,$haystack);
     }
 
     public function testUserButtonsShortcodeDoesntDisplayLogoutLinkWhenNotLoggedIn() {
@@ -111,9 +111,9 @@ class TestUserButtonsShortcode extends HfTestCase {
         $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator, $MarkupGenerator);
 
         $haystack = $UserButtonsShortcode->getOutput();
-        $needle = '<a href="google.com">Log In</a>';
+        $needle = '<a href=\'google.com\'>Log In</a>';
 
-        $this->assertTrue($this->haystackContainsNeedle($haystack, $needle));
+        $this->assertContains($needle,$haystack);
     }
 
     public function testUserButtonsShortcodeDisplaysSettingsLink() {
@@ -129,9 +129,9 @@ class TestUserButtonsShortcode extends HfTestCase {
         $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator, $MarkupGenerator);
 
         $haystack = $UserButtonsShortcode->getOutput();
-        $needle = '<a href="yahoo.com">Settings</a>';
+        $needle = '<a href=\'yahoo.com\'>Settings</a>';
 
-        $this->assertTrue($this->haystackContainsNeedle($haystack, $needle));
+        $this->assertContains($needle,$haystack);
     }
 
     public function testUserButtonsShortcodeDisplaysRegisterLink() {
@@ -147,8 +147,8 @@ class TestUserButtonsShortcode extends HfTestCase {
         $UserButtonsShortcode = new HfUserButtonsShortcode($UserManager, $AssetLocator, $MarkupGenerator);
 
         $haystack = $UserButtonsShortcode->getOutput();
-        $needle = '<a href="nathanarthur.com">Register</a>';
+        $needle = '<a href=\'nathanarthur.com\'>Register</a>';
 
-        $this->assertTrue($this->haystackContainsNeedle($haystack, $needle));
+        $this->assertContains($needle,$haystack);
     }
 }

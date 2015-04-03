@@ -61,10 +61,15 @@ class HfPartnerListShortcode implements Hf_iShortcode {
     }
 
     private function makeUnpartnerButton( $Partner ) {
+        $username = $Partner->user_nicename;
+        $confirmationMessage = "\"Are you sure you want to stop partnering with $username?\"";
+        $partnerId = $Partner->ID;
+        $onclick = "if (confirm($confirmationMessage)) { submitValue($partnerId);}";
         return
             $this->markupGenerator->buttonInput(
                 $Partner->ID,
-                'unpartner', "if (confirm('Are you sure you want to stop partnering with " . $Partner->user_nicename . "?')) { submitValue(" . $Partner->ID . ");}"
+                'unpartner',
+                $onclick
             );
     }
 }

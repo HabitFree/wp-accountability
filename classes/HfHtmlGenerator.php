@@ -28,22 +28,33 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         return $this->Cms->expandShortcodes( $html . '[/su_tabs]' );
     }
 
+    public function element($tag, $content, $properties = array()) {
+        $propertyString = $this->parseProperties($properties);
+        return ($content !== null) ? "<$tag$propertyString>$content</$tag>" : "<$tag$propertyString />";
+    }
+
     public function paragraph( $content, $classes = NULL ) {
-        $properties = ($classes === NULL ? '' : " class='$classes'");
-        return "<p$properties>$content</p>";
+        $properties = ($classes) ? array('class'=>$classes) : array();
+        return $this->element('p',$content,$properties);
+    }
+
+    public function div( $content, $classes = NULL ) {
+        $properties = ($classes) ? array('class'=>$classes) : array();
+        return $this->element('div',$content,$properties);
     }
 
     public function linkMarkup( $target, $content ) {
-        return '<a href="' . $target . '">' . $content . '</a>';
+        $properties = array('href'=>$target);
+        return $this->element('a',$content,$properties);
     }
 
     public function listMarkup( $items ) {
         $html = '';
         foreach ( $items as $item ) {
-            $html .= "<li>$item</li>";
+            $html .= $this->element('li',$item);
         }
 
-        return "<ul>$html</ul>";
+        return $this->element('ul',$html);
     }
 
     public function errorMessage( $content ) {
@@ -64,11 +75,13 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     }
 
     public function form( $url, $content, $name ) {
-        return '<form action="' . $url . '" method="post" name="' . $name . '">' . $content . '</form>';
+        $properties = array('action'=>$url,'method'=>'post','name'=>$name);
+        return $this->element('form',$content,$properties);
     }
 
     public function buttonInput( $name, $label, $onclick ) {
-        return '<input type="button" name="' . $name . '" value="' . $label . '" onclick="' . $onclick . '" />';
+        $properties = array('type'=>'button','name'=>$name, 'value'=>$label, 'onclick'=>$onclick);
+        return $this->element('input',null,$properties);
     }
 
     public function hiddenField( $name ) {
@@ -86,11 +99,6 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
 
     public function head($content, $level) {
         return "<h$level>$content</h$level>";
-    }
-
-    public function div( $content, $classes = NULL ) {
-        $properties = ($classes === NULL ? '' : " class='$classes'");
-        return "<div$properties>$content</div>";
     }
 
     public function goalCard(
@@ -149,11 +157,11 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     private function reportDiv($goalVerb, $goalId, $daysSinceLastReport)
     {
         $periodPhrase = $this->periodPhrase($daysSinceLastReport);
-        $reportDiv = "<div class='report'>Did you <strong>$goalVerb</strong> $periodPhrase?<div class='controls'>" .
-            "<label class='success'><input type='radio' name='$goalId' value='1'> No</label>" .
-            "<label class='setback'><input type='radio' name='$goalId' value='0'> Yes</label>" .
-            "</div></div>";
-        return $reportDiv;
+        $buttons = "<label class='success'><input type='radio' name='$goalId' value='1'> No</label>" .
+            "<label class='setback'><input type='radio' name='$goalId' value='0'> Yes</label>";
+        $controls = $this->div($buttons,'controls');
+        $question = "Did you <strong>$goalVerb</strong> $periodPhrase?";
+        return $this->div($question.$controls,'report');
     }
 
     private function glowStyle($isGlowing)
@@ -189,5 +197,14 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
                   <circle id='circle' class='circle_animation' r='47.7465' cy='60' cx='60' stroke-width='12' stroke='#BA0000' fill='none' $glowStyle/>
                  </g>
                 </svg>";
+    }
+
+    private function parseProperties($properties)
+    {
+        $propertyString = '';
+        foreach ($properties as $property => $value) {
+            $propertyString .= " $property='$value'";
+        }
+        return $propertyString;
     }
 }

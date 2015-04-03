@@ -93,8 +93,8 @@ class TestPartnerListShortcode extends HfTestCase {
         $this->setDefaultReturnValues();
         $PartnerListShortcode = $this->makeExpressivePartnerListShortcode();
 
-        $needle1  = '<input type="button" name="7" value="unpartner" onclick="if (confirm(';
-        $needle2  = ')) { submitValue(7);}" />';
+        $needle1  = '<input type=\'button\' name=\'7\' value=\'unpartner\' onclick=\'if (confirm(';
+        $needle2  = ')) { submitValue(7);}\' />';
         $haystack = $PartnerListShortcode->getOutput();
         $this->assertContains( $needle1, $haystack );
         $this->assertContains( $needle2, $haystack );
@@ -104,7 +104,7 @@ class TestPartnerListShortcode extends HfTestCase {
         $this->setDefaultReturnValues();
         $PartnerListShortcode = $this->makeExpressivePartnerListShortcode();
 
-        $needle   = "confirm('Are you sure you want to stop partnering with ludwig?')";
+        $needle   = 'confirm("Are you sure you want to stop partnering with ludwig?")';
         $haystack = $PartnerListShortcode->getOutput();
         $this->assertContains( $needle, $haystack );
     }
