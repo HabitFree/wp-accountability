@@ -168,8 +168,7 @@ class TestGoals extends HfTestCase {
             1,
             3.1415000000000002,
             1,
-            2,
-            ''
+            2
         ));
 
         $this->mockedGoals->generateGoalCard($MockSub);
@@ -200,8 +199,7 @@ class TestGoals extends HfTestCase {
             1,
             false,
             1,
-            2,
-            null
+            2
         ));
         $this->mockedGoals->generateGoalCard($mockSub);
     }

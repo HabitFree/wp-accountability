@@ -31,16 +31,13 @@ class HfGoals implements Hf_iGoals {
         $currentStreak = $this->currentStreak($goalID,$userID);
         $longestStreak = $this->findLongestStreak($goalID,$userID);
 
-        $bar          = $this->goalProgressBar( $goalID, $userID );
-
         $card = $this->markupGenerator->makeGoalCard(
             $goal->title,
             $goal->description,
             $goalID,
             $daysSinceLastReport,
             $currentStreak,
-            $longestStreak,
-            $bar
+            $longestStreak
         );
 
         return $card;
