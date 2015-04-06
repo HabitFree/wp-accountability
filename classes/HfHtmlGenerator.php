@@ -164,17 +164,14 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
 
     private function glowDefinition($isGlowing)
     {
-        $glowDefinition = "<defs>
-<filter id='glow'>
-            <feGaussianBlur stdDeviation='5' result='coloredBlur'/>
-            <feMerge>
-                <feMergeNode in='coloredBlur'/>
-                <feMergeNode in='SourceGraphic'/>
-            </feMerge>
-        </filter>
-    </defs>";
+        $blur = $this->element('feGaussianBlur',null,array('stdDeviation'=>'5','result'=>'coloredBlur'));
+        $blurMergeNode = $this->element('feMergeNode',null,array('in'=>'coloredBlur'));
+        $graphicMergeNode = $this->element('feMergeNode',null,array('in'=>'SourceGraphic'));
+        $merge = $this->element('feMerge',$blurMergeNode.$graphicMergeNode);
+        $filter = $this->element('filter',$blur.$merge,array('id'=>'glow'));
+        $definitions = $this->element('defs',$filter);
 
-        return ($isGlowing) ? $glowDefinition : '';
+        return ($isGlowing) ? $definitions : '';
     }
 
     private function donutSvg($isGlowing)
@@ -237,7 +234,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     {
         $successButton = $this->reportButton($goalId, 1, 'No', 'success');
         $setbackButton = $this->reportButton($goalId, 0, 'Yes', 'setback');
-        
+
         return $successButton . $setbackButton;
     }
 

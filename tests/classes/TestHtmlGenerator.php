@@ -309,15 +309,7 @@ class TestHtmlGenerator extends HfTestCase {
         $isGlowing = $currentStreak == $longestStreak;
         if ($isGlowing) {
             $glowStyle = 'style="filter:url(#glow)"';
-            $glowDef = "<defs>
-<filter id='glow'>
-            <feGaussianBlur stdDeviation='5' result='coloredBlur'/>
-            <feMerge>
-                <feMergeNode in='coloredBlur'/>
-                <feMergeNode in='SourceGraphic'/>
-            </feMerge>
-        </filter>
-    </defs>";
+            $glowDef = "<defs><filter id='glow'><feGaussianBlur stdDeviation='5' result='coloredBlur' /><feMerge><feMergeNode in='coloredBlur' /><feMergeNode in='SourceGraphic' /></feMerge></filter></defs>";
         } else {
             $glowStyle = '';
             $glowDef = '';
