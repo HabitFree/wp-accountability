@@ -229,10 +229,15 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         return $style;
     }
 
+    public function label($content, $properties) {
+        return $this->element('label', $content, $properties);
+    }
+
     private function reportButtons($goalId)
     {
-        $successButton = "<label class='success'><input type='radio' name='$goalId' value='1'> No</label>";
-        $setbackButton = "<label class='setback'><input type='radio' name='$goalId' value='0'> Yes</label>";
+        $successButton = $this->reportButton($goalId, 1, 'No', 'success');
+        $setbackButton = $this->reportButton($goalId, 0, 'Yes', 'setback');
+        
         return $successButton . $setbackButton;
     }
 
@@ -240,5 +245,11 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     {
         $buttons = $this->reportButtons($goalId);
         return $this->div($buttons, 'controls');
+    }
+
+    private function reportButton($goalId, $value, $text, $class)
+    {
+        $buttonContent = "<input type='radio' name='$goalId' value='$value'> $text";
+        return $this->label($buttonContent, array('class' => $class));
     }
 }
