@@ -11,13 +11,6 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         $this->assetLocator = $assetLocator;
     }
 
-    public function progressBar( $percent, $label ) {
-        return '<div class="meter">
-					<span class="label">' . $label . '</span>
-					<span class="progress" style="width: ' . $percent*100 . '%">' . $label . '</span>
-				</div>';
-    }
-
     public function tabs( $contents, $defaultTabNumber ) {
         $html = '[su_tabs active="' . $defaultTabNumber . '"]';
 
@@ -31,6 +24,10 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     public function element($tag, $content, $properties = array()) {
         $propertyString = $this->parseProperties($properties);
         return ($content !== null) ? "<$tag$propertyString>$content</$tag>" : "<$tag$propertyString />";
+    }
+
+    public function span($content, $properties) {
+        return $this->element('span', $content, $properties);
     }
 
     public function paragraph( $content, $classes = NULL ) {
@@ -79,13 +76,18 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         return $this->element('form',$content,$properties);
     }
 
-    public function buttonInput( $name, $label, $onclick ) {
-        $properties = array('type'=>'button','name'=>$name, 'value'=>$label, 'onclick'=>$onclick);
+    public function input($properties) {
         return $this->element('input',null,$properties);
     }
 
+    public function buttonInput( $name, $label, $onclick ) {
+        $properties = array('type'=>'button','name'=>$name, 'value'=>$label, 'onclick'=>$onclick);
+        return $this->input($properties);
+    }
+
     public function hiddenField( $name ) {
-        return '<input type="hidden" name="' . $name . '" />';
+        $properties = array('type'=>'hidden','name'=>$name);
+        return $this->input($properties);
     }
 
     public function redirectScript($url) {
@@ -139,27 +141,17 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
 
         $offset = (1 - ($currentStreak / $longestStreak)) * 300;
         $isGlowing = $currentStreak == $longestStreak;
-        $graphSvg = $this->donutSvg($isGlowing);
 
-        $label = "<h2><span class='top' title='Current Streak'>$currentStreak</span><span title='Longest Streak'>$longestStreak</span></h2>";
-        $graph = $this->div($label.$graphSvg,"donut graph$goalId");
-        $style = "<style>
-                .graph$goalId .circle_animation {
-                  -webkit-animation: graph$goalId 1s ease-out forwards;
-                  animation: graph$goalId 1s ease-out forwards;
-                }
-                @-webkit-keyframes graph$goalId { to { stroke-dashoffset: $offset; } }
-                @keyframes graph$goalId { to { stroke-dashoffset: $offset; } }
-            </style>";
+        $graph = $this->donutGraph($currentStreak, $longestStreak, $goalId, $isGlowing);
+        $style = $this->donutGraphCss($goalId, $offset);
+
         return $this->div($graph . $style,'stats');
     }
 
     private function reportDiv($goalVerb, $goalId, $daysSinceLastReport)
     {
         $periodPhrase = $this->periodPhrase($daysSinceLastReport);
-        $buttons = "<label class='success'><input type='radio' name='$goalId' value='1'> No</label>" .
-            "<label class='setback'><input type='radio' name='$goalId' value='0'> Yes</label>";
-        $controls = $this->div($buttons,'controls');
+        $controls = $this->controls($goalId);
         $question = "Did you <strong>$goalVerb</strong> $periodPhrase?";
         return $this->div($question.$controls,'report');
     }
@@ -206,5 +198,47 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
             $propertyString .= " $property='$value'";
         }
         return $propertyString;
+    }
+
+    private function donutLabel($currentStreak, $longestStreak)
+    {
+        $top = $this->span($currentStreak, array('class' => 'top', 'title' => 'Current Streak'));
+        $bottom = $this->span($longestStreak, array('title' => 'Longest Streak'));
+
+        return $this->element('h2', $top . $bottom);
+    }
+
+    private function donutGraph($currentStreak, $longestStreak, $goalId, $isGlowing)
+    {
+        $graphSvg = $this->donutSvg($isGlowing);
+        $label = $this->donutLabel($currentStreak, $longestStreak);
+
+        return $this->div($label . $graphSvg, "donut graph$goalId");
+    }
+
+    private function donutGraphCss($goalId, $offset)
+    {
+        $style = "<style>
+                .graph$goalId .circle_animation {
+                  -webkit-animation: graph$goalId 1s ease-out forwards;
+                  animation: graph$goalId 1s ease-out forwards;
+                }
+                @-webkit-keyframes graph$goalId { to { stroke-dashoffset: $offset; } }
+                @keyframes graph$goalId { to { stroke-dashoffset: $offset; } }
+            </style>";
+        return $style;
+    }
+
+    private function reportButtons($goalId)
+    {
+        $successButton = "<label class='success'><input type='radio' name='$goalId' value='1'> No</label>";
+        $setbackButton = "<label class='setback'><input type='radio' name='$goalId' value='0'> Yes</label>";
+        return $successButton . $setbackButton;
+    }
+
+    private function controls($goalId)
+    {
+        $buttons = $this->reportButtons($goalId);
+        return $this->div($buttons, 'controls');
     }
 }

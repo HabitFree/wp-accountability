@@ -61,14 +61,6 @@ class HfGoals implements Hf_iGoals {
         return $target - $daysOfSuccess;
     }
 
-    function goalProgressBar( $goalId, $userId ) {
-        $currentStreak = $this->currentStreak($goalId,$userId);
-        $longestStreak = $this->findLongestStreak($goalId, $userId);
-        $percent = $this->determinePercentOfLongestStreak($longestStreak, $currentStreak);
-        $label = $this->makeProgressBarLabel($longestStreak, $currentStreak);
-        return $this->markupGenerator->progressBar( $percent, $label );
-    }
-
     function currentLevelTarget( $daysOfSuccess ) {
         $level = $this->database->getLevel( $daysOfSuccess );
 

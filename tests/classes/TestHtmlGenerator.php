@@ -99,7 +99,7 @@ class TestHtmlGenerator extends HfTestCase {
     public function testMakeHiddenField() {
         $HtmlGenerator = $this->factory->makeMarkupGenerator();
         $actual = $HtmlGenerator->hiddenField('ghost');
-        $expected = '<input type="hidden" name="ghost" />';
+        $expected = '<input type=\'hidden\' name=\'ghost\' />';
         $this->assertEquals($expected, $actual);
     }
 
@@ -273,12 +273,6 @@ class TestHtmlGenerator extends HfTestCase {
         return $reportDiv;
     }
 
-    public function testProgressBar() {
-        $needle = 'width: 100%';
-        $haystack = $this->mockedMarkupGenerator->progressBar(1,'');
-        $this->assertContains($needle,$haystack);
-    }
-
     private function makeReportCard($reportDiv, $currentStreak, $longestStreak, $goalId)
     {
         $stats = $this->makeStats($currentStreak, $longestStreak, $goalId);
@@ -286,7 +280,7 @@ class TestHtmlGenerator extends HfTestCase {
         return "<div class='report-card'>$stats$reportDiv</div>";
     }
 
-    public function testMakeGoalCardRegonizesOneDay() {
+    public function testMakeGoalCardRecognizesOneDay() {
         $verb = 'verb';
         $goalDescription = '';
         $goalId = 1;

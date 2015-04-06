@@ -7,8 +7,6 @@ interface Hf_iGoals {
 
     function sendReportRequestEmails();
 
-    function goalProgressBar( $goalId, $userId );
-
     function levelPercentComplete( $goalId, $userId );
 
     function daysToNextLevel( $goalId, $userId );

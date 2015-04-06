@@ -1,8 +1,6 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
 interface Hf_iMarkupGenerator {
-    public function progressBar( $percent, $label );
-
     public function tabs( $contents, $defaultTabNumber );
 
     public function paragraph( $content );

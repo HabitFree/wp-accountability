@@ -121,7 +121,7 @@ class TestPartnerListShortcode extends HfTestCase {
         $this->setDefaultReturnValues();
         $PartnerListShortcode = $this->makeExpressivePartnerListShortcode();
 
-        $needle   = '<input type="hidden" name="userId" />';
+        $needle   = '<input type=\'hidden\' name=\'userId\' />';
         $haystack = $PartnerListShortcode->getOutput();
         $this->assertContains( $needle, $haystack );
     }
