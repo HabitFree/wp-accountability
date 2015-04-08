@@ -110,14 +110,14 @@ class TestHtmlGenerator extends HfTestCase {
     }
 
     public function testMakeRedirectScript() {
-        $result = $this->mockedMarkupGenerator->redirectScript('duck');
-        $this->assertEquals('<script>window.location.replace("duck");</script>', $result);
+        $result = $this->mockedMarkupGenerator->redirectScript('url');
+        $this->assertEquals($this->redirectScript('url'), $result);
     }
 
     public function testMakeRefreshScript() {
-        $this->setReturnValue($this->mockAssetLocator,'getCurrentPageUrl','duck');
+        $this->setReturnValue($this->mockAssetLocator,'getCurrentPageUrl','url');
         $result = $this->mockedMarkupGenerator->refreshScript();
-        $this->assertEquals('<script>window.location.replace("duck");</script>', $result);
+        $this->assertEquals($this->redirectScript('url'), $result);
     }
 
     public function testMakeGoalCard() {
@@ -336,5 +336,10 @@ class TestHtmlGenerator extends HfTestCase {
                 @-webkit-keyframes graph$goalId { to { stroke-dashoffset: $offset; } }
                 @keyframes graph$goalId { to { stroke-dashoffset: $offset; } }
             </style>";
+    }
+
+    private function redirectScript($url)
+    {
+        return "<script>window.location.replace('$url');</script>";
     }
 }

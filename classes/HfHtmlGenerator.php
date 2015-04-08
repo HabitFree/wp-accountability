@@ -91,7 +91,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     }
 
     public function redirectScript($url) {
-        return '<script>window.location.replace("'.$url.'");</script>';
+        return $this->element('script',"window.location.replace('$url');");
     }
 
     public function refreshScript() {
