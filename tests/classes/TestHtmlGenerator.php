@@ -137,7 +137,7 @@ class TestHtmlGenerator extends HfTestCase {
             $levelBar
         );
 
-        $reportDiv = $this->makeReportDiv($verb, 'since your last check-in <strong>3 days ago</strong>');
+        $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
         $expected = $this->makeReportCard($reportDiv,1,2,$goalId);
 
         $this->assertEquals($expected, $result);
@@ -160,7 +160,7 @@ class TestHtmlGenerator extends HfTestCase {
             $levelBar
         );
 
-        $reportDiv = $this->makeReportDiv($verb, 'since your last check-in <strong>3 days ago</strong>');
+        $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
         $expected = $this->makeReportCard($reportDiv,1,2,$goalId);
 
         $this->assertEquals($result, $expected);
@@ -189,7 +189,7 @@ class TestHtmlGenerator extends HfTestCase {
             $levelBar
         );
 
-        $reportDiv = $this->makeReportDiv($verb, 'since your last check-in <strong>1 day ago</strong>');
+        $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>day</strong>?</span>');
         $expected = $this->makeReportCard($reportDiv,1,2, $goalId);
 
         $this->assertEquals($result, $expected);
@@ -212,7 +212,7 @@ class TestHtmlGenerator extends HfTestCase {
             $levelBar
         );
 
-        $reportDiv = $this->makeReportDiv($goalTitle, 'since your last check-in <strong>less than a day ago</strong>');
+        $reportDiv = $this->makeReportDiv($goalTitle, 'since your <span class=\'duration\'><strong>last check-in</strong>?</span>');
         $expected = $this->makeReportCard($reportDiv, 1, 2,$goalId);
 
         $this->assertEquals($result, $expected);
@@ -235,7 +235,7 @@ class TestHtmlGenerator extends HfTestCase {
             $levelBar
         );
 
-        $reportDiv = $this->makeReportDiv($verb,'in the last <strong>24 hours</strong>');
+        $reportDiv = $this->makeReportDiv($verb,'in the last <span class=\'duration\'><strong>24 hours</strong>?</span>');
         $expected = $this->makeReportCard($reportDiv,1,2,$goalId);
 
         $this->assertEquals($result, $expected);
@@ -258,7 +258,7 @@ class TestHtmlGenerator extends HfTestCase {
             $levelBar
         );
 
-        $reportDiv = $this->makeReportDiv($verb, 'since your last check-in <strong>3 days ago</strong>');
+        $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
         $expected = $this->makeReportCard($reportDiv,1.1,2.2,$goalId);
 
         $this->assertEquals($result, $expected);
@@ -266,10 +266,11 @@ class TestHtmlGenerator extends HfTestCase {
 
     private function makeReportDiv($verb, $periodPhrase)
     {
-        $reportDiv = "<div class='report'>Did you <strong>$verb</strong> $periodPhrase?<div class='controls'>" .
+        $controls = "<div class='controls'>" .
             "<label class='success'><input type='radio' name='1' value='1'> No</label>" .
             "<label class='setback'><input type='radio' name='1' value='0'> Yes</label>" .
-            "</div></div>";
+            "</div>";
+        $reportDiv = "<div class='report'>Did you <strong class='verb'>$verb</strong> $periodPhrase$controls</div>";
         return $reportDiv;
     }
 
@@ -296,8 +297,7 @@ class TestHtmlGenerator extends HfTestCase {
             1,
             $levelBar
         );
-
-        $reportDiv = $this->makeReportDiv($verb, 'since your last check-in <strong>3 days ago</strong>');
+        $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
         $expected = $this->makeReportCard($reportDiv,1,1,$goalId);
 
         $this->assertEquals($result, $expected);

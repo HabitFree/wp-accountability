@@ -120,18 +120,20 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     private function periodPhrase($daysSinceLastReport)
     {
         if ($daysSinceLastReport === false) {
-            return 'in the last <strong>24 hours</strong>';
+            $prefix = 'in the last';
+            $time = '24 hours';
         } else {
             $days = round($daysSinceLastReport);
             if ($days == 0) {
-                $elapsed = 'less than a day';
-            } else if ($days == 1) {
-                $elapsed = '1 day';
+                $prefix = 'since your';
+                $time = 'last check-in';
             } else {
-                $elapsed = "$days days";
+                $prefix = 'in the last';
+                $time = ($days == 1) ? 'day' : "$days days";
             }
-            return "since your last check-in <strong>$elapsed ago</strong>";
         }
+
+        return $prefix .' <span class=\'duration\'><strong>'. $time .'</strong>?</span>';
     }
 
     private function stats($currentStreak, $longestStreak, $goalId)
@@ -152,7 +154,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     {
         $periodPhrase = $this->periodPhrase($daysSinceLastReport);
         $controls = $this->controls($goalId);
-        $question = "Did you <strong>$goalVerb</strong> $periodPhrase?";
+        $question = "Did you <strong class='verb'>$goalVerb</strong> $periodPhrase";
         return $this->div($question.$controls,'report');
     }
 
