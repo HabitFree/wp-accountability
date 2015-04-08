@@ -100,7 +100,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     }
 
     public function head($content, $level) {
-        return "<h$level>$content</h$level>";
+        return $this->element("h$level",$content);
     }
 
     public function goalCard(
