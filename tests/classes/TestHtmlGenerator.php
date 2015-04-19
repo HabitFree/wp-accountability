@@ -122,48 +122,20 @@ class TestHtmlGenerator extends HfTestCase {
 
     public function testMakeGoalCard() {
         $verb = 'Title';
-        $goalDescription = 'Description';
         $goalId = 1;
         $daysSinceLastReport = 3;
-        $levelBar = '';
 
         $result = $this->mockedMarkupGenerator->goalCard(
-            $verb,
-            $goalDescription,
             $goalId,
+            $verb,
             $daysSinceLastReport,
-            1,
-            2,
-            $levelBar
+            array()
         );
 
         $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
-        $expected = $this->makeReportCard($reportDiv,1,2,$goalId);
+        $expected = $this->makeReportCard($reportDiv,array());
 
         $this->assertEquals($expected, $result);
-    }
-
-    public function testMakeGoalCardDoesntIncludeEmptyDescriptionParagraph() {
-        $verb = 'Title';
-        $goalDescription = '';
-        $goalId = 1;
-        $daysSinceLastReport = 3;
-        $levelBar = '';
-
-        $result = $this->mockedMarkupGenerator->goalCard(
-            $verb,
-            $goalDescription,
-            $goalId,
-            $daysSinceLastReport,
-            1,
-            2,
-            $levelBar
-        );
-
-        $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
-        $expected = $this->makeReportCard($reportDiv,1,2,$goalId);
-
-        $this->assertEquals($result, $expected);
     }
 
     public function testMakeParagraphWithClass() {
@@ -174,92 +146,72 @@ class TestHtmlGenerator extends HfTestCase {
 
     public function testMakeGoalCardDoesntSay1Days() {
         $verb = 'Title';
-        $goalDescription = '';
         $goalId = 1;
         $daysSinceLastReport = 1;
-        $levelBar = '';
 
         $result = $this->mockedMarkupGenerator->goalCard(
-            $verb,
-            $goalDescription,
             $goalId,
+            $verb,
             $daysSinceLastReport,
-            1,
-            2,
-            $levelBar
+            array()
         );
 
         $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>day</strong>?</span>');
-        $expected = $this->makeReportCard($reportDiv,1,2, $goalId);
+        $expected = $this->makeReportCard($reportDiv,array());
 
         $this->assertEquals($result, $expected);
     }
 
     public function testMakeGoalCardSaysToday() {
-        $goalTitle = 'Title';
-        $goalDescription = '';
+        $verb = 'Title';
         $goalId = 1;
         $daysSinceLastReport = 0;
-        $levelBar = '';
 
         $result = $this->mockedMarkupGenerator->goalCard(
-            $goalTitle,
-            $goalDescription,
             $goalId,
+            $verb,
             $daysSinceLastReport,
-            1,
-            2,
-            $levelBar
+            array()
         );
 
-        $reportDiv = $this->makeReportDiv($goalTitle, 'since your <span class=\'duration\'><strong>last check-in</strong>?</span>');
-        $expected = $this->makeReportCard($reportDiv, 1, 2,$goalId);
+        $reportDiv = $this->makeReportDiv($verb, 'since your <span class=\'duration\'><strong>last check-in</strong>?</span>');
+        $expected = $this->makeReportCard($reportDiv, array());
 
         $this->assertEquals($result, $expected);
     }
 
     public function testMakeGoalCardRecognizesNoReport() {
         $verb = 'Title';
-        $goalDescription = '';
         $goalId = 1;
         $daysSinceLastReport = false;
-        $levelBar = '';
 
         $result = $this->mockedMarkupGenerator->goalCard(
-            $verb,
-            $goalDescription,
             $goalId,
+            $verb,
             $daysSinceLastReport,
-            1,
-            2,
-            $levelBar
+            array()
         );
 
         $reportDiv = $this->makeReportDiv($verb,'in the last <span class=\'duration\'><strong>24 hours</strong>?</span>');
-        $expected = $this->makeReportCard($reportDiv,1,2,$goalId);
+        $expected = $this->makeReportCard($reportDiv,array());
 
         $this->assertEquals($result, $expected);
     }
 
     public function testMakeGoalCardRoundsNumbers() {
-        $verb = 'verb';
-        $goalDescription = '';
+        $verb = 'Title';
         $goalId = 1;
         $daysSinceLastReport = 3.1415;
-        $levelBar = '';
 
         $result = $this->mockedMarkupGenerator->goalCard(
-            $verb,
-            $goalDescription,
             $goalId,
+            $verb,
             $daysSinceLastReport,
-            1.111,
-            2.222,
-            $levelBar
+            array()
         );
 
         $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
-        $expected = $this->makeReportCard($reportDiv,1.1,2.2,$goalId);
+        $expected = $this->makeReportCard($reportDiv,array());
 
         $this->assertEquals($result, $expected);
     }
@@ -274,43 +226,21 @@ class TestHtmlGenerator extends HfTestCase {
         return $reportDiv;
     }
 
-    private function makeReportCard($reportDiv, $fiveStreaks)
+    private function makeReportCard($reportDiv, $streaks)
     {
-        $stats = $this->makeStats($fiveStreaks);
+        $stats = $this->makeStats($streaks);
 
         return "<div class='report-card'>$stats$reportDiv</div>";
     }
 
-    public function testMakeGoalCardRecognizesOneDay() {
-        $verb = 'verb';
-        $goalDescription = '';
-        $goalId = 1;
-        $daysSinceLastReport = 3.1415;
-        $levelBar = '';
-
-        $result = $this->mockedMarkupGenerator->goalCard(
-            $verb,
-            $goalDescription,
-            $goalId,
-            $daysSinceLastReport,
-            1,
-            1,
-            $levelBar
-        );
-        $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
-        $expected = $this->makeReportCard($reportDiv,1,1,$goalId);
-
-        $this->assertEquals($result, $expected);
-    }
-
-    private function makeStats($fiveStreaks)
+    private function makeStats($streaks)
     {
         $header = '<thead><tr><th>Rank</th><th>Length</th><th>Date</th></tr></thead>';
 
         $rows = '';
-        foreach ($fiveStreaks as $streak) {
+        foreach ($streaks as $streak) {
             $row = "<tr><td>{$streak['rank']}</td><td>{$streak['length']}</td><td>{$streak['date']}</td></tr>";
-            $rows += $row;
+            $rows .= $row;
         }
 
         $body = "<tbody>$rows</tbody>";

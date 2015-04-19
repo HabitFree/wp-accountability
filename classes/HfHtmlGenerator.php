@@ -104,14 +104,12 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     }
 
     public function goalCard(
-        $goalVerb,
-        $goalDescription,
         $goalId,
+        $goalVerb,
         $daysSinceLastReport,
-        $currentStreak,
-        $longestStreak
+        $streaks
     ) {
-        $stats = $this->stats($currentStreak, $longestStreak, $goalId);
+        $stats = $this->stats($streaks);
         $reportDiv = $this->reportDiv($goalVerb, $goalId, $daysSinceLastReport);
 
         return $this->div($stats.$reportDiv,'report-card');
@@ -136,18 +134,20 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         return $prefix .' <span class=\'duration\'><strong>'. $time .'</strong>?</span>';
     }
 
-    private function stats($currentStreak, $longestStreak, $goalId)
+    private function stats($streaks)
     {
-        $currentStreak = round($currentStreak, 1);
-        $longestStreak = round($longestStreak, 1);
+        $header = '<thead><tr><th>Rank</th><th>Length</th><th>Date</th></tr></thead>';
 
-        $offset = (1 - ($currentStreak / $longestStreak)) * 300;
-        $isGlowing = $currentStreak == $longestStreak;
+        $rows = '';
+        foreach ($streaks as $streak) {
+            $row = "<tr><td>{$streak['rank']}</td><td>{$streak['length']}</td><td>{$streak['date']}</td></tr>";
+            $rows .= $row;
+        }
 
-        $graph = $this->donutGraph($currentStreak, $longestStreak, $goalId, $isGlowing);
-        $style = $this->donutGraphCss($goalId, $offset);
+        $body = "<tbody>$rows</tbody>";
+        $table = "<table>$header$body</table>";
 
-        return $this->div($graph . $style,'stats');
+        return $table;
     }
 
     private function reportDiv($goalVerb, $goalId, $daysSinceLastReport)
@@ -213,19 +213,6 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         $label = $this->donutLabel($currentStreak, $longestStreak);
 
         return $this->div($label . $graphSvg, "donut graph$goalId");
-    }
-
-    private function donutGraphCss($goalId, $offset)
-    {
-        $style = "<style>
-                .graph$goalId .circle_animation {
-                  -webkit-animation: graph$goalId 1s ease-out forwards;
-                  animation: graph$goalId 1s ease-out forwards;
-                }
-                @-webkit-keyframes graph$goalId { to { stroke-dashoffset: $offset; } }
-                @keyframes graph$goalId { to { stroke-dashoffset: $offset; } }
-            </style>";
-        return $style;
     }
 
     public function label($content, $properties) {

@@ -28,12 +28,10 @@ interface Hf_iMarkupGenerator {
     public function head($content, $level);
 
     public function goalCard(
-        $goalVerb,
-        $goalDescription,
         $goalId,
+        $goalVerb,
         $daysSinceLastReport,
-        $currentStreak,
-        $longestStreak
+        $streaks
     );
 
     public function refreshScript();
