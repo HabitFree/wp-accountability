@@ -136,18 +136,10 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
 
     private function stats($streaks)
     {
-        $header = '<thead><tr><th>Rank</th><th>Length</th><th>Date</th></tr></thead>';
+        $header = $this->statsTableHeader();
+        $body = $this->statsTableBody($streaks);
 
-        $rows = '';
-        foreach ($streaks as $streak) {
-            $row = "<tr><td>{$streak['rank']}</td><td>{$streak['length']}</td><td>{$streak['date']}</td></tr>";
-            $rows .= $row;
-        }
-
-        $body = "<tbody>$rows</tbody>";
-        $table = "<table>$header$body</table>";
-
-        return $table;
+        return "<table>$header$body</table>";
     }
 
     private function reportDiv($goalVerb, $goalId, $daysSinceLastReport)
@@ -158,38 +150,6 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         return $this->div($question.$controls,'report');
     }
 
-    private function glowStyle($isGlowing)
-    {
-        $glowStyle = 'style="filter:url(#glow)"';
-        return ($isGlowing) ? $glowStyle : '';
-    }
-
-    private function glowDefinition($isGlowing)
-    {
-        $blur = $this->element('feGaussianBlur',null,array('stdDeviation'=>'5','result'=>'coloredBlur'));
-        $blurMergeNode = $this->element('feMergeNode',null,array('in'=>'coloredBlur'));
-        $graphicMergeNode = $this->element('feMergeNode',null,array('in'=>'SourceGraphic'));
-        $merge = $this->element('feMerge',$blurMergeNode.$graphicMergeNode);
-        $filter = $this->element('filter',$blur.$merge,array('id'=>'glow'));
-        $definitions = $this->element('defs',$filter);
-
-        return ($isGlowing) ? $definitions : '';
-    }
-
-    private function donutSvg($isGlowing)
-    {
-        $glowDef = $this->glowDefinition($isGlowing);
-        $glowStyle = $this->glowStyle($isGlowing);
-
-        return "<svg width='120' height='120' xmlns='http://www.w3.org/2000/svg'>
-                $glowDef
-                 <g>
-                  <title>Layer 1</title>
-                  <circle id='circle' class='circle_animation' r='47.7465' cy='60' cx='60' stroke-width='12' stroke='#BA0000' fill='none' $glowStyle/>
-                 </g>
-                </svg>";
-    }
-
     private function parseProperties($properties)
     {
         $propertyString = '';
@@ -197,22 +157,6 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
             $propertyString .= " $property='$value'";
         }
         return $propertyString;
-    }
-
-    private function donutLabel($currentStreak, $longestStreak)
-    {
-        $top = $this->span($currentStreak, array('class' => 'top', 'title' => 'Current Streak'));
-        $bottom = $this->span($longestStreak, array('title' => 'Longest Streak'));
-
-        return $this->element('h2', $top . $bottom);
-    }
-
-    private function donutGraph($currentStreak, $longestStreak, $goalId, $isGlowing)
-    {
-        $graphSvg = $this->donutSvg($isGlowing);
-        $label = $this->donutLabel($currentStreak, $longestStreak);
-
-        return $this->div($label . $graphSvg, "donut graph$goalId");
     }
 
     public function label($content, $properties) {
@@ -237,5 +181,31 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     {
         $buttonContent = "<input type='radio' name='$goalId' value='$value'> $text";
         return $this->label($buttonContent, array('class' => $class));
+    }
+
+    private function statsTableHeader()
+    {
+        $rankCell = '<th>Rank</th>';
+        $lengthCell = '<th>Length</th>';
+        $dateCell = '<th>Date</th>';
+        $header = "<thead><tr>$rankCell$lengthCell$dateCell</tr></thead>";
+        return $header;
+    }
+
+    private function statsTableRows($streaks)
+    {
+        $rows = '';
+        foreach ($streaks as $streak) {
+            $row = "<tr><td>{$streak['rank']}</td><td>{$streak['length']}</td><td>{$streak['date']}</td></tr>";
+            $rows .= $row;
+        }
+        return $rows;
+    }
+
+    private function statsTableBody($streaks)
+    {
+        $rows = $this->statsTableRows($streaks);
+        $body = "<tbody>$rows</tbody>";
+        return $body;
     }
 }
