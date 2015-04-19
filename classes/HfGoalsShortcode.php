@@ -35,9 +35,9 @@ class HfGoalsShortcode implements Hf_iShortcode {
             $quotationMessage = $this->makeQuotationMessage();
             $successMessage   = $this->MarkupGenerator->successMessage( 'Thanks for checking in!' );
 
-            return $successMessage . $quotationMessage . $this->buildForm( $userID );
+            return $successMessage . $quotationMessage . $this->form( $userID );
         } else {
-            return $this->buildForm( $userID );
+            return $this->form( $userID );
         }
     }
 
@@ -94,7 +94,7 @@ class HfGoalsShortcode implements Hf_iShortcode {
         return $quotation ? $this->MarkupGenerator->quotation( $quotation ) : null;
     }
 
-    private function buildForm( $userID ) {
+    private function form( $userID ) {
         $currentURL         = $this->PageLocator->getCurrentPageURL();
         $goalSubs           = $this->Goals->getGoalSubscriptions( $userID );
         $AccountabilityForm = new HfAccountabilityForm( $currentURL, $this->Goals );
