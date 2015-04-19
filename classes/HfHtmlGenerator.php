@@ -196,8 +196,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     {
         $rows = '';
         foreach ($streaks as $streak) {
-            $row = "<tr><td>{$streak['rank']}</td><td>{$streak['length']}</td><td>{$streak['date']}</td></tr>";
-            $rows .= $row;
+            $rows .= $this->statsTableRow($streak);
         }
         return $rows;
     }
@@ -207,5 +206,11 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         $rows = $this->statsTableRows($streaks);
         $body = "<tbody>$rows</tbody>";
         return $body;
+    }
+
+    private function statsTableRow($streak)
+    {
+        $row = "<tr><td>{$streak['rank']}</td><td>{$streak['length']}</td><td>{$streak['date']}</td></tr>";
+        return $row;
     }
 }
