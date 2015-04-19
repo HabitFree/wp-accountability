@@ -1,13 +1,13 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
 class HfHtmlGenerator implements Hf_iMarkupGenerator {
-    private $Cms;
+    private $cms;
 
     function __construct(
-        Hf_iCms $ContentManagementSystem,
+        Hf_iCms $contentManagementSystem,
         Hf_iAssetLocator $assetLocator
     ) {
-        $this->Cms = $ContentManagementSystem;
+        $this->cms = $contentManagementSystem;
         $this->assetLocator = $assetLocator;
     }
 
@@ -18,7 +18,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
             $html .= '[su_tab title="' . $title . '"]' . $content . '[/su_tab]';
         }
 
-        return $this->Cms->expandShortcodes( $html . '[/su_tabs]' );
+        return $this->cms->expandShortcodes( $html . '[/su_tabs]' );
     }
 
     public function element($tag, $content, $properties = array()) {

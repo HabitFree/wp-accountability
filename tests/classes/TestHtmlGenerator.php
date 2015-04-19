@@ -274,9 +274,9 @@ class TestHtmlGenerator extends HfTestCase {
         return $reportDiv;
     }
 
-    private function makeReportCard($reportDiv, $currentStreak, $longestStreak, $goalId)
+    private function makeReportCard($reportDiv, $fiveStreaks)
     {
-        $stats = $this->makeStats($currentStreak, $longestStreak, $goalId);
+        $stats = $this->makeStats($fiveStreaks);
 
         return "<div class='report-card'>$stats$reportDiv</div>";
     }
@@ -303,39 +303,20 @@ class TestHtmlGenerator extends HfTestCase {
         $this->assertEquals($result, $expected);
     }
 
-    private function makeStats($currentStreak, $longestStreak, $goalId)
+    private function makeStats($fiveStreaks)
     {
-        $offset = (1 - ($currentStreak / $longestStreak)) * 300;
-        $isGlowing = $currentStreak == $longestStreak;
-        if ($isGlowing) {
-            $glowStyle = 'style="filter:url(#glow)"';
-            $glowDef = "<defs><filter id='glow'><feGaussianBlur stdDeviation='5' result='coloredBlur' /><feMerge><feMergeNode in='coloredBlur' /><feMergeNode in='SourceGraphic' /></feMerge></filter></defs>";
-        } else {
-            $glowStyle = '';
-            $glowDef = '';
+        $header = '<thead><tr><th>Rank</th><th>Length</th><th>Date</th></tr></thead>';
+
+        $rows = '';
+        foreach ($fiveStreaks as $streak) {
+            $row = "<tr><td>{$streak['rank']}</td><td>{$streak['length']}</td><td>{$streak['date']}</td></tr>";
+            $rows += $row;
         }
 
-        $graph = "<div class='donut graph$goalId'><h2><span class='top' title='Current Streak'>$currentStreak</span><span title='Longest Streak'>$longestStreak</span></h2><svg width='120' height='120' xmlns='http://www.w3.org/2000/svg'>
-                $glowDef
-                 <g>
-                  <title>Layer 1</title>
-                  <circle id='circle' class='circle_animation' r='47.7465' cy='60' cx='60' stroke-width='12' stroke='#BA0000' fill='none' $glowStyle/>
-                 </g>
-                </svg></div>";
-        $css = $this->donutCss($goalId, $offset);
-        return "<div class='stats'>$graph$css</div>";
-    }
+        $body = "<tbody>$rows</tbody>";
+        $table = "<table>$header$body</table>";
 
-    private function donutCss($goalId, $offset)
-    {
-        return "<style>
-                .graph$goalId .circle_animation {
-                  -webkit-animation: graph$goalId 1s ease-out forwards;
-                  animation: graph$goalId 1s ease-out forwards;
-                }
-                @-webkit-keyframes graph$goalId { to { stroke-dashoffset: $offset; } }
-                @keyframes graph$goalId { to { stroke-dashoffset: $offset; } }
-            </style>";
+        return $table;
     }
 
     private function redirectScript($url)
