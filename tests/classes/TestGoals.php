@@ -210,25 +210,14 @@ class TestGoals extends HfTestCase {
 
     private function makeMockReports()
     {
-        $genericReport = new stdClass();
-        $genericReport->isSuccessful = 1;
+        $first = $this->mockReport(true, 'firstSuccess');
+        $last = $this->mockReport(true, 'lastSuccess');
 
-        $first = clone $genericReport;
-        $first->date = 'firstSuccess';
-        $last = clone $genericReport;
-        $last->date = 'lastSuccess';
-        
-        $report1 = clone $genericReport;
-        $report1->date = '2015-03-04 15:54:32';
-        $report2 = clone $genericReport;
-        $report2->date = '2015-03-06 15:54:32';
-        $report3 = clone $genericReport;
-        $report3->isSuccessful = 0;
-        $report3->date = '2015-03-07 15:54:32';
-        $report4 = clone $genericReport;
-        $report4->date = '2015-03-08 15:54:32';
-        $report5 = clone $genericReport;
-        $report5->date = '2015-03-09 15:54:32';
+        $report1 = $this->mockReport(true, '2015-03-04 15:54:32');
+        $report2 = $this->mockReport(true, '2015-03-06 15:54:32');
+        $report3 = $this->mockReport(false, '2015-03-07 15:54:32');
+        $report4 = $this->mockReport(true, '2015-03-08 15:54:32');
+        $report5 = $this->mockReport(true, '2015-03-09 15:54:32');
         
         $reports = Array(
             Array($first, $last),
@@ -238,6 +227,15 @@ class TestGoals extends HfTestCase {
             Array()
         );
         return $reports;
+    }
+
+    private function mockReport($isSuccessful, $date)
+    {
+        $genericReport = new stdClass();
+        $genericReport->isSuccessful = ($isSuccessful) ? 1 : 0;
+        $report1 = clone $genericReport;
+        $report1->date = $date;
+        return $report1;
     }
 
     private function setReturnValsForFindingStreaks($currentStreak)
@@ -267,4 +265,6 @@ class TestGoals extends HfTestCase {
         $this->expectOnce($this->mockDatabase, 'getAllReportsForGoal');
         $this->mockedGoals->generateGoalCard($mockSub);
     }
+
+
 }
