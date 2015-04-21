@@ -28,16 +28,13 @@ class HfGoals implements Hf_iGoals {
         $goal          = $this->database->getGoal( $goalID );
         $daysSinceLastReport = $this->database->daysSinceLastReport($goalID, $userID);
 
-        $currentStreak = $this->currentStreak($goalID,$userID);
-        $longestStreak = $this->findLongestStreak($goalID,$userID);
+        $streaks = $this->findStreaks($goalID,$userID);
 
         $card = $this->markupGenerator->goalCard(
-            $goal->title,
-            $goal->description,
             $goalID,
+            $goal->title,
             $daysSinceLastReport,
-            $currentStreak,
-            $longestStreak
+            $streaks
         );
 
         return $card;
@@ -115,37 +112,6 @@ class HfGoals implements Hf_iGoals {
         $hours = $minutes / 60;
         $days = $hours / 24;
         return $days;
-    }
-
-    private function findLongestStreak($goalId, $userId)
-    {
-        $streaks = $this->findStreaks($goalId, $userId);
-        return max($streaks);
-    }
-
-    private function determinePercentOfLongestStreak($longestStreak, $currentStreak)
-    {
-        if ($longestStreak) {
-            $percent = $currentStreak / $longestStreak;
-            return $percent;
-        } else {
-            return 1;
-        }
-    }
-
-    private function makeProgressBarLabel($longestStreak, $currentStreak)
-    {
-        $timeToLongestStreak = round($longestStreak - $currentStreak, 1);
-        if ($timeToLongestStreak == 0) {
-            $label = 'Longest streak!';
-            return $label;
-        } elseif ($timeToLongestStreak == 1) {
-            $label = "$timeToLongestStreak day to longest streak";
-            return $label;
-        } else {
-            $label = "$timeToLongestStreak days to longest streak";
-            return $label;
-        }
     }
 
     private function streakExtension($reportTime, $lastTime)
