@@ -208,6 +208,24 @@ class TestGoals extends HfTestCase {
         return $MockGoal;
     }
 
+    private function setReturnValsForFindingStreaks($currentStreak)
+    {
+        $reports = $this->makeMockReports();
+        $this->setReturnValues($this->mockDatabase,'getAllReportsForGoal',$reports);
+
+        $firstSuccess = 0;
+        $lastSuccess = $this->daysInSeconds($currentStreak);
+
+        $time1 = $this->daysInSeconds(0);
+        $time2 = $this->daysInSeconds(1);
+        $time3 = $this->daysInSeconds(2); //setback
+        $time4 = $this->daysInSeconds(3);
+        $time5 = $this->daysInSeconds(4);
+
+        $times = array($firstSuccess, $lastSuccess, $time1, $time2, $time3, $time4, $time5);
+        $this->setReturnValues($this->mockCodeLibrary, 'convertStringToTime', $times);
+    }
+
     private function makeMockReports()
     {
         $first = $this->mockReport(true, 'firstSuccess');
@@ -218,7 +236,7 @@ class TestGoals extends HfTestCase {
         $report3 = $this->mockReport(false, '2015-03-07 15:54:32');
         $report4 = $this->mockReport(true, '2015-03-08 15:54:32');
         $report5 = $this->mockReport(true, '2015-03-09 15:54:32');
-        
+
         $reports = Array(
             Array($first, $last),
             Array($report1, $report2, $report3, $report4, $report5),
@@ -238,21 +256,11 @@ class TestGoals extends HfTestCase {
         return $report1;
     }
 
-    private function setReturnValsForFindingStreaks($currentStreak)
+    private function daysInSeconds($days)
     {
-        $reports = $this->makeMockReports();
-        $this->setReturnValues($this->mockDatabase,'getAllReportsForGoal',$reports);
-
-        $firstSuccess = 0;
-        $lastSuccess = $currentStreak * 24 * 60 * 60;
-
-        $time1 = 0 * 24 * 60 * 60;
-        $time2 = 1 * 24 * 60 * 60;
-        $time3 = 2 * 24 * 60 * 60; //setback
-        $time4 = 3 * 24 * 60 * 60;
-        $time5 = 4 * 24 * 60 * 60;
-        $times = array($firstSuccess, $lastSuccess, $time1, $time2, $time3, $time4, $time5);
-        $this->setReturnValues($this->mockCodeLibrary, 'convertStringToTime', $times);
+        $secondsInADay = 24 * 60 * 60;
+        $time1 = $days * $secondsInADay;
+        return $time1;
     }
 
     public function testMakingGoalCardGetsAllReportsForGoal() {
