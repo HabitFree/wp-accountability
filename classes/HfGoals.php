@@ -116,27 +116,60 @@ class HfGoals implements Hf_iGoals {
 
     private function streakExtension($reportTime, $lastTime)
     {
-        $seconds = $reportTime - $lastTime;
-        $days = $this->convertSecondsToDays($seconds);
-        return $days;
+        if ($lastTime === null) {
+            return 1;
+        } else {
+            $seconds = $reportTime - $lastTime;
+            return $this->convertSecondsToDays($seconds);
+        }
     }
 
-    private function findStreaks($goalId, $userId)
+    private function findStreaks(
+        $goalId,
+        $userId,
+        $reports = null,
+        $streaks = array(),
+        $candidateStreak = 0,
+        $lastTime = null)
     {
-        $reports = $this->database->getAllReportsForGoal($goalId, $userId);
-        $streaks = array();
-        $candidateStreak = 0;
-        foreach ($reports as $report) {
-            $reportTime = $this->codeLibrary->convertStringToTime($report->date);
-            if ($report->isSuccessful == 1 && isset($lastTime)) {
-                $candidateStreak += $this->streakExtension($reportTime, $lastTime);
-            } else {
-                $streaks[] = $candidateStreak;
-                $candidateStreak = 0;
-            }
-            $lastTime = $reportTime;
+        if ($reports === null) {
+            $reports = $this->database->getAllReportsForGoal($goalId, $userId);
         }
-        $streaks[] = $candidateStreak;
-        return $streaks;
+
+        if (empty($reports)) {
+            return $this->streaksAdjustedForTermination($streaks, $candidateStreak);
+        }
+
+        $report = array_shift($reports);
+        $reportTime = $this->codeLibrary->convertStringToTime($report->date);
+        $isReportSuccessful = $report->isSuccessful == 1;
+
+        if (!$isReportSuccessful && !empty($candidateStreak)) {
+            $streaks[] = $candidateStreak;
+        }
+
+        $candidateStreak = $this->newCandidateStreak($candidateStreak, $lastTime, $isReportSuccessful, $reportTime);
+
+        return $this->findStreaks(
+            $goalId,
+            $userId,
+            $reports,
+            $streaks,
+            $candidateStreak,
+            $reportTime
+        );
+    }
+
+    private function newCandidateStreak($candidateStreak, $lastTime, $isReportSuccessful, $reportTime)
+    {
+        return ($isReportSuccessful) ? $candidateStreak + $this->streakExtension($reportTime, $lastTime) : 0;
+    }
+
+    private function streaksAdjustedForTermination($streaks, $candidateStreak)
+    {
+        if (!empty($candidateStreak)) {
+            $streaks[] = $candidateStreak;
+        }
+        return (empty($streaks)) ? array(0) : $streaks;
     }
 } 
