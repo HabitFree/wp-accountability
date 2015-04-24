@@ -269,15 +269,18 @@ class TestGoals extends HfTestCase {
         return $report;
     }
 
-    private function setMockTimeReturnVals($reportInfos)
+    private function setMockTimeReturnVals($reportInfos, $times = array())
     {
-        $times = array();
-        foreach ($reportInfos as $info) {
-            $dayOfReport = $info[0];
-            $time = $this->daysInSeconds($dayOfReport);
-            $times[] = $time;
+        $info = array_shift($reportInfos);
+        $dayOfReport = $info[0];
+        $time = $this->daysInSeconds($dayOfReport);
+        $times[] = $time;
+
+        if (empty($reportInfos)) {
+            $this->setReturnValues($this->mockCodeLibrary, 'convertStringToTime', $times);
+        } else {
+            $this->setMockTimeReturnVals($reportInfos, $times);
         }
-        $this->setReturnValues($this->mockCodeLibrary, 'convertStringToTime', $times);
     }
 
     private function makeMockReportFromInfo($info)
@@ -286,7 +289,6 @@ class TestGoals extends HfTestCase {
         $isSuccess = $info[1];
         $time = $this->daysInSeconds($dayOfReport);
         $dateString = date('Y-m-d H:i:s', $time);
-        $mockReport = $this->mockReport($isSuccess, $dateString);
-        return $mockReport;
+        return $this->mockReport($isSuccess, $dateString);
     }
 }
