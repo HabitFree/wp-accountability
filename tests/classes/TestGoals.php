@@ -210,25 +210,9 @@ class TestGoals extends HfTestCase {
 
     private function setReturnValsForFindingStreaks($reportInfos)
     {
-        $reports = array();
-        foreach ($reportInfos as $info) {
-            $dayOfReport = $info[0];
-            $isSuccess = $info[1];
-            $time = $this->daysInSeconds($dayOfReport);
-            $dateString = date('Y-m-d H:i:s',$time);
-            $reports[] = $this->mockReport($isSuccess,$dateString);
-        }
+        $this->setMockReportReturnVals($reportInfos);
 
-        $times = array();
-        foreach ($reportInfos as $info) {
-            $dayOfReport = $info[0];
-            $time = $this->daysInSeconds($dayOfReport);
-            $times[] = $time;
-        }
-
-        $this->setReturnValue($this->mockDatabase,'getAllReportsForGoal',$reports);
-
-        $this->setReturnValues($this->mockCodeLibrary, 'convertStringToTime', $times);
+        $this->setMockTimeReturnVals($reportInfos);
     }
 
     private function mockReport($isSuccessful, $date)
@@ -258,7 +242,7 @@ class TestGoals extends HfTestCase {
         $this->mockedGoals->generateGoalCard($mockSub);
     }
 
-    public function testDoesntTakeZeroDayStreak() {
+    public function testKeepsZeroDayStreakAtEnd() {
         $this->setReturnValsForGoalCardCreation();
         $this->setReturnValsForFindingStreaks(array(array(0,true),array(1,false),array(1,false)));
         $MockSub = $this->makeMockGoalSub();
@@ -267,9 +251,33 @@ class TestGoals extends HfTestCase {
             1,
             'Title',
             3.1415000000000002,
-            array(1)
+            array(1,0)
         ));
 
         $this->mockedGoals->generateGoalCard($MockSub);
+    }
+
+    private function setMockReportReturnVals($reportInfos)
+    {
+        $reports = array();
+        foreach ($reportInfos as $info) {
+            $dayOfReport = $info[0];
+            $isSuccess = $info[1];
+            $time = $this->daysInSeconds($dayOfReport);
+            $dateString = date('Y-m-d H:i:s', $time);
+            $reports[] = $this->mockReport($isSuccess, $dateString);
+        }
+        $this->setReturnValue($this->mockDatabase, 'getAllReportsForGoal', $reports);
+    }
+
+    private function setMockTimeReturnVals($reportInfos)
+    {
+        $times = array();
+        foreach ($reportInfos as $info) {
+            $dayOfReport = $info[0];
+            $time = $this->daysInSeconds($dayOfReport);
+            $times[] = $time;
+        }
+        $this->setReturnValues($this->mockCodeLibrary, 'convertStringToTime', $times);
     }
 }

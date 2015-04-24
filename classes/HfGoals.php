@@ -130,14 +130,15 @@ class HfGoals implements Hf_iGoals {
         $reports = null,
         $streaks = array(),
         $candidateStreak = 0,
-        $lastTime = null)
-    {
+        $lastTime = null
+    ) {
         if ($reports === null) {
             $reports = $this->database->getAllReportsForGoal($goalId, $userId);
         }
 
         if (empty($reports)) {
-            return $this->streaksAdjustedForTermination($streaks, $candidateStreak);
+            $streaks[] = $candidateStreak;
+            return $streaks;
         }
 
         $report = array_shift($reports);
@@ -163,13 +164,5 @@ class HfGoals implements Hf_iGoals {
     private function newCandidateStreak($candidateStreak, $lastTime, $isReportSuccessful, $reportTime)
     {
         return ($isReportSuccessful) ? $candidateStreak + $this->streakExtension($reportTime, $lastTime) : 0;
-    }
-
-    private function streaksAdjustedForTermination($streaks, $candidateStreak)
-    {
-        if (!empty($candidateStreak)) {
-            $streaks[] = $candidateStreak;
-        }
-        return (empty($streaks)) ? array(0) : $streaks;
     }
 } 
