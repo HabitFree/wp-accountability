@@ -215,15 +215,6 @@ class TestGoals extends HfTestCase {
         $this->setMockTimeReturnVals($reportInfos);
     }
 
-    private function mockReport($isSuccessful, $date)
-    {
-        $genericReport = new stdClass();
-        $genericReport->isSuccessful = ($isSuccessful) ? 1 : 0;
-        $report1 = clone $genericReport;
-        $report1->date = $date;
-        return $report1;
-    }
-
     private function daysInSeconds($days)
     {
         $secondsInADay = 24 * 60 * 60;
@@ -257,17 +248,25 @@ class TestGoals extends HfTestCase {
         $this->mockedGoals->generateGoalCard($MockSub);
     }
 
-    private function setMockReportReturnVals($reportInfos)
+    private function setMockReportReturnVals($reportInfos, $reports = array())
     {
-        $reports = array();
-        foreach ($reportInfos as $info) {
-            $dayOfReport = $info[0];
-            $isSuccess = $info[1];
-            $time = $this->daysInSeconds($dayOfReport);
-            $dateString = date('Y-m-d H:i:s', $time);
-            $reports[] = $this->mockReport($isSuccess, $dateString);
+        $info = array_shift($reportInfos);
+        $mockReport = $this->makeMockReportFromInfo($info);
+        $reports[] = $mockReport;
+
+        if (empty($reportInfos)) {
+            $this->setReturnValue($this->mockDatabase, 'getAllReportsForGoal', $reports);
+        } else {
+            $this->setMockReportReturnVals($reportInfos, $reports);
         }
-        $this->setReturnValue($this->mockDatabase, 'getAllReportsForGoal', $reports);
+    }
+
+    private function mockReport($isSuccessful, $date)
+    {
+        $report = new stdClass();
+        $report->isSuccessful = ($isSuccessful) ? 1 : 0;
+        $report->date = $date;
+        return $report;
     }
 
     private function setMockTimeReturnVals($reportInfos)
@@ -279,5 +278,15 @@ class TestGoals extends HfTestCase {
             $times[] = $time;
         }
         $this->setReturnValues($this->mockCodeLibrary, 'convertStringToTime', $times);
+    }
+
+    private function makeMockReportFromInfo($info)
+    {
+        $dayOfReport = $info[0];
+        $isSuccess = $info[1];
+        $time = $this->daysInSeconds($dayOfReport);
+        $dateString = date('Y-m-d H:i:s', $time);
+        $mockReport = $this->mockReport($isSuccess, $dateString);
+        return $mockReport;
     }
 }
