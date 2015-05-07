@@ -166,7 +166,16 @@ class TestGoals extends HfTestCase {
             1,
             'Title',
             3.1415000000000002,
-            array(1,1.2)
+            array(
+                array(
+                    'length'=>1,
+                    'date'=>'1969-12-31'
+                ),
+                array(
+                    'length'=>1.2,
+                    'date'=>'1970-01-02'
+                )
+            )
         ));
 
         $this->mockedGoals->generateGoalCard($MockSub);
@@ -195,7 +204,7 @@ class TestGoals extends HfTestCase {
             1,
             $mockGoal->title,
             false,
-            array(0)
+            array(array('length'=>0,'date'=>'1969-12-31'))
         ));
         $this->mockedGoals->generateGoalCard($mockSub);
     }
@@ -242,7 +251,16 @@ class TestGoals extends HfTestCase {
             1,
             'Title',
             3.1415000000000002,
-            array(1,0)
+            array(
+                array(
+                    'length'=>1,
+                    'date'=>'1969-12-31'
+                ),
+                array(
+                    'length'=>0,
+                    'date'=>'1970-01-01'
+                ),
+            )
         ));
 
         $this->mockedGoals->generateGoalCard($MockSub);
