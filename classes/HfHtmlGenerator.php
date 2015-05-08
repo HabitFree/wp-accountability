@@ -187,8 +187,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     {
         $rankCell = '<th>Rank</th>';
         $lengthCell = '<th>Length</th>';
-        $dateCell = '<th>Date</th>';
-        $header = "<thead><tr>$rankCell$lengthCell$dateCell</tr></thead>";
+        $header = "<thead><tr>$rankCell$lengthCell</tr></thead>";
         return $header;
     }
 
@@ -210,7 +209,8 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
 
     private function statsTableRow($streak)
     {
-        $row = "<tr><td>{$streak['rank']}</td><td>{$streak['length']}</td><td>{$streak['date']}</td></tr>";
-        return $row;
+        $length = round($streak['length'],1);
+        $length = "$length days";
+        return "<tr><td>{$streak['rank']}</td><td>$length</td></tr>";
     }
 }
