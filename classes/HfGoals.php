@@ -30,6 +30,17 @@ class HfGoals implements Hf_iGoals {
 
         $streaks = $this->findStreaks($goalID,$userID);
 
+/*        usort($streaks, function ($a, $b) {
+            $a_val = (int) strtotime($a['date']);
+            $b_val = (int) strtotime($b['date']);
+
+            if($a_val > $b_val) return 1;
+            if($a_val < $b_val) return -1;
+            return 0;
+        });*/
+
+        $streaks = array_slice($streaks,-5);
+
         $card = $this->markupGenerator->goalCard(
             $goalID,
             $goal->title,

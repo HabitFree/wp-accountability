@@ -309,4 +309,53 @@ class TestGoals extends HfTestCase {
         $dateString = date('Y-m-d H:i:s', $time);
         return $this->mockReport($isSuccess, $dateString);
     }
+
+    public function testLimitsStreaksToFiveLongest() {
+        $this->setReturnValsForGoalCardCreation();
+        $this->setReturnValsForFindingStreaks(
+            array(
+                array(0,true),
+                array(1,false),
+                array(1.1,true),
+                array(2,false),
+                array(2.1,true),
+                array(3,false),
+                array(3.1,true),
+                array(4,false),
+                array(4.1,true),
+                array(5,false)
+            )
+        );
+        $MockSub = $this->makeMockGoalSub();
+
+        $this->expectOnce($this->mockMarkupGenerator, 'goalCard', array(
+            1,
+            'Title',
+            3.1415000000000002,
+            array(
+                array(
+                    'length' => 0.1,
+                    'date' => '1970-01-01'
+                ),
+                array(
+                    'length' => 0.1,
+                    'date' => '1970-01-02'
+                ),
+                array(
+                    'length' => 0.1,
+                    'date' => '1970-01-03'
+                ),
+                array(
+                    'length' => 0.099999999999999,
+                    'date' => '1970-01-04'
+                ),
+                array(
+                    'length' => 0,
+                    'date' => '1970-01-05'
+                )
+            )
+        ));
+
+        $this->mockedGoals->generateGoalCard($MockSub);
+    }
 }
