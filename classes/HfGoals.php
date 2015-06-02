@@ -39,8 +39,6 @@ class HfGoals implements Hf_iGoals {
             return 0;
         });*/
 
-        $streaks = array_slice($streaks,-5);
-
         $card = $this->markupGenerator->goalCard(
             $goalID,
             $goal->title,

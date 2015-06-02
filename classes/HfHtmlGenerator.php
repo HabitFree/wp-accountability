@@ -136,6 +136,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
 
     private function stats($streaks)
     {
+        $streaks = array_slice($streaks,-5);
         $header = $this->statsTableHeader();
         $body = $this->statsTableBody($streaks);
 

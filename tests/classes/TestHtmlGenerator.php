@@ -256,6 +256,7 @@ class TestHtmlGenerator extends HfTestCase {
     {
         $header = '<thead><tr><th>Rank</th><th>Length</th></tr></thead>';
 
+        $streaks = array_slice($streaks,-5);
         $rows = $this->makeRows($streaks);
 
         $body = "<tbody>$rows</tbody>";
@@ -316,6 +317,32 @@ class TestHtmlGenerator extends HfTestCase {
         $goalId = 1;
         $daysSinceLastReport = 3.1415;
         $streaks = array(array('length'=>1,'date'=>'date','rank'=>'rank'));
+
+        $result = $this->mockedMarkupGenerator->goalCard(
+            $goalId,
+            $verb,
+            $daysSinceLastReport,
+            $streaks
+        );
+
+        $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
+        $expected = $this->makeReportCard($reportDiv,$streaks);
+
+        $this->assertEquals($result, $expected);
+    }
+
+    public function testOnlyShowsFiveStreaks() {
+        $verb = 'Title';
+        $goalId = 1;
+        $daysSinceLastReport = 3.1415;
+        $streaks = array(
+            array('length'=>1,'date'=>'date','rank'=>'rank'),
+            array('length'=>1,'date'=>'date','rank'=>'rank'),
+            array('length'=>1,'date'=>'date','rank'=>'rank'),
+            array('length'=>1,'date'=>'date','rank'=>'rank'),
+            array('length'=>1,'date'=>'date','rank'=>'rank'),
+            array('length'=>1,'date'=>'date','rank'=>'rank')
+        );
 
         $result = $this->mockedMarkupGenerator->goalCard(
             $goalId,
