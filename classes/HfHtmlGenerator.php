@@ -209,8 +209,13 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
 
     private function statsTableRow($streak)
     {
-        $length = round($streak['length'],1);
-        $length = "$length days";
-        return "<tr><td>{$streak['rank']}</td><td>$length</td></tr>";
+        $lengthPhrase = $this->lengthPhrase($streak['length']);
+        return "<tr><td>{$streak['rank']}</td><td>$lengthPhrase</td></tr>";
+    }
+
+    private function lengthPhrase($length)
+    {
+        $d = round($length,1);
+        return ($d != 1) ? "$d days" : "$d day";
     }
 }

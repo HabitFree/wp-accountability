@@ -307,15 +307,15 @@ class TestHtmlGenerator extends HfTestCase {
 
     private function streakPhrase($length)
     {
-        $length = round($length,1);
-        return "$length days";
+        $d = round($length,1);
+        return ($d != 1) ? "$d days" : "$d day";
     }
 
-    public function testUsesMonthsWord() {
+    public function testSaysSingleDay() {
         $verb = 'Title';
         $goalId = 1;
         $daysSinceLastReport = 3.1415;
-        $streaks = array(array('length'=>35,'date'=>'date','rank'=>'rank'));
+        $streaks = array(array('length'=>1,'date'=>'date','rank'=>'rank'));
 
         $result = $this->mockedMarkupGenerator->goalCard(
             $goalId,
