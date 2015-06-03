@@ -128,8 +128,16 @@ class HfFactory {
         $HtmlGenerator = $this->makeMarkupGenerator();
         $Mailer        = $this->makeMessenger();
         $codeLibrary = $this->makeCodeLibrary();
+        $streaks = $this->makeStreaks();
 
-        return new HfGoals( $Mailer, $Cms, $HtmlGenerator, $Database, $codeLibrary );
+        return new HfGoals( $Mailer, $Cms, $HtmlGenerator, $Database, $codeLibrary, $streaks );
+    }
+
+    public function makeStreaks() {
+        $databse = $this->makeDatabase();
+        $codeLibrary = $this->makeCodeLibrary();
+
+        return new HfStreaks($databse, $codeLibrary);
     }
 
     public function makeSettingsShortcode() {

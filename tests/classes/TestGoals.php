@@ -159,23 +159,15 @@ class TestGoals extends HfTestCase {
 
     public function testUsesHtmlGeneratorToMakeGoalCard() {
         $this->setReturnValsForGoalCardCreation();
-        $this->setReturnValsForFindingStreaks(array(array(0,true),array(1,false),array(1.1,true),array(2.2,true)));
+        $this->setReturnValsForFindingStreaks(0);
         $MockSub = $this->makeMockGoalSub();
 
         $this->expectOnce($this->mockMarkupGenerator, 'goalCard', array(
             1,
             'Title',
             3.1415000000000002,
-            array(
-                array(
-                    'length'=>1,
-                    'date'=>'1969-12-31'
-                ),
-                array(
-                    'length'=>1.2,
-                    'date'=>'1970-01-02'
-                )
-            )
+            0,
+            array(0)
         ));
 
         $this->mockedGoals->generateGoalCard($MockSub);
@@ -204,7 +196,7 @@ class TestGoals extends HfTestCase {
             1,
             $mockGoal->title,
             false,
-            array(array('length'=>0,'date'=>'1969-12-31'))
+            0
         ));
         $this->mockedGoals->generateGoalCard($mockSub);
     }
@@ -217,11 +209,9 @@ class TestGoals extends HfTestCase {
         return $MockGoal;
     }
 
-    private function setReturnValsForFindingStreaks($reportInfos)
+    private function setReturnValsForFindingStreaks()
     {
-        $this->setMockReportReturnVals($reportInfos);
-
-        $this->setMockTimeReturnVals($reportInfos);
+        $this->setReturnValues($this->mockStreaks,'streaks',array(array(0),array(0)));
     }
 
     private function daysInSeconds($days)
@@ -229,41 +219,6 @@ class TestGoals extends HfTestCase {
         $secondsInADay = 24 * 60 * 60;
         $time1 = $days * $secondsInADay;
         return $time1;
-    }
-
-    public function testMakingGoalCardGetsAllReportsForGoal() {
-        $this->setReturnValue($this->mockDatabase,'daysSinceLastReport',false);
-        $mockSub = $this->makeMockGoalSub();
-
-        $this->setReturnValsForGoalCardCreation();
-        $this->setReturnValsForFindingStreaks(array());
-
-        $this->expectOnce($this->mockDatabase, 'getAllReportsForGoal');
-        $this->mockedGoals->generateGoalCard($mockSub);
-    }
-
-    public function testKeepsZeroDayStreakAtEnd() {
-        $this->setReturnValsForGoalCardCreation();
-        $this->setReturnValsForFindingStreaks(array(array(0,true),array(1,false),array(1,false)));
-        $MockSub = $this->makeMockGoalSub();
-
-        $this->expectOnce($this->mockMarkupGenerator, 'goalCard', array(
-            1,
-            'Title',
-            3.1415000000000002,
-            array(
-                array(
-                    'length'=>1,
-                    'date'=>'1969-12-31'
-                ),
-                array(
-                    'length'=>0,
-                    'date'=>'1970-01-01'
-                ),
-            )
-        ));
-
-        $this->mockedGoals->generateGoalCard($MockSub);
     }
 
     private function setMockReportReturnVals($reportInfos, $reports = array())
@@ -310,52 +265,29 @@ class TestGoals extends HfTestCase {
         return $this->mockReport($isSuccess, $dateString);
     }
 
-    /* public function testLimitsStreaksToFiveLongest() {
-         $this->setReturnValsForGoalCardCreation();
-         $this->setReturnValsForFindingStreaks(
-             array(
-                 array(0,true),
-                 array(1,false),
-                 array(1.1,true),
-                 array(2,false),
-                 array(2.1,true),
-                 array(3,false),
-                 array(3.1,true),
-                 array(4,false),
-                 array(4.1,true),
-                 array(5,false)
-             )
-         );
-         $MockSub = $this->makeckGoalSub();
+    public function testGivesHtmlGeneratorCurrentStreak() {
+        $this->setReturnValsForGoalCardCreation();
+        $this->setReturnValsForFindingStreaks();
+        $MockSub = $this->makeMockGoalSub();
 
- /*        $this->expectOnce($this->mockMarkupGenerator, 'goalCard', array(
-             1,
-             'Title',
-             3.1415000000000002,
-             array(
-                 array(
-                     'length' => 0.1,
-                     'date' => '1970-01-01'
-                 ),
-                 array(
-                     'length' => 0.1,
-                     'date' => '1970-01-02'
-                 ),
-                 array(
-                     'length' => 0.1,
-                     'date' => '1970-01-03'
-                 ),
-                 array(
-                     'length' => 0.099999999999999,
-                     'date' => '1970-01-04'
-                 ),
-                 array(
-                     'length' => 0,
-                     'date' => '1970-01-05'
-                 )
-             )
-         ));
+        $currentStreak = 0;
+        $daysSinceLastReport = 3.1415000000000002;
+        $this->expectOnce($this->mockMarkupGenerator, 'goalCard', array(
+            1,
+            'Title',
+            $daysSinceLastReport,
+            $currentStreak,
+            array(0)
+        ));
 
-         $this->mockedGoals->generateGoalCard($MockSub);
-     }*/
+        $this->mockedGoals->generateGoalCard($MockSub);
+    }
+
+    public function testFindsStreaksWhenMakingGoalCard() {
+        $this->setReturnValsForGoalCardCreation();
+        $this->setReturnValues($this->mockStreaks,'streaks',array(array(0),array(0)));
+        $this->expectAtLeastOnce($this->mockStreaks,'streaks',array(1,7));
+        $mockSub = $this->makeMockGoalSub();
+        $this->mockedGoals->generateGoalCard($mockSub);
+    }
 }

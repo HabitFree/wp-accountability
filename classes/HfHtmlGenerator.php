@@ -210,7 +210,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
 
     private function statsTableRow($streak)
     {
-        $lengthPhrase = $this->lengthPhrase($streak['length']);
+        $lengthPhrase = $this->lengthPhrase($streak);
         return "<tr><td>{$streak['rank']}</td><td>$lengthPhrase</td></tr>";
     }
 

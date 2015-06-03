@@ -301,7 +301,7 @@ class TestHtmlGenerator extends HfTestCase {
 
     private function makeRow($streak)
     {
-        $lengthPhrase = $this->streakPhrase($streak['length']);
+        $lengthPhrase = $this->streakPhrase($streak);
         $row = "<tr><td>{$streak['rank']}</td><td>$lengthPhrase</td></tr>";
         return $row;
     }
@@ -335,14 +335,7 @@ class TestHtmlGenerator extends HfTestCase {
         $verb = 'Title';
         $goalId = 1;
         $daysSinceLastReport = 3.1415;
-        $streaks = array(
-            array('length'=>1,'date'=>'date','rank'=>'rank'),
-            array('length'=>1,'date'=>'date','rank'=>'rank'),
-            array('length'=>1,'date'=>'date','rank'=>'rank'),
-            array('length'=>1,'date'=>'date','rank'=>'rank'),
-            array('length'=>1,'date'=>'date','rank'=>'rank'),
-            array('length'=>1,'date'=>'date','rank'=>'rank')
-        );
+        $streaks = array(1,1,1,1,1,1);
 
         $result = $this->mockedMarkupGenerator->goalCard(
             $goalId,

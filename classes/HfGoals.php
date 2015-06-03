@@ -6,19 +6,22 @@ class HfGoals implements Hf_iGoals {
     private $cms;
     private $messenger;
     private $codeLibrary;
+    private $streaks;
 
     function __construct(
         Hf_iMessenger $messenger,
         Hf_iCms $cms,
         Hf_iMarkupGenerator $markupGenerator,
         Hf_iDatabase $database,
-        Hf_iCodeLibrary $codeLibrary
+        Hf_iCodeLibrary $codeLibrary,
+        Hf_iStreaks $streaks
     ) {
         $this->messenger = $messenger;
         $this->cms = $cms;
         $this->markupGenerator = $markupGenerator;
         $this->database = $database;
         $this->codeLibrary = $codeLibrary;
+        $this->streaks = $streaks;
     }
 
     function generateGoalCard( $sub ) {
@@ -28,21 +31,14 @@ class HfGoals implements Hf_iGoals {
         $goal          = $this->database->getGoal( $goalID );
         $daysSinceLastReport = $this->database->daysSinceLastReport($goalID, $userID);
 
-        $streaks = $this->findStreaks($goalID,$userID);
-
-/*        usort($streaks, function ($a, $b) {
-            $a_val = (int) strtotime($a['date']);
-            $b_val = (int) strtotime($b['date']);
-
-            if($a_val > $b_val) return 1;
-            if($a_val < $b_val) return -1;
-            return 0;
-        });*/
+        $currentStreak = $this->currentStreak($goalID,$userID);
+        $streaks = $this->streaks->streaks($goalID,$userID);
 
         $card = $this->markupGenerator->goalCard(
             $goalID,
             $goal->title,
             $daysSinceLastReport,
+            $currentStreak,
             $streaks
         );
 
@@ -50,7 +46,7 @@ class HfGoals implements Hf_iGoals {
     }
 
     private function currentStreak( $goalId, $userId ) {
-        $streaks = $this->findStreaks($goalId, $userId);
+        $streaks = $this->streaks->streaks($goalId, $userId);
         return end($streaks);
     }
 
