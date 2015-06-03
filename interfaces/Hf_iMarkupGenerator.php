@@ -31,6 +31,7 @@ interface Hf_iMarkupGenerator {
         $goalId,
         $goalVerb,
         $daysSinceLastReport,
+        $currentStreak,
         $streaks
     );
 

@@ -129,11 +129,12 @@ class TestHtmlGenerator extends HfTestCase {
             $goalId,
             $verb,
             $daysSinceLastReport,
+            0,
             array()
         );
 
         $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
-        $expected = $this->makeReportCard($reportDiv,array());
+        $expected = $this->makeReportCard($reportDiv,0,array());
 
         $this->assertEquals($expected, $result);
     }
@@ -153,11 +154,12 @@ class TestHtmlGenerator extends HfTestCase {
             $goalId,
             $verb,
             $daysSinceLastReport,
+            0,
             array()
         );
 
         $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>day</strong>?</span>');
-        $expected = $this->makeReportCard($reportDiv,array());
+        $expected = $this->makeReportCard($reportDiv,0,array());
 
         $this->assertEquals($result, $expected);
     }
@@ -171,11 +173,12 @@ class TestHtmlGenerator extends HfTestCase {
             $goalId,
             $verb,
             $daysSinceLastReport,
+            0,
             array()
         );
 
         $reportDiv = $this->makeReportDiv($verb, 'since your <span class=\'duration\'><strong>last check-in</strong>?</span>');
-        $expected = $this->makeReportCard($reportDiv, array());
+        $expected = $this->makeReportCard($reportDiv, 0, array());
 
         $this->assertEquals($result, $expected);
     }
@@ -189,11 +192,12 @@ class TestHtmlGenerator extends HfTestCase {
             $goalId,
             $verb,
             $daysSinceLastReport,
+            0,
             array()
         );
 
         $reportDiv = $this->makeReportDiv($verb,'in the last <span class=\'duration\'><strong>24 hours</strong>?</span>');
-        $expected = $this->makeReportCard($reportDiv,array());
+        $expected = $this->makeReportCard($reportDiv,0,array());
 
         $this->assertEquals($result, $expected);
     }
@@ -207,11 +211,12 @@ class TestHtmlGenerator extends HfTestCase {
             $goalId,
             $verb,
             $daysSinceLastReport,
+            0,
             array()
         );
 
         $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
-        $expected = $this->makeReportCard($reportDiv,array());
+        $expected = $this->makeReportCard($reportDiv,0,array());
 
         $this->assertEquals($result, $expected);
     }
@@ -226,11 +231,12 @@ class TestHtmlGenerator extends HfTestCase {
             $goalId,
             $verb,
             $daysSinceLastReport,
+            0,
             $streaks
         );
 
         $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
-        $expected = $this->makeReportCard($reportDiv,$streaks);
+        $expected = $this->makeReportCard($reportDiv,0,$streaks);
 
         $this->assertEquals($result, $expected);
     }
@@ -245,19 +251,19 @@ class TestHtmlGenerator extends HfTestCase {
         return $reportDiv;
     }
 
-    private function makeReportCard($reportDiv, $streaks)
+    private function makeReportCard($reportDiv, $currentStreak, $streaks)
     {
-        $stats = $this->makeStats($streaks);
+        $stats = $this->makeStats($currentStreak,$streaks);
 
         return "<div class='report-card'>$stats$reportDiv</div>";
     }
 
-    private function makeStats($streaks)
+    private function makeStats($currentStreak,$streaks)
     {
         $header = '<thead><tr><th>Rank</th><th>Length</th></tr></thead>';
 
         $streaks = array_slice($streaks,-5);
-        $rows = $this->makeRows($streaks);
+        $rows = $this->makeRows($currentStreak,$streaks);
 
         $body = "<tbody>$rows</tbody>";
         $table = "<table>$header$body</table>";
@@ -280,29 +286,38 @@ class TestHtmlGenerator extends HfTestCase {
             $goalId,
             $verb,
             $daysSinceLastReport,
+            0,
             $streaks
         );
 
         $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
-        $expected = $this->makeReportCard($reportDiv,$streaks);
+        $expected = $this->makeReportCard($reportDiv,0,$streaks);
 
         $this->assertEquals($result, $expected);
     }
 
-    private function makeRows($streaks)
+    private function makeRows($currentStreak, $streaks)
     {
         $rows = '';
         foreach ($streaks as $streak) {
-            $row = $this->makeRow($streak);
+            $isCurrent = $currentStreak === $streak;
+            if ($isCurrent) {
+                $row = $this->makeRow($streak, true);
+                $currentStreak = null;
+            } else {
+                $row = $this->makeRow($streak, false);
+            }
+
             $rows .= $row;
         }
         return $rows;
     }
 
-    private function makeRow($streak)
+    private function makeRow($streak, $isCurrent)
     {
         $lengthPhrase = $this->streakPhrase($streak);
-        $row = "<tr><td>{$streak['rank']}</td><td>$lengthPhrase</td></tr>";
+        $class = ($isCurrent) ? ' class="current"' : '';
+        $row = "<tr$class><td>{$streak['rank']}</td><td>$lengthPhrase</td></tr>";
         return $row;
     }
 
@@ -322,11 +337,12 @@ class TestHtmlGenerator extends HfTestCase {
             $goalId,
             $verb,
             $daysSinceLastReport,
+            0,
             $streaks
         );
 
         $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
-        $expected = $this->makeReportCard($reportDiv,$streaks);
+        $expected = $this->makeReportCard($reportDiv,0,$streaks);
 
         $this->assertEquals($result, $expected);
     }
@@ -335,18 +351,20 @@ class TestHtmlGenerator extends HfTestCase {
         $verb = 'Title';
         $goalId = 1;
         $daysSinceLastReport = 3.1415;
+        $currentStreak = 1;
         $streaks = array(1,1,1,1,1,1);
 
         $result = $this->mockedMarkupGenerator->goalCard(
             $goalId,
             $verb,
             $daysSinceLastReport,
+            $currentStreak,
             $streaks
         );
 
         $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
-        $expected = $this->makeReportCard($reportDiv,$streaks);
+        $expected = $this->makeReportCard($reportDiv,$currentStreak,$streaks);
 
-        $this->assertEquals($result, $expected);
+        $this->assertEquals($expected,$result);
     }
 }

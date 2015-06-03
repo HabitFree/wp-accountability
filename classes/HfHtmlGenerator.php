@@ -107,9 +107,10 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         $goalId,
         $goalVerb,
         $daysSinceLastReport,
+        $currentStreak,
         $streaks
     ) {
-        $stats = $this->stats($streaks);
+        $stats = $this->stats($currentStreak,$streaks);
         $reportDiv = $this->reportDiv($goalVerb, $goalId, $daysSinceLastReport);
 
         return $this->div($stats.$reportDiv,'report-card');
@@ -134,11 +135,11 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         return $prefix .' <span class=\'duration\'><strong>'. $time .'</strong>?</span>';
     }
 
-    private function stats($streaks)
+    private function stats($currentStreak,$streaks)
     {
         $streaks = array_slice($streaks,-5);
         $header = $this->statsTableHeader();
-        $body = $this->statsTableBody($streaks);
+        $body = $this->statsTableBody($currentStreak,$streaks);
 
         return "<table>$header$body</table>";
     }
@@ -192,26 +193,34 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         return $header;
     }
 
-    private function statsTableRows($streaks)
+    private function statsTableRows($currentStreak,$streaks)
     {
         $rows = '';
         foreach ($streaks as $streak) {
-            $rows .= $this->statsTableRow($streak);
+            $isCurrent = $currentStreak === $streak;
+            if ($isCurrent) {
+                $rows .= $this->statsTableRow($streak,true);
+                $currentStreak = null;
+            } else {
+                $rows .= $this->statsTableRow($streak,false);
+            }
+
         }
         return $rows;
     }
 
-    private function statsTableBody($streaks)
+    private function statsTableBody($currentStreak,$streaks)
     {
-        $rows = $this->statsTableRows($streaks);
+        $rows = $this->statsTableRows($currentStreak,$streaks);
         $body = "<tbody>$rows</tbody>";
         return $body;
     }
 
-    private function statsTableRow($streak)
+    private function statsTableRow($streak,$isCurrent)
     {
         $lengthPhrase = $this->lengthPhrase($streak);
-        return "<tr><td>{$streak['rank']}</td><td>$lengthPhrase</td></tr>";
+        $class = ($isCurrent) ? ' class="current"' : '';
+        return "<tr$class><td>{$streak['rank']}</td><td>$lengthPhrase</td></tr>";
     }
 
     private function lengthPhrase($length)
