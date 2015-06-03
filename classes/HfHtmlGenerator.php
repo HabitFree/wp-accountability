@@ -137,7 +137,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
 
     private function stats($currentStreak,$streaks)
     {
-        $streaks = array_slice($streaks,-5);
+        //$streaks = array_slice($streaks,-5);
         $header = $this->statsTableHeader();
         $body = $this->statsTableBody($currentStreak,$streaks);
 
@@ -195,7 +195,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
 
     private function statsTableRows($currentStreak,$streaks)
     {
-        rsort($streaks);
+        $streaks = $this->trimStreaksToNeighborhood($currentStreak, $streaks);
         $rows = '';
         foreach ($streaks as $streak) {
             $isCurrent = $currentStreak === $streak;
@@ -208,6 +208,23 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
 
         }
         return $rows;
+    }
+
+    private function trimStreaksToNeighborhood($currentStreak, $streaks)
+    {
+        rsort($streaks);
+        $len = count($streaks);
+        $i = array_search($currentStreak, $streaks);
+        if ($i < 3) {
+            $streaks = array_slice($streaks, 0, 5);
+            return $streaks;
+        } elseif (($len - $i) < 3) {
+            $streaks = array_slice($streaks, -5);
+            return $streaks;
+        } else {
+            $streaks = array_slice($streaks, $i - 2, 5);
+            return $streaks;
+        }
     }
 
     private function statsTableBody($currentStreak,$streaks)

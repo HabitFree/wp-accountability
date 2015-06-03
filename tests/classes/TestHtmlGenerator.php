@@ -407,4 +407,25 @@ class TestHtmlGenerator extends HfTestCase {
 
         $this->assertEquals($expected,$result);
     }
+
+    public function testTrimsStreaksRelativeToCurrentStreak() {
+        $verb = 'Title';
+        $goalId = 1;
+        $daysSinceLastReport = 3.1415;
+        $currentStreak = 1;
+        $streaks = array(3,1,7,2,4,100);
+
+        $result = $this->mockedMarkupGenerator->goalCard(
+            $goalId,
+            $verb,
+            $daysSinceLastReport,
+            $currentStreak,
+            $streaks
+        );
+
+        $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
+        $expected = $this->makeReportCard($reportDiv,$currentStreak,$streaks);
+
+        $this->assertEquals($expected,$result);
+    }
 }
