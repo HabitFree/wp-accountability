@@ -137,11 +137,8 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
 
     private function stats($currentStreak,$streaks)
     {
-        //$streaks = array_slice($streaks,-5);
-        $header = $this->statsTableHeader();
         $body = $this->statsTableBody($currentStreak,$streaks);
-
-        return "<table>$header$body</table>";
+        return "<table>$body</table>";
     }
 
     private function reportDiv($goalVerb, $goalId, $daysSinceLastReport)
@@ -183,14 +180,6 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     {
         $buttonContent = "<input type='radio' name='$goalId' value='$value'> $text";
         return $this->label($buttonContent, array('class' => $class));
-    }
-
-    private function statsTableHeader()
-    {
-        $rankCell = '<th>Rank</th>';
-        $lengthCell = '<th>Length</th>';
-        $header = "<thead><tr>$rankCell$lengthCell</tr></thead>";
-        return $header;
     }
 
     private function statsTableRows($currentStreak,$streaks)

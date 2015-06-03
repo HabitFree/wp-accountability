@@ -260,13 +260,11 @@ class TestHtmlGenerator extends HfTestCase {
 
     private function makeStats($currentStreak,$streaks)
     {
-        $header = '<thead><tr><th>Rank</th><th>Length</th></tr></thead>';
-
         $streaks = array_slice($streaks,-10);
         $rows = $this->makeRows($currentStreak,$streaks);
 
         $body = "<tbody>$rows</tbody>";
-        $table = "<table>$header$body</table>";
+        $table = "<table>$body</table>";
 
         return $table;
     }
