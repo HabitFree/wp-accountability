@@ -140,7 +140,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         $header = '<h4>Personal Bests</h4>';
         $body = $this->statsTableBody($currentStreak,$streaks);
         $table = "<table>$body</table>";
-        return $header . $table;
+        return "<div class='streaks'>$header$table</div>";
     }
 
     private function reportDiv($goalVerb, $goalId, $daysSinceLastReport)

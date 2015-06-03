@@ -267,7 +267,7 @@ class TestHtmlGenerator extends HfTestCase {
         $body = "<tbody>$rows</tbody>";
         $table = "<table>$body</table>";
 
-        return $header . $table;
+        return "<div class='streaks'>$header$table</div>";
     }
 
     private function redirectScript($url)
