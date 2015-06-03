@@ -195,6 +195,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
 
     private function statsTableRows($currentStreak,$streaks)
     {
+        rsort($streaks);
         $rows = '';
         foreach ($streaks as $streak) {
             $isCurrent = $currentStreak === $streak;

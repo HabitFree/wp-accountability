@@ -262,7 +262,7 @@ class TestHtmlGenerator extends HfTestCase {
     {
         $header = '<thead><tr><th>Rank</th><th>Length</th></tr></thead>';
 
-        $streaks = array_slice($streaks,-5);
+        $streaks = array_slice($streaks,-10);
         $rows = $this->makeRows($currentStreak,$streaks);
 
         $body = "<tbody>$rows</tbody>";
@@ -298,6 +298,8 @@ class TestHtmlGenerator extends HfTestCase {
 
     private function makeRows($currentStreak, $streaks)
     {
+        $streaks = $this->trimStreaksToNeighborhood($currentStreak, $streaks);
+
         $rows = '';
         foreach ($streaks as $streak) {
             $isCurrent = $currentStreak === $streak;
@@ -353,6 +355,44 @@ class TestHtmlGenerator extends HfTestCase {
         $daysSinceLastReport = 3.1415;
         $currentStreak = 1;
         $streaks = array(1,1,1,1,1,1);
+
+        $result = $this->mockedMarkupGenerator->goalCard(
+            $goalId,
+            $verb,
+            $daysSinceLastReport,
+            $currentStreak,
+            $streaks
+        );
+
+        $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
+        $expected = $this->makeReportCard($reportDiv,$currentStreak,$streaks);
+
+        $this->assertEquals($expected,$result);
+    }
+
+    private function trimStreaksToNeighborhood($currentStreak, $streaks)
+    {
+        rsort($streaks);
+        $len = count($streaks);
+        $i = array_search($currentStreak, $streaks);
+        if ($i < 3) {
+            $streaks = array_slice($streaks, 0, 5);
+            return $streaks;
+        } elseif (($len - $i) < 3) {
+            $streaks = array_slice($streaks, -5);
+            return $streaks;
+        } else {
+            $streaks = array_slice($streaks, $i - 2, 5);
+            return $streaks;
+        }
+    }
+
+    public function testSortsStreaks() {
+        $verb = 'Title';
+        $goalId = 1;
+        $daysSinceLastReport = 3.1415;
+        $currentStreak = 1;
+        $streaks = array(3,1,7,2,4);
 
         $result = $this->mockedMarkupGenerator->goalCard(
             $goalId,
