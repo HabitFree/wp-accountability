@@ -225,7 +225,7 @@ class TestHtmlGenerator extends HfTestCase {
         $verb = 'Title';
         $goalId = 1;
         $daysSinceLastReport = 3.1415;
-        $streaks = array(array('length'=>3.3333,'date'=>'date','rank'=>'rank'));
+        $streaks = array(1,2,3,0);
 
         $result = $this->mockedMarkupGenerator->goalCard(
             $goalId,
@@ -238,7 +238,7 @@ class TestHtmlGenerator extends HfTestCase {
         $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
         $expected = $this->makeReportCard($reportDiv,0,$streaks);
 
-        $this->assertEquals($result, $expected);
+        $this->assertEquals($expected, $result);
     }
 
     private function makeReportDiv($verb, $periodPhrase)
@@ -263,10 +263,11 @@ class TestHtmlGenerator extends HfTestCase {
         $streaks = array_slice($streaks,-10);
         $rows = $this->makeRows($currentStreak,$streaks);
 
+        $header = '<h4>Personal Bests</h4>';
         $body = "<tbody>$rows</tbody>";
         $table = "<table>$body</table>";
 
-        return $table;
+        return $header . $table;
     }
 
     private function redirectScript($url)
@@ -291,16 +292,25 @@ class TestHtmlGenerator extends HfTestCase {
         $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
         $expected = $this->makeReportCard($reportDiv,0,$streaks);
 
-        $this->assertEquals($result, $expected);
+        $this->assertEquals($expected, $result);
     }
 
     private function makeRows($currentStreak, $streaks)
     {
-        $streaks = $this->trimStreaksToNeighborhood($currentStreak, $streaks);
+        rsort($streaks);
+
+        $rankedStreaks = array();
+        $rank = 1;
+        foreach ($streaks as $streak) {
+            $rankedStreaks[] = array($rank,$streak);
+            $rank++;
+        }
+
+        $areaStreaks = $this->trimStreaksToNeighborhood($currentStreak, $rankedStreaks);
 
         $rows = '';
-        foreach ($streaks as $streak) {
-            $isCurrent = $currentStreak === $streak;
+        foreach ($areaStreaks as $streak) {
+            $isCurrent = $currentStreak === $streak[1];
             if ($isCurrent) {
                 $row = $this->makeRow($streak, true);
                 $currentStreak = null;
@@ -315,9 +325,9 @@ class TestHtmlGenerator extends HfTestCase {
 
     private function makeRow($streak, $isCurrent)
     {
-        $lengthPhrase = $this->streakPhrase($streak);
+        $lengthPhrase = $this->streakPhrase($streak[1]);
         $class = ($isCurrent) ? ' class="current"' : '';
-        $row = "<tr$class><td>{$streak['rank']}</td><td>$lengthPhrase</td></tr>";
+        $row = "<tr$class><td class='rank'>{$streak[0]}</td><td>$lengthPhrase</td></tr>";
         return $row;
     }
 
@@ -344,7 +354,7 @@ class TestHtmlGenerator extends HfTestCase {
         $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
         $expected = $this->makeReportCard($reportDiv,0,$streaks);
 
-        $this->assertEquals($result, $expected);
+        $this->assertEquals($expected, $result);
     }
 
     public function testOnlyShowsFiveStreaks() {
@@ -370,7 +380,9 @@ class TestHtmlGenerator extends HfTestCase {
 
     private function trimStreaksToNeighborhood($currentStreak, $streaks)
     {
-        rsort($streaks);
+        usort($streaks, function($a,$b) {
+            return $a[0] - $b[0];
+        });
         $len = count($streaks);
         $i = array_search($currentStreak, $streaks);
         if ($i < 3) {
@@ -412,6 +424,27 @@ class TestHtmlGenerator extends HfTestCase {
         $daysSinceLastReport = 3.1415;
         $currentStreak = 1;
         $streaks = array(3,1,7,2,4,100);
+
+        $result = $this->mockedMarkupGenerator->goalCard(
+            $goalId,
+            $verb,
+            $daysSinceLastReport,
+            $currentStreak,
+            $streaks
+        );
+
+        $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
+        $expected = $this->makeReportCard($reportDiv,$currentStreak,$streaks);
+
+        $this->assertEquals($expected,$result);
+    }
+
+    public function testRanksStreaks() {
+        $verb = 'Title';
+        $goalId = 1;
+        $daysSinceLastReport = 3.1415;
+        $currentStreak = 1;
+        $streaks = array(1,1,1,1,1);
 
         $result = $this->mockedMarkupGenerator->goalCard(
             $goalId,

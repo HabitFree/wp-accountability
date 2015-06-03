@@ -137,8 +137,10 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
 
     private function stats($currentStreak,$streaks)
     {
+        $header = '<h4>Personal Bests</h4>';
         $body = $this->statsTableBody($currentStreak,$streaks);
-        return "<table>$body</table>";
+        $table = "<table>$body</table>";
+        return $header . $table;
     }
 
     private function reportDiv($goalVerb, $goalId, $daysSinceLastReport)
@@ -184,10 +186,20 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
 
     private function statsTableRows($currentStreak,$streaks)
     {
-        $streaks = $this->trimStreaksToNeighborhood($currentStreak, $streaks);
-        $rows = '';
+        rsort($streaks);
+
+        $rankedStreaks = array();
+        $rank = 1;
         foreach ($streaks as $streak) {
-            $isCurrent = $currentStreak === $streak;
+            $rankedStreaks[] = array($rank,$streak);
+            $rank++;
+        }
+
+        $areaStreaks = $this->trimStreaksToNeighborhood($currentStreak, $rankedStreaks);
+
+        $rows = '';
+        foreach ($areaStreaks as $streak) {
+            $isCurrent = $currentStreak === $streak[1];
             if ($isCurrent) {
                 $rows .= $this->statsTableRow($streak,true);
                 $currentStreak = null;
@@ -201,7 +213,9 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
 
     private function trimStreaksToNeighborhood($currentStreak, $streaks)
     {
-        rsort($streaks);
+        usort($streaks, function($a,$b) {
+            return $a[0] - $b[0];
+        });
         $len = count($streaks);
         $i = array_search($currentStreak, $streaks);
         if ($i < 3) {
@@ -225,9 +239,9 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
 
     private function statsTableRow($streak,$isCurrent)
     {
-        $lengthPhrase = $this->lengthPhrase($streak);
+        $lengthPhrase = $this->lengthPhrase($streak[1]);
         $class = ($isCurrent) ? ' class="current"' : '';
-        return "<tr$class><td>{$streak['rank']}</td><td>$lengthPhrase</td></tr>";
+        return "<tr$class><td class='rank'>{$streak[0]}</td><td>$lengthPhrase</td></tr>";
     }
 
     private function lengthPhrase($length)
