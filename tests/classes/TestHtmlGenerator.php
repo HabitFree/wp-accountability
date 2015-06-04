@@ -384,7 +384,8 @@ class TestHtmlGenerator extends HfTestCase {
             return $a[0] - $b[0];
         });
         $len = count($streaks);
-        $i = array_search($currentStreak, $streaks);
+        $i = $this->findCurrentStreakIndex($currentStreak, $streaks);
+
         if ($i < 3) {
             $streaks = array_slice($streaks, 0, 5);
             return $streaks;
@@ -458,5 +459,16 @@ class TestHtmlGenerator extends HfTestCase {
         $expected = $this->makeReportCard($reportDiv,$currentStreak,$streaks);
 
         $this->assertEquals($expected,$result);
+    }
+
+    private function findCurrentStreakIndex($currentStreak, $streaks)
+    {
+        $i = null;
+        foreach ($streaks as $key => $val) {
+            if ($val[1] === $currentStreak) {
+                $i = $key;
+            }
+        }
+        return $i;
     }
 }

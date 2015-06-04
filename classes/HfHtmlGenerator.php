@@ -217,7 +217,8 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
             return $a[0] - $b[0];
         });
         $len = count($streaks);
-        $i = array_search($currentStreak, $streaks);
+        $i = $this->findCurrentStreakIndex($currentStreak, $streaks);
+
         if ($i < 3) {
             $streaks = array_slice($streaks, 0, 5);
             return $streaks;
@@ -248,5 +249,16 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
     {
         $d = round($length,1);
         return ($d != 1) ? "$d days" : "$d day";
+    }
+
+    private function findCurrentStreakIndex($currentStreak, $streaks)
+    {
+        $i = null;
+        foreach ($streaks as $key => $val) {
+            if ($val[1] === $currentStreak) {
+                $i = $key;
+            }
+        }
+        return $i;
     }
 }
