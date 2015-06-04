@@ -62,4 +62,6 @@ interface Hf_iDatabase {
     public function deleteRelationship( $userId1, $userId2 );
 
     public function setDefaultGoalSubscription( $userId );
+
+    public function getAllReportsForGoal($goalId, $userId);
 }

@@ -356,7 +356,7 @@ class TestAuthenticateShortcode extends HfTestCase {
 
         $AuthenticateShortcode = $this->factory->makeAuthenticateShortcode();
         $haystack              = $AuthenticateShortcode->getOutput();
-        $needle                = "<p class=\"info\">Looks like you're responding to an invitation. Feel free to either register or log into an existing account—either way we'll automatically set up accountability between you and the user who invited you.</p>";
+        $needle                = "<p class='info'>Looks like you're responding to an invitation. Feel free to either register or log into an existing account—either way we'll automatically set up accountability between you and the user who invited you.</p>";
 
         $this->assertTrue( $this->haystackContainsNeedle( $haystack, $needle ) );
     }
@@ -530,14 +530,14 @@ class TestAuthenticateShortcode extends HfTestCase {
     public function testRegistrationRespectsErrors() {
         $this->setRegistrationPost();
         $this->setReturnValue($this->mockCms, 'isError', True);
-        $this->expectNever($this->mockMarkupGenerator, 'makeSuccessMessage');
+        $this->expectNever($this->mockMarkupGenerator, 'successMessage');
         $this->mockedAuthenticateShortcode->getOutput();
     }
 
     public function testRegistrationRespectsSuccess() {
         $this->setRegistrationPost();
         $this->setReturnValue($this->mockCms, 'isError', False);
-        $this->expectOnce($this->mockMarkupGenerator, 'makeSuccessMessage');
+        $this->expectOnce($this->mockMarkupGenerator, 'successMessage');
         $this->mockedAuthenticateShortcode->getOutput();
     }
 

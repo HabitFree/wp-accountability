@@ -51,7 +51,7 @@ class TestPartnerListShortcode extends HfTestCase {
 
     public function testPartnerListShortcodeGeneratesList() {
         $this->setReturnValue( $this->mockUserManager, 'getPartners', array() );
-        $this->expectOnce( $this->mockMarkupGenerator, 'makeList' );
+        $this->expectOnce( $this->mockMarkupGenerator, 'listMarkup' );
         $this->mockedPartnerListShortcode->getOutput();
     }
 
@@ -77,13 +77,13 @@ class TestPartnerListShortcode extends HfTestCase {
 
     public function testShortcodeMakesForm() {
         $this->setDefaultReturnValues();
-        $this->expectOnce( $this->mockMarkupGenerator, 'makeForm' );
+        $this->expectOnce( $this->mockMarkupGenerator, 'form' );
         $this->mockedPartnerListShortcode->getOutput();
     }
 
     public function testShortcodeReturnsForm() {
         $this->setDefaultReturnValues();
-        $this->setReturnValue( $this->mockMarkupGenerator, 'makeForm', 'duck' );
+        $this->setReturnValue( $this->mockMarkupGenerator, 'form', 'duck' );
         $actual   = $this->mockedPartnerListShortcode->getOutput();
         $expected = 'duck';
         $this->assertEquals( $expected, $actual );
@@ -93,8 +93,8 @@ class TestPartnerListShortcode extends HfTestCase {
         $this->setDefaultReturnValues();
         $PartnerListShortcode = $this->makeExpressivePartnerListShortcode();
 
-        $needle1  = '<input type="button" name="7" value="unpartner" onclick="if (confirm(';
-        $needle2  = ')) { submitValue(7);}" />';
+        $needle1  = '<input type=\'button\' name=\'7\' value=\'unpartner\' onclick=\'if (confirm(';
+        $needle2  = ')) { submitValue(7);}\' />';
         $haystack = $PartnerListShortcode->getOutput();
         $this->assertContains( $needle1, $haystack );
         $this->assertContains( $needle2, $haystack );
@@ -104,7 +104,7 @@ class TestPartnerListShortcode extends HfTestCase {
         $this->setDefaultReturnValues();
         $PartnerListShortcode = $this->makeExpressivePartnerListShortcode();
 
-        $needle   = "confirm('Are you sure you want to stop partnering with ludwig?')";
+        $needle   = 'confirm("Are you sure you want to stop partnering with ludwig?")';
         $haystack = $PartnerListShortcode->getOutput();
         $this->assertContains( $needle, $haystack );
     }
@@ -121,7 +121,7 @@ class TestPartnerListShortcode extends HfTestCase {
         $this->setDefaultReturnValues();
         $PartnerListShortcode = $this->makeExpressivePartnerListShortcode();
 
-        $needle   = '<input type="hidden" name="userId" />';
+        $needle   = '<input type=\'hidden\' name=\'userId\' />';
         $haystack = $PartnerListShortcode->getOutput();
         $this->assertContains( $needle, $haystack );
     }

@@ -24,6 +24,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     protected $mockLoginForm;
     protected $mockRegistrationForm;
     protected $mockInviteResponseForm;
+    protected $mockStreaks;
 
     protected $mockedInvitePartnerShortcode;
     protected $mockedUserManager;
@@ -39,6 +40,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     protected $mockedLoginForm;
     protected $mockedRegistrationForm;
     protected $mockedInviteResponseForm;
+    protected $mockedStreaks;
 
     function __construct() {
         $this->factory = new HfFactory();
@@ -67,6 +69,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->mockLoginForm              = $this->makeMock( 'HfLoginForm' );
         $this->mockRegistrationForm       = $this->makeMock( 'HfRegistrationForm' );
         $this->mockInviteResponseForm     = $this->makeMock( 'HfInviteResponseForm' );
+        $this->mockStreaks                = $this->makeMock( 'HfStreaks' );
 
         $this->setReturnValue( $this->mockCms, 'getDbPrefix', 'wptests_' );
     }
@@ -86,6 +89,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->resetMockedLoginForm();
         $this->mockedRegistrationForm = new HfRegistrationForm('url', $this->mockMarkupGenerator);
         $this->mockedInviteResponseForm = new HfInviteResponseForm('url', $this->mockMarkupGenerator);
+        $this->mockedStreaks = new HfStreaks($this->mockDatabase, $this->mockCodeLibrary);
     }
 
     protected function makeMock( $className ) {
@@ -173,7 +177,9 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
             $this->mockMessenger,
             $this->mockCms,
             $this->mockMarkupGenerator,
-            $this->mockDatabase
+            $this->mockDatabase,
+            $this->mockCodeLibrary,
+            $this->mockStreaks
         );
     }
 

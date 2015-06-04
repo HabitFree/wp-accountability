@@ -865,4 +865,24 @@ class TestDatabase extends HfTestCase {
         $result = $this->mockedDatabase->daysSinceLastReport(1,1);
         $this->assertEquals($result,false);
     }
+
+    public function testGetAllReportsForGoal() {
+        $this->setReturnValue($this->mockCms,'prepareQuery','preparedQuery');
+        $this->expectOnce($this->mockCms,'getResults',array('preparedQuery'));
+        $this->mockedDatabase->getAllReportsForGoal(1,7);
+    }
+
+    public function testGetAllReportsForGoalPreparesQuery() {
+        $this->expectOnce( $this->mockCms, 'prepareQuery', array(
+            'SELECT * FROM `wp_hf_report` WHERE goalID = %d AND userID = %d',
+            array( 1,7 )
+        ) );
+        $this->mockedDatabase->getAllReportsForGoal(1,7);
+    }
+
+    public function testGetAllReportsForGoalReturnsResults() {
+        $this->setReturnValue($this->mockCms,'getResults','results');
+        $result = $this->mockedDatabase->getAllReportsForGoal(1,7);
+        $this->assertEquals('results',$result);
+    }
 }

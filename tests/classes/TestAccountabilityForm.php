@@ -16,4 +16,12 @@ class TestAccountabilityForm extends HfTestCase {
         $AccountabilityForm = new HfAccountabilityForm( 'test.com', $Goals );
         $this->assertTrue( method_exists( $AccountabilityForm, 'populate' ) );
     }
+
+    public function testHfAccountabilityFormIncludesReportCardsClass() {
+        $Goals              = $this->makeMock( 'HfGoals' );
+        $AccountabilityForm = new HfAccountabilityForm( 'test.com', $Goals );
+        $result = $AccountabilityForm->getOutput();
+        $needle = 'report-cards';
+        $this->assertContains($needle,$result);
+    }
 }

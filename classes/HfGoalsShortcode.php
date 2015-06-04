@@ -33,11 +33,11 @@ class HfGoalsShortcode implements Hf_iShortcode {
             $this->submitAccountabilityReports( $userID );
 
             $quotationMessage = $this->makeQuotationMessage();
-            $successMessage   = $this->MarkupGenerator->makeSuccessMessage( 'Thanks for checking in!' );
+            $successMessage   = $this->MarkupGenerator->successMessage( 'Thanks for checking in!' );
 
-            return $successMessage . $quotationMessage . $this->buildForm( $userID );
+            return $successMessage . $quotationMessage . $this->form( $userID );
         } else {
-            return $this->buildForm( $userID );
+            return $this->form( $userID );
         }
     }
 
@@ -91,10 +91,10 @@ class HfGoalsShortcode implements Hf_iShortcode {
     private function makeQuotationMessage() {
         $quotation = $this->selectQuotation();
 
-        return $quotation ? $this->MarkupGenerator->makeQuoteMessage( $quotation ) : null;
+        return $quotation ? $this->MarkupGenerator->quotation( $quotation ) : null;
     }
 
-    private function buildForm( $userID ) {
+    private function form( $userID ) {
         $currentURL         = $this->PageLocator->getCurrentPageURL();
         $goalSubs           = $this->Goals->getGoalSubscriptions( $userID );
         $AccountabilityForm = new HfAccountabilityForm( $currentURL, $this->Goals );
@@ -141,8 +141,8 @@ class HfGoalsShortcode implements Hf_iShortcode {
     }
 
     private function generatePartnerReportBody( $Partner, $reporterUsername ) {
-        $greeting = $this->MarkupGenerator->makeParagraph( "Hello, " . $Partner->user_login . "," );
-        $intro    = $this->MarkupGenerator->makeParagraph(
+        $greeting = $this->MarkupGenerator->paragraph( "Hello, " . $Partner->user_login . "," );
+        $intro    = $this->MarkupGenerator->paragraph(
             "Your friend " . $reporterUsername . " just reported on their progress. Here's how they're doing:"
         );
 
@@ -167,7 +167,7 @@ class HfGoalsShortcode implements Hf_iShortcode {
             }
         };
 
-        return $this->MarkupGenerator->makeList( $reports );
+        return $this->MarkupGenerator->listMarkup( $reports );
     }
 
     private function generateReportsListItem( $goalId, $isSuccessful ) {

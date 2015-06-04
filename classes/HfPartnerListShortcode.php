@@ -17,8 +17,8 @@ class HfPartnerListShortcode implements Hf_iShortcode {
         $Partners      = $this->getPartners();
         $listItems     = $this->makeListItems( $Partners );
         $currentUrl    = $this->assetLocator->getCurrentPageUrl();
-        $list          = $this->markupGenerator->makeList( $listItems );
-        $hiddenField   = $this->markupGenerator->makeHiddenField( 'userId' );
+        $list          = $this->markupGenerator->listMarkup( $listItems );
+        $hiddenField   = $this->markupGenerator->hiddenField( 'userId' );
         $submitHandler =
             '<script>
                 function submitValue (n) {
@@ -28,7 +28,7 @@ class HfPartnerListShortcode implements Hf_iShortcode {
                 }
             </script>';
 
-        return $this->markupGenerator->makeForm( $currentUrl, $submitHandler . $hiddenField . $list, 'partnerlist' );
+        return $this->markupGenerator->form( $currentUrl, $submitHandler . $hiddenField . $list, 'partnerlist' );
     }
 
     private function processSubmittedForm() {
@@ -61,10 +61,15 @@ class HfPartnerListShortcode implements Hf_iShortcode {
     }
 
     private function makeUnpartnerButton( $Partner ) {
+        $username = $Partner->user_nicename;
+        $confirmationMessage = "\"Are you sure you want to stop partnering with $username?\"";
+        $partnerId = $Partner->ID;
+        $onclick = "if (confirm($confirmationMessage)) { submitValue($partnerId);}";
         return
-            $this->markupGenerator->makeButtonInput(
+            $this->markupGenerator->buttonInput(
                 $Partner->ID,
-                'unpartner', "if (confirm('Are you sure you want to stop partnering with " . $Partner->user_nicename . "?')) { submitValue(" . $Partner->ID . ");}"
+                'unpartner',
+                $onclick
             );
     }
 }
