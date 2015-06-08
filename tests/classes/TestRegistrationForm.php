@@ -77,7 +77,7 @@ class TestRegistrationForm extends HfTestCase {
 
     public function testWrapsCheckboxWithLabel() {
         $this->setReturnValue($this->mockMarkupGenerator,'input','checkbox');
-        $content = 'checkbox Remind me to check in once in a while. <em>(Recommended)</em>';
+        $content = 'checkbox Email to remind me to check in once in a while. <em>(Recommended)</em>';
         $properties = array();
         $this->expectOnce($this->mockMarkupGenerator,'label',array($content,$properties));
         $this->mockedRegistrationForm->getOutput();
