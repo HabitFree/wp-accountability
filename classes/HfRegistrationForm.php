@@ -73,7 +73,7 @@ class HfRegistrationForm extends HfForm {
         );
         $input = $this->markupGenerator->input($properties);
 
-        $content = "$input Keep me accountable by email.";
+        $content = "$input Remind me to check in once in a while. <em>(Recommended)</em>";
         $labeledCheckbox = $this->markupGenerator->label($content, array());
         $paragraphedCheckbox = $this->markupGenerator->paragraph($labeledCheckbox);
         $this->elements[] = $paragraphedCheckbox;
