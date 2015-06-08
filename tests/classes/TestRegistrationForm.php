@@ -63,4 +63,35 @@ class TestRegistrationForm extends HfTestCase {
         $needle = '<p><input type="submit" name="register" value="Register" /></p>';
         $this->assertRegistrationFormOutputContainsNeedle($needle);
     }
+
+    public function testMakesCheckbox() {
+        $properties = array(
+            'type' => 'checkbox',
+            'name' => 'accountability',
+            'value' => 'yes',
+            'checked' => 'checked'
+        );
+        $this->expectOnce($this->mockMarkupGenerator,'input',array($properties));
+        $this->mockedRegistrationForm->getOutput();
+    }
+
+    public function testWrapsCheckboxWithLabel() {
+        $this->setReturnValue($this->mockMarkupGenerator,'input','checkbox');
+        $content = 'checkbox Keep me accountable by email.';
+        $properties = array();
+        $this->expectOnce($this->mockMarkupGenerator,'label',array($content,$properties));
+        $this->mockedRegistrationForm->getOutput();
+    }
+
+    public function testWrapsCheckboxWithParagraph() {
+        $this->setReturnValue($this->mockMarkupGenerator,'label','labeledCheckbox');
+        $this->expectOnce($this->mockMarkupGenerator,'paragraph',array('labeledCheckbox'));
+        $this->mockedRegistrationForm->getOutput();
+    }
+
+    public function testOutputsCheckbox() {
+        $this->setReturnValue($this->mockMarkupGenerator,'paragraph','checkbox');
+        $needle = 'checkbox';
+        $this->assertRegistrationFormOutputContainsNeedle($needle);
+    }
 } 
