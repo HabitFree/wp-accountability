@@ -80,4 +80,10 @@ class TestUserManager extends HfTestCase {
         $this->expectAtLeastOnce($this->mockDatabase, 'setDefaultGoalSubscription', array(7));
         $this->mockedUserManager->processAllUsers();
     }
+
+    public function testUserManagerSendsWelcomeEmailWhenProcessingNewUser() {
+        $message = "<p>Welcome to HabitFree! You can <a href=''>edit your account settings by clicking here</a>.</p>";
+        $this->expectOnce($this->mockMessenger,'sendEmailToUser',array(7, 'Welcome!',$message));
+        $this->mockedUserManager->processNewUser(7);
+    }
 }

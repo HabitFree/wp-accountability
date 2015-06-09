@@ -15,7 +15,8 @@ class TestWordPress extends HfTestCase {
             'getOption',
             'getPluginDirectoryUrl',
             'getNonceField',
-            'isNonceValid'
+            'isNonceValid',
+            'updateUserMeta'
         );
 
         foreach($methods as $method) {

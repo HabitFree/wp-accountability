@@ -36,4 +36,8 @@ interface Hf_iMarkupGenerator {
     );
 
     public function refreshScript();
+
+    public function input($properties);
+
+    public function label($content, $properties);
 }

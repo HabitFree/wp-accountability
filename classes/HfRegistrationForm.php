@@ -18,6 +18,7 @@ class HfRegistrationForm extends HfForm {
         $this->addUsernameChoiceMessage();
         $this->addUsernameField();
         $this->addEmailField();
+        $this->addAccountabilitySubscriptionCheckbox();
         $this->addPasswordFields();
         $this->addSubmitButton( 'register', 'Register' );
     }
@@ -60,5 +61,21 @@ class HfRegistrationForm extends HfForm {
         $this->addPasswordChoiceMessage();
         $this->addPasswordBox('password', 'Password', true);
         $this->addPasswordBox('passwordConfirmation', 'Confirm Password', true);
+    }
+
+    private function addAccountabilitySubscriptionCheckbox()
+    {
+        $properties = array(
+            'type' => 'checkbox',
+            'name' => 'accountability',
+            'value' => 'yes',
+            'checked' => 'checked'
+        );
+        $input = $this->markupGenerator->input($properties);
+
+        $content = "$input Email to remind me to check in once in a while. <em>(Recommended)</em>";
+        $labeledCheckbox = $this->markupGenerator->label($content, array());
+        $paragraphedCheckbox = $this->markupGenerator->paragraph($labeledCheckbox);
+        $this->elements[] = $paragraphedCheckbox;
     }
 } 
