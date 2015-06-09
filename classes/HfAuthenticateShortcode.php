@@ -222,12 +222,6 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
         return $_POST['password'] !== $_POST['passwordConfirmation'];
     }
 
-    private function makeRedirectMessage( $url ) {
-        $infoMessageText = 'Redirecting... <a href="' . $url . '">Click here</a> if you are not automatically redirected. <a href="' . $url . '">Onward!</a>';
-
-        return $this->markupGenerator->infoMessage( $infoMessageText );
-    }
-
     private function enqueueRegistrationErrorMessage()
     {
         $errorMessageText = "We're very sorry, but something seems to have gone wrong with your registration.";
@@ -242,10 +236,15 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private function processSuccessfulRegistration($userIdOrError)
     {
         $this->isRegistrationSuccessful = true;
-        $subscribed = isset( $_POST['accountability'] );
-        $this->cms->updateUserMeta($userIdOrError,'hfSubscribed',$subscribed);
+        $this->setUserSubscriptionPreference($userIdOrError);
         $this->processInvite($userIdOrError);
         $this->enqueueRegistrationSuccessMessage();
         $this->registrationMessages .= $this->loginForm->getOutput();
+    }
+
+    private function setUserSubscriptionPreference($userIdOrError)
+    {
+        $subscribed = isset($_POST['accountability']);
+        $this->cms->updateUserMeta($userIdOrError, 'hfSubscribed', $subscribed);
     }
 } 
