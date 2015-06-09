@@ -255,7 +255,7 @@ class TestHtmlGenerator extends HfTestCase {
     {
         $stats = $this->makeStats($currentStreak,$streaks);
 
-        return "<div class='report-card'><div class='front'>$stats$reportDiv</div><div class='back'></div></div>";
+        return "<div class='report-card'>$stats$reportDiv</div>";
     }
 
     private function makeStats($currentStreak,$streaks)

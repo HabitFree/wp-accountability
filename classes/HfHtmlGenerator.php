@@ -110,10 +110,10 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         $currentStreak,
         $streaks
     ) {
-        $front = $this->goalCardFront($goalId, $goalVerb, $daysSinceLastReport, $currentStreak, $streaks);
-        $back = $this->div('','back');
+        $stats = $this->stats($currentStreak,$streaks);
+        $reportDiv = $this->reportDiv($goalVerb, $goalId, $daysSinceLastReport);
 
-        return $this->div($front.$back,'report-card');
+        return $this->div($stats.$reportDiv,'report-card');
     }
 
     private function periodPhrase($daysSinceLastReport)
@@ -260,14 +260,5 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
             }
         }
         return $i;
-    }
-
-    private function goalCardFront($goalId, $goalVerb, $daysSinceLastReport, $currentStreak, $streaks)
-    {
-        $stats = $this->stats($currentStreak, $streaks);
-        $reportDiv = $this->reportDiv($goalVerb, $goalId, $daysSinceLastReport);
-
-        $front = $this->div($stats . $reportDiv, 'front');
-        return $front;
     }
 }
