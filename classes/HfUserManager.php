@@ -93,9 +93,7 @@ class HfUserManager implements Hf_iUserManager {
     private function sendWelcomeMessage($userId)
     {
         $settingsPageURL = $this->assetLocator->getPageUrlByTitle('Settings');
-        $message = "<p>Welcome to HabitFree!
-				You've been subscribed to periodic accountability emails.
-				You can <a href='" . $settingsPageURL . "'>edit your subscription settings by clicking here</a>.</p>";
+        $message = "<p>Welcome to HabitFree! You can <a href='$settingsPageURL'>edit your account settings by clicking here</a>.</p>";
         $this->messenger->sendEmailToUser($userId, 'Welcome!', $message);
     }
 }
