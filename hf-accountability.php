@@ -62,9 +62,14 @@ add_action( 'admin_menu', array( $HfAdminPanel, 'registerAdminPanel' ) );
 add_action( 'admin_head', array( $HfAdminPanel, 'addToAdminHead' ) );
 add_action( 'init', 'hfRegisterShortcodes' );
 add_action( 'init', 'hfAddPostTypes' );
+add_action( 'wp_enqueue_scripts', 'hfEnqueueScripts' );
 
 add_filter( 'user_can_richedit', 'hfDisableWysiwygForQuotes' );
 add_filter( 'enter_title_here', 'hfChangeEditTitleLabelForQuotations' );
+
+function hfEnqueueScripts() {
+    wp_enqueue_script( 'jquery' );
+}
 
 function hfRegisterShortcodes() {
     $Factory                 = new HfFactory();
