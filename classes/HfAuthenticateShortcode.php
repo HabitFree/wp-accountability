@@ -242,6 +242,8 @@ class HfAuthenticateShortcode implements Hf_iShortcode {
     private function processSuccessfulRegistration($userIdOrError)
     {
         $this->isRegistrationSuccessful = true;
+        $subscribed = isset( $_POST['accountability'] );
+        $this->cms->updateUserMeta($userIdOrError,'hfSubscribed',$subscribed);
         $this->processInvite($userIdOrError);
         $this->enqueueRegistrationSuccessMessage();
         $this->registrationMessages .= $this->loginForm->getOutput();

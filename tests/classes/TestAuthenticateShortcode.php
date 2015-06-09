@@ -610,4 +610,21 @@ class TestAuthenticateShortcode extends HfTestCase {
         $result = $this->mockedAuthenticateShortcode->getOutput();
         $this->assertContains('loginForm', $result);
     }
+
+    public function testUpdatesUserMeta() {
+        $this->setRegistrationPost();
+        $_POST['accountability'] = 'yes';
+        $this->setReturnValue($this->mockCms, 'isError', False);
+        $this->setReturnValue($this->mockCms, 'createUser', 7);
+        $this->expectOnce($this->mockCms,'updateUserMeta',array(7,'hfSubscribed',true));
+        $this->mockedAuthenticateShortcode->getOutput();
+    }
+
+    public function testUpdatesUserMetaWithNo() {
+        $this->setRegistrationPost();
+        $this->setReturnValue($this->mockCms, 'isError', False);
+        $this->setReturnValue($this->mockCms, 'createUser', 7);
+        $this->expectOnce($this->mockCms,'updateUserMeta',array(7,'hfSubscribed',false));
+        $this->mockedAuthenticateShortcode->getOutput();
+    }
 }
