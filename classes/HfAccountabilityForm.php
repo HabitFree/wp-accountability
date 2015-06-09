@@ -15,7 +15,7 @@ class HfAccountabilityForm extends HfForm {
     public function populate($goalSubs) {
 
         foreach ($goalSubs as $sub) {
-            $this->elements[] = $this->Goals->generateGoalCard($sub);
+            $this->elements[] = $this->Goals->goalCard($sub);
         }
 
         $this->elements[] = '<p><input class="submit" type="submit" name="submit" value="Submit" /></p>';
