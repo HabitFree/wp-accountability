@@ -155,4 +155,8 @@ class HfWordPress implements Hf_iCms {
     public function isNonceValid($nonce, $action) {
         return wp_verify_nonce($nonce, $action);
     }
+
+    public function updateUserMeta($userId, $metaName, $metaValue) {
+        update_user_meta( $userId, $metaName, $metaValue );
+    }
 } 
