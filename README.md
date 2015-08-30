@@ -20,6 +20,8 @@ Based on [this tutorial](http://codesymphony.co/writing-wordpress-plugin-unit-te
 
 #### Mac OS X 10.6.8
 
+Note that you may need to modify paths based on the version of WordPress you install.
+
 1. In terminal: 
 `cd /Applications/wordpress-4.3-0/apps/wordpress/htdocs/wp-content/plugins/wp-accountability/tests/`
 2. `mkdir wordpress-dev`
@@ -37,10 +39,23 @@ Based on [this tutorial](http://codesymphony.co/writing-wordpress-plugin-unit-te
 13. Change `define( 'DB_HOST', 'localhost' );` to `define( 'DB_HOST', 'localhost:/Applications/wordpress-4.3-0/mysql/tmp/mysql.sock' );`
 14. `^x` to exit and save; save as `wp-tests-config.php` while exiting
 15. `svn up`
-16. Download the latest stable release of [PHPUnit](https://phpunit.de/index.html) and copy it to 
+16. Download the latest stable release of [PHPUnit](https://phpunit.de/index.html) and move it to 
 `/Applications/wordpress-4.3-0/apps/wordpress/htdocs/wp-content/plugins/wp-accountability/tests`
 16. `cd /Applications/wordpress-4.3-0/apps/wordpress/htdocs/wp-content/plugins/wp-accountability/tests`
 17. `chmod +x phpunit.phar`
 18. `cp phpunit.phar /usr/local/bin/` (be sure to leave a copy in the `tests` folder)
-19. `cd tests/wordpress-dev/trunk/`
-20. Run `phpunit.phar`. If your installation of phpunit.phar is correct, PHPUnit should attempt to run the WordPress development tests. Otherwise, you should see a lot of html and error messages (commonly mysql connect error messages).
+20. `cp phpunit.phar /Applications/wordpress-4.3-0/php/lib/php`
+21. `cd tests/wordpress-dev/trunk/`
+22. Run `phpunit.phar`. If your installation of phpunit.phar is correct, PHPUnit should attempt to run the WordPress development tests. Otherwise, you should see a lot of html and error messages (commonly mysql connect error messages).
+23. Open the `wp-accountability` folder in PhpStorm
+24. Open PhpStorm preferences and select `Languages > PHP`
+25. Click the three dots by the "Interpreter" drop-down menu
+26. Click the plus sign at the top of the "Interpreters" dialog that appears and select "Other remote..."
+27. Click the three dots by "PHP executable"
+28. Set the path to the executable to `/Applications/wordpress-4.3-0/php/bin/php`
+29. Apply changes and close the "Interpreters" dialog
+30. Back in preferences, go to `Languages > PHP > PHPUnit`
+31. Set `PHPUnit library` to `Path to phpunit.phar`
+32. Set path to `/Applications/wordpress-4.3-0/apps/wordpress/htdocs/wp-content/plugins/wp-accountability/tests`
+33. Apply changes
+34. Right-click `tests/phpunit.xml` and select "Run phpunit.xml". If all is well, the HabitFree plugin tests should run within PhpStorm.
