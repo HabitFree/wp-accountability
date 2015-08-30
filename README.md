@@ -2,7 +2,7 @@
 
 ## Setting Up Your Development Environment
 
-### General Set-up
+### Installing PHP, MySQL, PhpMyAdmin, and WordPress
 
 Install [Bitnami Wordpress Stack](https://bitnami.com/stack/wordpress), taking careful 
 note of the login details and other settings chosen during installation.
@@ -16,11 +16,11 @@ Activate the plugin and (optionally) the theme within the WordPress admin panel
 
 ### Setting Up WordPress Testing in PhpStorm
 
-Based on [this tutorial](http://codesymphony.co/writing-wordpress-plugin-unit-tests/)
+Based on [this tutorial](http://codesymphony.co/writing-wordpress-plugin-unit-tests/).
 
 #### Mac OS X 10.6.8
 
-Note that you may need to modify paths based on the version of WordPress you install.
+These instructions assume that you've already installed the Bitnami WordPress Stack. Note that you may need to modify paths based on the version of WordPress you install.
 
 ##### Set up PHPUnit with WordPress
 
