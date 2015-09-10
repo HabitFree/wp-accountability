@@ -68,6 +68,6 @@ class HfAdminPanel extends HfForm {
 
     function addToAdminHead() {
         $cssURL = $this->cms->getPluginAssetUrl('admin.css');
-        echo "<link rel='stylesheet' type='text/css' href='" . $cssURL . "' />";
+        echo "<link rel='stylesheet' type='text/css' href='$cssURL' />";
     }
 }
