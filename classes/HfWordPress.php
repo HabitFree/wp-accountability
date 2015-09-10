@@ -159,4 +159,8 @@ class HfWordPress implements Hf_iCms {
     public function updateUserMeta($userId, $metaName, $metaValue) {
         update_user_meta( $userId, $metaName, $metaValue );
     }
+
+    public function registerPostType($postType, $args) {
+        register_post_type($postType, $args);
+    }
 } 

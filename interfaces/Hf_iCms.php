@@ -70,4 +70,6 @@ interface Hf_iCms {
     public function isNonceValid($nonce, $action);
 
     public function updateUserMeta($userId, $metaName, $metaValue);
+
+    public function registerPostType($postType, $args);
 }
