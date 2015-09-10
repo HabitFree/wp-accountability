@@ -31,7 +31,7 @@ interface Hf_iCms {
 
     public function getShortcodeOutput( $shortcode );
 
-    public function addPageToAdminMenu($name, $slug, $function);
+    public function addPageToAdminMenu($name, $slug, $function, $iconUrlOrName);
 
     public function getPluginAssetUrl( $fileName );
 

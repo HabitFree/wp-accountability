@@ -21,4 +21,14 @@ class TestAdminPanel extends HfTestCase {
 
         $this->assertEquals( $expectedHtml, $resultHtml );
     }
+
+    public function testSetsAdminPageIcon() {
+        $this->expectOnce(
+            $this->mockCms,
+            'addPageToAdminMenu',
+            array('HF Plugin', 'hfAdmin', array($this->mockedAdminPanel, 'generateAdminPanel'),'dashicons-unlock')
+        );
+
+        $this->mockedAdminPanel->registerAdminPanel();
+    }
 }
