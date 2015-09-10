@@ -77,8 +77,8 @@ class HfWordPress implements Hf_iCms {
         return do_shortcode( $shortcode );
     }
 
-    public function addPageToAdminMenu($name, $slug, $function, $iconUrlOrName) {
-        add_menu_page( $name, $name, 'activate_plugins', $slug, $function, $iconUrlOrName );
+    public function addPageToAdminMenu($name, $slug, $function, $iconUrlOrName, $position) {
+        add_menu_page( $name, $name, 'activate_plugins', $slug, $function, $iconUrlOrName, $position );
     }
 
     public function getPluginAssetUrl( $fileName ) {

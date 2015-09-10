@@ -29,7 +29,7 @@ class HfAdminPanel extends HfForm {
     }
 
     function registerAdminPanel() {
-        $this->cms->addPageToAdminMenu('HF Plugin', 'hfAdmin', array($this, 'generateAdminPanel'),'dashicons-unlock');
+        $this->cms->addPageToAdminMenu('HF Plugin', 'hfAdmin', array($this, 'generateAdminPanel'),'dashicons-unlock',3);
     }
 
     function generateAdminPanel() {

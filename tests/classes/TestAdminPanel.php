@@ -26,7 +26,7 @@ class TestAdminPanel extends HfTestCase {
         $this->expectOnce(
             $this->mockCms,
             'addPageToAdminMenu',
-            array('HF Plugin', 'hfAdmin', array($this->mockedAdminPanel, 'generateAdminPanel'),'dashicons-unlock')
+            array('HF Plugin', 'hfAdmin', array($this->mockedAdminPanel, 'generateAdminPanel'),'dashicons-unlock',3)
         );
 
         $this->mockedAdminPanel->registerAdminPanel();
