@@ -100,7 +100,6 @@ class HfAdminPanel extends HfForm {
             'public' => true,
             'show_ui' => true,
             'show_in_menu' => true,
-            'menu_position' => 5,
             'menu_icon' => 'dashicons-forms',
             'show_in_admin_bar' => false,
             'show_in_nav_menus' => false,
