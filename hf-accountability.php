@@ -89,19 +89,20 @@ function hfAddPostTypes() {
     register_post_type( 'hf_quotation',
         array(
             'labels'      => array(
-                'name'              => __( 'Quotations' ),
-                'singular_name'     => __( 'Quotation' ),
-                'menu_name'         => __( 'Quotations', 'text_domain' ),
-                'parent_item_colon' => __( 'Parent Quotation:', 'text_domain' ),
-                'all_items'         => __( 'All Quotations', 'text_domain' ),
-                'view_item'         => __( 'View Quotation', 'text_domain' ),
-                'add_new_item'      => __( 'Add New Quotation', 'text_domain' ),
-                'edit_item'         => __( 'Edit Quotation', 'text_domain' ),
-                'update_item'       => __( 'Update Quotation', 'text_domain' ),
-                'search_items'      => __( 'Search Quotation', 'text_domain' )
+                'name'              => 'Quotations',
+                'singular_name'     => 'Quotation',
+                'menu_name'         => 'Quotations',
+                'parent_item_colon' => 'Parent Quotation:',
+                'all_items'         => 'All Quotations',
+                'view_item'         => 'View Quotation',
+                'add_new_item'      => 'Add New Quotation',
+                'edit_item'         => 'Edit Quotation',
+                'update_item'       => 'Update Quotation',
+                'search_items'      => 'Search Quotation'
             ),
             'public'      => true,
             'has_archive' => true,
+            'menu_icon'   => 'dashicons-format-quote'
         )
     );
 
