@@ -63,3 +63,32 @@ These instructions assume that you've already installed the Bitnami WordPress St
 10. Set path to `/Applications/wordpress-4.3-0/apps/wordpress/htdocs/wp-content/plugins/wp-accountability/tests`
 11. Apply changes
 12. Right-click `tests/phpunit.xml` and select "Run phpunit.xml". If all is well, the HabitFree plugin tests should run within PhpStorm.
+
+##### Diagnosing Database Errors
+
+Before you try fixing the connection error, be sure it is really a connection error. One common error occurs when the test database becomes corrupted. To determine if that's the problem:
+
+1. In terminal, run `cd /Applications/wordpress-4.3-0/apps/wordpress/htdocs/wp-content/plugins/wp-accountability/tests/wordpress-dev/trunk/`
+2. `phpunit.phar >error.htm`
+3. `open error.htm`
+
+If the page that opens says the following, you have a test database corruption issue:
+
+"One or more database tables are unavailable. The database may need to be repaired."
+
+If that is the case, log into localhost:8080/phpmyadmin and drop all the tables from the wp_test database.
+
+If that isn't the probblem, make sure you are using a `DB_HOST` url of this format:
+
+     localhost:/Applications/wordpress-4.3-0/mysql/tmp/mysql.sock
+
+Double-check that `mysql.sock` is indeed at that location. If not, modify url as needed. One common problem is that you're using a different version of WordPress, so need to change the `wordpress-4.3-0` to match.
+
+Here's how to find your `mysql.sock` file:
+
+1. Run `open /Applications/wordpress-4.3-0/manager-osx.app/` in terminal
+2. In the window that appears, select the "Manage Servers" tab.
+3. Select "MySQL Database" from the server list.
+4. Click "Configure."
+5. Click "Open Log."
+6. The last line in the window that appears should say something like: `Version: '5.6.26'  socket: '/Applications/wordpress-4.3-0/mysql/tmp/mysql.sock'  port: 3306  Source distribution`
