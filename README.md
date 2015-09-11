@@ -74,7 +74,7 @@ Before you try fixing the connection error, be sure it is really a connection er
 
 If the page that opens says the following, you have a test database corruption issue:
 
-"One or more database tables are unavailable. The database may need to be repaired."
+> "One or more database tables are unavailable. The database may need to be repaired."
 
 If that is the case, log into localhost:8080/phpmyadmin and drop all the tables from the wp_test database. (Do not drop the database itself.) This error may be caused when the tests are inturrupted before they are completed.
 
