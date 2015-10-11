@@ -95,7 +95,7 @@ class HfAdminPanel extends HfForm {
             'label' => 'Survey Question',
             'description' => 'Questions displayed after report.',
             'labels' => $labels,
-            'supports' => array('title', 'revisions', 'custom-fields',),
+            'supports' => array('title', 'revisions'),
             'hierarchical' => false,
             'public' => true,
             'show_ui' => true,
