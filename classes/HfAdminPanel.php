@@ -28,9 +28,12 @@ class HfAdminPanel extends HfForm {
         $this->userManager = $userManager;
     }
 
-    function registerAdminPanel() {
-        $this->cms->addPageToAdminMenu('HF Plugin', 'hfAdmin', array($this, 'generateAdminPanel'),'dashicons-unlock',3);
+    function registerCustomPostTypes() {
         $this->registerSurveyQuestionCustomPostType();
+    }
+
+    function registerAdminPages() {
+        $this->cms->addPageToAdminMenu('HF Plugin', 'hfAdmin', array($this, 'generateAdminPanel'),'dashicons-unlock',3);
     }
 
     function generateAdminPanel() {

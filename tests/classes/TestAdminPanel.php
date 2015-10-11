@@ -17,7 +17,7 @@ class TestAdminPanel extends HfTestCase {
             array('HF Plugin', 'hfAdmin', array($this->mockedAdminPanel, 'generateAdminPanel'),'dashicons-unlock',3)
         );
 
-        $this->mockedAdminPanel->registerAdminPanel();
+        $this->mockedAdminPanel->registerAdminPages();
     }
 
     public function testCreatesCustomPostType() {
@@ -42,7 +42,7 @@ class TestAdminPanel extends HfTestCase {
             'label'               => 'Survey Question',
             'description'         => 'Questions displayed after report.',
             'labels'              => $labels,
-            'supports'            => array( 'title', 'revisions', 'custom-fields', ),
+            'supports'            => array( 'title', 'revisions'),
             'hierarchical'        => false,
             'public'              => true,
             'show_ui'             => true,
@@ -58,6 +58,6 @@ class TestAdminPanel extends HfTestCase {
         );
         $this->expectOnce($this->mockCms, 'registerPostType', array('hf_survey_question', $args));
 
-        $this->mockedAdminPanel->registerAdminPanel();
+        $this->mockedAdminPanel->registerCustomPostTypes();
     }
 }
