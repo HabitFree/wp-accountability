@@ -314,7 +314,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     private function resetMockedAdminPanel()
     {
         $this->mockedAdminPanel = new HfAdminPanel(
-            '',
+            'url',
             $this->mockMarkupGenerator,
             $this->mockMessenger,
             $this->mockAssetLocator,
