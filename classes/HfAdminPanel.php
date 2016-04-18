@@ -38,7 +38,7 @@ class HfAdminPanel extends HfForm {
         $currentUserId = $this->UserManager->getCurrentUserId();
 
         if (isset($_POST) && array_key_exists('sendTestReportRequestEmail', $_POST)) {
-            $this->Messenger->sendReportRequestEmail(1);
+            $this->Messenger->sendReportRequestEmail($currentUserId);
             echo '<p class="success">Test email sent.</p>';
         }
 

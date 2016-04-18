@@ -14,4 +14,12 @@ class TestAdminPanel extends HfTestCase {
         $this->expectOnce($this->mockUserManager, 'getCurrentUserId');
         $this->mockedAdminPanel->generateAdminPanel();
     }
+
+    public function testUsesCurrentUserIdToSendTestReportRequest() {
+        $_POST['sendTestReportRequestEmail'] = '';
+        $this->setReturnValue($this->mockUserManager, 'getCurrentUserId', 7);
+        $this->expectOnce($this->mockMessenger, 'sendReportRequestEmail', array(7));
+
+        $this->mockedAdminPanel->generateAdminPanel();
+    }
 }
