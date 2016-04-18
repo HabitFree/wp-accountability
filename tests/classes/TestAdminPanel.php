@@ -3,10 +3,6 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 require_once( dirname( dirname( __FILE__ ) ) . '/HfTestCase.php' );
 
 class TestAdminPanel extends HfTestCase {
-    // Helper Functions
-
-    // Tests
-
     public function testGenerateAdminPanelButtons() {
         $Mailer       = $this->makeMock( 'HfMailer' );
         $URLFinder    = $this->makeMock( 'HfUrlFinder' );
@@ -20,5 +16,10 @@ class TestAdminPanel extends HfTestCase {
         $resultHtml   = $AdminPanel->generateAdminPanelForm();
 
         $this->assertEquals( $expectedHtml, $resultHtml );
+    }
+
+    public function testGetsCurrentUserId() {
+        $this->expectOnce($this->mockUserManager, 'getCurrentUserId');
+        $this->mockedAdminPanel->generateAdminPanel();
     }
 }

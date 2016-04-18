@@ -35,13 +35,15 @@ class HfAdminPanel extends HfForm {
     function generateAdminPanel() {
         echo '<h1>HabitFree Admin Panel</h1>';
 
+        $currentUserId = $this->UserManager->getCurrentUserId();
+
         if (isset($_POST) && array_key_exists('sendTestReportRequestEmail', $_POST)) {
             $this->Messenger->sendReportRequestEmail(1);
             echo '<p class="success">Test email sent.</p>';
         }
 
         if (isset($_POST) && array_key_exists('sendTestInvite', $_POST)) {
-            $this->UserManager->sendInvitation(1, 'natethegreat.arthur@gmail.com', 7);
+            $this->UserManager->sendInvitation(1, 'natethegreat.arthur@gmail.com');
             echo '<p class="success">Test invite sent.</p>';
         }
 
