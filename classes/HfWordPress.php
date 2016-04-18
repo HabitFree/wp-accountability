@@ -13,7 +13,14 @@ class HfWordPress implements Hf_iCms {
     }
 
     public function sendEmail( $to, $subject, $message ) {
-        return wp_mail( $to, $subject, $message );
+        add_filter( 'wp_mail_content_type', array($this, 'set_html_content_type') );
+        $result = wp_mail($to, $subject, $message);
+        remove_filter( 'wp_mail_content_type', array($this, 'set_html_content_type') );
+        return $result;
+    }
+
+    function set_html_content_type() {
+        return 'text/html';
     }
 
     public function getSubscribedUsers() {
