@@ -43,7 +43,8 @@ class HfAdminPanel extends HfForm {
         }
 
         if (isset($_POST) && array_key_exists('sendTestInvite', $_POST)) {
-            $this->UserManager->sendInvitation(1, 'natethegreat.arthur@gmail.com');
+            $address = $this->Cms->getUserEmail($currentUserId);
+            $this->UserManager->sendInvitation($currentUserId, $address);
             echo '<p class="success">Test invite sent.</p>';
         }
 

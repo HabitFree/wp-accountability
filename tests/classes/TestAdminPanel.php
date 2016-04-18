@@ -22,4 +22,14 @@ class TestAdminPanel extends HfTestCase {
 
         $this->mockedAdminPanel->generateAdminPanel();
     }
+
+    public function testUsesCurrentUserIdToSendTestInvite() {
+        $_POST['sendTestInvite'] = '';
+        $this->setReturnValue($this->mockUserManager, 'getCurrentUserId', 7);
+        $this->setReturnValue($this->mockCms, 'getUserEmail', 'user@provider.com');
+
+        $this->expectOnce($this->mockUserManager, 'sendInvitation', array(7, 'user@provider.com'));
+
+        $this->mockedAdminPanel->generateAdminPanel();
+    }
 }
