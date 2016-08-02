@@ -1,15 +1,15 @@
 # wp-accountability
 
-## Setting Up Your Development Environment with Docker [recommended]
-
-Follow the instructions [at this link](https://github.com/HabitFree/hf-docker/blob/master/README.md).
-
-##### Set up PHPUnit with WordPress
+## Setting Up Your Development Environment with Docker
 
 Note that these instructions will only work within the [HabitFree
 Docker environment](https://github.com/HabitFree/hf-docker) and 
 after you've started the Docker environment containers using 
-`./restart-env.sh`.
+`./restart-env.sh`. Follow the instructions [at this 
+link](https://github.com/HabitFree/hf-docker/blob/master/README.md)
+before going on.
+
+##### Set up PHPUnit with WordPress
 
 0. In terminal, `cd` into `wp-accountability/tests/`
 0. `wget https://phar.phpunit.de/phpunit.phar`
