@@ -4,6 +4,58 @@
 
 Follow the instructions [at this link](https://github.com/HabitFree/hf-docker/blob/master/README.md).
 
+##### Set up PHPUnit with WordPress
+
+Note that these instructions will only work within the [HabitFree
+Docker environment](https://github.com/HabitFree/hf-docker) and 
+after you've started the Docker environment containers using 
+`./restart-env.sh`.
+
+0. In terminal, `cd` into `wp-accountability/tests/`
+0. `wget https://phar.phpunit.de/phpunit.phar`
+0. `chmod +x phpunit.phar`
+0. `mkdir wordpress-dev`
+0. `cd wordpress-dev`
+0. `svn co http://develop.svn.wordpress.org/trunk/`
+0. `cd trunk`
+0. `cp ../../wp-tests-config.php .`
+0. `svn up`
+0. `../../phpunit.phar`
+
+If your installation of phpunit.phar is correct, PHPUnit should 
+attempt to run the WordPress development tests. Otherwise, you 
+should see a lot of html and error messages (commonly mysql 
+connect error messages).
+
+If you get this error:
+
+> Your PHP installation appears to be missing the MySQL extension which is required by WordPress.
+
+Do this in Debian-based linux:
+
+```
+sudo apt-get install php5-mysql
+sudo service apache2 restart
+```
+
+And then try running `phpunit.phar` again.
+
+##### Set up PHPUnit testing in PhpStorm
+
+1. Open the `wp-accountability` folder in PhpStorm
+2. Open PhpStorm preferences and select `Languages > PHP`
+3. Click the three dots by the "Interpreter" drop-down menu
+4. Click the plus sign at the top of the "Interpreters" dialog that appears and select "Other remote..."
+5. Click the three dots by "PHP executable"
+6. Set the path to the executable to `/Applications/wordpress-4.3-0/php/bin/php`
+7. Apply changes and close the "Interpreters" dialog
+8. Back in preferences, go to `Languages > PHP > PHPUnit`
+9. Set `PHPUnit library` to `Path to phpunit.phar`
+10. Set path to `/Applications/wordpress-4.3-0/apps/wordpress/htdocs/wp-content/plugins/wp-accountability/tests`
+11. Apply changes
+12. Right-click `tests/phpunit.xml` and select "Run phpunit.xml". If all is well, the HabitFree plugin tests should run within PhpStorm.
+
+
 ## Setting Up Your Development Environment with Bitnami [old]
 
 ### Installing PHP, MySQL, PhpMyAdmin, and WordPress
