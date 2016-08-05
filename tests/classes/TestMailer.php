@@ -40,7 +40,7 @@ class TestMailer extends HfTestCase {
     }
 
     public function testSendEmailToUserAndSpecifyEmailID() {
-        $this->setReturnValue( $this->mockCms, 'sendWpEmail', true );
+        $this->setReturnValue( $this->mockCms, 'sendEmail', true );
         $this->setReturnValue( $this->mockCms, 'getUserEmail', 'me@test.com' );
 
         $this->expectAtLeastOnce( $this->mockDatabase, 'recordEmail', array(1, 'test subject', 'test body', 123, 'me@test.com') );
