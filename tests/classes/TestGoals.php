@@ -136,14 +136,14 @@ class TestGoals extends HfTestCase {
         $this->mockedGoals->sendReportRequestEmails();
     }
 
-    public function testGenerateGoalCardUsesDatabaseGetGoalMethod() {
+    public function testgoalCardUsesDatabaseGetGoalMethod() {
         $this->setReturnValsForGoalCardCreation();
         $this->setReturnValsForFindingStreaks(array(array(0,true),array(1,false)));
 
         $this->expectOnce( $this->mockDatabase, 'getGoal', array(1) );
 
         $MockSub = $this->makeMockGoalSub();
-        $this->mockedGoals->generateGoalCard( $MockSub );
+        $this->mockedGoals->goalCard( $MockSub );
     }
 
     private function setReturnValsForGoalCardCreation()
@@ -170,7 +170,7 @@ class TestGoals extends HfTestCase {
             array(0)
         ));
 
-        $this->mockedGoals->generateGoalCard($MockSub);
+        $this->mockedGoals->goalCard($MockSub);
     }
 
     public function testReturnsHtmlGeneratorMadeGoalCard() {
@@ -179,7 +179,7 @@ class TestGoals extends HfTestCase {
         $MockSub = $this->makeMockGoalSub();
         $this->setReturnValue($this->mockMarkupGenerator, 'goalCard', 'goose');
 
-        $result = $this->mockedGoals->generateGoalCard($MockSub);
+        $result = $this->mockedGoals->goalCard($MockSub);
 
         $this->assertEquals('goose', $result);
     }
@@ -198,7 +198,7 @@ class TestGoals extends HfTestCase {
             false,
             0
         ));
-        $this->mockedGoals->generateGoalCard($mockSub);
+        $this->mockedGoals->goalCard($mockSub);
     }
 
     private function makeMockGoal()
@@ -280,7 +280,7 @@ class TestGoals extends HfTestCase {
             array(0)
         ));
 
-        $this->mockedGoals->generateGoalCard($MockSub);
+        $this->mockedGoals->goalCard($MockSub);
     }
 
     public function testFindsStreaksWhenMakingGoalCard() {
@@ -288,6 +288,6 @@ class TestGoals extends HfTestCase {
         $this->setReturnValues($this->mockStreaks,'streaks',array(array(0),array(0)));
         $this->expectAtLeastOnce($this->mockStreaks,'streaks',array(1,7));
         $mockSub = $this->makeMockGoalSub();
-        $this->mockedGoals->generateGoalCard($mockSub);
+        $this->mockedGoals->goalCard($mockSub);
     }
 }

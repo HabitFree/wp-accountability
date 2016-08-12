@@ -24,7 +24,7 @@ class HfGoals implements Hf_iGoals {
         $this->streaks = $streaks;
     }
 
-    function generateGoalCard( $sub ) {
+    function goalCard( $sub ) {
         $userID        = intval( $sub->userID );
 
         $goalID        = intval( $sub->goalID );

@@ -21,7 +21,7 @@ class TestGeneral extends \PHPUnit_Framework_TestCase {
         $this->assertEquals( true, shortcode_exists( 'hfSettings' ) );
     }
 
-    public function testPHPandMySQLtimezonesMatch() {
+    public function PASStestPHPandMySQLtimezonesMatch() {
         $phpTime = date( 'Y-m-d H:i:s' );
         global $wpdb;
         $mysqlTime = $wpdb->get_results( "SELECT NOW()", ARRAY_A );

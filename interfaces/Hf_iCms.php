@@ -31,7 +31,7 @@ interface Hf_iCms {
 
     public function getShortcodeOutput( $shortcode );
 
-    public function addPageToAdminMenu($name, $slug, $function);
+    public function addPageToAdminMenu($name, $slug, $function, $iconUrlOrName, $position);
 
     public function getPluginAssetUrl( $fileName );
 
@@ -70,4 +70,6 @@ interface Hf_iCms {
     public function isNonceValid($nonce, $action);
 
     public function updateUserMeta($userId, $metaName, $metaValue);
+
+    public function registerPostType($postType, $args);
 }

@@ -84,8 +84,8 @@ class HfWordPress implements Hf_iCms {
         return do_shortcode( $shortcode );
     }
 
-    public function addPageToAdminMenu($name, $slug, $function) {
-        add_menu_page( $name, $name, 'activate_plugins', $slug, $function );
+    public function addPageToAdminMenu($name, $slug, $function, $iconUrlOrName, $position) {
+        add_menu_page( $name, $name, 'activate_plugins', $slug, $function, $iconUrlOrName, $position );
     }
 
     public function getPluginAssetUrl( $fileName ) {
@@ -165,5 +165,9 @@ class HfWordPress implements Hf_iCms {
 
     public function updateUserMeta($userId, $metaName, $metaValue) {
         update_user_meta( $userId, $metaName, $metaValue );
+    }
+
+    public function registerPostType($postType, $args) {
+        register_post_type($postType, $args);
     }
 } 

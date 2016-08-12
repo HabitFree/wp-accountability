@@ -4,6 +4,8 @@
  * Set up environment for my plugin's tests suite.
  */
 
+system('mysql -h127.0.0.1 -P3306 -pqwerqwer -uroot -e"DROP DATABASE IF EXISTS wp_test; CREATE DATABASE wp_test;"');
+
     /**
      * The path to the WordPress tests checkout.
      */

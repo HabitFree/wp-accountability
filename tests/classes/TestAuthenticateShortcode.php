@@ -388,7 +388,7 @@ class TestAuthenticateShortcode extends HfTestCase {
 
     public function testAuthenticationShortcodeDoesntDisplayAuthenticiationFormWhenLoggedIn() {
         $this->setReturnValue( $this->mockUserManager, 'isUserLoggedIn', true );
-        $this->expectNever( $this->mockMarkupGenerator, 'generateTabs' );
+        $this->expectNever( $this->mockMarkupGenerator, 'tabs' );
 
         $this->mockedAuthenticateShortcode->getOutput();
     }
