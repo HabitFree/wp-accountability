@@ -3,7 +3,52 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 require_once( dirname( dirname( __FILE__ ) ) . '/HfTestCase.php' );
 
 class TestHealth extends HfTestCase {
-    public function testHasGetHealthMethod() {
-        $this->mockedHealth->getHealth(1, 1);
+    private function getHealth($days) {
+        $exponent = 2 / (365+1);
+        $health = 0;
+
+        foreach ($days as $day) {
+            $health = (intval($day) * $exponent) + ($health * (1-$exponent));
+        }
+
+        return $health;
+    }
+
+    private function makeReports($days) {
+        $reports = array();
+
+        foreach ($days as $i => $day) {
+            $time = strtotime("+$i days");
+
+            $report = new stdClass();
+            $report->isSuccessful = intval($day);
+            $report->date = date('Y-m-d H:i:s', $time);
+
+            $reports[] = $report;
+        }
+
+        return $reports;
+    }
+
+    public function testReturnsZeroWhenNoReports() {
+        $this->setReturnValue($this->mockDatabase,'getAllReportsForGoal',array());
+        $result = $this->mockedHealth->getHealth(1, 1);
+        $this->assertEquals($result, 0);
+    }
+
+    public function testReturnsCorrectValueFor5daysOfSetback() {
+        $days = str_pad('',360,'1');
+        $days = str_pad($days,365,'0');
+        $days = str_split($days);
+
+        $health = $this->getHealth($days);
+        $reports = $this->makeReports($days);
+        $this->setReturnValue($this->mockDatabase,'getAllReportsForGoal',$reports);
+
+        var_dump($reports);
+
+        $result = $this->mockedHealth->getHealth(1,1);
+
+        $this->assertEquals($health, $result);
     }
 }
