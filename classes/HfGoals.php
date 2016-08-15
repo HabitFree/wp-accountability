@@ -14,7 +14,8 @@ class HfGoals implements Hf_iGoals {
         Hf_iMarkupGenerator $markupGenerator,
         Hf_iDatabase $database,
         Hf_iCodeLibrary $codeLibrary,
-        Hf_iStreaks $streaks
+        Hf_iStreaks $streaks,
+        Hf_iHealth $health
     ) {
         $this->messenger = $messenger;
         $this->cms = $cms;
@@ -22,6 +23,7 @@ class HfGoals implements Hf_iGoals {
         $this->database = $database;
         $this->codeLibrary = $codeLibrary;
         $this->streaks = $streaks;
+        $this->health = $health;
     }
 
     function goalCard( $sub ) {
@@ -32,14 +34,14 @@ class HfGoals implements Hf_iGoals {
         $daysSinceLastReport = $this->database->daysSinceLastReport($goalID, $userID);
 
         $currentStreak = $this->currentStreak($goalID,$userID);
-        $streaks = $this->streaks->streaks($goalID,$userID);
+        $health = $this->health->getHealth($goalID, $userID);
 
         $card = $this->markupGenerator->goalCard(
             $goalID,
             $goal->title,
             $daysSinceLastReport,
             $currentStreak,
-            $streaks
+            $health
         );
 
         return $card;

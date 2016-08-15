@@ -108,12 +108,24 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         $goalVerb,
         $daysSinceLastReport,
         $currentStreak,
-        $streaks
+        $health
     ) {
-        $stats = $this->stats($currentStreak,$streaks);
+        $stats = $this->stats($currentStreak,$health,$goalId);
         $reportDiv = $this->reportDiv($goalVerb, $goalId, $daysSinceLastReport);
 
         return $this->div($stats.$reportDiv,'report-card');
+    }
+
+    private function stats($currentStreak, $health, $goalId)
+    {
+        $chartScript = "<script type=\"text/javascript\">
+            function drawChart$goalId() {
+                drawChart('chart$goalId', $health);
+            }
+            google.charts.setOnLoadCallback(drawChart$goalId);
+        </script>";
+        $chartDiv = "<div id='chart$goalId'></div>";
+        return "<div class='streaks'>$chartDiv$chartScript</div>";
     }
 
     private function periodPhrase($daysSinceLastReport)
@@ -133,14 +145,6 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         }
 
         return $prefix .' <span class=\'duration\'><strong>'. $time .'</strong>?</span>';
-    }
-
-    private function stats($currentStreak,$streaks)
-    {
-        $header = '<h4>Personal Bests</h4>';
-        $body = $this->statsTableBody($currentStreak,$streaks);
-        $table = "<table>$body</table>";
-        return "<div class='streaks'>$header$table</div>";
     }
 
     private function reportDiv($goalVerb, $goalId, $daysSinceLastReport)

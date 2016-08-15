@@ -155,6 +155,7 @@ class TestGoals extends HfTestCase {
         $this->setReturnValue($this->mockDatabase, 'getLevel', $MockLevel);
 
         $this->setReturnValue($this->mockDatabase, 'daysSinceLastReport', 3.1415);
+        $this->setReturnValue($this->mockHealth, 'getHealth', .5);
     }
 
     public function testUsesHtmlGeneratorToMakeGoalCard() {
@@ -167,7 +168,7 @@ class TestGoals extends HfTestCase {
             'Title',
             3.1415000000000002,
             0,
-            array(0)
+            .5
         ));
 
         $this->mockedGoals->goalCard($MockSub);
@@ -277,7 +278,7 @@ class TestGoals extends HfTestCase {
             'Title',
             $daysSinceLastReport,
             $currentStreak,
-            array(0)
+            .5
         ));
 
         $this->mockedGoals->goalCard($MockSub);
@@ -289,5 +290,21 @@ class TestGoals extends HfTestCase {
         $this->expectAtLeastOnce($this->mockStreaks,'streaks',array(1,7));
         $mockSub = $this->makeMockGoalSub();
         $this->mockedGoals->goalCard($mockSub);
+    }
+
+    public function testUsesHealthToMakeGoalCard() {
+        $this->setReturnValsForGoalCardCreation();
+        $this->setReturnValsForFindingStreaks();
+        $MockSub = $this->makeMockGoalSub();
+
+        $this->expectOnce($this->mockMarkupGenerator, 'goalCard', array(
+            1,
+            'Title',
+            3.1415000000000002,
+            0,
+            .5
+        ));
+
+        $this->mockedGoals->goalCard($MockSub);
     }
 }

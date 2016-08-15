@@ -127,10 +127,17 @@ class HfFactory {
         $Database      = $this->makeDatabase();
         $HtmlGenerator = $this->makeMarkupGenerator();
         $Mailer        = $this->makeMessenger();
-        $codeLibrary = $this->makeCodeLibrary();
-        $streaks = $this->makeStreaks();
+        $codeLibrary   = $this->makeCodeLibrary();
+        $streaks       = $this->makeStreaks();
+        $health        = $this->makeHealth();
 
-        return new HfGoals( $Mailer, $Cms, $HtmlGenerator, $Database, $codeLibrary, $streaks );
+        return new HfGoals( $Mailer, $Cms, $HtmlGenerator, $Database, $codeLibrary, $streaks, $health );
+    }
+
+    public function makeHealth() {
+        $database = $this->makeDatabase();
+
+        return new HfHealth($database);
     }
 
     public function makeStreaks() {

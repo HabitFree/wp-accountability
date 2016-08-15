@@ -130,13 +130,10 @@ class TestHtmlGenerator extends HfTestCase {
             $verb,
             $daysSinceLastReport,
             0,
-            array()
+            50
         );
 
-        $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
-        $expected = $this->makeReportCard($reportDiv,0,array());
-
-        $this->assertEquals($expected, $result);
+        $this->assertContains('in the last <span class=\'duration\'><strong>3 days</strong>?</span>', $result);
     }
 
     public function testMakeParagraphWithClass() {
@@ -145,330 +142,47 @@ class TestHtmlGenerator extends HfTestCase {
         $this->assertEquals($expected, $result);
     }
 
-    public function testMakeGoalCardDoesntSay1Days() {
-        $verb = 'Title';
-        $goalId = 1;
-        $daysSinceLastReport = 1;
-
-        $result = $this->mockedMarkupGenerator->goalCard(
-            $goalId,
-            $verb,
-            $daysSinceLastReport,
-            0,
-            array()
-        );
-
-        $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>day</strong>?</span>');
-        $expected = $this->makeReportCard($reportDiv,0,array());
-
-        $this->assertEquals($result, $expected);
-    }
-
-    public function testMakeGoalCardSaysToday() {
-        $verb = 'Title';
-        $goalId = 1;
-        $daysSinceLastReport = 0;
-
-        $result = $this->mockedMarkupGenerator->goalCard(
-            $goalId,
-            $verb,
-            $daysSinceLastReport,
-            0,
-            array()
-        );
-
-        $reportDiv = $this->makeReportDiv($verb, 'since your <span class=\'duration\'><strong>last check-in</strong>?</span>');
-        $expected = $this->makeReportCard($reportDiv, 0, array());
-
-        $this->assertEquals($result, $expected);
-    }
-
-    public function testMakeGoalCardRecognizesNoReport() {
-        $verb = 'Title';
-        $goalId = 1;
-        $daysSinceLastReport = false;
-
-        $result = $this->mockedMarkupGenerator->goalCard(
-            $goalId,
-            $verb,
-            $daysSinceLastReport,
-            0,
-            array()
-        );
-
-        $reportDiv = $this->makeReportDiv($verb,'in the last <span class=\'duration\'><strong>24 hours</strong>?</span>');
-        $expected = $this->makeReportCard($reportDiv,0,array());
-
-        $this->assertEquals($result, $expected);
-    }
-
-    public function testMakeGoalCardRoundsNumbers() {
-        $verb = 'Title';
-        $goalId = 1;
-        $daysSinceLastReport = 3.1415;
-
-        $result = $this->mockedMarkupGenerator->goalCard(
-            $goalId,
-            $verb,
-            $daysSinceLastReport,
-            0,
-            array()
-        );
-
-        $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
-        $expected = $this->makeReportCard($reportDiv,0,array());
-
-        $this->assertEquals($result, $expected);
-    }
-
-    public function testRoundsStreakLength() {
-        $verb = 'Title';
-        $goalId = 1;
-        $daysSinceLastReport = 3.1415;
-        $streaks = array(1,2,3,0);
-
-        $result = $this->mockedMarkupGenerator->goalCard(
-            $goalId,
-            $verb,
-            $daysSinceLastReport,
-            0,
-            $streaks
-        );
-
-        $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
-        $expected = $this->makeReportCard($reportDiv,0,$streaks);
-
-        $this->assertEquals($expected, $result);
-    }
-
-    private function makeReportDiv($verb, $periodPhrase)
-    {
-        $controls = "<div class='controls'>" .
-            "<label class='success'><input type='radio' name='1' value='1'> No</label>" .
-            "<label class='setback'><input type='radio' name='1' value='0'> Yes</label>" .
-            "</div>";
-        $reportDiv = "<div class='report'>Did you <strong class='verb'>$verb</strong> $periodPhrase$controls</div>";
-        return $reportDiv;
-    }
-
-    private function makeReportCard($reportDiv, $currentStreak, $streaks)
-    {
-        $stats = $this->makeStats($currentStreak,$streaks);
-
-        return "<div class='report-card'>$stats$reportDiv</div>";
-    }
-
-    private function makeStats($currentStreak,$streaks)
-    {
-        $streaks = array_slice($streaks,-10);
-        $rows = $this->makeRows($currentStreak,$streaks);
-
-        $header = '<h4>Personal Bests</h4>';
-        $body = "<tbody>$rows</tbody>";
-        $table = "<table>$body</table>";
-
-        return "<div class='streaks'>$header$table</div>";
-    }
-
     private function redirectScript($url)
     {
         return "<script>window.location.replace('$url');</script>";
     }
 
-    public function testUsesDaysWord() {
-        $verb = 'Title';
-        $goalId = 1;
-        $daysSinceLastReport = 3.1415;
-        $streaks = array(array('length'=>3.3333,'date'=>'date','rank'=>'rank'));
-
-        $result = $this->mockedMarkupGenerator->goalCard(
-            $goalId,
-            $verb,
-            $daysSinceLastReport,
-            0,
-            $streaks
-        );
-
-        $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
-        $expected = $this->makeReportCard($reportDiv,0,$streaks);
-
-        $this->assertEquals($expected, $result);
-    }
-
-    private function makeRows($currentStreak, $streaks)
-    {
-        rsort($streaks);
-
-        $rankedStreaks = array();
-        $rank = 1;
-        foreach ($streaks as $streak) {
-            $rankedStreaks[] = array($rank,$streak);
-            $rank++;
-        }
-
-        $areaStreaks = $this->trimStreaksToNeighborhood($currentStreak, $rankedStreaks);
-
-        $rows = '';
-        foreach ($areaStreaks as $streak) {
-            $isCurrent = $currentStreak === $streak[1];
-            if ($isCurrent) {
-                $row = $this->makeRow($streak, true);
-                $currentStreak = null;
-            } else {
-                $row = $this->makeRow($streak, false);
-            }
-
-            $rows .= $row;
-        }
-        return $rows;
-    }
-
-    private function makeRow($streak, $isCurrent)
-    {
-        $lengthPhrase = $this->streakPhrase($streak[1]);
-        $class = ($isCurrent) ? ' class="current"' : '';
-        $row = "<tr$class><td class='rank'>{$streak[0]}</td><td>$lengthPhrase</td></tr>";
-        return $row;
-    }
-
-    private function streakPhrase($length)
-    {
-        $d = round($length,1);
-        return ($d != 1) ? "$d days" : "$d day";
-    }
-
-    public function testSaysSingleDay() {
-        $verb = 'Title';
-        $goalId = 1;
-        $daysSinceLastReport = 3.1415;
-        $streaks = array(array('length'=>1,'date'=>'date','rank'=>'rank'));
-
-        $result = $this->mockedMarkupGenerator->goalCard(
-            $goalId,
-            $verb,
-            $daysSinceLastReport,
-            0,
-            $streaks
-        );
-
-        $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
-        $expected = $this->makeReportCard($reportDiv,0,$streaks);
-
-        $this->assertEquals($expected, $result);
-    }
-
-    public function testOnlyShowsFiveStreaks() {
+    public function testIncludesIdChartDivs() {
         $verb = 'Title';
         $goalId = 1;
         $daysSinceLastReport = 3.1415;
         $currentStreak = 1;
-        $streaks = array(1,1,1,1,1,1);
+        $health = 50;
 
         $result = $this->mockedMarkupGenerator->goalCard(
             $goalId,
             $verb,
             $daysSinceLastReport,
             $currentStreak,
-            $streaks
+            $health
         );
 
-        $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
-        $expected = $this->makeReportCard($reportDiv,$currentStreak,$streaks);
+        $needle = "<div id='chart1'>";
 
-        $this->assertEquals($expected,$result);
+        $this->assertContains($needle, $result);
     }
 
-    private function trimStreaksToNeighborhood($currentStreak, $streaks)
-    {
-        usort($streaks, function($a,$b) {
-            return $a[0] - $b[0];
-        });
-        $len = count($streaks);
-        $i = $this->findCurrentStreakIndex($currentStreak, $streaks);
-
-        if ($i < 3) {
-            $streaks = array_slice($streaks, 0, 5);
-            return $streaks;
-        } elseif (($len - $i) < 3) {
-            $streaks = array_slice($streaks, -5);
-            return $streaks;
-        } else {
-            $streaks = array_slice($streaks, $i - 2, 5);
-            return $streaks;
-        }
-    }
-
-    public function testSortsStreaks() {
+    public function testIncludesIndividualChartInitScripts() {
         $verb = 'Title';
         $goalId = 1;
         $daysSinceLastReport = 3.1415;
         $currentStreak = 1;
-        $streaks = array(3,1,7,2,4);
+        $health = 50;
 
         $result = $this->mockedMarkupGenerator->goalCard(
             $goalId,
             $verb,
             $daysSinceLastReport,
             $currentStreak,
-            $streaks
+            $health
         );
 
-        $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
-        $expected = $this->makeReportCard($reportDiv,$currentStreak,$streaks);
-
-        $this->assertEquals($expected,$result);
-    }
-
-    public function testTrimsStreaksRelativeToCurrentStreak() {
-        $verb = 'Title';
-        $goalId = 1;
-        $daysSinceLastReport = 3.1415;
-        $currentStreak = 1;
-        $streaks = array(3,1,7,2,4,100);
-
-        $result = $this->mockedMarkupGenerator->goalCard(
-            $goalId,
-            $verb,
-            $daysSinceLastReport,
-            $currentStreak,
-            $streaks
-        );
-
-        $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
-        $expected = $this->makeReportCard($reportDiv,$currentStreak,$streaks);
-
-        $this->assertEquals($expected,$result);
-    }
-
-    public function testRanksStreaks() {
-        $verb = 'Title';
-        $goalId = 1;
-        $daysSinceLastReport = 3.1415;
-        $currentStreak = 1;
-        $streaks = array(1,1,1,1,1);
-
-        $result = $this->mockedMarkupGenerator->goalCard(
-            $goalId,
-            $verb,
-            $daysSinceLastReport,
-            $currentStreak,
-            $streaks
-        );
-
-        $reportDiv = $this->makeReportDiv($verb, 'in the last <span class=\'duration\'><strong>3 days</strong>?</span>');
-        $expected = $this->makeReportCard($reportDiv,$currentStreak,$streaks);
-
-        $this->assertEquals($expected,$result);
-    }
-
-    private function findCurrentStreakIndex($currentStreak, $streaks)
-    {
-        $i = null;
-        foreach ($streaks as $key => $val) {
-            if ($val[1] === $currentStreak) {
-                $i = $key;
-            }
-        }
-        return $i;
+        $needle = "google.charts.setOnLoadCallback(drawChart1);";
+        $this->assertContains($needle, $result);
     }
 }

@@ -32,7 +32,7 @@ interface Hf_iMarkupGenerator {
         $goalVerb,
         $daysSinceLastReport,
         $currentStreak,
-        $streaks
+        $health
     );
 
     public function refreshScript();
