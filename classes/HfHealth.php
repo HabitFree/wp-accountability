@@ -18,21 +18,27 @@ class HfHealth implements Hf_iHealth
             return 0;
         }
 
+        $firstDate = reset($reports)->date;
         $lastDate = end($reports)->date;
+        $firstDateClean = explode(' ', $firstDate)[0];
         $lastDateClean = explode(' ', $lastDate)[0];
-        $dayStats = $this->getDayStats($lastDateClean, $reports);
+
+        $dayStats = $this->getDayStats($firstDateClean, $lastDateClean, $reports);
 
         return $this->calculateHealth($dayStats);
     }
 
-    private function getDayStats($lastDateClean, $reports) {
+    private function getDayStats($firstDateClean, $lastDateClean, $reports) {
         $status = 0;
         $dayStats = [];
+        $timeLimit = strtotime($firstDateClean);
 
         for ($i = 0; $i < 365; $i++) {
             $time = strtotime("-$i days", strtotime($lastDateClean));
-            $status = $this->getDayStatus($reports, $time, $status);
+            if ($time < $timeLimit) break;
 
+            $status = $this->getDayStatus($reports, $time, $status);
+            
             array_unshift($dayStats, $status);
         }
         return $dayStats;
@@ -66,13 +72,13 @@ class HfHealth implements Hf_iHealth
     }
 
     private function calculateHealth($days) {
-        $exponent = 2 / (365+1);
+        $exponent = 2 / 97;
         $health = 0;
 
         foreach ($days as $day) {
             $health = (intval($day) * $exponent) + ($health * (1-$exponent));
         }
 
-        return $health;
+        return round($health,3);
     }
 }

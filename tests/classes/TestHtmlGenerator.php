@@ -185,4 +185,23 @@ class TestHtmlGenerator extends HfTestCase {
         $needle = "google.charts.setOnLoadCallback(drawChart1);";
         $this->assertContains($needle, $result);
     }
+
+    public function testMultipliesHealthBy100() {
+        $verb = 'Title';
+        $goalId = 1;
+        $daysSinceLastReport = 3.1415;
+        $currentStreak = 1;
+        $health = .5;
+
+        $result = $this->mockedMarkupGenerator->goalCard(
+            $goalId,
+            $verb,
+            $daysSinceLastReport,
+            $currentStreak,
+            $health
+        );
+
+        $needle = "50";
+        $this->assertContains($needle, $result);
+    }
 }
