@@ -42,11 +42,11 @@ class HfHealth implements Hf_iHealth
         $dayReports = $this->getReportsForDay($reports, $time);
 
         if ($dayReports === null) {
-            return ($lastStatus === 0) ? 0 : $lastStatus;
+            return $lastStatus;
         }
 
         for ($i = 0; $i < count($dayReports); $i++) {
-            if ($dayReports[$i]->isSuccessful === 0) {
+            if ($dayReports[$i]->isSuccessful == 0) {
                 return 0;
             }
         }

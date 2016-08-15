@@ -21,7 +21,7 @@ class TestHealth extends HfTestCase {
             $time = strtotime("+$i days");
 
             $report = new stdClass();
-            $report->isSuccessful = intval($day);
+            $report->isSuccessful = strval($day);
             $report->date = date('Y-m-d H:i:s', $time);
 
             $reports[] = $report;
@@ -44,8 +44,6 @@ class TestHealth extends HfTestCase {
         $health = $this->getHealth($days);
         $reports = $this->makeReports($days);
         $this->setReturnValue($this->mockDatabase,'getAllReportsForGoal',$reports);
-
-        var_dump($reports);
 
         $result = $this->mockedHealth->getHealth(1,1);
 
