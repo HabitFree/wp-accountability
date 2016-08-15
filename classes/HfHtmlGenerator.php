@@ -108,15 +108,16 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
         $goalVerb,
         $daysSinceLastReport,
         $currentStreak,
+        $longestStreak,
         $health
     ) {
-        $stats = $this->stats($currentStreak,$health,$goalId);
+        $stats = $this->stats($currentStreak,$longestStreak,$health,$goalId);
         $reportDiv = $this->reportDiv($goalVerb, $goalId, $daysSinceLastReport);
 
         return $this->div($stats.$reportDiv,'report-card');
     }
 
-    private function stats($currentStreak, $health, $goalId)
+    private function stats($currentStreak, $longestStreak, $health, $goalId)
     {
         $health = $health * 100;
         $chartScript = "<script type=\"text/javascript\">
@@ -126,7 +127,9 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
             google.charts.setOnLoadCallback(drawChart$goalId);
         </script>";
         $chartDiv = "<div id='chart$goalId'></div>";
-        return "<div class='streaks'>$chartDiv$chartScript</div>";
+        $streakStats = "<div class='stat'>Current <span class='number'>$currentStreak</span> Streak</div>
+            <div class='stat'>Longest <span class='number'>$longestStreak</span> Streak</div>";
+        return "<div class='streaks'>$chartDiv$chartScript$streakStats</div>";
     }
 
     private function periodPhrase($daysSinceLastReport)

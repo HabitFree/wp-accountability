@@ -32,6 +32,7 @@ interface Hf_iMarkupGenerator {
         $goalVerb,
         $daysSinceLastReport,
         $currentStreak,
+        $longestStreak,
         $health
     );
 

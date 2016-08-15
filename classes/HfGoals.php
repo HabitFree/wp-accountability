@@ -27,20 +27,22 @@ class HfGoals implements Hf_iGoals {
     }
 
     function goalCard( $sub ) {
-        $userID        = intval( $sub->userID );
+        $userId        = intval( $sub->userID );
 
-        $goalID        = intval( $sub->goalID );
-        $goal          = $this->database->getGoal( $goalID );
-        $daysSinceLastReport = $this->database->daysSinceLastReport($goalID, $userID);
+        $goalId        = intval( $sub->goalID );
+        $goal          = $this->database->getGoal( $goalId );
+        $daysSinceLastReport = $this->database->daysSinceLastReport($goalId, $userId);
 
-        $currentStreak = $this->currentStreak($goalID,$userID);
-        $health = $this->health->getHealth($goalID, $userID);
+        $currentStreak = $this->currentStreak($goalId,$userId);
+        $longestStreak = $this->longestStreak($goalId,$userId);
+        $health = $this->health->getHealth($goalId, $userId);
 
         $card = $this->markupGenerator->goalCard(
-            $goalID,
+            $goalId,
             $goal->title,
             $daysSinceLastReport,
             $currentStreak,
+            $longestStreak,
             $health
         );
 
@@ -50,6 +52,11 @@ class HfGoals implements Hf_iGoals {
     private function currentStreak( $goalId, $userId ) {
         $streaks = $this->streaks->streaks($goalId, $userId);
         return end($streaks);
+    }
+
+    private function longestStreak( $goalId, $userId ) {
+        $streaks = $this->streaks->streaks($goalId, $userId);
+        return max($streaks);
     }
 
     function levelPercentComplete( $goalId, $userId ) {

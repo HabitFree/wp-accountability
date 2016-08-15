@@ -160,13 +160,14 @@ class TestGoals extends HfTestCase {
 
     public function testUsesHtmlGeneratorToMakeGoalCard() {
         $this->setReturnValsForGoalCardCreation();
-        $this->setReturnValsForFindingStreaks(0);
+        $this->setReturnValsForFindingStreaks();
         $MockSub = $this->makeMockGoalSub();
 
         $this->expectOnce($this->mockMarkupGenerator, 'goalCard', array(
             1,
             'Title',
             3.1415000000000002,
+            0,
             0,
             .5
         ));
@@ -278,6 +279,7 @@ class TestGoals extends HfTestCase {
             'Title',
             $daysSinceLastReport,
             $currentStreak,
+            0,
             .5
         ));
 
@@ -301,6 +303,7 @@ class TestGoals extends HfTestCase {
             1,
             'Title',
             3.1415000000000002,
+            0,
             0,
             .5
         ));

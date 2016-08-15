@@ -130,6 +130,7 @@ class TestHtmlGenerator extends HfTestCase {
             $verb,
             $daysSinceLastReport,
             0,
+            0,
             50
         );
 
@@ -152,6 +153,7 @@ class TestHtmlGenerator extends HfTestCase {
         $goalId = 1;
         $daysSinceLastReport = 3.1415;
         $currentStreak = 1;
+        $longestStreak = 777;
         $health = 50;
 
         $result = $this->mockedMarkupGenerator->goalCard(
@@ -159,6 +161,7 @@ class TestHtmlGenerator extends HfTestCase {
             $verb,
             $daysSinceLastReport,
             $currentStreak,
+            $longestStreak,
             $health
         );
 
@@ -172,6 +175,7 @@ class TestHtmlGenerator extends HfTestCase {
         $goalId = 1;
         $daysSinceLastReport = 3.1415;
         $currentStreak = 1;
+        $longestStreak = 777;
         $health = 50;
 
         $result = $this->mockedMarkupGenerator->goalCard(
@@ -179,6 +183,7 @@ class TestHtmlGenerator extends HfTestCase {
             $verb,
             $daysSinceLastReport,
             $currentStreak,
+            $longestStreak,
             $health
         );
 
@@ -191,6 +196,7 @@ class TestHtmlGenerator extends HfTestCase {
         $goalId = 1;
         $daysSinceLastReport = 3.1415;
         $currentStreak = 1;
+        $longestStreak = 777;
         $health = .5;
 
         $result = $this->mockedMarkupGenerator->goalCard(
@@ -198,10 +204,53 @@ class TestHtmlGenerator extends HfTestCase {
             $verb,
             $daysSinceLastReport,
             $currentStreak,
+            $longestStreak,
             $health
         );
 
         $needle = "50";
+        $this->assertContains($needle, $result);
+    }
+
+    public function testDisplaysCurrentStreak() {
+        $verb = 'Title';
+        $goalId = 1;
+        $daysSinceLastReport = 3.1415;
+        $currentStreak = 1;
+        $longestStreak = 777;
+        $health = .5;
+
+        $result = $this->mockedMarkupGenerator->goalCard(
+            $goalId,
+            $verb,
+            $daysSinceLastReport,
+            $currentStreak,
+            $longestStreak,
+            $health
+        );
+
+        $needle = "Current";
+        $this->assertContains($needle, $result);
+    }
+
+    public function testDisplaysLongestStreak() {
+        $verb = 'Title';
+        $goalId = 1;
+        $daysSinceLastReport = 3.1415;
+        $currentStreak = 1;
+        $longestStreak = 777;
+        $health = .5;
+
+        $result = $this->mockedMarkupGenerator->goalCard(
+            $goalId,
+            $verb,
+            $daysSinceLastReport,
+            $currentStreak,
+            $longestStreak,
+            $health
+        );
+
+        $needle = "Longest";
         $this->assertContains($needle, $result);
     }
 }
