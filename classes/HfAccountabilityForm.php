@@ -40,9 +40,13 @@ class HfAccountabilityForm extends HfForm {
                 chart.draw(data, options);
               }</script>";
 
+        $this->elements[]  = "<div class='card-wrapper'>";
+
         foreach ($goalSubs as $sub) {
             $this->elements[] = $this->Goals->goalCard($sub);
         }
+
+        $this->elements[] = "</div>";
 
         $this->elements[] = '<p><input class="submit" type="submit" name="submit" value="Submit" /></p>';
     }
