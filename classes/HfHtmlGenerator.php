@@ -119,7 +119,10 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
 
     private function stats($currentStreak, $longestStreak, $health, $goalId)
     {
+        $currentStreak = round($currentStreak, 2);
+        $longestStreak = round($longestStreak, 2);
         $health = $health * 100;
+
         $chartScript = "<script type=\"text/javascript\">
             function drawChart$goalId() {
                 drawChart('chart$goalId', $health);

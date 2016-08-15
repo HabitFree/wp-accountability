@@ -253,4 +253,25 @@ class TestHtmlGenerator extends HfTestCase {
         $needle = "Longest";
         $this->assertContains($needle, $result);
     }
+
+    public function testRoundsStreaks() {
+        $verb = 'Title';
+        $goalId = 1;
+        $daysSinceLastReport = 3.1415;
+        $currentStreak = 1.816596912698615987614328975442;
+        $longestStreak = 777;
+        $health = .5;
+
+        $result = $this->mockedMarkupGenerator->goalCard(
+            $goalId,
+            $verb,
+            $daysSinceLastReport,
+            $currentStreak,
+            $longestStreak,
+            $health
+        );
+
+        $needle = "1.82";
+        $this->assertContains($needle, $result);
+    }
 }
