@@ -165,7 +165,7 @@ class TestHtmlGenerator extends HfTestCase {
             $health
         );
 
-        $needle = "<div id='chart1'>";
+        $needle = "<div class='guage' id='chart1'>";
 
         $this->assertContains($needle, $result);
     }
@@ -258,7 +258,7 @@ class TestHtmlGenerator extends HfTestCase {
         $verb = 'Title';
         $goalId = 1;
         $daysSinceLastReport = 3.1415;
-        $currentStreak = 1.816596912698615987614328975442;
+        $currentStreak = 1.896596912698615987614328975442;
         $longestStreak = 777;
         $health = .5;
 
@@ -271,7 +271,7 @@ class TestHtmlGenerator extends HfTestCase {
             $health
         );
 
-        $needle = "1.82";
+        $needle = "1.9";
         $this->assertContains($needle, $result);
     }
 }
