@@ -129,7 +129,7 @@ class HfHtmlGenerator implements Hf_iMarkupGenerator {
             }
             google.charts.setOnLoadCallback(drawChart$goalId);
         </script>";
-        $chartDiv = "<div id='chart$goalId'></div>";
+        $chartDiv = "<div class='guage' id='chart$goalId'></div>";
         $streakStats = "<div class='streaks'><div class='stat'>Current <span class='number'>$currentStreak</span> Streak</div>
             <div class='stat'>Longest <span class='number'>$longestStreak</span> Streak</div></div>";
         return "<div class='stats'>$chartDiv$chartScript$streakStats</div>";
