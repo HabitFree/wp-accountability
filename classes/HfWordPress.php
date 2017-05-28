@@ -174,4 +174,9 @@ class HfWordPress implements Hf_iCms {
     public function isPluginActive($plugin) {
         return is_plugin_active($plugin);
     }
+
+    public function addSettingsError( $setting, $code, $message ) {
+        // https://developer.wordpress.org/reference/functions/add_settings_error/
+        add_settings_error( $setting, $code, $message );
+    }
 } 
