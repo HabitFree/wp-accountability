@@ -17,7 +17,8 @@ class TestWordPress extends HfTestCase {
             'getNonceField',
             'isNonceValid',
             'updateUserMeta',
-            'registerPostType'
+            'registerPostType',
+            'isPluginActive'
         );
 
         foreach($methods as $method) {

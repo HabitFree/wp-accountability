@@ -170,4 +170,8 @@ class HfWordPress implements Hf_iCms {
     public function registerPostType($postType, $args) {
         register_post_type($postType, $args);
     }
+
+    public function isPluginActive($plugin) {
+        return is_plugin_active($plugin);
+    }
 } 
