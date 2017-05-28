@@ -33,19 +33,7 @@ function hfDeactivate() {
     wp_clear_scheduled_hook( 'hfEmailCronHook' );
 }
 
-
-function hfAutoload( $folder ) {
-    foreach ( scandir( dirname( __FILE__ ) . DIRECTORY_SEPARATOR . $folder ) as $filename ) {
-        $path = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . $filename;
-        if ( is_file( $path ) ) {
-            require_once $path;
-        }
-    }
-}
-
-hfAutoload( 'interfaces' );
-hfAutoload( 'abstractClasses' );
-hfAutoload( 'classes' );
+require_once( dirname( __FILE__ ) . DIRECTORY_SEPARATOR . "hf-autoload.php" );
 
 date_default_timezone_set( 'America/Chicago' );
 
