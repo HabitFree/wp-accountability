@@ -97,7 +97,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->mockedStreaks = new HfStreaks($this->mockDatabase, $this->mockCodeLibrary);
         $this->resetMockedAdminPanel();
         $this->mockedHealth = new HfHealth($this->mockDatabase);
-        $this->mockedDependencyChecker = new HfDependencyChecker();
+        $this->mockedDependencyChecker = new HfDependencyChecker( $this->mockCms );
     }
 
     protected function makeMock( $className ) {

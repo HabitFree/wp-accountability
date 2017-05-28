@@ -4,6 +4,7 @@ require_once(dirname(dirname(__FILE__)) . '/HfTestCase.php');
 
 class TestDependencyChecker extends HfTestCase {
     public function testGetDependencyErrors() {
+        $this->expectAtLeastOnce( $this->mockCms, "isPluginActive", ["timber"] );
         $this->mockedDependencyChecker->getDependencyErrors();
     }
 }
