@@ -7,4 +7,13 @@ class TestDependencyChecker extends HfTestCase {
         $this->expectAtLeastOnce( $this->mockCms, "isPluginActive", ["timber"] );
         $this->mockedDependencyChecker->getDependencyErrors();
     }
+
+    public function testRegistersError() {
+        $this->expectAtLeastOnce( $this->mockCms, "addSettingsError", [
+            "hfDependencyError",
+            "hfDependencyError",
+            "hf-accountability requires the following plugins: timber"
+        ] );
+        $this->mockedDependencyChecker->getDependencyErrors();
+    }
 }
