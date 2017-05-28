@@ -1,5 +1,5 @@
 <?php
-require_once( dirname(dirname( __FILE__ )) . '/HfTestCase.php' );
+require_once(dirname(dirname(__FILE__)) . '/HfTestCase.php');
 
 class Test_iView extends HfTestCase {
     // Helper Functions
