@@ -25,10 +25,11 @@ class TestWordPress extends HfTestCase {
         }
     }
 
-    public function testPrepareMethod() {
-        $expected = "select * from 'wptest_duck' where duckId = 5";
-        $actual = $this->factory->makeCms()->prepareQuery('select * from %s where duckId = %d', array('wptest_duck', 5));
-
-        $this->assertEquals($expected, $actual);
-    }
+//  Impure test
+//    public function testPrepareMethod() {
+//        $expected = "select * from 'wptest_duck' where duckId = 5";
+//        $actual = $this->factory->makeCms()->prepareQuery('select * from %s where duckId = %d', array('wptest_duck', 5));
+//
+//        $this->assertEquals($expected, $actual);
+//    }
 }
