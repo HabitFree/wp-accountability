@@ -44,6 +44,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     protected $mockedStreaks;
     protected $mockedAdminPanel;
     protected $mockedHealth;
+    protected $mockedDependencyChecker;
 
     function __construct() {
         $this->factory = new HfFactory();
@@ -96,6 +97,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->mockedStreaks = new HfStreaks($this->mockDatabase, $this->mockCodeLibrary);
         $this->resetMockedAdminPanel();
         $this->mockedHealth = new HfHealth($this->mockDatabase);
+        $this->mockedDependencyChecker = new HfDependencyChecker();
     }
 
     protected function makeMock( $className ) {
