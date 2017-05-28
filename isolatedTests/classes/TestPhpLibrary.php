@@ -1,6 +1,6 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
-require_once( dirname( dirname( __FILE__ ) ) . '/HfTestCase.php' );
+require_once(dirname(dirname(__FILE__)) . '/HfTestCase.php');
 
 class TestPhpLibrary extends HfTestCase {
 
