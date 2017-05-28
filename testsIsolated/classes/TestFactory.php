@@ -80,4 +80,9 @@ class TestFactory extends HfTestCase {
         $f = $this->factory->makeLoginForm('jo');
         $this->assertInstanceOf('HfLoginForm', $f);
     }
+
+    public function testMakeDependencyChecker() {
+        $d = $this->factory->makeDependencyChecker();
+        $this->assertInstanceOf('HfDependencyChecker', $d);
+    }
 }

@@ -5,15 +5,13 @@ require_once(dirname(dirname(__FILE__)) . '/HfTestCase.php');
 class TestDependencyChecker extends HfTestCase {
     public function testGetDependencyErrors() {
         $this->expectAtLeastOnce( $this->mockCms, "isPluginActive", ["timber"] );
-        $this->mockedDependencyChecker->getDependencyErrors();
+        $this->mockedDependencyChecker->checkForDependencyErrors();
     }
 
     public function testRegistersError() {
-        $this->expectAtLeastOnce( $this->mockCms, "addSettingsError", [
-            "hfDependencyError",
-            "hfDependencyError",
+        $this->expectAtLeastOnce( $this->mockCms, "addAdminErrorMessage", [
             "hf-accountability requires the following plugins: timber"
         ] );
-        $this->mockedDependencyChecker->getDependencyErrors();
+        $this->mockedDependencyChecker->checkForDependencyErrors();
     }
 }

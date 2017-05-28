@@ -37,20 +37,22 @@ require_once( dirname( __FILE__ ) . DIRECTORY_SEPARATOR . "hf-autoload.php" );
 
 date_default_timezone_set( 'America/Chicago' );
 
-$HfFactory               = new HfFactory();
-$HfGoals                 = $HfFactory->makeGoals();
-$HfUserManager           = $HfFactory->makeUserManager();
-$HfAdminPanel            = $HfFactory->makeAdminPanel();
-$HfLoginForm             = $HfFactory->makeLoginForm();
+$hfFactory               = new HfFactory();
+$hfGoals                 = $hfFactory->makeGoals();
+$hfUserManager           = $hfFactory->makeUserManager();
+$hfAdminPanel            = $hfFactory->makeAdminPanel();
+$hfLoginForm             = $hfFactory->makeLoginForm();
+$hfDependencyChecker     = $hfFactory->makeDependencyChecker();
 
-add_action( 'after_setup_theme', array( $HfLoginForm, 'attemptLogin' ) );
-add_action( 'hfEmailCronHook', array( $HfGoals, 'sendReportRequestEmails' ) );
-add_action( 'user_register', array( $HfUserManager, 'processNewUser' ) );
-add_action( 'init', array( $HfAdminPanel, 'registerCustomPostTypes' ) );
-add_action( 'admin_menu', array( $HfAdminPanel, 'registerAdminPages' ) );
-add_action( 'admin_head', array( $HfAdminPanel, 'addToAdminHead' ) );
+add_action( 'after_setup_theme', array( $hfLoginForm, 'attemptLogin' ) );
+add_action( 'hfEmailCronHook', array( $hfGoals, 'sendReportRequestEmails' ) );
+add_action( 'user_register', array( $hfUserManager, 'processNewUser' ) );
+add_action( 'init', array( $hfAdminPanel, 'registerCustomPostTypes' ) );
+add_action( 'admin_menu', array( $hfAdminPanel, 'registerAdminPages' ) );
+add_action( 'admin_head', array( $hfAdminPanel, 'addToAdminHead' ) );
 add_action( 'init', 'hfRegisterShortcodes' );
 add_action( 'init', 'hfAddPostTypes' );
+add_action( 'admin_init', array( $hfDependencyChecker, 'checkForDependencyErrors' ) );
 
 add_filter( 'user_can_richedit', 'hfDisableWysiwygForQuotes' );
 add_filter( 'enter_title_here', 'hfChangeEditTitleLabelForQuotations' );

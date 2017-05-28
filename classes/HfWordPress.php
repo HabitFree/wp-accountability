@@ -179,4 +179,10 @@ class HfWordPress implements Hf_iCms {
         // https://developer.wordpress.org/reference/functions/add_settings_error/
         add_settings_error( $setting, $code, $message );
     }
+
+    public function addAdminErrorMessage( $message ) {
+        add_action( 'admin_notices', function() use ($message) {
+            echo "<div class=\"error notice\"><p>$message</p></div>";
+        } );
+    }
 } 

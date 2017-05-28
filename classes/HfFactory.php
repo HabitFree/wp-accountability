@@ -198,4 +198,9 @@ class HfFactory {
         $actionUrl = $assetLocator->getCurrentPageUrl();
         return $actionUrl;
     }
+
+    public function makeDependencyChecker() {
+        $cms = $this->makeCms();
+        return new HfDependencyChecker( $cms );
+    }
 } 
