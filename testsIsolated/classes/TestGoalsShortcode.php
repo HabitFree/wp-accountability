@@ -21,4 +21,13 @@ class TestGoalsShortcode extends HfTestCase2 {
 
         $this->assertFalse( array_key_exists( "content", $data ));
     }
+
+    public function testGetsGoalCardsData() {
+        $this->mockUserManager->setReturnValue( 'isUserLoggedIn', true );
+        $this->mockUserManager->setReturnValue( "getCurrentUserId", 7 );
+
+        $this->mockedGoalsShortcode->getOutput();
+
+        $this->assertCalledWith( $this->mockGoals, "getGoalCardsData", 7 );
+    }
 }

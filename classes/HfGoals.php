@@ -7,6 +7,7 @@ class HfGoals implements Hf_iGoals {
     private $messenger;
     private $codeLibrary;
     private $streaks;
+    private $health;
 
     function __construct(
         HfMailer $messenger,
@@ -123,5 +124,13 @@ class HfGoals implements Hf_iGoals {
             $longestStreak,
             $health
         ];
+    }
+
+    public function getGoalCardsData( $userId ) {
+        $subs = $this->getGoalSubscriptions( $userId );
+
+        return array_map( function( $sub ) {
+            return $this->getGoalCardData( $sub );
+        }, $subs );
     }
 } 

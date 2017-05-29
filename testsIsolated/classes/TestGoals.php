@@ -142,14 +142,18 @@ class TestGoals extends HfTestCase2 {
 
     private function setReturnValsForGoalCardCreation()
     {
-        $MockGoal = $this->makeMockGoal();
-        $this->mockMysqlDatabase->setReturnValue( 'getGoal', $MockGoal);
+        $mockSub = $this->makeMockGoalSub();
+        $this->mockMysqlDatabase->setReturnValue( "getGoalSubscriptions", [$mockSub] );
 
-        $MockLevel = $this->makeMockLevel();
-        $this->mockMysqlDatabase->setReturnValue( 'getLevel', $MockLevel);
+        $mockGoal = $this->makeMockGoal();
+        $this->mockMysqlDatabase->setReturnValue( 'getGoal', $mockGoal);
+
+        $mockLevel = $this->makeMockLevel();
+        $this->mockMysqlDatabase->setReturnValue( 'getLevel', $mockLevel);
 
         $this->mockMysqlDatabase->setReturnValue( 'daysSinceLastReport', 3.1415);
         $this->mockHealth->setReturnValue( 'getHealth', .5);
+        $this->mockStreaks->setReturnValue( "streaks", [5] );
     }
 
     public function testUsesHtmlGeneratorToMakeGoalCard() {
@@ -287,5 +291,29 @@ class TestGoals extends HfTestCase2 {
             0,
             .5
         );
+    }
+
+    public function testGetGoalCardsData() {
+        $this->setReturnValsForGoalCardCreation();
+
+        $this->mockedGoals->getGoalCardsData( 0 );
+
+        $this->assertCalledWith( $this->mockMysqlDatabase, "getGoalSubscriptions", 0 );
+    }
+
+    public function testGetsHealth() {
+        $this->setReturnValsForGoalCardCreation();
+
+        $this->mockedGoals->getGoalCardsData( 0 );
+
+        $this->assertCalled( $this->mockHealth, "getHealth" );
+    }
+
+    public function testsReturnsData() {
+        $this->setReturnValsForGoalCardCreation();
+
+        $result = $this->mockedGoals->getGoalCardsData( 0 );
+
+        $this->assertTrue( is_array( $result ) );
     }
 }
