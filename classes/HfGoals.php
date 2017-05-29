@@ -9,13 +9,13 @@ class HfGoals implements Hf_iGoals {
     private $streaks;
 
     function __construct(
-        Hf_iMessenger $messenger,
-        Hf_iCms $cms,
-        Hf_iMarkupGenerator $markupGenerator,
-        Hf_iDatabase $database,
-        Hf_iCodeLibrary $codeLibrary,
-        Hf_iStreaks $streaks,
-        Hf_iHealth $health
+        HfMailer $messenger,
+        HfWordPress $cms,
+        HfHtmlGenerator $markupGenerator,
+        HfMysqlDatabase $database,
+        HfPhpLibrary $codeLibrary,
+        HfStreaks $streaks,
+        HfHealth $health
     ) {
         $this->messenger = $messenger;
         $this->cms = $cms;

@@ -33,10 +33,22 @@ abstract class HfTestCase2 extends \PHPUnit_Framework_TestCase {
     /** @var  HfMysqlDatabase $mockMysqlDatabase */
     protected $mockMysqlDatabase;
 
+    /** @var  HfWordPress $mockWordPress */
+    protected $mockWordPress;
+
+    /** @var  HfStreaks $mockStreaks */
+    protected $mockStreaks;
+
+    /** @var  HfHealth $mockHealth */
+    protected $mockHealth;
+
     /* mocked objects */
 
     /** @var  HfGoalsShortcode $mockedGoalsShortcode */
     protected $mockedGoalsShortcode;
+
+    /** @var  HfGoals $mockedGoals */
+    protected $mockedGoals;
 
     /* helper fields */
     /** @var  Factory $factory */
@@ -140,5 +152,14 @@ abstract class HfTestCase2 extends \PHPUnit_Framework_TestCase {
         ];
         $error = implode( "\r\n\r\n", $errorLines );
         $this->assertTrue( in_array( $arguments, $calls, TRUE ), $error );
+    }
+
+    /* Helper Functions */
+
+    protected function makeMockUsers()
+    {
+        $user = new stdClass();
+        $user->ID = 7;
+        return [$user];
     }
 }
