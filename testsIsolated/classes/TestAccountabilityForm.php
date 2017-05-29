@@ -24,13 +24,4 @@ class TestAccountabilityForm extends HfTestCase {
         $needle = 'report-cards';
         $this->assertContains($needle,$result);
     }
-
-    public function testIncludesGoogleChartsScript() {
-        $Goals              = $this->makeMock( 'HfGoals' );
-        $AccountabilityForm = new HfAccountabilityForm( 'test.com', $Goals );
-        $AccountabilityForm->populate(array());
-        $result = $AccountabilityForm->getOutput();
-        $needle = 'https://www.gstatic.com/charts/loader.js';
-        $this->assertContains($needle,$result);
-    }
 }

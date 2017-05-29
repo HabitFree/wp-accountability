@@ -12,14 +12,14 @@ class HfGoalsShortcode implements Hf_iShortcode {
     private $timber;
 
     function __construct(
-        Hf_iUserManager $UserManager,
-        Hf_iMessenger $Messenger,
-        Hf_iAssetLocator $PageLocator,
-        Hf_iGoals $Goals,
-        Hf_iSecurity $Security,
-        Hf_iMarkupGenerator $MarkupGenerator,
-        Hf_iCodeLibrary $CodeLibrary,
-        Hf_iDatabase $Database,
+        HfUserManager $UserManager,
+        HfMailer $Messenger,
+        HfUrlFinder $PageLocator,
+        HfGoals $Goals,
+        HfSecurity $Security,
+        HfHtmlGenerator $MarkupGenerator,
+        HfPhpLibrary $CodeLibrary,
+        HfMysqlDatabase $Database,
         HfTimber $timber
     ) {
         $this->UserManager     = $UserManager;
@@ -34,7 +34,7 @@ class HfGoalsShortcode implements Hf_iShortcode {
     }
 
     public function getOutput() {
-        $this->timber->render("goals.twig",[]);
+        $viewData = [];
 
         if ( !$this->isUserAuthorized() ) {
             return $this->Security->requireLogin();
@@ -49,10 +49,12 @@ class HfGoalsShortcode implements Hf_iShortcode {
             $quotationMessage = $this->makeQuotationMessage();
             $successMessage   = $this->MarkupGenerator->successMessage( 'Thanks for checking in!' );
 
-            return $successMessage . $quotationMessage . $this->form( $userID );
+            $viewData["content"] =  $successMessage . $quotationMessage . $this->form( $userID );
         } else {
-            return $this->form( $userID );
+            $viewData["content"] = $this->form( $userID );
         }
+
+        $this->timber->render("goals.twig",$viewData);
     }
 
     private function isUserAuthorized() {

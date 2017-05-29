@@ -1,1 +1,73 @@
-Hello World
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    google.charts.load('current', {'packages': ['gauge']});
+
+    function drawChart(id, health) {
+        var data = google.visualization.arrayToDataTable([
+            ['Label', 'Value'],
+            ['Health', 0]
+        ]);
+
+        var options = {
+            width: 400, height: 120,
+            redFrom: 0, redTo: 15,
+            yellowFrom: 15, yellowTo: 85,
+            greenFrom: 85, greenTo: 100,
+            minorTicks: 5
+        };
+
+        var chart = new google.visualization.Gauge(document.getElementById(id));
+
+        chart.draw(data, options);
+
+        data.setValue(0, 1, health);
+        chart.draw(data, options);
+    }
+</script>
+
+{#{{ content }}#}
+
+<form action="http://localhost:8080/?page_id=5" method="post" class="report-cards">
+    <div class="card-wrapper">
+        <div class="report-card">
+            <div class="stats">
+                <div class="guage" id="chart1"></div>
+                <script type="text/javascript">
+                    function drawChart1() {
+                        drawChart('chart1', 0);
+                    }
+                    google.charts.setOnLoadCallback(drawChart1);
+                </script>
+                <div class="streaks">
+                    <div class="stat">Current <span class="number">0</span> Streak</div>
+                    <div class="stat">Longest <span class="number">0</span> Streak</div>
+                </div>
+            </div>
+            <div class="report">Did you <strong class="verb">view pornography</strong> in the last <span
+                        class="duration"><strong>24 hours</strong>?</span>
+                <div class="controls"><label class="success"><input type="radio" name="1" value="1"> No</label><label
+                            class="setback"><input type="radio" name="1" value="0"> Yes</label></div>
+            </div>
+        </div>
+        <div class="report-card">
+            <div class="stats">
+                <div class="guage" id="chart2"></div>
+                <script type="text/javascript">
+                    function drawChart2() {
+                        drawChart('chart2', 0);
+                    }
+                    google.charts.setOnLoadCallback(drawChart2);
+                </script>
+                <div class="streaks">
+                    <div class="stat">Current <span class="number">0</span> Streak</div>
+                    <div class="stat">Longest <span class="number">0</span> Streak</div>
+                </div>
+            </div>
+            <div class="report">Did you <strong class="verb">practice self-abuse</strong> in the last <span
+                        class="duration"><strong>24 hours</strong>?</span>
+                <div class="controls"><label class="success"><input type="radio" name="2" value="1"> No</label><label
+                            class="setback"><input type="radio" name="2" value="0"> Yes</label></div>
+            </div>
+        </div>
+    </div>
+    <p><input class="submit" type="submit" name="submit" value="Submit"></p></form>

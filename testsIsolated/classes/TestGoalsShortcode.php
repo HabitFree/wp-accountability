@@ -1,10 +1,15 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
-require_once(dirname(dirname(__FILE__)) . '/HfTestCase.php');
+require_once(dirname(dirname(__FILE__)) . '/HfTestCase2.php');
 
-class TestGoalsShortcode extends HfTestCase {
+class TestGoalsShortcode extends HfTestCase2 {
     public function testRendersTemplate() {
-        $this->expectAtLeastOnce( $this->mockTimber, "render", ["goals.twig",[]] );
+        $mockGoalSubs = array(new stdClass());
+        $this->mockGoals->setReturnValue( 'getGoalSubscriptions', $mockGoalSubs );
+        $this->mockUserManager->setReturnValue( 'isUserLoggedIn', true );
+
         $this->mockedGoalsShortcode->getOutput();
+
+        $this->assertCalled( $this->mockTimber, "render" );
     }
 }

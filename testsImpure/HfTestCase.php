@@ -1,8 +1,6 @@
 <?php
 
-if ( !defined( 'ABSPATH' ) ) {
-    exit;
-}
+if ( !defined( 'ABSPATH' ) ) exit;
 
 //require_once( dirname( dirname( __FILE__ ) ) . '/wp-hf-accountability.php' );
 
