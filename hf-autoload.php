@@ -1,14 +1,19 @@
 <?php
 
-function hfAutoload( $folder ) {
-    foreach ( scandir( dirname( __FILE__ ) . DIRECTORY_SEPARATOR . $folder ) as $filename ) {
-        $path = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . $filename;
-        if ( is_file( $path ) ) {
-            require_once $path;
+function hfAutoload( $path ) {
+    foreach ( scandir( $path ) as $entry ) {
+        if ( ! in_array( $entry, [".",".."] ) ) {
+            if ( is_file( "$path/$entry" ) ) {
+                require_once "$path/$entry";
+            } else if ( is_dir( "$path/$entry" ) ) {
+                hfAutoload( "$path/$entry" );
+            }
         }
     }
 }
 
-hfAutoload( 'interfaces' );
-hfAutoload( 'abstractClasses' );
-hfAutoload( 'classes' );
+$root = dirname( __FILE__ );
+
+hfAutoload( "$root/interfaces" );
+hfAutoload( "$root/abstractClasses" );
+hfAutoload( "$root/classes" );
