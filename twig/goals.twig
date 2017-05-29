@@ -25,49 +25,32 @@
     }
 </script>
 
-{#{{ content }}#}
-
 <form action="http://localhost:8080/?page_id=5" method="post" class="report-cards">
     <div class="card-wrapper">
-        <div class="report-card">
-            <div class="stats">
-                <div class="guage" id="chart1"></div>
-                <script type="text/javascript">
-                    function drawChart1() {
-                        drawChart('chart1', 0);
-                    }
-                    google.charts.setOnLoadCallback(drawChart1);
-                </script>
-                <div class="streaks">
-                    <div class="stat">Current <span class="number">0</span> Streak</div>
-                    <div class="stat">Longest <span class="number">0</span> Streak</div>
-                </div>
-            </div>
-            <div class="report">Did you <strong class="verb">view pornography</strong> in the last <span
-                        class="duration"><strong>24 hours</strong>?</span>
-                <div class="controls"><label class="success"><input type="radio" name="1" value="1"> No</label><label
-                            class="setback"><input type="radio" name="1" value="0"> Yes</label></div>
+{% for goal in goals %}
+    {% set interval = ( goal.daysSinceLastReport < 1 ) ? "24 hours" : goal.daysSinceLastReport|round(0) ~ " days" %}
+
+    <div class="report-card">
+        <div class="stats">
+            <div class="guage" id="chart{{ goal.id }}"></div>
+            <script type="text/javascript">
+                function drawChart{{ goal.id }}() {
+                    drawChart('chart{{ goal.id }}', {{ goal.health }});
+                }
+                google.charts.setOnLoadCallback(drawChart{{ goal.id }});
+            </script>
+            <div class="streaks">
+                <div class="stat">Current <span class="number">{{ goal.currentStreak|round(1) }}</span> Streak</div>
+                <div class="stat">Longest <span class="number">{{ goal.longestStreak|round(1) }}</span> Streak</div>
             </div>
         </div>
-        <div class="report-card">
-            <div class="stats">
-                <div class="guage" id="chart2"></div>
-                <script type="text/javascript">
-                    function drawChart2() {
-                        drawChart('chart2', 0);
-                    }
-                    google.charts.setOnLoadCallback(drawChart2);
-                </script>
-                <div class="streaks">
-                    <div class="stat">Current <span class="number">0</span> Streak</div>
-                    <div class="stat">Longest <span class="number">0</span> Streak</div>
-                </div>
-            </div>
-            <div class="report">Did you <strong class="verb">practice self-abuse</strong> in the last <span
-                        class="duration"><strong>24 hours</strong>?</span>
-                <div class="controls"><label class="success"><input type="radio" name="2" value="1"> No</label><label
-                            class="setback"><input type="radio" name="2" value="0"> Yes</label></div>
-            </div>
+        <div class="report">Did you <strong class="verb">{{ goal.title }}</strong> in the last <span
+                    class="duration"><strong>{{ interval }}</strong>?</span>
+            <div class="controls"><label class="success"><input type="radio" name="{{ goal.id }}" value="1"> No</label><label
+                        class="setback"><input type="radio" name="{{ goal.id }}" value="0"> Yes</label></div>
         </div>
     </div>
-    <p><input class="submit" type="submit" name="submit" value="Submit"></p></form>
+{% endfor %}
+    </div>
+    <p><input class="submit" type="submit" name="submit" value="Submit"></p>
+</form>

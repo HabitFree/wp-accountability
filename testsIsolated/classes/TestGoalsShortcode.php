@@ -30,4 +30,15 @@ class TestGoalsShortcode extends HfTestCase2 {
 
         $this->assertCalledWith( $this->mockGoals, "getGoalCardsData", 7 );
     }
+
+    public function testIncludesGoalCardsDataWhenRenderingTemplate() {
+        $this->mockUserManager->setReturnValue( 'isUserLoggedIn', true );
+
+        $this->mockedGoalsShortcode->getOutput();
+
+        $call = $this->mockTimber->getCalls("render")[0];
+        $data = $call[1];
+
+        $this->assertTrue( array_key_exists( "goals", $data ));
+    }
 }

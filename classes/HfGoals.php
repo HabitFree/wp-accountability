@@ -130,7 +130,16 @@ class HfGoals implements Hf_iGoals {
         $subs = $this->getGoalSubscriptions( $userId );
 
         return array_map( function( $sub ) {
-            return $this->getGoalCardData( $sub );
+            $data =  $this->getGoalCardData( $sub );
+
+            return [
+                "id" => $data[0],
+                "title" => $data[1],
+                "daysSinceLastReport" => $data[2],
+                "currentStreak" => $data[3],
+                "longestStreak" => $data[4],
+                "health" => $data[5]
+            ];
         }, $subs );
     }
 } 

@@ -49,12 +49,12 @@ class HfGoalsShortcode implements Hf_iShortcode {
             $quotationMessage = $this->makeQuotationMessage();
             $successMessage   = $this->MarkupGenerator->successMessage( 'Thanks for checking in!' );
 
-            $viewData["content"] =  $successMessage . $quotationMessage . $this->form( $userID );
+            $viewData["content"] = $successMessage . $quotationMessage . $this->form( $userID );
         } else {
-            $this->Goals->getGoalCardsData( $userID );
+            $viewData["goals"] = $this->Goals->getGoalCardsData( $userID );
         }
 
-        $this->timber->render("goals.twig",$viewData);
+        $this->timber->render( "goals.twig", $viewData );
     }
 
     private function isUserAuthorized() {

@@ -316,4 +316,12 @@ class TestGoals extends HfTestCase2 {
 
         $this->assertTrue( is_array( $result ) );
     }
+
+    public function testsReturnsDataInAssociativeArray() {
+        $this->setReturnValsForGoalCardCreation();
+
+        $result = $this->mockedGoals->getGoalCardsData( 0 );
+
+        $this->assertTrue( array_key_exists( "id", $result[0] ) );
+    }
 }
