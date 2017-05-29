@@ -109,13 +109,11 @@ class TestGoals extends HfTestCase2 {
     public function testRecordAccountabilityReport() {
         $this->mockedGoals->recordAccountabilityReport( 1, 2, 3, 4 );
 
-        var_dump($this->mockMysqlDatabase->getCalls("recordAccountabilityReport"));
-
         $this->assertCalledWith( $this->mockMysqlDatabase, 'recordAccountabilityReport', 1, 2, 3, 4);
     }
 
     public function testGetGoalSubscriptions() {
-        $expected = array(1, 2, 3, 4);
+        $expected = [1, 2, 3, 4];
 
         $this->mockMysqlDatabase->setReturnValue( 'getGoalSubscriptions', $expected );
 

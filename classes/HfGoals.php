@@ -27,26 +27,9 @@ class HfGoals implements Hf_iGoals {
     }
 
     function goalCard( $sub ) {
-        $userId        = intval( $sub->userID );
+        $goalCardData = $this->getGoalCardData($sub);
 
-        $goalId        = intval( $sub->goalID );
-        $goal          = $this->database->getGoal( $goalId );
-        $daysSinceLastReport = $this->database->daysSinceLastReport($goalId, $userId);
-
-        $currentStreak = $this->currentStreak($goalId,$userId);
-        $longestStreak = $this->longestStreak($goalId,$userId);
-        $health = $this->health->getHealth($goalId, $userId);
-
-        $card = $this->markupGenerator->goalCard(
-            $goalId,
-            $goal->title,
-            $daysSinceLastReport,
-            $currentStreak,
-            $longestStreak,
-            $health
-        );
-
-        return $card;
+        return $this->markupGenerator->goalCard( ...$goalCardData );
     }
 
     private function currentStreak( $goalId, $userId ) {
@@ -118,5 +101,27 @@ class HfGoals implements Hf_iGoals {
 
     public function recordAccountabilityReport( $userId, $goalId, $isSuccessful, $emailId = null ) {
         $this->database->recordAccountabilityReport( $userId, $goalId, $isSuccessful, $emailId );
+    }
+
+    private function getGoalCardData($sub)
+    {
+        $userId = intval($sub->userID);
+
+        $goalId = intval($sub->goalID);
+        $goal = $this->database->getGoal($goalId);
+        $daysSinceLastReport = $this->database->daysSinceLastReport($goalId, $userId);
+
+        $currentStreak = $this->currentStreak($goalId, $userId);
+        $longestStreak = $this->longestStreak($goalId, $userId);
+        $health = $this->health->getHealth($goalId, $userId);
+
+        return [
+            $goalId,
+            $goal->title,
+            $daysSinceLastReport,
+            $currentStreak,
+            $longestStreak,
+            $health
+        ];
     }
 } 
