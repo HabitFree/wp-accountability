@@ -26,6 +26,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     protected $mockInviteResponseForm;
     protected $mockStreaks;
     protected $mockHealth;
+    protected $mockTimber;
 
     protected $mockedInvitePartnerShortcode;
     protected $mockedUserManager;
@@ -75,6 +76,7 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
         $this->mockInviteResponseForm     = $this->makeMock( 'HfInviteResponseForm' );
         $this->mockStreaks                = $this->makeMock( 'HfStreaks' );
         $this->mockHealth                 = $this->makeMock( 'HfHealth' );
+        $this->mockTimber                 = $this->makeMock( 'HfTimber' );
 
         $this->setReturnValue( $this->mockCms, 'getDbPrefix', 'wptests_' );
     }
@@ -137,7 +139,8 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
             $this->mockSecurity,
             $this->mockMarkupGenerator,
             $this->mockCodeLibrary,
-            $this->mockDatabase
+            $this->mockDatabase,
+            $this->mockTimber
         );
     }
 

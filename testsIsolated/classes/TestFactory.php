@@ -85,4 +85,9 @@ class TestFactory extends HfTestCase {
         $d = $this->factory->makeDependencyChecker();
         $this->assertInstanceOf('HfDependencyChecker', $d);
     }
+
+    public function testMakeGoalsShortcode() {
+        $s = $this->factory->makeGoalsShortcode();
+        $this->assertInstanceOf("HfGoalsShortcode", $s);
+    }
 }

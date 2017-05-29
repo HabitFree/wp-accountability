@@ -118,8 +118,19 @@ class HfFactory {
         $MarkupGenerator = $this->makeMarkupGenerator();
         $CodeLibrary     = $this->makeCodeLibrary();
         $Database        = $this->makeDatabase();
+        $timber          = new HfTimber();
 
-        return new HfGoalsShortcode( $UserManager, $Messenger, $AssetLocator, $Goals, $Security, $MarkupGenerator, $CodeLibrary, $Database );
+        return new HfGoalsShortcode(
+            $UserManager,
+            $Messenger,
+            $AssetLocator,
+            $Goals,
+            $Security,
+            $MarkupGenerator,
+            $CodeLibrary,
+            $Database,
+            $timber
+        );
     }
 
     public function makeGoals() {

@@ -2,5 +2,5 @@
 
 class HfTimber
 {
-
+    public function render() {}
 }

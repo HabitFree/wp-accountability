@@ -9,8 +9,19 @@ class HfGoalsShortcode implements Hf_iShortcode {
     private $MarkupGenerator;
     private $CodeLibrary;
     private $Database;
+    private $timber;
 
-    function __construct( Hf_iUserManager $UserManager, Hf_iMessenger $Messenger, Hf_iAssetLocator $PageLocator, Hf_iGoals $Goals, Hf_iSecurity $Security, Hf_iMarkupGenerator $MarkupGenerator, Hf_iCodeLibrary $CodeLibrary, Hf_iDatabase $Database ) {
+    function __construct(
+        Hf_iUserManager $UserManager,
+        Hf_iMessenger $Messenger,
+        Hf_iAssetLocator $PageLocator,
+        Hf_iGoals $Goals,
+        Hf_iSecurity $Security,
+        Hf_iMarkupGenerator $MarkupGenerator,
+        Hf_iCodeLibrary $CodeLibrary,
+        Hf_iDatabase $Database,
+        HfTimber $timber
+    ) {
         $this->UserManager     = $UserManager;
         $this->Messenger       = $Messenger;
         $this->PageLocator     = $PageLocator;
@@ -19,9 +30,12 @@ class HfGoalsShortcode implements Hf_iShortcode {
         $this->MarkupGenerator = $MarkupGenerator;
         $this->CodeLibrary     = $CodeLibrary;
         $this->Database        = $Database;
+        $this->timber          = $timber;
     }
 
     public function getOutput() {
+        $this->timber->render("goals.twig",[]);
+
         if ( !$this->isUserAuthorized() ) {
             return $this->Security->requireLogin();
         }
