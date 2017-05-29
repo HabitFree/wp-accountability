@@ -7,7 +7,7 @@ class HfMysqlDatabase implements Hf_iDatabase {
     private $cms;
     private $codeLibrary;
 
-    public function HfMysqlDatabase( Hf_iCms $ContentManagementSystem, Hf_iCodeLibrary $CodeLibrary ) { //constructor
+    public function __construct( Hf_iCms $ContentManagementSystem, Hf_iCodeLibrary $CodeLibrary ) { //constructor
         $this->cms         = $ContentManagementSystem;
         $this->codeLibrary = $CodeLibrary;
     }

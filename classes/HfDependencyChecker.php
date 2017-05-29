@@ -7,8 +7,8 @@ class HfDependencyChecker
     }
 
     public function checkForDependencyErrors() {
-        if (! $this->cms->isPluginActive( "timber" ) ) {
-            $this->cms->addAdminErrorMessage( "hf-accountability requires the following plugins: timber" );
+        if (! $this->cms->isPluginActive( "timber-library" ) ) {
+            $this->cms->addAdminErrorMessage( "hf-accountability requires the following plugins: timber-library" );
         }
     }
 }

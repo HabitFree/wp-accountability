@@ -7,7 +7,7 @@ class HfMailer implements Hf_iMessenger {
     private $ContentManagementSystem;
     private $CodeLibrary;
 
-    function HfMailer( Hf_iAssetLocator $PageLocator, Hf_iSecurity $Security, Hf_iDatabase $Database, Hf_iCms $ContentManagementSystem, Hf_iCodeLibrary $CodeLibrary ) {
+    function __construct( Hf_iAssetLocator $PageLocator, Hf_iSecurity $Security, Hf_iDatabase $Database, Hf_iCms $ContentManagementSystem, Hf_iCodeLibrary $CodeLibrary ) {
         $this->Database                = $Database;
         $this->Security                = $Security;
         $this->PageLocator             = $PageLocator;
