@@ -51,7 +51,7 @@ class HfGoalsShortcode implements Hf_iShortcode {
 
             $viewData["content"] =  $successMessage . $quotationMessage . $this->form( $userID );
         } else {
-            $viewData["content"] = $this->form( $userID );
+            // add form data
         }
 
         $this->timber->render("goals.twig",$viewData);
