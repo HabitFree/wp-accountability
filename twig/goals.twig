@@ -25,7 +25,9 @@
     }
 </script>
 
-<form action="http://localhost:8080/?page_id=5" method="post" class="report-cards">
+{{ messages }}
+
+<form action="{{ postUrl }}" method="post" class="report-cards">
     <div class="card-wrapper">
 {% for goal in goals %}
     {% set interval = ( goal.daysSinceLastReport < 1 ) ? "24 hours" : goal.daysSinceLastReport|round(0) ~ " days" %}

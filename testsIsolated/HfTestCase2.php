@@ -58,6 +58,9 @@ abstract class HfTestCase2 extends \PHPUnit_Framework_TestCase {
     protected $sourcePath;
 
     protected function setUp() {
+        $_POST = array();
+        $_GET  = array();
+
         $this->objectMocker = new MockFactory();
         $this->resetMocks();
         $this->resetMockedObjects();

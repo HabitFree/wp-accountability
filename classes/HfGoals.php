@@ -27,12 +27,6 @@ class HfGoals implements Hf_iGoals {
         $this->health = $health;
     }
 
-    function goalCard( $sub ) {
-        $goalCardData = $this->getGoalCardData($sub);
-
-        return $this->markupGenerator->goalCard( ...$goalCardData );
-    }
-
     private function currentStreak( $goalId, $userId ) {
         $streaks = $this->streaks->streaks($goalId, $userId);
         return end($streaks);

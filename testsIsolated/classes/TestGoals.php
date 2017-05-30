@@ -130,16 +130,6 @@ class TestGoals extends HfTestCase2 {
         $this->assertCalledWith( $this->mockMysqlDatabase, 'getGoalSubscriptions', 7);
     }
 
-    public function testgoalCardUsesDatabaseGetGoalMethod() {
-        $this->setReturnValsForGoalCardCreation();
-        $this->setReturnValsForFindingStreaks([[0,true], [1,false]]);
-
-        $MockSub = $this->makeMockGoalSub();
-        $this->mockedGoals->goalCard( $MockSub );
-
-        $this->assertCalledWith( $this->mockMysqlDatabase, 'getGoal', 1);
-    }
-
     private function setReturnValsForGoalCardCreation()
     {
         $mockSub = $this->makeMockGoalSub();
@@ -154,34 +144,6 @@ class TestGoals extends HfTestCase2 {
         $this->mockMysqlDatabase->setReturnValue( 'daysSinceLastReport', 3.1415);
         $this->mockHealth->setReturnValue( 'getHealth', .5);
         $this->mockStreaks->setReturnValue( "streaks", [5] );
-    }
-
-    public function testUsesHtmlGeneratorToMakeGoalCard() {
-        $this->setReturnValsForGoalCardCreation();
-        $this->setReturnValsForFindingStreaks();
-        $MockSub = $this->makeMockGoalSub();
-
-        $this->mockedGoals->goalCard($MockSub);
-
-        $this->assertCalledWith($this->mockHtmlGenerator, 'goalCard',
-            1,
-            'Title',
-            3.1415000000000002,
-            0,
-            0,
-            .5
-        );
-    }
-
-    public function testReturnsHtmlGeneratorMadeGoalCard() {
-        $this->setReturnValsForGoalCardCreation();
-        $this->setReturnValsForFindingStreaks([]);
-        $MockSub = $this->makeMockGoalSub();
-        $this->mockHtmlGenerator->setReturnValue( 'goalCard', 'goose');
-
-        $result = $this->mockedGoals->goalCard($MockSub);
-
-        $this->assertEquals('goose', $result);
     }
 
     private function makeMockGoal()
@@ -246,51 +208,6 @@ class TestGoals extends HfTestCase2 {
         $time = $this->daysInSeconds($dayOfReport);
         $dateString = date('Y-m-d H:i:s', $time);
         return $this->mockReport($isSuccess, $dateString);
-    }
-
-    public function testGivesHtmlGeneratorCurrentStreak() {
-        $this->setReturnValsForGoalCardCreation();
-        $this->setReturnValsForFindingStreaks();
-        $MockSub = $this->makeMockGoalSub();
-
-        $currentStreak = 0;
-        $daysSinceLastReport = 3.1415000000000002;
-
-        $this->mockedGoals->goalCard($MockSub);
-
-        $this->assertCalledWith($this->mockHtmlGenerator, 'goalCard',
-            1,
-            'Title',
-            $daysSinceLastReport,
-            $currentStreak,
-            0,
-            .5
-        );
-    }
-
-    public function testFindsStreaksWhenMakingGoalCard() {
-        $this->setReturnValsForGoalCardCreation();
-        $this->mockStreaks->setReturnValues('streaks', [[0], [0]]);
-        $mockSub = $this->makeMockGoalSub();
-        $this->mockedGoals->goalCard($mockSub);
-        $this->assertCalledWith( $this->mockStreaks,'streaks', 1, 7 );
-    }
-
-    public function testUsesHealthToMakeGoalCard() {
-        $this->setReturnValsForGoalCardCreation();
-        $this->setReturnValsForFindingStreaks();
-        $MockSub = $this->makeMockGoalSub();
-
-        $this->mockedGoals->goalCard($MockSub);
-
-        $this->assertCalledWith($this->mockHtmlGenerator, 'goalCard',
-            1,
-            'Title',
-            3.1415000000000002,
-            0,
-            0,
-            .5
-        );
     }
 
     public function testGetGoalCardsData() {

@@ -3,8 +3,6 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 interface Hf_iGoals {
     function currentLevelTarget( $daysOfSuccess );
 
-    function goalCard( $sub );
-
     function sendReportRequestEmails();
 
     function levelPercentComplete( $goalId, $userId );

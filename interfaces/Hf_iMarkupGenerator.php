@@ -27,15 +27,6 @@ interface Hf_iMarkupGenerator {
 
     public function head($content, $level);
 
-    public function goalCard(
-        $goalId,
-        $goalVerb,
-        $daysSinceLastReport,
-        $currentStreak,
-        $longestStreak,
-        $health
-    );
-
     public function refreshScript();
 
     public function input($properties);

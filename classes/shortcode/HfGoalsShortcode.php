@@ -3,7 +3,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class HfGoalsShortcode implements Hf_iShortcode {
     private $UserManager;
     private $Messenger;
-    private $PageLocator;
+    private $urlFinder;
     private $Goals;
     private $Security;
     private $MarkupGenerator;
@@ -14,7 +14,7 @@ class HfGoalsShortcode implements Hf_iShortcode {
     function __construct(
         HfUserManager $UserManager,
         HfMailer $Messenger,
-        HfUrlFinder $PageLocator,
+        HfUrlFinder $urlFinder,
         HfGoals $Goals,
         HfSecurity $Security,
         HfHtmlGenerator $MarkupGenerator,
@@ -24,7 +24,7 @@ class HfGoalsShortcode implements Hf_iShortcode {
     ) {
         $this->UserManager     = $UserManager;
         $this->Messenger       = $Messenger;
-        $this->PageLocator     = $PageLocator;
+        $this->urlFinder       = $urlFinder;
         $this->Goals           = $Goals;
         $this->Security        = $Security;
         $this->MarkupGenerator = $MarkupGenerator;
@@ -42,6 +42,7 @@ class HfGoalsShortcode implements Hf_iShortcode {
 
         $userID = $this->determineUserID();
         $this->updateReportRequest();
+        $viewData["postUrl"] = $this->urlFinder->getCurrentPageUrl();
 
         if ( $this->isSubmitted() ) {
             $this->submitAccountabilityReports( $userID );
@@ -49,7 +50,8 @@ class HfGoalsShortcode implements Hf_iShortcode {
             $quotationMessage = $this->makeQuotationMessage();
             $successMessage   = $this->MarkupGenerator->successMessage( 'Thanks for checking in!' );
 
-            $viewData["content"] = $successMessage . $quotationMessage . $this->form( $userID );
+            $viewData["messages"] = $successMessage . $quotationMessage;
+            $viewData["goals"] = $this->Goals->getGoalCardsData( $userID );
         } else {
             $viewData["goals"] = $this->Goals->getGoalCardsData( $userID );
         }
@@ -108,16 +110,6 @@ class HfGoalsShortcode implements Hf_iShortcode {
         $quotation = $this->selectQuotation();
 
         return $quotation ? $this->MarkupGenerator->quotation( $quotation ) : null;
-    }
-
-    private function form( $userID ) {
-        $currentURL         = $this->PageLocator->getCurrentPageURL();
-        $goalSubs           = $this->Goals->getGoalSubscriptions( $userID );
-        $AccountabilityForm = new HfAccountabilityForm( $currentURL, $this->Goals );
-
-        $AccountabilityForm->populate( $goalSubs );
-
-        return $AccountabilityForm->getOutput();
     }
 
     private function isRequested() {
