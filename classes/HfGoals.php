@@ -108,7 +108,7 @@ class HfGoals implements Hf_iGoals {
 
         $currentStreak = $this->currentStreak($goalId, $userId);
         $longestStreak = $this->longestStreak($goalId, $userId);
-        $health = $this->health->getHealth($goalId, $userId);
+        $health = $this->health->getHealth($goalId, $userId) * 100;
 
         return [
             $goalId,

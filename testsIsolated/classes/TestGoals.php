@@ -241,4 +241,12 @@ class TestGoals extends HfTestCase2 {
 
         $this->assertTrue( array_key_exists( "id", $result[0] ) );
     }
+
+    public function testReturnsHealthInPercentageForm() {
+        $this->setReturnValsForGoalCardCreation();
+
+        $result = $this->mockedGoals->getGoalCardsData( 0 );
+
+        $this->assertEquals( 50, $result[0]["health"] );
+    }
 }
