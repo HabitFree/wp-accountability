@@ -1,8 +1,8 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
-require_once(dirname(dirname(__FILE__)) . '/HfTestCase.php');
+require_once(dirname(dirname(__FILE__)) . '/HfTestCase2.php');
 
-class TestHealth extends HfTestCase {
+class TestHealth extends HfTestCase2 {
     private function getHealth($days) {
         $exponent = 2 / 97; // was 2 / (365 + 1)
         $health = 0;
@@ -31,7 +31,7 @@ class TestHealth extends HfTestCase {
     }
 
     public function testReturnsZeroWhenNoReports() {
-        $this->setReturnValue($this->mockDatabase,'getAllReportsForGoal',array());
+        $this->mockMysqlDatabase->setReturnValue( 'getAllReportsForGoal', [] );
         $result = $this->mockedHealth->getHealth(1, 1);
         $this->assertEquals($result, 0);
     }
@@ -43,7 +43,7 @@ class TestHealth extends HfTestCase {
 
         $health = $this->getHealth($days);
         $reports = $this->makeReports($days);
-        $this->setReturnValue($this->mockDatabase,'getAllReportsForGoal',$reports);
+        $this->mockMysqlDatabase->setReturnValue( 'getAllReportsForGoal',$reports);
 
         $result = $this->mockedHealth->getHealth(1,1);
 
@@ -72,10 +72,21 @@ class TestHealth extends HfTestCase {
 
         $health = $this->getHealth($days);
         $reports = $this->makeReports($days);
-        $this->setReturnValue($this->mockDatabase,'getAllReportsForGoal',$reports);
+		$this->mockMysqlDatabase->setReturnValue( 'getAllReportsForGoal',$reports);
 
         $result = $this->mockedHealth->getHealth(1,1);
 
         $this->assertEquals($health, $result);
     }
+
+    public function testGetHealthsWithNoReports() {
+    	$time = 1496254842; // May 31, 2017
+
+		$this->mockPhpLibrary->setReturnValue( "getCurrentTime", $time );
+		$this->mockMysqlDatabase->setReturnValue( 'getAllReportsForGoal', [] );
+
+		$healths = $this->mockedHealth->getHealths(1,1);
+
+		$this->assertEquals( [ "5/2017", 0 ], $healths );
+	}
 }

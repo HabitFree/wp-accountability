@@ -52,6 +52,9 @@ abstract class HfTestCase2 extends TestCase {
     /** @var  HfGoals $mockedGoals */
     protected $mockedGoals;
 
+	/** @var  HfHealth $mockedHealth */
+	protected $mockedHealth;
+
     /* helper fields */
     /** @var  Factory $factory */
     protected $factory;

@@ -147,8 +147,9 @@ class HfFactory {
 
     public function makeHealth() {
         $database = $this->makeDatabase();
+        $codeLibrary = $this->makeCodeLibrary();
 
-        return new HfHealth($database);
+        return new HfHealth($database, $codeLibrary);
     }
 
     public function makeStreaks() {

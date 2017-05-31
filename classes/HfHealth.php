@@ -4,11 +4,14 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class HfHealth implements Hf_iHealth
 {
     private $db;
+    private $php;
 
     public function __construct(
-        Hf_iDatabase $database
+        HfMysqlDatabase $database,
+		HfPhpLibrary $php
     ) {
         $this->db = $database;
+        $this->php = $php;
     }
 
     public function getHealth($goalId, $userId)
@@ -71,14 +74,26 @@ class HfHealth implements Hf_iHealth
         return ($results) ? $results : null;
     }
 
-    private function calculateHealth($days) {
-        $exponent = 2 / 97;
+    private function calculateHealth( $dayStatuses) {
         $health = 0;
 
-        foreach ($days as $day) {
-            $health = (intval($day) * $exponent) + ($health * (1-$exponent));
+        foreach ( $dayStatuses as $status ) {
+            $health = $this->adjustedHealth( $health, $status );
         }
 
-        return round($health,3);
+        return round( $health, 3 );
     }
+
+    private function adjustedHealth( $previousHealth, $nextStatus ) {
+		$exponent = 2 / 97;
+
+		return (intval($nextStatus) * $exponent) + ($previousHealth * (1-$exponent));
+	}
+
+	public function getHealths() {
+    	$time = $this->php->getCurrentTime();
+    	$monthString = date( "n/Y", $time );
+
+    	return [ $monthString, 0 ];
+	}
 }

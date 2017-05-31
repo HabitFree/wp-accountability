@@ -98,7 +98,7 @@ abstract class HfTestCase extends TestCase {
         $this->mockedInviteResponseForm = new HfInviteResponseForm('url', $this->mockMarkupGenerator);
         $this->mockedStreaks = new HfStreaks($this->mockDatabase, $this->mockCodeLibrary);
         $this->resetMockedAdminPanel();
-        $this->mockedHealth = new HfHealth($this->mockDatabase);
+        $this->mockedHealth = new HfHealth($this->mockDatabase,$this->mockCodeLibrary);
         $this->mockedDependencyChecker = new HfDependencyChecker( $this->mockCms );
     }
 
