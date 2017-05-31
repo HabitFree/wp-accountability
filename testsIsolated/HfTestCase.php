@@ -4,9 +4,11 @@ if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 
+use PHPUnit\Framework\TestCase;
+
 //require_once( dirname( dirname( __FILE__ ) ) . '/wp-hf-accountability.php' );
 
-abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
+abstract class HfTestCase extends TestCase {
     protected $backupGlobals = false;
     protected $factory;
 
@@ -47,13 +49,11 @@ abstract class HfTestCase extends \PHPUnit_Framework_TestCase {
     protected $mockedHealth;
     protected $mockedDependencyChecker;
 
-    function __construct() {
-        $this->factory = new HfFactory();
-    }
-
     protected function setUp() {
         $_POST = array();
         $_GET  = array();
+
+		$this->factory = new HfFactory();
 
         $this->resetMocks();
         $this->resetMockedObjects();

@@ -3,7 +3,9 @@
 if ( !defined( 'ABSPATH' ) ) exit;
 require_once(dirname(__FILE__) . '/MockFactory.php');
 
-abstract class HfTestCase2 extends \PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+abstract class HfTestCase2 extends TestCase {
     /* mock objects */
 
     /** @var  HfTimber $mockTimber */
