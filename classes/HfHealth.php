@@ -16,22 +16,22 @@ class HfHealth implements Hf_iHealth
 
     public function getHealth($goalId, $userId)
     {
-        $reports = $this->db->getAllReportsForGoal($goalId, $userId);
-        if (!$reports) {
-            return 0;
-        }
+		$reports = $this->db->getAllReportsForGoal($goalId, $userId);
+		if (!$reports) {
+			return 0;
+		}
 
-        $firstDate = reset($reports)->date;
-        $lastDate = end($reports)->date;
-        $firstDateClean = explode(' ', $firstDate)[0];
-        $lastDateClean = explode(' ', $lastDate)[0];
-
-        $dayStats = $this->getDayStats($firstDateClean, $lastDateClean, $reports);
+		$dayStats = $this->getDayStats($reports);
 
         return $this->calculateHealth($dayStats);
     }
 
-    private function getDayStats($firstDateClean, $lastDateClean, $reports) {
+    private function getDayStats($reports) {
+		$firstDate = reset($reports)->date;
+		$lastDate = end($reports)->date;
+		$firstDateClean = explode(' ', $firstDate)[0];
+		$lastDateClean = explode(' ', $lastDate)[0];
+
         $status = 0;
         $dayStats = [];
         $timeLimit = strtotime($firstDateClean);
@@ -74,26 +74,70 @@ class HfHealth implements Hf_iHealth
         return ($results) ? $results : null;
     }
 
-    private function calculateHealth( $dayStatuses) {
-        $health = 0;
+	public function getHealths( $goalId, $userId ) {
+		$reports = $this->db->getAllReportsForGoal($goalId, $userId);
 
-        foreach ( $dayStatuses as $status ) {
-            $health = $this->adjustedHealth( $health, $status );
-        }
+		if (!$reports) {
+			$now = $this->php->getCurrentTime();
+			$monthString = $this->makeMonthString( $now );
+			return [[$monthString, 0]];
+		}
 
-        return round( $health, 3 );
-    }
+		$lastDate = end($reports)->date;
+		$lastDateClean = explode(' ', $lastDate)[0];
 
-    private function adjustedHealth( $previousHealth, $nextStatus ) {
+		$healths = [];
+
+		for ($i = 365; $i > 0; $i--) {
+			$time = strtotime("-$i days", strtotime($lastDateClean));
+
+			$dayOfMonth = date( "d", $time );
+
+			if ($dayOfMonth === '01') {
+				$healths[] = [
+					$this->makeMonthString( $time ),
+					$this->calculateHealthAtTime( $time, $reports )
+				];
+			}
+		}
+
+    	return $healths;
+	}
+
+	private function makeMonthString( $time )
+	{
+		return date( "n/Y", $time );
+	}
+
+	private function calculateHealthAtTime( $time, $reports ) {
+
+
+    	$relevantReports = array_filter( $reports, function($report) use($time) {
+    		$statTime = strtotime( $report->date );
+    		return $statTime <= $time;
+		} );
+
+    	if ($relevantReports) {
+			$dayStats = $this->getDayStats($relevantReports);
+			return $this->calculateHealth( $dayStats );
+		}
+
+		return 0;
+	}
+
+	private function calculateHealth( $dayStatuses) {
+		$health = 0;
+
+		foreach ( $dayStatuses as $status ) {
+			$health = $this->adjustedHealth( $health, $status );
+		}
+
+		return round( $health, 3 );
+	}
+
+	private function adjustedHealth( $previousHealth, $nextStatus ) {
 		$exponent = 2 / 97;
 
 		return (intval($nextStatus) * $exponent) + ($previousHealth * (1-$exponent));
-	}
-
-	public function getHealths() {
-    	$time = $this->php->getCurrentTime();
-    	$monthString = date( "n/Y", $time );
-
-    	return [ $monthString, 0 ];
 	}
 }
